@@ -1,0 +1,109 @@
+package kmap;
+
+import com.google.gson.JsonArray;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Created by holger on 30.03.17.
+ */
+public class Node {
+    String name;
+    Integer row;
+    Integer column;
+    private List<String> depends = new ArrayList<>();
+    Integer priority;
+    private String links;
+    private String description;
+    private String summary;
+    private JsonArray attachments;
+
+    public Node(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Integer getRow() {
+        return row;
+    }
+
+    public void setRow(Integer row) {
+        this.row = row;
+    }
+
+    public Integer getColumn() {
+        return column;
+    }
+
+    public void setColumn(Integer column) {
+        this.column = column;
+    }
+
+    @Override
+    public String toString() {
+        return name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Node)) return false;
+
+        Node node = (Node)o;
+
+        return name.equals(node.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
+
+    public List<String> getDepends() {
+        return depends;
+    }
+
+    public Integer getPriority() {
+        return priority;
+    }
+
+    public void setPriority(Integer priority) {
+        this.priority = priority;
+    }
+
+    public String getLinks() {
+        return links;
+    }
+
+    public void setLinks(String links) {
+        this.links = links;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getSummary() {
+        return summary;
+    }
+
+    public void setSummary(String summary) {
+        this.summary = summary;
+    }
+
+    public JsonArray getAttachments() {
+        return attachments;
+    }
+
+    public void setAttachments(JsonArray attachments) {
+        this.attachments = attachments;
+    }
+}

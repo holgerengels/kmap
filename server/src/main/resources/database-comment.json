@@ -1,0 +1,15 @@
+/*
+function(doc) {
+var res = new Document();
+if ('_' === doc.topic)
+  return null;
+
+res.add(doc.chapter, {'field':'chapter', 'store':'yes'});
+res.add(doc.topic, {'field':'topic', 'store':'yes'});
+res.add(doc.topic, {'field':'content'});
+res.add(doc.summary, {'field':'summary', 'store':'yes'});
+res.add(doc.summary, {'field':'content'});
+res.add(doc.description, {'field':'content'});
+return res;
+}
+*/

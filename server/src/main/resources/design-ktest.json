@@ -1,0 +1,24 @@
+{
+  "_id": "_design/test",
+  "views": {
+    "byChapterTopic": {
+      "map": "function(doc) {\n    if (doc.subject && doc.chapter && doc.topic)\n      emit([doc.subject, doc.chapter, doc.topic]);\n}"
+    },
+    "byChapter": {
+      "map": "function(doc) {\n    if (doc.subject && doc.chapter)\n      emit([doc.subject, doc.chapter]);\n}"
+    },
+    "bySet": {
+      "map": "function(doc) {\n    if (doc.subject && doc.set)\n      emit([doc.subject, doc.set]);\n}"
+    },
+    "availableSets": {
+      "map": "function(doc) {\n    if (doc.subject && doc.set)\n      emit([doc.subject, doc.set], 1);\n}",
+      "reduce": "_sum"
+    },
+    "chapters": {
+      "map": "function(doc) {\n    if (!doc.links)\n        emit(doc.subject, doc.chapter);\n}"
+    },
+    "topics": {
+      "map": "function(doc) {\n    if (!doc.links)\n        emit(doc.subject, doc.subject + \".\" + doc.chapter + \".\" + doc.topic);\n}"
+    }
+  }
+}

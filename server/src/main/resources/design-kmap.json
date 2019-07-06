@@ -1,0 +1,38 @@
+{
+  "_id": "_design/net",
+  "views": {
+    "byChapter": {
+      "map": "function(doc) {\n    if (doc.subject && doc.chapter)\n      emit([doc.subject, doc.chapter]);\n    else if (doc.chapter)\n      emit([\"Mathematik\", doc.chapter]);\n}"
+    },
+    "links": {
+      "map": "function(doc) {\n    if (doc.links)\n        emit(doc.subject + \".\" + doc.chapter + \".\" + doc.topic, doc.subject + \".\" + doc.links);\n}"
+    },
+    "count": {
+      "map": "function(doc) {\n  if (!doc.links && doc.topic != \"_\")\n    emit(doc.subject + \".\" + doc.chapter, doc.subject + \".\" + doc.chapter);\n}",
+      "reduce": "_count"
+    },
+    "byModule": {
+      "map": "function(doc) {\n    if (doc.subject && doc.module)\n      emit([doc.subject, doc.module]);\n    else if (doc.module)\n      emit([\"Mathematik\", doc.module]);\n}"
+    },
+    "availableModules": {
+      "map": "function(doc) {\n    if (doc.subject && doc.module)\n      emit([doc.subject, doc.module], 1);\n    else if (doc.module)\n      emit([\"Mathematik\", doc.module], 1);\n}",
+      "reduce": "_sum"
+    },
+    "deps": {
+      "map": "function(doc) {\n    if (doc.links && doc.depends) {\n        for (var i = 0; i < doc.depends.length; i++)\n            emit(doc.subject + \".\" + doc.links, doc.subject + \".\" + doc.chapter + \".\" + doc.depends[i]);\n    }\n}"
+    },
+    "chapters": {
+      "map": "function(doc) {\n    emit(doc.subject, doc.chapter);\n}"
+    },
+    "topics": {
+      "map": "function(doc) {\n    if (!doc.links)\n        emit([doc.subject, doc.chapter], doc.chapter + \".\" + doc.topic);\n}"
+    }
+  },
+  "fulltext": {
+    "search": {
+      "index": "function(doc) { var res = new Document(); if ('_' === doc.topic) return null; res.add(doc.chapter, {'field':'chapter', 'store':'yes'}); res.add(doc.topic, {'field':'topic', 'store':'yes'}); res.add(doc.topic, {'field':'content'}); res.add(doc.summary, {'field':'summary', 'store':'yes'}); res.add(doc.summary, {'field':'content'}); res.add(doc.description, {'field':'content'}); return res; }",
+      "analyzer": "german"
+    }
+  },
+  "language": "javascript"
+}

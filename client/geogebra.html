@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name=viewport content="width=device-width,initial-scale=1">
+    <style>
+        body { margin: 0px; }
+        #applet_container {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            right: 0px;
+            bottom: 0px;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <div id="applet_container" class="applet_container"></div>
+
+    <script type="text/javascript" src="https://cdn.geogebra.org/apps/deployggb.js"></script>
+    <script type="text/javascript">
+        var parameters = {
+            "showToolBar":false,
+            "borderColor":null,
+            "showMenuBar":false,
+            "showAlgebraInput":true,
+            "showResetIcon":true,
+            "enableLabelDrags":false,
+            "enableShiftDragZoom":true,
+            "enableRightClick":false,
+            "capturingThreshold":null,
+            "showToolBarHelp":true,
+            "errorDialogsActive":true,
+            "useBrowserForJS":false,
+            "scaleContainerClass": "applet_container",
+        };
+
+        var urlParams = new URLSearchParams(window.location.search);
+        parameters.appName = urlParams.get("app");
+        if (parameters.appName == null)
+            parameters.appName = "graphing";
+        var path = urlParams.get("path");
+        var request = new XMLHttpRequest();
+        request.open("GET", path, true);
+        request.responseType = "blob";
+        request.onload = function(oEvent) {
+            var reader = new FileReader();
+            reader.readAsDataURL(request.response);
+            reader.onloadend = function() {
+                parameters.ggbBase64 = reader.result.substring("data:application/vnd.geogebra.file;base64,".length);
+                var applet = new GGBApplet(parameters, 5.0);
+                applet.inject('applet_container');
+            };
+        };
+        request.send();
+    </script>
+</body>
+</html>
