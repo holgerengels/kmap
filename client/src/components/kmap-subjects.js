@@ -1,6 +1,7 @@
 import {LitElement, html, css} from 'lit-element';
 import {connect} from 'pwa-helpers/connect-mixin.js';
-import {store} from "../store.js";
+import {config} from "../config";
+import {store} from "../store";
 import './kmap-subject-card';
 
 import 'mega-material/icon-button';
@@ -46,7 +47,7 @@ class KMapSubjects extends connect(store)(LitElement) {
   }
 
   firstUpdated(changedProperties) {
-      return fetch(`http://127.0.0.1:8081/kmap/kmap/data?subjects=all`, {
+      return fetch(`${config.server}data?subjects=all`, {
           method: "GET",
           mode: "cors",
           cache: "no-cache",

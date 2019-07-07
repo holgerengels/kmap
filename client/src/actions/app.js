@@ -8,6 +8,7 @@
  subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
  */
 import {handleErrors} from "./fetchy";
+import {config} from "../config";
 
 export const UPDATE_PAGE = 'UPDATE_PAGE';
 export const UPDATE_OFFLINE = 'UPDATE_OFFLINE';
@@ -163,7 +164,7 @@ export const updateOffline = (offline) => (dispatch, getState) => {
 export const login = (credentials) => (dispatch, getState) => {
   if (credentials && credentials.userid && !credentials.roles && !getState.loginFetching) {
     dispatch(requestLogin(credentials.userid));
-    return fetch(`http://127.0.0.1:8081/kmap/kmap/state?login=${credentials.userid}`, {
+    return fetch(`${config.server}state?login=${credentials.userid}`, {
       method: "POST",
       mode: "cors",
       cache: "no-cache",
@@ -211,7 +212,7 @@ const failLogin = (userid, response) => {
 export const logout = (credentials) => (dispatch, getState) => {
   if (credentials && credentials.userid && !getState.logoutFetching) {
     dispatch(requestLogout(credentials.userid));
-    return fetch(`http://127.0.0.1:8081/kmap/kmap/state?logout=${credentials.userid}`, {
+    return fetch(`${config.server}state?logout=${credentials.userid}`, {
       method: "POST",
       mode: "cors",
       cache: "no-cache",

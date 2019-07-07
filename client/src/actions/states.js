@@ -1,4 +1,5 @@
 import {handleErrors} from "./fetchy";
+import {config} from "../config";
 import {logout, showMessage} from "./app";
 
 export const LOAD = 'LOAD';
@@ -6,7 +7,7 @@ export const LOAD = 'LOAD';
 export const fetchStateIfNeeded = (state) => (dispatch, getState) => {
   if (state && state.userid && state.subject && !state.states && !state.loadFetching) {
     dispatch(requestState(state.userid, state.subject));
-    return fetch(`http://127.0.0.1:8081/kmap/kmap/state?load=${state.userid}&subject=${state.subject}`, {
+    return fetch(`${config.server}state?load=${state.userid}&subject=${state.subject}`, {
       method: "GET",
       mode: "cors",
       cache: "no-cache",
@@ -72,7 +73,7 @@ function handleSessionTimeout(response) {
 export const storeState = (state, id, rate) => (dispatch, getState) => {
   if (state && state.userid && state.subject && id && rate) {
     dispatch(requestStore(state.userid, state.subject, id, rate));
-    return fetch(`http://127.0.0.1:8081/kmap/kmap/state?save=${state.userid}&subject=${state.subject}`, {
+    return fetch(`${config.server}state?save=${state.userid}&subject=${state.subject}`, {
       method: "POST",
       mode: "cors",
       cache: "no-cache",

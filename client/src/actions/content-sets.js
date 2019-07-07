@@ -1,4 +1,5 @@
 import {handleErrors} from "./fetchy";
+import {config} from "../config";
 import {logout, showMessage} from "./app";
 
 export const SETS = 'SETS';
@@ -8,7 +9,7 @@ export const DELETE_SET = 'DELETE_SET';
 
 export const sets = () => (dispatch, getState) => {
   dispatch(requestSets());
-  return fetch(`http://127.0.0.1:8081/kmap/kmap/tests?sets=all`, {
+  return fetch(`${config.server}tests?sets=all`, {
     method: "GET",
     mode: "cors",
     cache: "no-cache",
@@ -53,7 +54,7 @@ const failSets = (response) => {
 export const importSet = (subject, module, data) => (dispatch, getState) => {
   if (subject && module && data) {
     dispatch(requestImportSet(subject, module, data));
-    return fetch(`http://127.0.0.1:8081/kmap/kmap/tests?subject=${subject}&import=${module}`, {
+    return fetch(`${config.server}tests?subject=${subject}&import=${module}`, {
       method: "POST",
       mode: "cors",
       cache: "no-cache",
@@ -108,7 +109,7 @@ const failImportSet = (subject, module, response) => {
 
 export const exportSet = (subject, module) => (dispatch, getState) => {
   dispatch(requestExportSet());
-  return fetch(`http://127.0.0.1:8081/kmap/kmap/tests?subject=${subject}&load=${module}`, {
+  return fetch(`${config.server}tests?subject=${subject}&load=${module}`, {
     method: "GET",
     mode: "cors",
     cache: "no-cache",
@@ -153,7 +154,7 @@ const failExportSet = (response) => {
 export const deleteSet = (subject, module) => (dispatch, getState) => {
   if (subject && module) {
     dispatch(requestDeleteSet(subject, module));
-    return fetch(`http://127.0.0.1:8081/kmap/kmap/tests?subject=${subject}&delete=${module}`, {
+    return fetch(`${config.server}tests?subject=${subject}&delete=${module}`, {
       method: "POST",
       mode: "cors",
       cache: "no-cache",

@@ -1,4 +1,5 @@
 import {handleErrors} from "./fetchy";
+import {config} from "../config";
 import {logout, showMessage} from "./app";
 
 export const MODULES = 'MODULES';
@@ -8,7 +9,7 @@ export const DELETE_MAP = 'DELETE_MAP';
 
 export const modules = () => (dispatch, getState) => {
   dispatch(requestModules());
-  return fetch(`http://127.0.0.1:8081/kmap/kmap/edit?modules=all`, {
+  return fetch(`${config.server}edit?modules=all`, {
     method: "GET",
     mode: "cors",
     cache: "no-cache",
@@ -53,7 +54,7 @@ const failModules = (response) => {
 export const importMap = (subject, module, data) => (dispatch, getState) => {
   if (subject && module && data) {
     dispatch(requestImportMap(subject, module, data));
-    return fetch(`http://127.0.0.1:8081/kmap/kmap/edit?subject=${subject}&import=${module}`, {
+    return fetch(`${config.server}edit?subject=${subject}&import=${module}`, {
       method: "POST",
       mode: "cors",
       cache: "no-cache",
@@ -108,7 +109,7 @@ const failImportMap = (subject, module, response) => {
 
 export const exportMap = (subject, module) => (dispatch, getState) => {
   dispatch(requestExportMap());
-  return fetch(`http://127.0.0.1:8081/kmap/kmap/edit?subject=${subject}&load=${module}`, {
+  return fetch(`${config.server}edit?subject=${subject}&load=${module}`, {
     method: "GET",
     mode: "cors",
     cache: "no-cache",
@@ -153,7 +154,7 @@ const failExportMap = (response) => {
 export const deleteMap = (subject, module) => (dispatch, getState) => {
   if (subject && module) {
     dispatch(requestDeleteMap(subject, module));
-    return fetch(`http://127.0.0.1:8081/kmap/kmap/edit?subject=${subject}&delete=${module}`, {
+    return fetch(`${config.server}edit?subject=${subject}&delete=${module}`, {
       method: "POST",
       mode: "cors",
       cache: "no-cache",

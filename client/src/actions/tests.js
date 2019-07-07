@@ -1,3 +1,6 @@
+import {handleErrors} from "./fetchy";
+import {config} from "../config";
+
 export const REQUEST_SUBJECTS = 'REQUEST_SUBJECTS';
 export const RECEIVE_SUBJECTS = 'RECEIVE_SUBJECTS';
 export const FAIL_SUBJECTS = 'FAIL_SUBJECTS';
@@ -15,7 +18,7 @@ export const fetchSubjectsIfNeeded = () => (dispatch, getState) => {
     let state = getState();
     if (!state.tests.subjects && !state.tests.fetchingSubjects) {
         dispatch(requestSubjects());
-        return fetch(`http://127.0.0.1:8081/kmap/kmap/data?subjects=all`, {
+        return fetch(`${config.server}data?subjects=all`, {
             method: "GET",
             mode: "cors",
             cache: "no-cache",
@@ -24,9 +27,10 @@ export const fetchSubjectsIfNeeded = () => (dispatch, getState) => {
                 "Content-Type": "application/json; charset=utf-8",
             }
         })
-            .then(res => res.json())
-            .then(subjects => dispatch(receiveSubjects(subjects)))
-            .catch(() => dispatch(failSubjects()));
+          .then(handleErrors)
+          .then(res => res.json())
+          .then(subjects => dispatch(receiveSubjects(subjects)))
+          .catch(() => dispatch(failSubjects()));
     } else {
         return Promise.resolve();
     }
@@ -57,7 +61,7 @@ export const fetchChaptersIfNeeded = (subject) => (dispatch, getState) => {
     let state = getState();
     if (subject && !state.tests.subject !== subject && !state.tests.fetchingChapters) {
         dispatch(requestChapters(subject));
-        return fetch(`http://127.0.0.1:8081/kmap/kmap/tests?chapters=all&subject=${subject}`, {
+        return fetch(`${config.server}tests?chapters=all&subject=${subject}`, {
             method: "GET",
             mode: "cors",
             cache: "no-cache",
@@ -66,9 +70,10 @@ export const fetchChaptersIfNeeded = (subject) => (dispatch, getState) => {
                 "Content-Type": "application/json; charset=utf-8",
             }
         })
-            .then(res => res.json())
-            .then(chapters => dispatch(receiveChapters(subject, chapters)))
-            .catch(() => dispatch(failChapters(subject)));
+          .then(handleErrors)
+          .then(res => res.json())
+          .then(chapters => dispatch(receiveChapters(subject, chapters)))
+          .catch(() => dispatch(failChapters(subject)));
     } else {
         return Promise.resolve();
     }
@@ -102,7 +107,7 @@ export const fetchTreeIfNeeded = (subject) => (dispatch, getState) => {
     let state = getState();
     if (subject && !state.tests.subject !== subject && !state.tests.fetchingTree) {
         dispatch(requestTree(subject));
-        return fetch(`http://127.0.0.1:8081/kmap/kmap/data?tree=all&subject=${subject}`, {
+        return fetch(`${config.server}data?tree=all&subject=${subject}`, {
             method: "GET",
             mode: "cors",
             cache: "no-cache",
@@ -111,9 +116,10 @@ export const fetchTreeIfNeeded = (subject) => (dispatch, getState) => {
                 "Content-Type": "application/json; charset=utf-8",
             }
         })
-            .then(res => res.json())
-            .then(tree => dispatch(receiveTree(subject, tree)))
-            .catch(() => dispatch(failTree(subject)));
+          .then(handleErrors)
+          .then(res => res.json())
+          .then(tree => dispatch(receiveTree(subject, tree)))
+          .catch(() => dispatch(failTree(subject)));
     } else {
         return Promise.resolve();
     }
@@ -147,7 +153,7 @@ export const fetchTestsIfNeeded = (subject, chapter) => (dispatch, getState) => 
     let state = getState();
     if (subject && chapter && !state.tests.chapter !== chapter && !state.tests.fetchingTests) {
         dispatch(requestTests(subject, chapter));
-        return fetch(`http://127.0.0.1:8081/kmap/kmap/tests?load=${chapter}&subject=${subject}`, {
+        return fetch(`${config.server}tests?load=${chapter}&subject=${subject}`, {
             method: "GET",
             mode: "cors",
             cache: "no-cache",
@@ -156,9 +162,10 @@ export const fetchTestsIfNeeded = (subject, chapter) => (dispatch, getState) => 
                 "Content-Type": "application/json; charset=utf-8",
             }
         })
-            .then(res => res.json())
-            .then(data => dispatch(receiveTests(subject, chapter, data.data)))
-            .catch(() => dispatch(failTests(subject, chapter)));
+          .then(handleErrors)
+          .then(res => res.json())
+          .then(data => dispatch(receiveTests(subject, chapter, data.data)))
+          .catch(() => dispatch(failTests(subject, chapter)));
     } else {
         return Promise.resolve();
     }
