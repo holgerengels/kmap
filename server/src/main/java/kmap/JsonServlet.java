@@ -74,7 +74,7 @@ public class JsonServlet extends HttpServlet {
         if (referer == null || referer.length() == 0)
             throw new RuntimeException("referer header missing");
 
-        int i = referer.indexOf("/", 8);
+        int i = referer.indexOf("/", 9);
         if (i != -1)
             referer = referer.substring(0, i);
 
@@ -87,6 +87,14 @@ public class JsonServlet extends HttpServlet {
     }
 
     String extractClient(HttpServletRequest request) {
-        return "vu";
+        String referer = request.getHeader("referer");
+        if (referer == null || referer.length() == 0)
+            throw new RuntimeException("referer header missing");
+
+        int start = referer.indexOf("/", 9);
+        int end = referer.indexOf("/", start + 1);
+        referer = referer.substring(start + 1, end);
+        System.out.println("client " + referer);
+        return referer;
     }
 }
