@@ -9,6 +9,7 @@
  */
 
 import {LitElement, html, css} from 'lit-element';
+import {config} from '../config';
 import 'mega-material/icon';
 
 class KMapCardAttachment extends LitElement {
@@ -53,11 +54,11 @@ class KMapCardAttachment extends LitElement {
       else if (this._handler)
         return html `
             <a href="${this._handler}${this.attachment.href}" target="_blank">${this.attachment.name} <mwc-icon>open_in_new</mwc-icon></a>
-            <a href="${this._fileServer}${this.attachment.href}" download="${this._isDownload}" target="${this._isTarget}"><mwc-icon>cloud_download</mwc-icon></a>
+            <a href="${config.server}${this.attachment.href}" download="${this._isDownload}" target="${this._isTarget}"><mwc-icon>cloud_download</mwc-icon></a>
         `;
       else
         return html `
-            <a href="${this._fileServer}${this.attachment.href}" ?download="${this._isDownload}" ?target="${this._isTarget}">${this.attachment.name}</a>
+            <a href="${config.server}${this.attachment.href}" ?download="${this._isDownload}" ?target="${this._isTarget}">${this.attachment.name}</a>
         `;
 
     }
@@ -75,14 +76,13 @@ class KMapCardAttachment extends LitElement {
     }
 
     firstUpdated() {
-        this._fileServer = "http://localhost:8081/kmap"
         this._supportsDownload = !(/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream);
     }
 
     updated(changedProperties) {
         if (changedProperties.has("attachment")) {
             let attachment = this.attachment;
-            this._handler = attachment.type === "application/vnd.geogebra.file" ? "geogebra.html?path=" + this._fileServer + "/" : "";
+            this._handler = attachment.type === "application/vnd.geogebra.file" ? "geogebra.html?path=" + config.server : "";
             this._mimeIcon = this.mimeIcon(attachment.type);
             this._isDownload = attachment.type !== "link" && attachment.type !== "text/html" && this._supportsDownload ? attachment.name : null;
             this._isTarget = attachment.type === "link" || attachment.type === "text/html" || !this._supportsDownload ? "_blank" : null;

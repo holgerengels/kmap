@@ -93,7 +93,7 @@ public class JsonServlet extends HttpServlet {
 
         int start = referer.indexOf("/", 9);
         int end = referer.indexOf("/", start + 1);
-        referer = referer.substring(start + 1, end);
+        referer = end != -1 ? referer.substring(start + 1, end) : "vu";
         System.out.println("client " + referer);
         return referer;
     }

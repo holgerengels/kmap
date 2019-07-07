@@ -12,7 +12,7 @@ import {LitElement, html, css} from 'lit-element';
 import {unsafeHTML} from 'lit-html/directives/unsafe-html';
 import {connect} from "pwa-helpers/connect-mixin";
 import {store} from "../store";
-import {selectSummaryCard} from '../actions/maps.js';
+import {config} from '../config';
 import { STATE_COLORS } from './state-colors';
 import './star-rating';
 import './kmap-card-attachment';
@@ -227,7 +227,6 @@ render() {
 
     static get properties() {
         return {
-          _fileServer: {type: String},
             subject: {type: String},
             chapter: {type: String},
             card: {type: Object},
@@ -252,10 +251,6 @@ render() {
         super();
         this._colorize("0");
     }
-
-  firstUpdated() {
-    this._fileServer = "http://localhost:8081/kmap"
-  }
 
     _colorize(rate) {
         this._opaque = STATE_COLORS[rate][0];
@@ -301,7 +296,7 @@ render() {
 
       if (changedProperties.has("card") && this.card) {
         if (this.card.description) {
-          let description = this.card.description.replace(/inline:/g, this._fileServer + "/kmap/data/" + this.subject + "/" + this.chapter + "/" + this.card.name + "/");
+          let description = this.card.description.replace(/inline:/g, config.server + "data/" + this.subject + "/" + this.chapter + "/" + this.card.name + "/");
           var buffer = "";
           var t = false;
           description.split("`").reverse().forEach(function (element) {

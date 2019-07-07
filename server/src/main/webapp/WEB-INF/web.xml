@@ -31,32 +31,32 @@
 
     <servlet-mapping>
         <servlet-name>data</servlet-name>
-        <url-pattern>/kmap/data</url-pattern>
+        <url-pattern>/data</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
         <servlet-name>data</servlet-name>
-        <url-pattern>/kmap/data/*</url-pattern>
+        <url-pattern>/data/*</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
         <servlet-name>edit</servlet-name>
-        <url-pattern>/kmap/edit</url-pattern>
+        <url-pattern>/edit</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
         <servlet-name>state</servlet-name>
-        <url-pattern>/kmap/state</url-pattern>
+        <url-pattern>/state</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
         <servlet-name>tests</servlet-name>
-        <url-pattern>/kmap/tests</url-pattern>
+        <url-pattern>/tests</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
         <servlet-name>identities</servlet-name>
-        <url-pattern>/kmap/identities</url-pattern>
+        <url-pattern>/identities</url-pattern>
     </servlet-mapping>
 
     <welcome-file-list>

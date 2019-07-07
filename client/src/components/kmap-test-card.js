@@ -2,6 +2,7 @@ import {LitElement, html, css} from 'lit-element';
 import {unsafeHTML} from 'lit-html/directives/unsafe-html';
 import {connect} from "pwa-helpers/connect-mixin";
 import {store} from "../store";
+import {config} from '../config';
 import {STATE_COLORS} from './state-colors';
 import './star-rating';
 import 'mega-material/icon';
@@ -163,7 +164,6 @@ input[correction=incorrect] {
   firstUpdated() {
     this._question = this.shadowRoot.getElementById('question');
     this._answer = this.shadowRoot.getElementById('answer');
-    this._fileServer = "http://localhost:8081/kmap"
   }
 
     updated(changedProperties) {
@@ -195,7 +195,7 @@ input[correction=incorrect] {
 
     math(text, element) {
         if (text) {
-            let replace = text.replace(/inline:/g, this._fileServer + "/kmap/data/" + this.subject + "/" + this.chapter + "/" + this.topic + "/tests/");
+            let replace = text.replace(/inline:/g, config.server + "data/" + this.subject + "/" + this.chapter + "/" + this.topic + "/tests/");
             replace = replace.replace(/<check\/>/g, "<input type='checkbox'/>");
             replace = replace.replace(/<text\/>/g, "<input type='text' inputmode='text'/>");
             replace = replace.replace(/<text ([0-9])\/>/g, "<input type='text' inputmode='text' maxsize='$1' style='width: $1em'/>");

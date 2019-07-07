@@ -380,7 +380,7 @@ public class Couch extends Server {
                 JsonObject attachment = (JsonObject)element;
                 if (!attachment.has("href")) {
                     String fileName = encode(string(attachment, "name"));
-                    String path = "kmap/data/" + encode(subject) + "/" + encode(chapter) + "/" + encode(topic) + "/" + fileName;
+                    String path = "data/" + encode(subject) + "/" + encode(chapter) + "/" + encode(topic) + "/" + fileName;
                     attachment.addProperty("href", path);
                 }
             }
