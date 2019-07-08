@@ -69,6 +69,7 @@ public class Authentication {
     }
 
     public boolean handle(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        System.out.println(request.getSession().getId());
         String login = request.getParameter("login");
         String logout = request.getParameter("logout");
         if (login != null) {
