@@ -13,7 +13,7 @@ export const fetchMapIfNeeded = (map) => (dispatch, getState) => {
             method: "GET",
             mode: "cors",
             cache: "no-cache",
-            credentials: "same-origin",
+            credentials: "include",
             headers: {
                 "Content-Type": "application/json; charset=utf-8",
             }

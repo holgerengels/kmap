@@ -51,7 +51,7 @@ class KMapSubjects extends connect(store)(LitElement) {
           method: "GET",
           mode: "cors",
           cache: "no-cache",
-          credentials: "same-origin",
+          credentials: "include",
           headers: {
               "Content-Type": "application/json; charset=utf-8",
           }

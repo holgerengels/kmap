@@ -13,7 +13,7 @@ export const modules = () => (dispatch, getState) => {
     method: "GET",
     mode: "cors",
     cache: "no-cache",
-    credentials: "same-origin",
+    credentials: "include",
     headers: {
       "Content-Type": "application/json; charset=utf-8",
     },
@@ -58,7 +58,7 @@ export const importMap = (subject, module, data) => (dispatch, getState) => {
       method: "POST",
       mode: "cors",
       cache: "no-cache",
-      credentials: "same-origin",
+      credentials: "include",
       headers: {
         "Content-Type": "application/json; charset=utf-8",
       },
@@ -113,7 +113,7 @@ export const exportMap = (subject, module) => (dispatch, getState) => {
     method: "GET",
     mode: "cors",
     cache: "no-cache",
-    credentials: "same-origin",
+    credentials: "include",
     headers: {
       "Content-Type": "application/json; charset=utf-8",
     },
@@ -158,7 +158,7 @@ export const deleteMap = (subject, module) => (dispatch, getState) => {
       method: "POST",
       mode: "cors",
       cache: "no-cache",
-      credentials: "same-origin",
+      credentials: "include",
       headers: {
         "Content-Type": "application/json; charset=utf-8",
       },
