@@ -24,7 +24,8 @@ import AsciiMathParser from "asciimath2tex";
 class KMapKnowledgeCard extends connect(store)(LitElement) {
 
     static get styles() {
-        return [fontStyles,
+        return [
+          fontStyles,
           colorStyles,
           mathjaxStyles,
             css`

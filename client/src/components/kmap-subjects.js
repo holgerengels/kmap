@@ -51,14 +51,14 @@ class KMapSubjects extends connect(store)(LitElement) {
           method: "GET",
           mode: "cors",
           cache: "no-cache",
-          //credentials: "include",
+          credentials: "include",
           headers: {
               "Content-Type": "application/json; charset=utf-8",
           }
       })
-          .then(res => res.json())
-          .then(subjects => this.subjects = subjects)
-          .catch((e) => { console.log(e);});
+        .then(res => res.json())
+        .then(subjects => this.subjects = subjects)
+        .catch((e) => { console.log(e);});
   }
 
     updated(changedProperties) {

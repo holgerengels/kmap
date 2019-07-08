@@ -52,7 +52,6 @@ class KMapTestCard extends connect(store)(LitElement) {
 }
 .card-content {
   padding: 8px;
-  color: black;
   background-color: var(--color-lightest);
   transition: background-color .5s ease-in-out;
   display: flex;
