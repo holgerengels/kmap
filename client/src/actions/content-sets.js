@@ -13,7 +13,7 @@ export const sets = () => (dispatch, getState) => {
     method: "GET",
     mode: "cors",
     cache: "no-cache",
-    credentials: "include",
+    credentials: "same-origin",
     headers: {
       "Content-Type": "application/json; charset=utf-8",
     },
@@ -58,7 +58,7 @@ export const importSet = (subject, module, data) => (dispatch, getState) => {
       method: "POST",
       mode: "cors",
       cache: "no-cache",
-      credentials: "include",
+      credentials: "same-origin",
       headers: {
         "Content-Type": "application/json; charset=utf-8",
       },
@@ -113,7 +113,7 @@ export const exportSet = (subject, module) => (dispatch, getState) => {
     method: "GET",
     mode: "cors",
     cache: "no-cache",
-    credentials: "include",
+    credentials: "same-origin",
     headers: {
       "Content-Type": "application/json; charset=utf-8",
     },
@@ -158,7 +158,7 @@ export const deleteSet = (subject, module) => (dispatch, getState) => {
       method: "POST",
       mode: "cors",
       cache: "no-cache",
-      credentials: "include",
+      credentials: "same-origin",
       headers: {
         "Content-Type": "application/json; charset=utf-8",
       },

@@ -11,7 +11,7 @@ export const fetchStateIfNeeded = (state) => (dispatch, getState) => {
       method: "GET",
       mode: "cors",
       cache: "no-cache",
-      credentials: "include",
+      credentials: "same-origin",
       headers: {
         "Content-Type": "application/json; charset=utf-8",
       }
@@ -77,7 +77,7 @@ export const storeState = (state, id, rate) => (dispatch, getState) => {
       method: "POST",
       mode: "cors",
       cache: "no-cache",
-      credentials: "include",
+      credentials: "same-origin",
       headers: {
         "Content-Type": "application/json; charset=utf-8",
       },

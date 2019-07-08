@@ -22,7 +22,7 @@ export const fetchSubjectsIfNeeded = () => (dispatch, getState) => {
             method: "GET",
             mode: "cors",
             cache: "no-cache",
-            credentials: "include",
+            credentials: "same-origin",
             headers: {
                 "Content-Type": "application/json; charset=utf-8",
             }
@@ -65,7 +65,7 @@ export const fetchChaptersIfNeeded = (subject) => (dispatch, getState) => {
             method: "GET",
             mode: "cors",
             cache: "no-cache",
-            credentials: "include",
+            credentials: "same-origin",
             headers: {
                 "Content-Type": "application/json; charset=utf-8",
             }
@@ -111,7 +111,7 @@ export const fetchTreeIfNeeded = (subject) => (dispatch, getState) => {
             method: "GET",
             mode: "cors",
             cache: "no-cache",
-            credentials: "include",
+            credentials: "same-origin",
             headers: {
                 "Content-Type": "application/json; charset=utf-8",
             }
@@ -157,7 +157,7 @@ export const fetchTestsIfNeeded = (subject, chapter) => (dispatch, getState) => 
             method: "GET",
             mode: "cors",
             cache: "no-cache",
-            credentials: "include",
+            credentials: "same-origin",
             headers: {
                 "Content-Type": "application/json; charset=utf-8",
             }
