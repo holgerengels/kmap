@@ -23,6 +23,7 @@ public class JsonServlet extends HttpServlet {
         try {
             properties = new Properties();
             properties.load(getServletContext().getResourceAsStream("/kmap.properties"));
+            getServletContext().setAttribute("properties", properties);
             authentication = new Authentication(properties);
         }
         catch (IOException e) {
@@ -70,20 +71,23 @@ public class JsonServlet extends HttpServlet {
     }
 
     static void corsHeaders(HttpServletRequest request, HttpServletResponse resp) {
-        String referer = request.getHeader("referer");
-        if (referer == null || referer.length() == 0)
-            throw new RuntimeException("referer header missing");
+        Properties properties = (Properties)request.getServletContext().getAttribute("properties");
+        if (Boolean.valueOf(properties.getProperty("kmap.cors"))) {
+            String referer = request.getHeader("referer");
+            if (referer == null || referer.length() == 0)
+                throw new RuntimeException("referer header missing");
 
-        int i = referer.indexOf("/", 9);
-        if (i != -1)
-            referer = referer.substring(0, i);
+            int i = referer.indexOf("/", 9);
+            if (i != -1)
+                referer = referer.substring(0, i);
 
-        System.out.println(referer);
+            System.out.println(referer);
 
-        resp.setHeader("Access-Control-Allow-Origin", referer);
-        resp.setHeader("Access-Control-Allow-Credentials", "true");
-        resp.setHeader("Access-Control-Allow-Methods","GET, OPTIONS, HEAD, PUT, POST");
-        resp.setHeader("Access-Control-Allow-Headers", "Origin, Accept, Content-Type, X-Requested-With, X-CSRF-Token");
+            resp.setHeader("Access-Control-Allow-Origin", referer);
+            resp.setHeader("Access-Control-Allow-Credentials", "true");
+            resp.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS, HEAD, PUT, POST");
+            resp.setHeader("Access-Control-Allow-Headers", "Origin, Accept, Content-Type, X-Requested-With, X-CSRF-Token");
+        }
     }
 
     String extractClient(HttpServletRequest request) {
