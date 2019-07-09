@@ -268,6 +268,7 @@ const failLogout = (userid, response) => {
 const translations = new Map([
   ["invalid credentials" , "Benutzername oder Passwort falsch"],
   ["Failed to fetch" , "Netzwerkfehler"],
+  ["Internal Server Error" , "Serverfehler"],
 ]);
 
 function translate(message) {

@@ -9,6 +9,7 @@ export default [
     plugins: [
       ...config.plugins,
       cpy([
+        { files: 'favicon.ico', dest: 'dist' },
         { files: '*.png', dest: 'dist' },
         { files: 'manifest.json', dest: 'dist' },
         { files: 'browserconfig.xml', dest: 'dist' },
