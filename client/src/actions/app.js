@@ -176,12 +176,20 @@ export const login = (credentials) => (dispatch, getState) => {
     })
       .then(handleErrors)
       .then(res => res.json())
-      .then(roles => dispatch(receiveLogin(credentials.userid, roles.data)))
+      .then(data => handleResponse(data))
+      .then(data => dispatch(receiveLogin(credentials.userid, data.roles)))
       .catch(error => dispatch(failLogin(credentials.userid, error)));
   } else {
     return Promise.resolve();
   }
 };
+
+function handleResponse(data) {
+  if (data.response === "error") {
+    throw Error(data.message);
+  }
+  return data;
+}
 
 const requestLogin = (userid) => {
   return {
@@ -205,7 +213,7 @@ const failLogin = (userid, response) => {
     type: LOGIN,
     userid,
     status: 'error',
-    response: response.message,
+    response: translate(response.message),
   };
 };
 
@@ -256,3 +264,12 @@ const failLogout = (userid, response) => {
     respone: response.message
   };
 };
+
+const translations = new Map([
+  ["invalid credentials" , "Benutzername oder Passwort falsch"],
+  ["Failed to fetch" , "Netzwerkfehler"],
+]);
+
+function translate(message) {
+  return translations.has(message) ? translations.get(message) : message;
+}

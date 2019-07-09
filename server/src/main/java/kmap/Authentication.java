@@ -158,7 +158,7 @@ public class Authentication {
             }
             return roles;
         }
-        Set<String> roles = null; // doauthenticate(user, password);
+        Set<String> roles = doauthenticate(user, password);
         Map<String, String> csv = getCSV();
         if (roles == null && csv != null) {
             roles = password.equals(csv.get(user)) ? Collections.singleton("student") : null;
