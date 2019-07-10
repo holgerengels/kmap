@@ -177,7 +177,7 @@ export const login = (credentials) => (dispatch, getState) => {
       .then(handleErrors)
       .then(res => res.json())
       .then(data => handleResponse(data))
-      .then(data => dispatch(receiveLogin(credentials.userid, data.roles)))
+      .then(data => dispatch(receiveLogin(credentials.userid, data.data)))
       .catch(error => dispatch(failLogin(credentials.userid, error)));
   } else {
     return Promise.resolve();

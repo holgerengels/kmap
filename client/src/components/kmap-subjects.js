@@ -8,18 +8,23 @@ import 'mega-material/icon-button';
 import 'mega-material/top-app-bar';
 
 class KMapSubjects extends connect(store)(LitElement) {
-    static get styles() {
-        return [
-            css`
-            .board {
-                height: auto;
-                outline: none;
-                padding: 8px;
-                padding-bottom: 36px;
-            }
+  static get styles() {
+    return [
+      css`
+.board {
+    height: auto;
+    outline: none;
+    padding: 8px;
+    padding-bottom: 36px;
+}
+kmap-subject-card {
+  vertical-align: top;
+  margin-left: 6px;
+  margin-right: 6px;
+}
         `
-        ];
-    }
+    ];
+  }
 
     render() {
         return html`

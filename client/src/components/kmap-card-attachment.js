@@ -40,7 +40,7 @@ class KMapCardAttachment extends LitElement {
     render() {
         return html`
             <p>
-                <mwc-icon>${this._mimeIcon}</mwc-icon>
+                <mwc-icon>${this._mimeIcon}</mwc-icon>&nbsp;
                 ${this._renderAttachment()}
             </p>
         `;

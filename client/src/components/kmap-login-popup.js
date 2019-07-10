@@ -80,6 +80,7 @@ class KMapLoginPopup extends connect(store)(LitElement) {
   static get properties() {
     return {
       _userid: {type: String},
+      _roles: {type: Array},
       _initials: {type: String},
       _message: {type: String},
       _failure: {type: Boolean},
@@ -107,6 +108,7 @@ class KMapLoginPopup extends connect(store)(LitElement) {
 
   stateChanged(state) {
     this._userid = state.app.userid;
+    this._roles = state.app.roles;
     this._initials = this._userid ? this._buildInitials(this._userid) : null;
     this._message = state.app.loginResponse;
     this._failure = state.app.loginFailure;
