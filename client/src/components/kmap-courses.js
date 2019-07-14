@@ -38,11 +38,14 @@ class KCourses extends connect(store)(LitElement) {
   justify-content: space-between;
   margin: 12px;
 }
-.field input, .field div {
-  width: 180px;
+.field input, .field textarea, .field div {
+  width: 210px;
+}
+textarea {
+  resize: vertical;
 }
 .scroll {
-  height: 160px;
+  height: 208px;
   overflow-y: auto;
 }
 mwc-icon {
@@ -102,7 +105,7 @@ mwc-list-item {
             </div>
             <div class="field">
                 <label for="newStudents">Schüler</label>
-                <input id="newStudents" required type="text" value=${this._newStudents} @change=${e => this._newStudents = e.target.value}/>
+                <textarea id="editStudents" required rows="7" @change=${e => this._editStudents = e.target.value}>${this._editStudents}</textarea>
             </div>
             <mwc-button @click="${this._new}">Speichern</mwc-button>
           </div>
@@ -114,7 +117,7 @@ mwc-list-item {
             </div>
             <div class="field">
                 <label for="editStudents">Schüler</label>
-                <input id="editStudents" required type="text" value=${this._editStudents} @change=${e => this._editStudents = e.target.value}/>
+                <textarea id="editStudents" required rows="7" @change=${e => this._editStudents = e.target.value}>${this._editStudents}</textarea>
             </div>
             <mwc-button @click="${this._edit}">Speichern</mwc-button>
           </div>
@@ -189,7 +192,7 @@ mwc-list-item {
           }
         })
           .then(res => res.json())
-          .then(data => this._selectedStudents = data.data.join(','))
+          .then(data => this._selectedStudents = data.data.join(', '))
           .catch((e) => { console.log(e);});
     }
   }
@@ -257,7 +260,7 @@ mwc-list-item {
       students[i] = students[i].trim();
 
     store.dispatch(storeCourse({ name: name, students: students })).then(() => {
-      this._selectedStudents = this._editStudents;
+      this._selectedStudents = students.join(', ');
       this._editName = '';
       this._editStudents = '';
       this._page = 'default';
