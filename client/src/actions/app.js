@@ -57,18 +57,21 @@ export const navigate = (path) => (dispatch, getState) => {
 const loadPage = (page) => (dispatch) => {
   switch (page) {
     case 'home':
-      import('../components/kmap-subjects.js').then((module) => {
+      import('../components/kmap-subjects').then((module) => {
       });
       break;
     case 'browser':
-      import('../components/kmap-browser.js').then((module) => {
+      import('../components/kmap-browser').then((module) => {
       });
       break;
     case 'test':
-      import('../components/kmap-test.js');
+      import('../components/kmap-test');
+      break;
+    case 'courses':
+      import('../components/kmap-courses');
       break;
     case 'content-manager':
-      import('../components/kmap-content-manager.js');
+      import('../components/kmap-content-manager');
       break;
     /*
   case 'settings':

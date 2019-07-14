@@ -158,6 +158,9 @@ public class States {
         try {
             JsonObject object = client.find(JsonObject.class, user + ".courses");
             object.add(name, data.getAsJsonArray("students"));
+            JsonArray courses = object.get("courses").getAsJsonArray();
+            if (!courses.contains(new JsonPrimitive(name)))
+                courses.add(name);
             client.update(object);
         }
         catch (NoDocumentException e) {

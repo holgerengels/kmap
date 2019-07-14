@@ -33,6 +33,7 @@ class KMapLoginPopup extends connect(store)(LitElement) {
   width: 180px;
 }
 .fab {
+  cursor: pointer;
   position: absolute;
   display: flex;
   right: -4px;

@@ -93,6 +93,7 @@ class KmapMain extends connect(store)(LitElement) {
         <a ?selected="${this._page === 'home'}" href="#home">Home</a>
         <a ?selected="${this._page === 'browser'}" href="#browser">Browser</a>
         <a ?selected="${this._page === 'test'}" href="#test">Test</a>
+        <a ?selected="${this._page === 'courses'}" ?disabled="${!this._roles || !this._roles.includes("teacher")}" href="#courses">Kurse</a>
         <a ?selected="${this._page === 'content-mananer'}" ?disabled="${!this._roles || !this._roles.includes("teacher")}" href="#content-manager">Content Manager</a>
         <hr/>
         <a href="#browser/Hilfe/Hilfe">Hilfe</a>
@@ -105,6 +106,7 @@ class KmapMain extends connect(store)(LitElement) {
         <kmap-subjects ?active="${this._page === 'home'}" class="page" ></kmap-subjects>
         <kmap-browser ?active="${this._page === 'browser'}" class="page" ></kmap-browser>
         <kmap-test ?active="${this._page === 'test'}" class="page" ></kmap-test>
+        <kmap-courses ?active="${this._page === 'courses'}" class="page" ></kmap-courses>
         <kmap-content-manager ?active="${this._page === 'content-manager'}" class="page" ></kmap-content-manager>
     </main>
       </div>

@@ -1,14 +1,13 @@
 import {LitElement, html, css} from 'lit-element';
 import {connect} from 'pwa-helpers/connect-mixin.js';
-import {store} from "../store.js";
-import './kmap-subject-card';
+import {store} from "../store";
 
 import 'mega-material/icon-button';
 import 'mega-material/list';
 import 'mega-material/top-app-bar';
+import {colorStyles, fontStyles} from "./kmap-styles";
 import {importMap, exportMap, deleteMap, modules} from "../actions/content-maps";
 import {importSet, exportSet, deleteSet, sets} from "../actions/content-sets";
-import {colorStyles, fontStyles} from "./kmap-styles";
 
 class KMapContentManager extends connect(store)(LitElement) {
   static get styles() {

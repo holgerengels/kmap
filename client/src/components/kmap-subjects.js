@@ -52,7 +52,7 @@ kmap-subject-card {
   }
 
   firstUpdated(changedProperties) {
-      return fetch(`${config.server}data?subjects=all`, {
+      fetch(`${config.server}data?subjects=all`, {
           method: "GET",
           mode: "cors",
           cache: "no-cache",

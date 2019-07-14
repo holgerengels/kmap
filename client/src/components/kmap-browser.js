@@ -1,6 +1,6 @@
 import {LitElement, html, css} from 'lit-element';
 import {connect} from 'pwa-helpers/connect-mixin.js';
-import {store} from "../store.js";
+import {store} from "../store";
 import {updateTitle, showMessage} from "../actions/app";
 import {fetchMapIfNeeded} from "../actions/maps";
 import {fetchStateIfNeeded, forgetState, storeState} from "../actions/states";
@@ -120,8 +120,8 @@ kmap-summary-card {
             topicCard: {type: Object},
             board: {type: Object},
             lines: {type: Array, value: []},
-            state: {type: Number, value: 0, reflectToAttribute: true, observer: 'reflectState'},
-            page: {type: String, value: "map"},
+            state: {type: Number },
+            page: {type: String },
             mapHeight: {type: Number, value: 0},
             mapScroll: {type: Number, value: 0},
             detailCard: {type: Object, value: {}},

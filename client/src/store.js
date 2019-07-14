@@ -24,6 +24,7 @@ import states from './reducers/states';
 import tests from './reducers/tests';
 import contentMaps from './reducers/content-maps';
 import contentSets from './reducers/content-sets';
+import courses from './reducers/courses';
 
 const devCompose = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
@@ -41,4 +42,5 @@ store.addReducers({
   tests,
   contentMaps,
   contentSets,
+  courses,
 });
