@@ -21,6 +21,9 @@ export const SHOW_MESSAGE = 'SHOW_MESSAGE';
 export const TIMEOUT_MESSAGE = 'TIMEOUT_MESSAGE';
 export const LOGIN = 'LOGIN';
 export const LOGOUT = 'LOGOUT';
+export const ADD_LAYER = 'ADD_LAYER';
+export const REMOVE_LAYER = 'REMOVE_LAYER';
+export const CARD_FOR_EDIT = 'CARD_FOR_EDIT';
 
 export const navigate = (path) => (dispatch, getState) => {
   console.log(path);
@@ -265,6 +268,34 @@ const failLogout = (userid, response) => {
     userid,
     status: 'error',
     respone: response.message
+  };
+};
+
+export const addLayer = (layer) => {
+  return {
+    type: ADD_LAYER,
+    layer
+  };
+};
+
+export const removeLayer = (layer) => {
+  return {
+    type: REMOVE_LAYER,
+    layer
+  };
+};
+
+export const setCardForEdit = (card) => {
+  return {
+    type: CARD_FOR_EDIT,
+    card
+  };
+};
+
+export const unsetCardForEdit = () => {
+  return {
+    type: CARD_FOR_EDIT,
+    card: null
   };
 };
 

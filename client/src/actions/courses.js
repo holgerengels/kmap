@@ -3,6 +3,7 @@ import {config} from "../config";
 import {logout, showMessage} from "./app";
 
 export const LOAD_COURSES = 'LOAD_COURSES';
+export const SELECT_COURSE = 'SELECT_COURSE';
 export const STORE_COURSES = 'STORE_COURSES';
 export const FORGET_COURSES = 'FORGET_COURSES';
 export const LOAD_COURSE = 'LOAD_COURSE';
@@ -61,6 +62,13 @@ export const forgetCourses = (userid) => {
   return {
     type: FORGET_COURSES,
     userid,
+  };
+};
+
+export const selectCourse = (course) => {
+  return {
+    type: SELECT_COURSE,
+    course,
   };
 };
 

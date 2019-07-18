@@ -9,6 +9,9 @@ import {
   UPDATE_TITLE,
   LOGIN,
   LOGOUT,
+  ADD_LAYER,
+  REMOVE_LAYER,
+  CARD_FOR_EDIT,
 } from '../actions/app.js';
 
 const INITIAL_STATE = {
@@ -19,12 +22,15 @@ const INITIAL_STATE = {
   dataPath: [],
   title: "KnowledgeMap",
   userid: null,
+  roles: [],
+  layers: ['summary'],
   loginFailure: false,
   loginFetching: false,
   loginResponse: null,
   logoutFailure: false,
   logoutFetching: false,
   logoutResponse: null,
+  cardForEdit: null,
 };
 
 const app = (state = INITIAL_STATE, action) => {
@@ -125,9 +131,29 @@ const app = (state = INITIAL_STATE, action) => {
             logoutResponse: action.response
           };
       }
+    case ADD_LAYER:
+      return {
+        ...state,
+        layers: [...state.layers, action.layer].unique()
+      };
+    case REMOVE_LAYER:
+      return {
+        ...state,
+        layers: [...state.layers].filter(e => e !== action.layer)
+      };
+    case CARD_FOR_EDIT:
+      return {
+        ...state,
+        cardForEdit: action.card
+      };
     default:
       return state;
   }
 };
 
+Array.prototype.unique = function() {
+  return this.filter(function (value, index, self) {
+    return self.indexOf(value) === index;
+  });
+}
 export default app;

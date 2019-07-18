@@ -4,6 +4,7 @@ import {installMediaQueryWatcher} from 'pwa-helpers/media-query.js';
 import {installOfflineWatcher} from 'pwa-helpers/network.js';
 import {installRouter} from 'pwa-helpers/router.js';
 import {updateMetadata} from 'pwa-helpers/metadata.js';
+import {fontStyles, colorStyles} from "./components/kmap-styles";
 
 import {store} from './store.js';
 
@@ -12,19 +13,24 @@ import {
     updateOffline,
     login,
     showMessage,
+    addLayer, removeLayer
 } from './actions/app.js';
 
 import 'mega-material/drawer';
 import 'mega-material/icon-button';
 import 'mega-material/snackbar';
 
-import './components/kmap-login-popup'
-import './components/kmap-subjects'
+import './components/kmap-login-popup';
+import './components/kmap-subjects';
+import './components/kmap-course-selector';
+import './components/kmap-card-editor';
 
 class KmapMain extends connect(store)(LitElement) {
 
   static get styles() {
     return [
+      fontStyles,
+      colorStyles,
       css`
       :host {
         --app-drawer-background-color: var(--app-secondary-color);
@@ -79,6 +85,10 @@ class KmapMain extends connect(store)(LitElement) {
         pointer-events: none;
         color: var(--color-mediumgray);
       }
+      mwc-button[disabled] {
+         --mdc-theme-primary: var(--color-mediumgray);
+         pointer-events: none;
+      }
       `,
     ];
   }
@@ -93,11 +103,18 @@ class KmapMain extends connect(store)(LitElement) {
         <a ?selected="${this._page === 'home'}" href="#home">Home</a>
         <a ?selected="${this._page === 'browser'}" href="#browser">Browser</a>
         <a ?selected="${this._page === 'test'}" href="#test">Test</a>
-        <a ?selected="${this._page === 'courses'}" ?disabled="${!this._roles || !this._roles.includes("teacher")}" href="#courses">Kurse</a>
-        <a ?selected="${this._page === 'content-mananer'}" ?disabled="${!this._roles || !this._roles.includes("teacher")}" href="#content-manager">Content Manager</a>
-        <hr/>
+        <a ?selected="${this._page === 'courses'}" ?disabled="${!this._roles.includes("teacher")}" href="#courses">Kurse</a>
+        <a ?selected="${this._page === 'content-mananer'}" ?disabled="${!this._roles.includes("teacher")}" href="#content-manager">Content Manager</a>
         <a href="#browser/Hilfe/Hilfe">Hilfe</a>
       </nav>
+      <hr/>
+      <br/>
+      <label section>Layer</label><br/><br/>
+      <mwc-button @click="${e => this._toggleLayer('summary')}" icon="short_text" outlined ?raised="${this._layers.includes('summary')}">Kurztexte</mwc-button>
+      <mwc-button @click="${e => this._toggleLayer('averages')}" icon="group_work" outlined ?raised="${this._layers.includes('averages')}" ?disabled="${!this._roles.includes("teacher")}">Mittelwerte</mwc-button>
+      ${this._layers.includes('averages') ? html`<kmap-course-selector></kmap-course-selector>` : ''}
+      <mwc-button @click="${e => this._toggleLayer('editor')}" icon="edit" outlined ?raised="${this._layers.includes('editor')}" ?disabled="${!this._roles.includes("teacher")}">editor</mwc-button>
+      ${this._layers.includes('editor') ? html`<kmap-card-editor></kmap-card-editor>` : ''}
     </div>
     <div slot="app-content">
     <main role="main" class="main-content">
@@ -122,6 +139,7 @@ class KmapMain extends connect(store)(LitElement) {
       _userid: {type: String},
       _roles: {type: Array},
       _messages: {type: Array},
+      _layers: {type: Array},
     };
   }
 
@@ -129,6 +147,8 @@ class KmapMain extends connect(store)(LitElement) {
     super();
     this.title = 'KMap';
     this._page = "home";
+    this._roles = [];
+    this._layers = [];
   }
 
     firstUpdated(changedProperties) {
@@ -164,6 +184,7 @@ class KmapMain extends connect(store)(LitElement) {
         this._userid = state.app.userid;
         this._roles = state.app.roles;
         this._messages = state.app.messages;
+        this._layers = state.app.layers;
     }
 
     _renderMessages() {
@@ -172,6 +193,22 @@ class KmapMain extends connect(store)(LitElement) {
                 <li>${message}</li>
             `)}
       `;
+    }
+
+    _toggleLayer(layer) {
+      if (this._layers.includes(layer))
+        store.dispatch(removeLayer(layer));
+      else {
+        if (layer === 'summary' && this._layers.includes('averages'))
+          store.dispatch(removeLayer('averages'));
+        else if (layer === 'averages' && this._layers.includes('summary'))
+          store.dispatch(removeLayer('summary'));
+        else if (layer === 'summary' && this._layers.includes('editor'))
+          store.dispatch(removeLayer('editor'));
+        else if (layer === 'editor' && this._layers.includes('summary'))
+          store.dispatch(removeLayer('summary'));
+        store.dispatch(addLayer(layer));
+      }
     }
 }
 

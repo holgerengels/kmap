@@ -2,8 +2,8 @@ import {
   LOAD_COURSES,
   STORE_COURSES,
   FORGET_COURSES,
-  LOAD_COURSE,
   STORE_COURSE,
+  SELECT_COURSE,
 } from '../actions/courses';
 
 const INITIAL_STATE = {
@@ -20,6 +20,7 @@ const INITIAL_STATE = {
   storeCourseFetching: false,
   storeCourseResponse: null,
   courses: [],
+  selectedCourse: '',
 };
 
 const state = (state = INITIAL_STATE, action) => {
@@ -103,6 +104,12 @@ const state = (state = INITIAL_STATE, action) => {
             storeCourseResponse: action.response,
           };
       }
+    case SELECT_COURSE:
+      return {
+        ...state,
+        selectedCourse: action.course
+      };
+
     default:
       return state;
   }

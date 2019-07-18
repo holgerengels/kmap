@@ -8,12 +8,7 @@
  subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
  */
 
-import {
-    createStore,
-    compose,
-    applyMiddleware,
-    combineReducers
-} from 'redux';
+import {createStore, compose, applyMiddleware, combineReducers} from 'redux';
 import thunk from 'redux-thunk';
 import {lazyReducerEnhancer} from 'pwa-helpers/lazy-reducer-enhancer.js';
 //import loggerMiddleware from './store-logger';
@@ -21,6 +16,7 @@ import {lazyReducerEnhancer} from 'pwa-helpers/lazy-reducer-enhancer.js';
 import app from './reducers/app';
 import maps from './reducers/maps';
 import states from './reducers/states';
+import averageStates from './reducers/average-states';
 import tests from './reducers/tests';
 import contentMaps from './reducers/content-maps';
 import contentSets from './reducers/content-sets';
@@ -39,6 +35,7 @@ store.addReducers({
   app,
   maps,
   states,
+  averageStates,
   tests,
   contentMaps,
   contentSets,

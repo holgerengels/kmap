@@ -7,13 +7,13 @@ h1, .font-title {
   font-size: 1.25rem;
   font-weight: 500;
 }
-h2, .font-subtitle {
+h2, .font-subtitle, label[section] {
   font-family: Roboto,sans-serif;
   -webkit-font-smoothing: antialiased;
   font-size: 1.10rem;
   font-weight: 500;
 }
-h3, .font-subsubtitle, label[section] {
+h3, .font-subsubtitle {
   font-family: Roboto,sans-serif;
   -webkit-font-smoothing: antialiased;
   font-size: 0.95rem;

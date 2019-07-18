@@ -2,8 +2,8 @@ import {handleErrors} from "./fetchy";
 import {config} from "../config";
 import {logout, showMessage} from "./app";
 
-export const LOAD_STATES = 'LOAD_STATES';
-export const STORE_STATES = 'STORE_STATES';
+export const LOAD_AVERAGE_STATES = 'LOAD_AVERAGE_STATES';
+export const STORE_AVERAGE_STATES = 'STORE_AVERAGE_STATES';
 
 export const fetchStateIfNeeded = (state) => (dispatch, getState) => {
   if (state && state.userid && state.subject && !state.states && !state.loadFetching) {
@@ -28,7 +28,7 @@ export const fetchStateIfNeeded = (state) => (dispatch, getState) => {
 
 export const forgetState = (userid, subject) => {
   return {
-    type: LOAD_STATES,
+    type: LOAD_AVERAGE_STATES,
     userid,
     subject,
     status: 'forget',
@@ -37,7 +37,7 @@ export const forgetState = (userid, subject) => {
 
 const requestState = (userid, subject) => {
   return {
-    type: LOAD_STATES,
+    type: LOAD_AVERAGE_STATES,
     userid, subject,
     status: 'pending',
   };
@@ -45,7 +45,7 @@ const requestState = (userid, subject) => {
 
 const receiveState = (userid, subject, state) => {
   return {
-    type: LOAD_STATES,
+    type: LOAD_AVERAGE_STATES,
     userid, subject,
     status: 'success',
     state,
@@ -54,7 +54,7 @@ const receiveState = (userid, subject, state) => {
 
 const failState = (userid, subject, response) => {
   return {
-    type: LOAD_STATES,
+    type: LOAD_AVERAGE_STATES,
     userid, subject,
     status: 'error',
     response,
@@ -98,7 +98,7 @@ export const storeState = (state, id, rate) => (dispatch, getState) => {
 
 const requestStore = (userid, subject) => {
   return {
-    type: STORE_STATES,
+    type: STORE_AVERAGE_STATES,
     userid, subject,
     status: 'pending',
   };
@@ -106,7 +106,7 @@ const requestStore = (userid, subject) => {
 
 const receiveStore = (userid, subject, state) => {
   return {
-    type: STORE_STATES,
+    type: STORE_AVERAGE_STATES,
     userid, subject,
     status: 'success',
     state,
@@ -115,7 +115,7 @@ const receiveStore = (userid, subject, state) => {
 
 const failStore = (userid, subject, response) => {
   return {
-    type: STORE_STATES,
+    type: STORE_AVERAGE_STATES,
     userid, subject,
     status: 'error',
     response: response.message,

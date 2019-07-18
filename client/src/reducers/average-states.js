@@ -1,7 +1,7 @@
 import {
-  LOAD_STATES,
-  STORE_STATES,
-} from '../actions/states.js';
+  LOAD_AVERAGE_STATES,
+  STORE_AVERAGE_STATES,
+} from '../actions/average-states';
 
 const INITIAL_STATE = {
   loadFailure: false,
@@ -15,7 +15,7 @@ const INITIAL_STATE = {
 
 const state = (state = INITIAL_STATE, action) => {
   switch (action.type) {
-    case LOAD_STATES:
+    case LOAD_AVERAGE_STATES:
       switch (action.status) {
         case 'pending':
           return {
@@ -48,7 +48,7 @@ const state = (state = INITIAL_STATE, action) => {
             state: [],
           };
       }
-    case STORE_STATES:
+    case STORE_AVERAGE_STATES:
       switch (action.status) {
         case 'pending':
           return {
