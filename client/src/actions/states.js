@@ -5,10 +5,12 @@ import {logout, showMessage} from "./app";
 export const LOAD_STATES = 'LOAD_STATES';
 export const STORE_STATES = 'STORE_STATES';
 
-export const fetchStateIfNeeded = (state) => (dispatch, getState) => {
-  if (state && state.userid && state.subject && !state.states && !state.loadFetching) {
-    dispatch(requestState(state.userid, state.subject));
-    return fetch(`${config.server}state?load=${state.userid}&subject=${state.subject}`, {
+export const fetchStateIfNeeded = (subject) => (dispatch, getState) => {
+  let state = getState();
+  let userid = state.app.userid;
+  if (userid && subject && !state.states.loadFetching) {
+    dispatch(requestState(subject));
+    return fetch(`${config.server}state?load=${userid}&subject=${subject}`, {
       method: "GET",
       mode: "cors",
       cache: "no-cache",
@@ -19,43 +21,42 @@ export const fetchStateIfNeeded = (state) => (dispatch, getState) => {
     })
       .then(handleErrors)
       .then(res => res.json())
-      .then(response => dispatch(receiveState(state.userid, state.subject, response.data)))
-      .catch(error => dispatch(failState(state.userid, state.subject, error)));
+      .then(response => dispatch(receiveState(subject, response.data)))
+      .catch(error => dispatch(failState(subject, error)));
   } else {
     return Promise.resolve();
   }
 };
 
-export const forgetState = (userid, subject) => {
+export const forgetState = (subject) => {
   return {
     type: LOAD_STATES,
-    userid,
     subject,
     status: 'forget',
   };
 };
 
-const requestState = (userid, subject) => {
+const requestState = (subject) => {
   return {
     type: LOAD_STATES,
-    userid, subject,
+    subject,
     status: 'pending',
   };
 };
 
-const receiveState = (userid, subject, state) => {
+const receiveState = (subject, state) => {
   return {
     type: LOAD_STATES,
-    userid, subject,
+    subject,
     status: 'success',
     state,
   };
 };
 
-const failState = (userid, subject, response) => {
+const failState = (subject, response) => {
   return {
     type: LOAD_STATES,
-    userid, subject,
+    subject,
     status: 'error',
     response,
   };

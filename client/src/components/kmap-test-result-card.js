@@ -11,6 +11,7 @@ import {colorStyles, fontStyles} from "./kmap-styles";
 class KMapTestResultCard extends connect(store)(LitElement) {
 
     static get styles() {
+      // language=CSS
         return [
           fontStyles,
           colorStyles,

@@ -3,6 +3,7 @@ import 'mega-material/icon';
 
 class StarRating extends LitElement {
     static get styles() {
+      // language=CSS
         return [
             css`
 :host {

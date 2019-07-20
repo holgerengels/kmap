@@ -1,6 +1,7 @@
 package kmap;
 
 import org.apache.http.HttpHost;
+import org.apache.http.StatusLine;
 import org.apache.http.annotation.NotThreadSafe;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -92,8 +93,16 @@ public class Cloud extends Server
             this.stream = stream;
             this.mimeType = mimeType;
             this.contentLength = contentLength;
+            this.responseCode = 200;
         }
 
+        public AttachmentStream(int responseCode, String responseMessage) {
+            this.responseCode = responseCode;
+            this.responseMessage = responseMessage;
+        }
+
+        int responseCode;
+        String responseMessage;
         InputStream stream;
         String mimeType;
         long contentLength;
@@ -112,7 +121,10 @@ public class Cloud extends Server
 
         HttpGet get = new HttpGet(files + path);
         try (CloseableHttpResponse response = client.execute(get, context)) {
-            sender.accept(new AttachmentStream(response.getEntity().getContent(), response.getEntity().getContentType().getValue(), response.getEntity().getContentLength()));
+            StatusLine statusLine = response.getStatusLine();
+            sender.accept(statusLine.getStatusCode() == 200
+                    ? new AttachmentStream(response.getEntity().getContent(), response.getEntity().getContentType().getValue(), response.getEntity().getContentLength())
+                    : new AttachmentStream(statusLine.getStatusCode(), statusLine.getReasonPhrase()));
         }
     }
 

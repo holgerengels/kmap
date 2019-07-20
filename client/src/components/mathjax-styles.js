@@ -1,5 +1,6 @@
 import { css } from 'lit-element';
 
+// language=CSS
 export const mathjaxStyles = css`
   g[data-mml-node="merror"] > g {
     fill: red;

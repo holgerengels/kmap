@@ -8,6 +8,7 @@ import './modal-dialog';
 
 class KMapSummaryCardEditor extends connect(store)(LitElement) {
   static get styles() {
+    // language=CSS
     return [
       fontStyles,
       colorStyles,
@@ -46,10 +47,12 @@ class KMapSummaryCardEditor extends connect(store)(LitElement) {
   }
 
   updated(changedProperties) {
+    /*
     if (changedProperties.has('card') && this.card.topic) {
       if (card.links === null)
         card.links = '';
     }
+    */
   }
 
   stateChanged(state) {

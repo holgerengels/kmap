@@ -1,5 +1,6 @@
 import { css } from 'lit-element';
 
+// language=CSS
 export const fontStyles = css`
 h1, .font-title {
   font-family: Roboto, Noto, sans-serif;

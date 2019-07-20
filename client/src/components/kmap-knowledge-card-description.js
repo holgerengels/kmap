@@ -7,6 +7,7 @@ import AsciiMathParser from "asciimath2tex";
 
 class KMapKnowledgeCardDescription extends LitElement {
   static get styles() {
+    // language=CSS
     return [
       fontStyles,
       colorStyles,
@@ -26,13 +27,32 @@ class KMapKnowledgeCardDescription extends LitElement {
   font-weight: bold;
 }
 .content a:hover {
-   text-decoration: underline;
+  text-decoration: underline;
+}
+container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin: -8px;
+}
+box {
+  flex: none;
+  margin: 8px;
+}
+growbox {
+  flex: 1;
+  flex-basis: 0.000000001px;
+  margin: 8px;
+}
+box img {
+  max-width: calc(100vw - 44px);
 }
       `
     ];
   }
 
   render() {
+    // language=HTML
     return html`
 <div class="content">
     ${unsafeHTML(this._description)}

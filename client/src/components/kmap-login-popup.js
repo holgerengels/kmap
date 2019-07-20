@@ -11,6 +11,7 @@ import {fontStyles} from "./kmap-styles";
 
 class KMapLoginPopup extends connect(store)(LitElement) {
   static get styles() {
+    // language=CSS
     return [
       fontStyles,
       css`

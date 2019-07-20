@@ -8,6 +8,7 @@ import {fontStyles, colorStyles} from "./kmap-styles";
 class KMapCourseSelector extends connect(store)(LitElement) {
 
     static get styles() {
+      // language=CSS
         return [
           fontStyles,
           colorStyles,

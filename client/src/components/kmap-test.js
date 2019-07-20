@@ -17,6 +17,7 @@ import {storeState} from "../actions/states";
 
 class KmapTest extends connect(store)(LitElement) {
   static get styles() {
+    // language=CSS
     return [
       fontStyles,
       colorStyles,

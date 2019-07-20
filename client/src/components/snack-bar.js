@@ -18,6 +18,7 @@ class SnackBar extends LitElement {
   }
 
   static get styles() {
+    // language=CSS
     return [
       css`
       :host {

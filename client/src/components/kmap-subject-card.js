@@ -16,6 +16,7 @@ import {STATE_COLORS} from "./state-colors";
 
 class KMapSubjectCard extends connect(store)(LitElement) {
     static get styles() {
+      // language=CSS
         return [
             css`
       :host {

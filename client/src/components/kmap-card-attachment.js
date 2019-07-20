@@ -14,6 +14,7 @@ import 'mega-material/icon';
 
 class KMapCardAttachment extends LitElement {
     static get styles() {
+      // language=CSS
         return [
             css`
             a {
