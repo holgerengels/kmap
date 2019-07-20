@@ -11,6 +11,7 @@ import {config} from "../config";
 
 class KCourses extends connect(store)(LitElement) {
   static get styles() {
+    // language=CSS
     return [
       fontStyles,
       colorStyles,

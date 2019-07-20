@@ -1,6 +1,6 @@
 import {LitElement, html, css} from 'lit-element';
 import {connect} from 'pwa-helpers/connect-mixin.js';
-import {config} from "../config";
+import {config} from "../config.js";
 import {store} from "../store";
 import './kmap-subject-card';
 
@@ -9,6 +9,7 @@ import 'mega-material/top-app-bar';
 
 class KMapSubjects extends connect(store)(LitElement) {
   static get styles() {
+    // language=CSS
     return [
       css`
 .board {
@@ -26,8 +27,9 @@ kmap-subject-card {
     ];
   }
 
-    render() {
-        return html`
+  render() {
+    // language=HTML
+    return html`
       <mwc-top-app-bar>
         <mwc-icon-button icon="menu" slot="navigationIcon"></mwc-icon-button>
         <div slot="title">Fächer</div>

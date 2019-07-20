@@ -13,6 +13,7 @@ import {fontStyles, colorStyles} from "./kmap-styles";
 class KMapSummaryCard extends connect(store)(LitElement) {
 
   static get styles() {
+    // language=CSS
     return [
       fontStyles,
       colorStyles,

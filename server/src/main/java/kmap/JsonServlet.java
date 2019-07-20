@@ -65,9 +65,14 @@ public class JsonServlet extends HttpServlet {
         resp.getWriter().print(object.toString());
     }
 
-    protected void sendError(HttpServletRequest request, HttpServletResponse resp, int code, String message) throws IOException {
+    protected void sendError(HttpServletRequest request, HttpServletResponse resp, int code, String message) {
         corsHeaders(request, resp);
-        resp.sendError(code, message);
+        try {
+            resp.sendError(code, message);
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     static void corsHeaders(HttpServletRequest request, HttpServletResponse resp) {

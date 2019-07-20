@@ -15,6 +15,7 @@ class ModalDialog extends LitElement {
   }
 
   static get styles() {
+    // language=CSS
     return [
       fontStyles,
       colorStyles,

@@ -3,6 +3,7 @@ import {colorStyles, fontStyles} from "./kmap-styles";
 
 class KMapKnowledgeCardDepends extends LitElement {
   static get styles() {
+    // language=CSS
     return [
       fontStyles,
       colorStyles,
@@ -21,7 +22,7 @@ class KMapKnowledgeCardDepends extends LitElement {
   font-weight: bold;
 }
 .content a:hover {
-   text-decoration: underline;
+  text-decoration: underline;
 }
       `
     ];

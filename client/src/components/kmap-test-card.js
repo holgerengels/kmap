@@ -14,6 +14,7 @@ import AsciiMathParser from "asciimath2tex";
 class KMapTestCard extends connect(store)(LitElement) {
 
     static get styles() {
+      // language=CSS
         return [
           fontStyles,
           colorStyles,

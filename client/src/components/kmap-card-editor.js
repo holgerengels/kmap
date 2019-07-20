@@ -11,6 +11,7 @@ import './kmap-knowledge-card-description';
 class KMapCardEditor extends connect(store)(LitElement) {
 
   static get styles() {
+    // language=CSS
     return [
       fontStyles,
       colorStyles,

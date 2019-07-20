@@ -28,9 +28,7 @@ public class DataServlet
         cloud = new Cloud(properties);
     }
 
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-        throws IOException
-    {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
         try {
             Server.CLIENT.set(extractClient(req));
             String subjects = req.getParameter("subjects");
@@ -92,27 +90,30 @@ public class DataServlet
                 //boolean iosHack = userAgent.indexOf("applewebkit") != -1 && userAgent.indexOf("mobile") != -1;
 
                 cloud.loadAttachment(attachment -> {
-                    String fileName = dirs[dirs.length - 1];
-                    System.out.println("fileName = " + fileName);
-                    String mimeType = MimeTypes.tweakMimeType(attachment.mimeType, fileName);
-                    System.out.println("mimeType = " + mimeType);
-                    System.out.println("contentLength = " + attachment.contentLength);
-                    resp.setContentType(mimeType);
-                    resp.setContentLength((int)attachment.contentLength);
-                    if (!"text/html".equals(mimeType))
-                        resp.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
-                    resp.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
-                    resp.setHeader("Expires", "0");
-                    resp.setHeader("Pragma", "no-cache");
-                    corsHeaders(req, resp);
-                    try {
-                        IOUtils.copy(attachment.stream, resp.getOutputStream());
-                        resp.getOutputStream().flush();
+                    if (attachment.responseCode == 200) {
+                        String fileName = dirs[dirs.length - 1];
+                        System.out.println("fileName = " + fileName);
+                        String mimeType = MimeTypes.tweakMimeType(attachment.mimeType, fileName);
+                        System.out.println("mimeType = " + mimeType);
+                        System.out.println("contentLength = " + attachment.contentLength);
+                        resp.setContentType(mimeType);
+                        resp.setContentLength((int) attachment.contentLength);
+                        if (!"text/html".equals(mimeType))
+                            resp.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
+                        resp.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
+                        resp.setHeader("Expires", "0");
+                        resp.setHeader("Pragma", "no-cache");
+                        corsHeaders(req, resp);
+                        try {
+                            IOUtils.copy(attachment.stream, resp.getOutputStream());
+                            resp.getOutputStream().flush();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            throw new RuntimeException(e);
+                        }
                     }
-                    catch (Exception e) {
-                        e.printStackTrace();
-                        throw new RuntimeException(e);
-                    }
+                    else
+                        sendError(req, resp, attachment.responseCode, attachment.responseMessage);
                 }, dirs);
             }
         }

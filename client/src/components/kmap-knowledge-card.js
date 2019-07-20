@@ -13,6 +13,7 @@ import './kmap-card-attachment';
 class KMapKnowledgeCard extends connect(store)(LitElement) {
 
     static get styles() {
+      // language=CSS
         return [
           fontStyles,
           colorStyles,
@@ -36,6 +37,7 @@ class KMapKnowledgeCard extends connect(store)(LitElement) {
   -webkit-font-smoothing: antialiased;
   font-size: 1.00rem;
   font-weight: 400;
+  background-color: var(--color-lightest);
 }
 .card[selected] {
     filter: saturate(1.2) brightness(1.1);
@@ -64,40 +66,19 @@ class KMapKnowledgeCard extends connect(store)(LitElement) {
   justify-content: space-between;
 }
 .card-footer a {
-    color: black;
+  color: black;
 }
 .attachments {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    margin-top: 12px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin-top: 12px;
 }
 .attachments > div {
-    align-content: start;
-    margin-left: 12px;
-    margin-right: 12px;
+  align-content: start;
+  margin-left: 12px;
+  margin-right: 12px;
 }
-kmap-knowledge-card-description {
-  background-color: var(--color-lightest);
-}
-            container {
-              display: flex;
-              flex-direction: row;
-              flex-wrap: wrap;
-              margin: -8px;
-            }
-            box {
-                flex: none;
-                margin: 8px;
-            }
-            growbox {
-              flex: 1;
-              flex-basis: 0.000000001px;
-              margin: 8px;
-            }
-            box img {
-                max-width: calc(100vw - 44px);
-            }
       `
         ];
     }
@@ -129,6 +110,7 @@ render() {
       .progressNum="${this.progressNum}"
       .progressOf="${this.progressOf}">
   </kmap-knowledge-card-description>
+
   <div class="attachments">
       ${this._explanations && this._explanations.length > 0
           ? html`<div>

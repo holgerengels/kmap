@@ -3,7 +3,7 @@ import {connect} from 'pwa-helpers/connect-mixin.js';
 import {store} from "../store";
 import {updateTitle, showMessage} from "../actions/app";
 import {fetchMapIfNeeded} from "../actions/maps";
-import {fetchStateIfNeeded, forgetState, storeState} from "../actions/states";
+import {storeState} from "../actions/states";
 
 import 'mega-material/icon-button';
 import 'mega-material/top-app-bar';
@@ -12,6 +12,7 @@ import './kmap-knowledge-card';
 
 class KMapBrowser extends connect(store)(LitElement) {
     static get styles() {
+      // language=CSS
         return [
             css`
 .scrollpane {
@@ -115,18 +116,17 @@ kmap-summary-card {
             loadingSubject: {type: String},
             loadingChapter: {type: String},
             subject: {type: String},
-            chapter: {type: String, notify: true},
+            chapter: {type: String},
             topic: {type: String},
             topicCard: {type: Object},
             board: {type: Object},
-            lines: {type: Array, value: []},
-            state: {type: Number },
+            lines: {type: Array},
             page: {type: String },
-            mapHeight: {type: Number, value: 0},
-            mapScroll: {type: Number, value: 0},
-            detailCard: {type: Object, value: {}},
+            mapHeight: {type: Number},
+            mapScroll: {type: Number},
+            detailCard: {type: Object},
             search: {type: String, observer: 'searchChanged'},
-            filtered: {type: Array, value: null, observer: 'filteredChanged'},
+            filtered: {type: Array, observer: 'filteredChanged'},
         };
     }
 
@@ -198,12 +198,6 @@ kmap-summary-card {
         else {
             console.log("cannot save " + detail.key + " := " + detail.rate);
             store.dispatch(showMessage("Achtung! Deine Eingaben können nur gespeichert werden, wenn Du angemeldet bist!"));
-            /*
-            this.dispatchEvent(new CustomEvent('message', {
-              message: "Achtung! Deine Eingaben können nur gespeichert werden, wenn Du angemeldet bist!",
-              bubbles: true, composed: true
-            }));
-            */
         }
     }
 
@@ -245,12 +239,14 @@ kmap-summary-card {
             this.subject = state.maps.map.subject;
             this.chapter = state.maps.map.chapter;
             this.lines = state.maps.map.lines;
+            /*
             for (let line of this.lines) {
                 for (let card of line.cards) {
                     if (!card.links)
                         card.links = null;
                 }
             }
+            */
         }
         else {
             this.subject = "";
@@ -268,21 +264,12 @@ kmap-summary-card {
             }
             this.topicCard = lala;
         }
-
-        if (this.userid !== state.app.userid) {
-            this.userid = state.app.userid;
-
-          if (this.userid)
-            store.dispatch(fetchStateIfNeeded({userid: this.userid, subject: this.routeSubject}));
-          else
-            store.dispatch(forgetState({userid: this.userid, subject: this.routeSubject}));
-        }
     }
 
-    activeChanged(active) {
-        if (active && this.routeSubject && this.routeChapter)
-            store.dispatch(fetchMapIfNeeded({subject: this.routeSubject, chapter: this.routeChapter}));
-    }
+  activeChanged(active) {
+    if (active && this.routeSubject && this.routeChapter)
+      store.dispatch(fetchMapIfNeeded({subject: this.routeSubject, chapter: this.routeChapter}));
+  }
 
 }
 

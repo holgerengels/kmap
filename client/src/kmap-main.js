@@ -24,10 +24,13 @@ import './components/kmap-login-popup';
 import './components/kmap-subjects';
 import './components/kmap-course-selector';
 import './components/kmap-card-editor';
+import {fetchStateIfNeeded, forgetState} from "./actions/states";
+import {fetchAverageStateIfNeeded, forgetAverageState} from "./actions/average-states";
 
 class KmapMain extends connect(store)(LitElement) {
 
   static get styles() {
+    // language=CSS
     return [
       fontStyles,
       colorStyles,
@@ -134,82 +137,111 @@ class KmapMain extends connect(store)(LitElement) {
 
   static get properties() {
     return {
-      title: { type: String },
-      _page: {type: String},
       _userid: {type: String},
       _roles: {type: Array},
+      _page: {type: String},
+      _title: {type: String},
       _messages: {type: Array},
       _layers: {type: Array},
+      _subject: {type: String},
+      _selectedCourse: {type: String},
     };
   }
 
   constructor() {
     super();
-    this.title = 'KMap';
-    this._page = "home";
     this._roles = [];
+    this._page = "home";
+    this._title = 'KMap';
     this._layers = [];
+    this._subject = '';
+    this._selectedCourse = '';
   }
 
-    firstUpdated(changedProperties) {
-        installRouter((location) => store.dispatch(navigate(decodeURIComponent(location.hash))));
-        installOfflineWatcher((offline) => store.dispatch(updateOffline(offline)));
-        installMediaQueryWatcher(`(min-width: 460px)`, () => {});
-        this._drawer = this.shadowRoot.getElementById('drawer');
-        this._snackbar = this.shadowRoot.getElementById('snackbar');
+  firstUpdated(changedProperties) {
+    installRouter((location) => store.dispatch(navigate(decodeURIComponent(location.hash))));
+    installOfflineWatcher((offline) => store.dispatch(updateOffline(offline)));
+    installMediaQueryWatcher(`(min-width: 460px)`, () => {});
+    this._drawer = this.shadowRoot.getElementById('drawer');
+    this._snackbar = this.shadowRoot.getElementById('snackbar');
+  }
+
+  updated(changedProps) {
+    if (changedProps.has('_title')) {
+      const pageTitle = this.appTitle + ' - ' + this._title;
+      updateMetadata({
+        title: pageTitle,
+        description: pageTitle
+      });
     }
 
-    updated(changedProps) {
-        if (changedProps.has('_title')) {
-            const pageTitle = this.appTitle + ' - ' + this._title;
-            updateMetadata({
-                title: pageTitle,
-                description: pageTitle
-                // This object also takes an image property, that points to an img src.
-            });
+    if (changedProps.has('_page'))
+      this._drawer.close();
+
+    if (changedProps.has('_messages')) {
+      if (this._messages.length > 0) {
+        this._snackbar.open();
+        console.log(this._messages);
+      }
+    }
+
+    if (changedProps.has("_userid") && !this._userid) {
+      store.dispatch(forgetState(this._subject));
+      store.dispatch(forgetAverageState(this._subject, this._selectedCourse));
+    }
+
+    if (changedProps.has("_selectedCourse") && !this._selectedCourse) {
+      store.dispatch(forgetAverageState(this._subject, this._selectedCourse));
+    }
+
+    if (this._userid) {
+      if (this._layers.includes("summary")) {
+        if (changedProps.has("_userid") || changedProps.has("_subject")) {
+          store.dispatch(fetchStateIfNeeded(this._subject));
         }
-        if (changedProps.has('_page'))
-          this._drawer.close();
-        if (changedProps.has('_messages')) {
-          if (this._messages.length > 0) {
-            this._snackbar.open();
-            console.log(this._messages);
-          }
+      }
+      if (this._layers.includes("averages")) {
+        if (changedProps.has("_userid") || changedProps.has("_subject") || changedProps.has("_selectedCourse")) {
+          store.dispatch(fetchAverageStateIfNeeded(this._subject, this._selectedCourse));
         }
+      }
     }
+  }
 
-    stateChanged(state) {
-        this._page = state.app.page;
-        this._title = state.app.title;
-        this._userid = state.app.userid;
-        this._roles = state.app.roles;
-        this._messages = state.app.messages;
-        this._layers = state.app.layers;
-    }
+  stateChanged(state) {
+    this._userid = state.app.userid;
+    this._roles = state.app.roles;
+    this._page = state.app.page;
+    this._title = state.app.title;
+    this._messages = state.app.messages;
+    this._layers = state.app.layers;
+    this._subject = state.maps.map ? state.maps.map.subject : '';
+    this._selectedCourse = state.courses.selectedCourse;
+  }
 
-    _renderMessages() {
-      return html`
+  _renderMessages() {
+    return html`
             ${this._messages.map((message, i) => html`
                 <li>${message}</li>
             `)}
       `;
-    }
+  }
 
-    _toggleLayer(layer) {
-      if (this._layers.includes(layer))
-        store.dispatch(removeLayer(layer));
-      else {
-        if (layer === 'summary' && this._layers.includes('averages'))
-          store.dispatch(removeLayer('averages'));
-        else if (layer === 'averages' && this._layers.includes('summary'))
-          store.dispatch(removeLayer('summary'));
-        else if (layer === 'summary' && this._layers.includes('editor'))
-          store.dispatch(removeLayer('editor'));
-        else if (layer === 'editor' && this._layers.includes('summary'))
-          store.dispatch(removeLayer('summary'));
-        store.dispatch(addLayer(layer));
-      }
+  _toggleLayer(layer) {
+    if (this._layers.includes(layer))
+      store.dispatch(removeLayer(layer));
+    else {
+      if (layer === 'summary' && this._layers.includes('averages'))
+        store.dispatch(removeLayer('averages'));
+      else if (layer === 'averages' && this._layers.includes('summary'))
+        store.dispatch(removeLayer('summary'));
+      else if (layer === 'summary' && this._layers.includes('editor'))
+        store.dispatch(removeLayer('editor'));
+      else if (layer === 'editor' && this._layers.includes('summary'))
+        store.dispatch(removeLayer('summary'));
+      store.dispatch(addLayer(layer));
     }
+  }
 }
 
 customElements.define('kmap-main', KmapMain);

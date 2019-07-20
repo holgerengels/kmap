@@ -5,6 +5,7 @@ import {store} from "../store";
 
 class KMapSummaryCardAverages extends connect(store)(LitElement) {
   static get styles() {
+    // language=CSS
     return [
       fontStyles,
       colorStyles,
