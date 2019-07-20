@@ -8,7 +8,7 @@
  subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
  */
 import {handleErrors} from "./fetchy";
-import {config} from "../config";
+import {config} from "../config.js";
 
 export const UPDATE_PAGE = 'UPDATE_PAGE';
 export const UPDATE_OFFLINE = 'UPDATE_OFFLINE';

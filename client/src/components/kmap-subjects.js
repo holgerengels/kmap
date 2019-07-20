@@ -1,6 +1,6 @@
 import {LitElement, html, css} from 'lit-element';
 import {connect} from 'pwa-helpers/connect-mixin.js';
-import {config} from "../config";
+import {config} from "../config.js";
 import {store} from "../store";
 import './kmap-subject-card';
 
