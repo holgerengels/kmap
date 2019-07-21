@@ -22,10 +22,11 @@ export const modules = () => (dispatch, getState) => {
     .then(response => response.json())
     .then(response => dispatch(receiveModules(response)))
     .catch(error => {
-        dispatch(failModules(error));
-        dispatch(showMessage({ message: error.message }));
-      }
-    );
+      dispatch(failModules(error));
+      dispatch(showMessage(error.message));
+      if (error.message === "invalid session")
+        dispatch(logout({userid: state.userid}));
+    });
 };
 
 const requestModules = () => {
@@ -71,10 +72,11 @@ export const importMap = (subject, module, data) => (dispatch, getState) => {
         dispatch(modules());
       })
       .catch(error => {
-          dispatch(failImportMap(subject, module, error));
-          dispatch(showMessage({ message: error.message }));
-        }
-      );
+        dispatch(failImportMap(subject, module, error));
+        dispatch(showMessage(error.message));
+        if (error.message === "invalid session")
+          dispatch(logout({userid: state.userid}));
+      });
   } else {
     return Promise.resolve();
   }
@@ -122,10 +124,11 @@ export const exportMap = (subject, module) => (dispatch, getState) => {
     .then(response => response.json())
     .then(response => dispatch(receiveExportMap(response)))
     .catch(error => {
-        dispatch(failExportMap(error));
-        dispatch(showMessage({ message: error.message }));
-      }
-    );
+      dispatch(failExportMap(error));
+      dispatch(showMessage(error.message));
+      if (error.message === "invalid session")
+        dispatch(logout({userid: state.userid}));
+    });
 };
 
 const requestExportMap = () => {
@@ -170,11 +173,13 @@ export const deleteMap = (subject, module) => (dispatch, getState) => {
         dispatch(modules());
       })
       .catch(error => {
-          dispatch(failDeleteMap(subject, module, error));
-          dispatch(showMessage(error.message));
-        }
-      );
-  } else {
+        dispatch(failDeleteMap(subject, module, error));
+        dispatch(showMessage(error.message));
+        if (error.message === "invalid session")
+          dispatch(logout({userid: state.userid}));
+      });
+  }
+  else {
     return Promise.resolve();
   }
 };

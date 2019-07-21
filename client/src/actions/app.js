@@ -301,6 +301,7 @@ export const unsetCardForEdit = () => {
 
 const translations = new Map([
   ["invalid credentials" , "Benutzername oder Passwort falsch"],
+  ["invalid session" , "Session ungültig"],
   ["Failed to fetch" , "Netzwerkfehler"],
   ["Internal Server Error" , "Serverfehler"],
 ]);

@@ -6,6 +6,8 @@ import './kmap-subject-card';
 
 import 'mega-material/icon-button';
 import 'mega-material/top-app-bar';
+import {handleErrors} from "../actions/fetchy";
+import {logout, showMessage} from "../actions/app";
 
 class KMapSubjects extends connect(store)(LitElement) {
   static get styles() {
@@ -43,6 +45,7 @@ kmap-subject-card {
 
     static get properties() {
         return {
+          _userid: {type: String},
             subjects: {type: Array},
             active: {type: Boolean, observer: 'activeChanged'},
         };
@@ -63,13 +66,22 @@ kmap-subject-card {
               "Content-Type": "application/json; charset=utf-8",
           }
       })
-          .then(res => res.json())
-          .then(subjects => this.subjects = subjects)
-          .catch((e) => { console.log(e);});
+        .then(handleErrors)
+        .then(res => res.json())
+        .then(subjects => this.subjects = subjects)
+        .catch((error) => {
+          store.dispatch(showMessage(error.message));
+          if (error.message === "invalid session")
+            store.dispatch(logout({userid: this._userid}));
+        });
   }
 
     updated(changedProperties) {
         console.log(changedProperties);
+    }
+
+    stateChanged(state) {
+      this._userid = state.app.userid;
     }
 }
 customElements.define('kmap-subjects', KMapSubjects);

@@ -22,7 +22,12 @@ export const fetchAverageStateIfNeeded = (subject, course) => (dispatch, getStat
       .then(handleErrors)
       .then(res => res.json())
       .then(response => dispatch(receiveState(subject, course, response.data)))
-      .catch(error => dispatch(failState(subject, course, error)));
+      .catch(error => {
+        dispatch(failState(subject, course, error));
+        dispatch(showMessage(error.message));
+        if (error.message === "invalid session")
+          dispatch(logout({userid: state.userid}));
+      });
   } else {
     return Promise.resolve();
   }

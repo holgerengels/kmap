@@ -8,7 +8,8 @@ import 'mega-material/list';
 import 'mega-material/top-app-bar';
 import {colorStyles, fontStyles} from "./kmap-styles";
 import {config} from "../config";
-import {updateTitle} from "../actions/app";
+import {logout, showMessage, updateTitle} from "../actions/app";
+import {handleErrors} from "../actions/fetchy";
 
 class KCourses extends connect(store)(LitElement) {
   static get styles() {
@@ -195,10 +196,17 @@ mwc-list-item {
             "Content-Type": "application/json; charset=utf-8",
           }
         })
+          .then(handleErrors)
           .then(res => res.json())
           .then(data => this._selectedStudents = data.data.join(', '))
-          .catch((e) => { console.log(e);});
+          .catch((error) => {
+            store.dispatch(showMessage(error.message));
+            if (error.message === "invalid session")
+              store.dispatch(logout({userid: this._userid}));
+          });
     }
+    if (changedProperties.has('_userid') && !this._userid)
+      this._page = '';
   }
 
   stateChanged(state) {
@@ -235,9 +243,14 @@ mwc-list-item {
           "Content-Type": "application/json; charset=utf-8",
         }
       })
+        .then(handleErrors)
         .then(res => res.json())
         .then(data => this._editStudents = data.data.join(','))
-        .catch((e) => { console.log(e);});
+        .catch((error) => {
+          store.dispatch(showMessage(error.message));
+          if (error.message === "invalid session")
+            store.dispatch(logout({userid: this._userid}));
+        });
     }
   }
 
@@ -278,7 +291,6 @@ mwc-list-item {
       this._page = '';
     });
   }
-
 }
 customElements.define('kmap-courses', KCourses);
 

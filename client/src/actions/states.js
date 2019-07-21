@@ -22,8 +22,14 @@ export const fetchStateIfNeeded = (subject) => (dispatch, getState) => {
       .then(handleErrors)
       .then(res => res.json())
       .then(response => dispatch(receiveState(subject, response.data)))
-      .catch(error => dispatch(failState(subject, error)));
-  } else {
+      .catch(error => {
+        dispatch(failState(subject, error));
+        dispatch(showMessage(error.message));
+        if (error.message === "invalid session")
+          dispatch(logout({userid: state.userid}));
+      });
+  }
+  else {
     return Promise.resolve();
   }
 };
@@ -87,12 +93,13 @@ export const storeState = (state, id, rate) => (dispatch, getState) => {
       .then(res => res.json())
       .then(response => dispatch(receiveStore(state.userid, state.subject, response.data)))
       .catch(error => {
-          dispatch(failStore(state.userid, state.subject, error));
-          dispatch(logout({ userid: state.userid }));
-          dispatch(showMessage(error.message));
-        }
-      );
-  } else {
+        dispatch(failStore(state.userid, state.subject, error));
+        dispatch(showMessage(error.message));
+        if (error.message === "invalid session")
+          dispatch(logout({userid: state.userid}));
+      });
+  }
+  else {
     return Promise.resolve();
   }
 };

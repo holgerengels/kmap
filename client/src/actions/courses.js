@@ -26,10 +26,11 @@ export const loadCourses = () => (dispatch, getState) => {
     .then(response => response.json())
     .then(response => dispatch(receiveLoadCourses(userid, response.data)))
     .catch(error => {
-        dispatch(failLoadCourses(userid, error));
-        dispatch(showMessage({ message: error.message }));
-      }
-    );
+      dispatch(failLoadCourses(userid, error));
+      dispatch(showMessage(error.message));
+      if (error.message === "invalid session")
+        dispatch(logout({userid: state.userid}));
+    });
 };
 
 const requestLoadCourses = (userid) => {
@@ -91,11 +92,13 @@ export const storeCourses = (courses) => (dispatch, getState) => {
       .then(res => res.json())
       .then(response => dispatch(receiveStoreCourses(userid, courses)))
       .catch(error => {
-          dispatch(failStoreCourses(userid, courses, error));
-          dispatch(showMessage({ message: error.message }));
-        }
-      );
-  } else {
+        dispatch(failStoreCourses(userid, courses, error));
+        dispatch(showMessage(error.message));
+        if (error.message === "invalid session")
+          dispatch(logout({userid: state.userid}));
+      });
+  }
+  else {
     return Promise.resolve();
   }
 };
@@ -146,11 +149,13 @@ export const storeCourse = (course) => (dispatch, getState) => {
       .then(res => res.json())
       .then(response => dispatch(receiveStoreCourse(userid, course)))
       .catch(error => {
-          dispatch(failStoreCourse(userid, course.name, error));
-          dispatch(showMessage({ message: error.message }));
-        }
-      );
-  } else {
+        dispatch(failStoreCourse(userid, course.name, error));
+        dispatch(showMessage(error.message));
+        if (error.message === "invalid session")
+          dispatch(logout({userid: state.userid}));
+      });
+  }
+  else {
     return Promise.resolve();
   }
 };
