@@ -1,21 +1,21 @@
 import {LitElement, html, css} from 'lit-element';
 import {connect} from "pwa-helpers/connect-mixin";
 import {store} from "../store";
-import { selectSummaryCard } from '../actions/maps.js';
-import { STATE_COLORS } from './state-colors';
+import {selectSummaryCard} from '../actions/maps.js';
+import {STATE_COLORS} from './state-colors';
 import './star-rating';
 import 'mega-material/icon';
 import 'mega-material/list';
-import {colorStyles, fontStyles} from "./kmap-styles";
+import {fontStyles, colorStyles} from "./kmap-styles";
 
 class KMapTestResultCard extends connect(store)(LitElement) {
 
-    static get styles() {
-      // language=CSS
-        return [
-          fontStyles,
-          colorStyles,
-          css`
+  static get styles() {
+    // language=CSS
+    return [
+      fontStyles,
+      colorStyles,
+      css`
 :host {
   --color-opaque: #f5f5f5;
   --color-light: #e0e0e0;
@@ -24,17 +24,11 @@ class KMapTestResultCard extends connect(store)(LitElement) {
 .card {
   display: inline-block;
   box-sizing: border-box;
-  overflow: overlay;
   width: 300px;
   border-radius: 3px;
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
       0 1px 5px 0 rgba(0, 0, 0, 0.12),
       0 3px 1px -2px rgba(0, 0, 0, 0.2);
-  color: #212121;
-  font-family: Roboto,sans-serif;
-  -webkit-font-smoothing: antialiased;
-  font-size: 0.95rem;
-  font-weight: 400;
 }
 .card-header {
   padding: 8px;
@@ -46,19 +40,8 @@ class KMapTestResultCard extends connect(store)(LitElement) {
   background-color: var(--color-lightest);
   transition: background-color .5s ease-in-out;
 }
-.card-content span {
-  white-space: normal;
-  hyphens: auto;
-  overflow : hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-}
-.card-content img {
-  max-width: calc(100vw - 44px);
-}
 .card-footer {
-  color: #212121;
+  color: var(--color-darkgray);
   background-color: var(--color-light);
   transition: background-color .5s ease-in-out;
   padding: 8px;
@@ -69,16 +52,7 @@ class KMapTestResultCard extends connect(store)(LitElement) {
   justify-content: space-between;
 }
 .card-footer a {
-  color: black;
-}
-.card[selected] {
-  filter: saturate(1.2) brightness(1.1);
-  box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14),
-      0 1px 10px 0 rgba(0, 0, 0, 0.12),
-      0 2px 4px -1px rgba(0, 0, 0, 0.4);
-}
-.card[highlighted] {
-  filter: saturate(1.2) brightness(1.1);
+  color: var(--color-darkgray);
 }
 .card-content mwc-icon {
   vertical-align: bottom;
@@ -96,7 +70,7 @@ class KMapTestResultCard extends connect(store)(LitElement) {
 
     render() {
         return html`
-    <div class="card" ?selected="${this._selected}" ?highlighted="${this._highlighted}">
+    <div class="card font-body" ?selected="${this._selected}" ?highlighted="${this._highlighted}">
             <div class="card-header" @click="${this._clicked}">
                 <span>${this.card.chapter} → ${this.card.topic}</span>
             </div>
@@ -105,63 +79,90 @@ class KMapTestResultCard extends connect(store)(LitElement) {
                 <mwc-icon class="wrong">thumb_down</mwc-icon> ${this.card.wrong} falsch<br/>
             </div>
             <div class="card-footer">
-                <star-rating .rate="${this.state}" @rated="${this._rated}" .color_unrated="${this._lightest}" .color_rated="${this._opaque}"></star-rating>
+                <star-rating .rate="${this._state}" @rated="${this._rated}" .color_unrated="${this._lightest}" .color_rated="${this._opaque}"></star-rating>
                 <div slot="footer" style="flex: 1 0 auto"></div>
                 <a slot="footer" href="#browser/${this.card.subject}/${this.card.chapter}/${this.card.topic}"><mwc-icon>open_in_new</mwc-icon></a>
             </div>
 </div>
     `;
-    }
+  }
 
-    static get properties() {
-        return {
-            subject: {type: String},
-            chapter: {type: String},
-            card: {type: Object},
-            state: {type: Number, value: 0},
-            progressNum: {type: Number},
-            progressOf: {type: Number},
-            _selected: {type: Boolean},
-            _highlighted: {type: Boolean},
-            _opaque: {type: String},
-            _light: {type: String},
-            _lightest: {type: String},
-        };
-    }
+  static get properties() {
+    return {
+      subject: {type: String},
+      chapter: {type: String},
+      card: {type: Object},
+      state: {type: Number},
+      _states: {type: Array},
+      _state: {type: Number},
+      progressNum: {type: Number},
+      progressOf: {type: Number},
+      _selected: {type: Boolean},
+      _highlighted: {type: Boolean},
+      _opaque: {type: String},
+      _light: {type: String},
+      _lightest: {type: String},
+      _rateModified: {type: Boolean},
+    };
+  }
 
-    constructor() {
-        super();
-        this._colorize("0");
-    }
+  constructor() {
+    super();
+    this._states = [];
+    this._state = 0;
+    this.state = 0;
+    this._rateModified = false;
+    this._colorize("0");
+  }
 
-    _colorize(rate) {
-        this._opaque = STATE_COLORS[rate][0];
-        this._light = STATE_COLORS[rate][1];
-        this._lightest = STATE_COLORS[rate][2];
-        this.style.setProperty('--color-opaque', this._opaque);
-        this.style.setProperty('--color-light', this._light);
-        this.style.setProperty('--color-lightest', this._lightest);
-    }
+  updated(changedProperties) {
+    if (changedProperties.has("_states"))
+      this._rating(this._states);
 
-    _clicked() {
-        store.dispatch(selectSummaryCard(this.card));
-    }
+    if (changedProperties.has("state"))
+      this._state = this.state;
 
-    _rated(e) {
-        let key = this.chapter + "." + this.card.topic;
-        this.dispatchEvent(new CustomEvent('rated', { bubbles: true, detail: {key: key, rate: e.detail.rate}}));
-    }
+    if (changedProperties.has("_state"))
+      this._colorize(this._state);
+  }
 
-    updated(changedProperties) {
-        if (changedProperties.has("state"))
-          this._colorize(this.state);
-    }
+  stateChanged(state) {
+    this._states = state.states;
+  }
 
-    _getStateValue(state, key) {
-        let value = state.states.state[key];
-        return value !== undefined ? value : 0;
+  _rating() {
+    if (this._rateModified && this._states && this._states.state && this._states.state.length !== 0) {
+      let key = this.chapter + "." + this.card.topic;
+      this._state = this._getStateValue(key);
     }
+    else {
+      this._state = 0;
+    }
+  }
 
+  _getStateValue(key) {
+    let value = this._states.state[key];
+    return value !== undefined ? value : 0;
+  }
+
+  _colorize(state) {
+    this._opaque = STATE_COLORS[state][0];
+    this._light = STATE_COLORS[state][1];
+    this._lightest = STATE_COLORS[state][2];
+    this.style.setProperty('--color-opaque', this._opaque);
+    this.style.setProperty('--color-light', this._light);
+    this.style.setProperty('--color-lightest', this._lightest);
+  }
+
+  _clicked() {
+    store.dispatch(selectSummaryCard(this.card));
+  }
+
+  _rated(e) {
+    this._rateModified = true;
+    let key = this.chapter + "." + this.card.topic;
+    this.dispatchEvent(new CustomEvent('rated', { bubbles: true, detail: {key: key, rate: e.detail.rate}}));
+  }
 }
 
 window.customElements.define('kmap-test-result-card', KMapTestResultCard);

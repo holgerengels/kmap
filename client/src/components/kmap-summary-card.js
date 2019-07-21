@@ -32,7 +32,7 @@ class KMapSummaryCard extends connect(store)(LitElement) {
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
       0 1px 5px 0 rgba(0, 0, 0, 0.12),
       0 3px 1px -2px rgba(0, 0, 0, 0.2);
-  color: #212121;
+  color: var(--color-darkgray);
 }
 .card-header {
   padding: 8px;
@@ -40,7 +40,7 @@ class KMapSummaryCard extends connect(store)(LitElement) {
   background-color: var(--color-opaque);
 }
 .card-footer {
-  color: #212121;
+  color: var(--color-darkgray);
   background-color: var(--color-light);
   transition: background-color .5s ease-in-out;
   padding: 8px;
@@ -165,12 +165,6 @@ class KMapSummaryCard extends connect(store)(LitElement) {
       if (!this._layers.includes(this._stateLayer))
         this._colorize(0);
   }
-
-  _getStateValue(state, key) {
-    let value = state.states.state[key];
-    return value !== undefined ? value : 0;
-  }
-
 }
 
 window.customElements.define('kmap-summary-card', KMapSummaryCard);

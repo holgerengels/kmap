@@ -1,5 +1,5 @@
 import {LitElement, html, css} from 'lit-element';
-import {showMessage, updateTitle} from "../actions/app";
+import {updateTitle, showMessage} from "../actions/app";
 import 'mega-material/button';
 import 'mega-material/icon-button';
 import 'mega-material/slider';
@@ -344,12 +344,6 @@ class KmapTest extends connect(store)(LitElement) {
     else {
       console.log("cannot save " + detail.key + " := " + detail.rate);
       store.dispatch(showMessage("Achtung! Deine Eingaben können nur gespeichert werden, wenn Du angemeldet bist!"));
-      /*
-      this.dispatchEvent(new CustomEvent('message', {
-        message: "Achtung! Deine Eingaben können nur gespeichert werden, wenn Du angemeldet bist!",
-        bubbles: true, composed: true
-      }));
-      */
     }
   }
 
@@ -402,6 +396,18 @@ class KmapTest extends connect(store)(LitElement) {
   }
 
   updated(changedProperties) {
+    if (changedProperties.has("_page")) {
+      switch (this._page) {
+        case 'start':
+        case 'tests':
+          store.dispatch(updateTitle("Test"));
+          break;
+        case 'result':
+          store.dispatch(updateTitle("Testergebnis"));
+          break;
+      }
+    }
+
     if (changedProperties.has("active") && this.active)
       store.dispatch(fetchSubjectsIfNeeded());
 

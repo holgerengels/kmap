@@ -168,7 +168,7 @@ class KmapMain extends connect(store)(LitElement) {
 
   updated(changedProps) {
     if (changedProps.has('_title')) {
-      const pageTitle = this.appTitle + ' - ' + this._title;
+      const pageTitle = 'KMap - ' + this._title;
       updateMetadata({
         title: pageTitle,
         description: pageTitle

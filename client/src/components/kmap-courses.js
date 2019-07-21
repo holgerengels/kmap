@@ -8,6 +8,7 @@ import 'mega-material/list';
 import 'mega-material/top-app-bar';
 import {colorStyles, fontStyles} from "./kmap-styles";
 import {config} from "../config";
+import {updateTitle} from "../actions/app";
 
 class KCourses extends connect(store)(LitElement) {
   static get styles() {
@@ -177,6 +178,8 @@ mwc-list-item {
   firstUpdated(changedProperties) {
     if (this._userid)
       store.dispatch(loadCourses());
+
+    store.dispatch(updateTitle("Kurse"));
   }
 
   updated(changedProperties) {

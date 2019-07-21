@@ -8,6 +8,7 @@ import 'mega-material/top-app-bar';
 import {colorStyles, fontStyles} from "./kmap-styles";
 import {importMap, exportMap, deleteMap, modules} from "../actions/content-maps";
 import {importSet, exportSet, deleteSet, sets} from "../actions/content-sets";
+import {updateTitle} from "../actions/app";
 
 class KMapContentManager extends connect(store)(LitElement) {
   static get styles() {
@@ -231,6 +232,7 @@ mwc-icon {
     this._download = this.shadowRoot.getElementById('download');
     store.dispatch(modules());
     store.dispatch(sets());
+    store.dispatch(updateTitle("Kurse"));
   }
 
   updated(changedProperties) {
