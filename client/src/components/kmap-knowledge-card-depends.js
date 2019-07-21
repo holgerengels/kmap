@@ -10,7 +10,6 @@ class KMapKnowledgeCardDepends extends LitElement {
       css`
 .content {
   padding: 12px;
-  background-color: var(--color-lightest);
   transition: background-color .5s ease-in-out;
 }
 .content img {
@@ -36,7 +35,6 @@ class KMapKnowledgeCardDepends extends LitElement {
             <b>Voraussetzungen:</b> ${this.depends.map((depend, i) => html`
                 &nbsp;<a href="#browser/${this.subject}/${this.chapter}/${depend}">${depend}</a>
             `)}
-            <br/><br/>
         `
         : ''
     }

@@ -73,6 +73,7 @@ class KMapKnowledgeCard extends connect(store)(LitElement) {
   flex-direction: row;
   flex-wrap: wrap;
   margin-top: 12px;
+  margin-bottom: 12px;
 }
 .attachments > div {
   align-content: start;

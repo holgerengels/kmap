@@ -51,7 +51,7 @@ class KMapSummaryCard extends connect(store)(LitElement) {
   justify-content: space-between;
 }
 .card-footer a {
-  color: black;
+  color: var(--color-darkgray);
 }
 .card[selected] {
   filter: saturate(1.2) brightness(1.1);

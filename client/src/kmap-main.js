@@ -209,6 +209,8 @@ class KmapMain extends connect(store)(LitElement) {
   }
 
   stateChanged(state) {
+    console.log(state);
+
     this._userid = state.app.userid;
     this._roles = state.app.roles;
     this._page = state.app.page;

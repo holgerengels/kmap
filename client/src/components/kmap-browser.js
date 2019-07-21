@@ -107,7 +107,7 @@ kmap-summary-card {
 
     static get properties() {
         return {
-            userid: {type: String},
+            _userid: {type: String},
             active: {type: Boolean, observer: 'activeChanged'},
             dataPath: {type: String},
             routeSubject: {type: String},
@@ -191,9 +191,9 @@ kmap-summary-card {
 
     _rated(e) {
         var detail = e.detail;
-        if (this.userid) {
+        if (this._userid) {
             console.log("save " + detail.key + " := " + detail.rate);
-            store.dispatch(storeState({userid: this.userid, subject: this.routeSubject}, detail.key, detail.rate));
+            store.dispatch(storeState({userid: this._userid, subject: this.routeSubject}, detail.key, detail.rate));
         }
         else {
             console.log("cannot save " + detail.key + " := " + detail.rate);
@@ -201,76 +201,66 @@ kmap-summary-card {
         }
     }
 
-    stateChanged(state) {
-        console.log(state);
+  stateChanged(state) {
+    this._userid = state.app.userid;
+    if (this.dataPath !== state.app.dataPath) {
+      this.dataPath = state.app.dataPath;
 
-        if (this.dataPath !== state.app.dataPath) {
-            this.dataPath = state.app.dataPath;
+      let changeMap = false;
 
-            let changeMap = false;
+      if (state.app.dataPath.length > 0 && this.routeSubject !== state.app.dataPath[0]) {
+        this.routeSubject = state.app.dataPath[0];
+        changeMap = true;
+      }
+      if (state.app.dataPath.length > 1 && this.routeChapter !== state.app.dataPath[1]) {
+        this.routeChapter = state.app.dataPath[1];
+        changeMap = true;
+      }
+      if (state.app.dataPath.length > 2)
+        this.routeTopic = state.app.dataPath[2];
+      else
+        this.routeTopic = null;
 
-            if (state.app.dataPath.length > 0 && this.routeSubject !== state.app.dataPath[0]) {
-                this.routeSubject = state.app.dataPath[0];
-                changeMap = true;
-            }
-            if (state.app.dataPath.length > 1 && this.routeChapter !== state.app.dataPath[1]) {
-                this.routeChapter = state.app.dataPath[1];
-                changeMap = true;
-            }
-            if (state.app.dataPath.length > 2)
-                this.routeTopic = state.app.dataPath[2];
-            else
-                this.routeTopic = null;
+      if (this.routeTopic) {
+        this.page = "topic";
+        store.dispatch(updateTitle(this.routeTopic));
+      }
+      else {
+        this.page = "map";
+        store.dispatch(updateTitle(this.routeChapter));
+      }
 
-            if (this.routeTopic) {
-                this.page = "topic";
-                store.dispatch(updateTitle(this.routeTopic));
-            }
-            else {
-                this.page = "map";
-                store.dispatch(updateTitle(this.routeChapter));
-            }
-
-            if (changeMap)
-                store.dispatch(fetchMapIfNeeded({subject: this.routeSubject, chapter: this.routeChapter}));
-        }
-
-        if (state.maps.map) {
-            this.subject = state.maps.map.subject;
-            this.chapter = state.maps.map.chapter;
-            this.lines = state.maps.map.lines;
-            /*
-            for (let line of this.lines) {
-                for (let card of line.cards) {
-                    if (!card.links)
-                        card.links = null;
-                }
-            }
-            */
-        }
-        else {
-            this.subject = "";
-            this.chapter = "";
-            this.lines = [];
-        }
-
-        if (this.routeTopic && this.lines) {
-            let lala = {};
-            for (let line of this.lines) {
-                for (let card of line.cards) {
-                    if (card.name === this.routeTopic)
-                        lala = card;
-                }
-            }
-            this.topicCard = lala;
-        }
+      if (changeMap)
+        store.dispatch(fetchMapIfNeeded({subject: this.routeSubject, chapter: this.routeChapter}));
     }
+
+    if (state.maps.map) {
+      this.subject = state.maps.map.subject;
+      this.chapter = state.maps.map.chapter;
+      this.lines = state.maps.map.lines;
+    }
+    else {
+      this.subject = "";
+      this.chapter = "";
+      this.lines = [];
+    }
+
+    if (this.routeTopic && this.lines) {
+      let lala = {};
+      for (let line of this.lines) {
+        for (let card of line.cards) {
+          if (card.name === this.routeTopic)
+            lala = card;
+        }
+      }
+      this.topicCard = lala;
+    }
+  }
 
   activeChanged(active) {
     if (active && this.routeSubject && this.routeChapter)
       store.dispatch(fetchMapIfNeeded({subject: this.routeSubject, chapter: this.routeChapter}));
   }
-
 }
 
 customElements.define('kmap-browser', KMapBrowser);

@@ -15,7 +15,6 @@ class KMapKnowledgeCardDescription extends LitElement {
       css`
 .content {
   padding: 12px;
-  background-color: var(--color-lightest);
   transition: background-color .5s ease-in-out;
 }
 .content img {
