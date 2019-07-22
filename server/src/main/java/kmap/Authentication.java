@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 public class Authentication {
     private Properties properties;
     private Map<String, List<String>> groupConfig = new HashMap<>();
-    private Map<String, Map<String, String>> csvs = new HashMap<>();
+    private Map<String, Map<String, Account>> csvs = new HashMap<>();
 
     public Authentication(Properties properties) {
         this.properties = properties;
@@ -43,12 +43,12 @@ public class Authentication {
         }
     }
 
-    private Map<String, String> getCSV() {
+    private Map<String, Account> getCSV() {
         if (!csvs.containsKey(Server.CLIENT.get())) {
             Path path = Paths.get(properties.getProperty("ldap.csv") + Server.CLIENT.get() + "-users.csv");
             if (Files.exists(path)) {
                 try {
-                    Map<String, String> csv = Files.readAllLines(path).stream().map(l -> l.split(",")).collect(Collectors.toMap(s -> s[0], s -> s[1]));
+                    Map<String, Account> csv = Files.readAllLines(path).stream().map(l -> l.split(",")).collect(Collectors.toMap(c -> c[0], Account::new));
                     csvs.put(Server.CLIENT.get(), csv);
                 }
                 catch (IOException e) {
@@ -159,9 +159,10 @@ public class Authentication {
             return roles;
         }
         Set<String> roles = doauthenticate(user, password);
-        Map<String, String> csv = getCSV();
+        Map<String, Account> csv = getCSV();
         if (roles == null && csv != null) {
-            roles = password.equals(csv.get(user)) ? Collections.singleton("student") : null;
+            Account account = csv.get(user);
+            roles = account != null && account.match(password) ? account.roles : null;
         }
         return roles;
     }
@@ -222,5 +223,25 @@ public class Authentication {
             groups.add(value.substring("CN=".length(), index));
         }
         return groups;
+    }
+
+    class Account {
+        String userid;
+        String password;
+        Set<String> roles;
+
+
+        public Account(String[] cols) {
+            this.userid = cols[0];
+            this.password = cols[1];
+            if (cols.length > 2)
+                this.roles = new HashSet<>(Arrays.asList(Arrays.copyOfRange(cols, 2, cols.length)));
+            else
+                this.roles = Collections.singleton("student");
+        }
+
+        boolean match(String password) {
+            return this.password.equals(password);
+        }
     }
 }
