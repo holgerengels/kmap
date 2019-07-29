@@ -37,24 +37,24 @@ export const fetchStateIfNeeded = (subject) => (dispatch, getState) => {
 export const forgetState = (subject) => {
   return {
     type: LOAD_STATES,
-    subject,
     status: 'forget',
+    subject,
   };
 };
 
 const requestState = (subject) => {
   return {
     type: LOAD_STATES,
-    subject,
     status: 'pending',
+    subject,
   };
 };
 
 const receiveState = (subject, state) => {
   return {
     type: LOAD_STATES,
-    subject,
     status: 'success',
+    subject,
     state,
   };
 };
@@ -62,8 +62,8 @@ const receiveState = (subject, state) => {
 const failState = (subject, response) => {
   return {
     type: LOAD_STATES,
-    subject,
     status: 'error',
+    subject,
     response,
   };
 };

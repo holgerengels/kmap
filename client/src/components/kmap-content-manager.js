@@ -103,11 +103,11 @@ mwc-icon {
             </div>
             <div class="field">
                 <label for="subjectMap">Fach</label>
-                <input id="subjectMap" required="" type="text" value=${this._subjectMap} @change=${e => this._subjectMap = e.target.value}/>
+                <input id="subjectMap" required="" type="text" .value=${this._subjectMap} @change=${e => this._subjectMap = e.target.value}/>
             </div>
             <div class="field">
                 <label for="moduleMap">Modul</label>
-                <input id="moduleMap" required="" type="text" value=${this._moduleMap} @change=${e => this._moduleMap = e.target.value}/>
+                <input id="moduleMap" required="" type="text" .value=${this._moduleMap} @change=${e => this._moduleMap = e.target.value}/>
             </div>
             <mwc-button @click="${this._importMap}">Importieren</mwc-button>
           </div>
@@ -159,11 +159,11 @@ mwc-icon {
             </div>
             <div class="field">
                 <label for="subjectSet">Fach</label>
-                <input id="subjectSet" required="" type="text" value=${this._subjectSet} @change=${e => this._subjectSet = e.target.value}/>
+                <input id="subjectSet" required="" type="text" .value=${this._subjectSet} @change=${e => this._subjectSet = e.target.value}/>
             </div>
             <div class="field">
                 <label for="moduleSet">Modul</label>
-                <input id="moduleSet" required="" type="text" value=${this._moduleSet} @change=${e => this._moduleSet = e.target.value}/>
+                <input id="moduleSet" required="" type="text" .value=${this._moduleSet} @change=${e => this._moduleSet = e.target.value}/>
             </div>
             <mwc-button @click="${this._importSet}">Importieren</mwc-button>
           </div>

@@ -102,7 +102,7 @@ class KmapTest extends connect(store)(LitElement) {
     <br/><br/>
     <div>
       <span style="vertical-align: top; display: inline-block; width: 36px">${this._number}</span>
-      <input type="range" style="display: inline-block" class="form" value="${this._number}" step="3" min="3" max="${this._maxNumber}" @input="${this._numberChange}"/>
+      <input type="range" style="display: inline-block" class="form" .value="${this._number}" step="3" min="3" max="${this._maxNumber}" @input="${this._numberChange}"/>
     </div>
     <br/><br/>
     <mwc-button @click="${this._start}" ?disabled="${!this._allTests || this._allTests.length === 0}">Starten</mwc-button>

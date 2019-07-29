@@ -60,12 +60,8 @@ public class Couch extends Server {
             .includeDocs(true);
         List<JsonObject> objects = view.query(JsonObject.class);
         objects.removeIf(o -> string(o, "chapter") == null || string(o,"topic") == null);
-        objects.sort((o1, o2) -> {
-            int diff = string(o1, "chapter").compareTo(string(o2, "chapter"));
-            if (diff != 0)
-                return diff;
-            return string(o1, "topic").compareTo(string(o2, "topic"));
-        });
+        objects.forEach(o -> o.addProperty("module", module));
+        objects.sort(Comparator.comparing((JsonObject o) -> string(o, "chapter")).thenComparing(o -> string(o, "topic")));
         return objects;
     }
 
@@ -255,6 +251,7 @@ public class Couch extends Server {
             }
             else {
                 Node node = new Node(topicName);
+                node.setModule(string(topic, "module"));
                 node.setDescription(string(topic, "description"));
                 node.setSummary(string(topic, "summary"));
                 node.setPriority(integer(topic, "priority"));
@@ -328,6 +325,7 @@ public class Couch extends Server {
                 row++;
             }
             JsonObject card = new JsonObject();
+            card.addProperty("module", node.getModule());
             card.addProperty("name", node.getName());
             card.addProperty("row", node.getRow());
             card.addProperty("col", node.getColumn());

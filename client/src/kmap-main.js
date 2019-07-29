@@ -16,6 +16,7 @@ import {
     addLayer, removeLayer
 } from './actions/app.js';
 
+import 'mega-material/button';
 import 'mega-material/drawer';
 import 'mega-material/icon-button';
 import 'mega-material/snackbar';
@@ -23,9 +24,9 @@ import 'mega-material/snackbar';
 import './components/kmap-login-popup';
 import './components/kmap-subjects';
 import './components/kmap-course-selector';
-import './components/kmap-card-editor';
-import {fetchStateIfNeeded, forgetState} from "./actions/states";
-import {fetchAverageStateIfNeeded, forgetAverageState} from "./actions/average-states";
+import './components/kmap-editor';
+import './components/kmap-summaries'
+import './components/kmap-averages'
 
 class KmapMain extends connect(store)(LitElement) {
 
@@ -113,11 +114,12 @@ class KmapMain extends connect(store)(LitElement) {
       <hr/>
       <br/>
       <label section>Layer</label><br/><br/>
-      <mwc-button @click="${e => this._toggleLayer('summary')}" icon="short_text" outlined ?raised="${this._layers.includes('summary')}">Kurztexte</mwc-button>
+      <mwc-button @click="${e => this._toggleLayer('summaries')}" icon="short_text" outlined ?raised="${this._layers.includes('summaries')}">Kurztexte</mwc-button>
+      ${this._layers.includes('summaries') ? html`<kmap-summaries></kmap-summaries>` : ''}
       <mwc-button @click="${e => this._toggleLayer('averages')}" icon="group_work" outlined ?raised="${this._layers.includes('averages')}" ?disabled="${!this._roles.includes("teacher")}">Mittelwerte</mwc-button>
-      ${this._layers.includes('averages') ? html`<kmap-course-selector></kmap-course-selector>` : ''}
+      ${this._layers.includes('averages') ? html`<kmap-averages></kmap-averages>` : ''}
       <mwc-button @click="${e => this._toggleLayer('editor')}" icon="edit" outlined ?raised="${this._layers.includes('editor')}" ?disabled="${!this._roles.includes("teacher")}">editor</mwc-button>
-      ${this._layers.includes('editor') ? html`<kmap-card-editor></kmap-card-editor>` : ''}
+      ${this._layers.includes('editor') ? html`<kmap-editor></kmap-editor>` : ''}
     </div>
     <div slot="app-content">
     <main role="main" class="main-content">
@@ -143,8 +145,6 @@ class KmapMain extends connect(store)(LitElement) {
       _title: {type: String},
       _messages: {type: Array},
       _layers: {type: Array},
-      _subject: {type: String},
-      _selectedCourse: {type: String},
     };
   }
 
@@ -154,8 +154,6 @@ class KmapMain extends connect(store)(LitElement) {
     this._page = "home";
     this._title = 'KMap';
     this._layers = [];
-    this._subject = '';
-    this._selectedCourse = '';
   }
 
   firstUpdated(changedProperties) {
@@ -184,28 +182,6 @@ class KmapMain extends connect(store)(LitElement) {
         console.log(this._messages);
       }
     }
-
-    if (changedProps.has("_userid") && !this._userid) {
-      store.dispatch(forgetState(this._subject));
-      store.dispatch(forgetAverageState(this._subject, this._selectedCourse));
-    }
-
-    if (changedProps.has("_selectedCourse") && !this._selectedCourse) {
-      store.dispatch(forgetAverageState(this._subject, this._selectedCourse));
-    }
-
-    if (this._userid) {
-      if (this._layers.includes("summary")) {
-        if (changedProps.has("_userid") || changedProps.has("_subject")) {
-          store.dispatch(fetchStateIfNeeded(this._subject));
-        }
-      }
-      if (this._layers.includes("averages")) {
-        if (changedProps.has("_userid") || changedProps.has("_subject") || changedProps.has("_selectedCourse")) {
-          store.dispatch(fetchAverageStateIfNeeded(this._subject, this._selectedCourse));
-        }
-      }
-    }
   }
 
   stateChanged(state) {
@@ -217,8 +193,6 @@ class KmapMain extends connect(store)(LitElement) {
     this._title = state.app.title;
     this._messages = state.app.messages;
     this._layers = state.app.layers;
-    this._subject = state.maps.map ? state.maps.map.subject : '';
-    this._selectedCourse = state.courses.selectedCourse;
   }
 
   _renderMessages() {
@@ -233,14 +207,15 @@ class KmapMain extends connect(store)(LitElement) {
     if (this._layers.includes(layer))
       store.dispatch(removeLayer(layer));
     else {
-      if (layer === 'summary' && this._layers.includes('averages'))
+      if (layer === 'summaries' && this._layers.includes('averages'))
         store.dispatch(removeLayer('averages'));
-      else if (layer === 'averages' && this._layers.includes('summary'))
-        store.dispatch(removeLayer('summary'));
-      else if (layer === 'summary' && this._layers.includes('editor'))
+      else if (layer === 'averages' && this._layers.includes('summaries'))
+        store.dispatch(removeLayer('summaries'));
+      else if (layer === 'summaries' && this._layers.includes('editor'))
         store.dispatch(removeLayer('editor'));
-      else if (layer === 'editor' && this._layers.includes('summary'))
-        store.dispatch(removeLayer('summary'));
+      else if (layer === 'editor' && this._layers.includes('summaries'))
+        store.dispatch(removeLayer('summaries'));
+
       store.dispatch(addLayer(layer));
     }
   }

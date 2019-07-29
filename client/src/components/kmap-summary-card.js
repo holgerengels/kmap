@@ -60,7 +60,7 @@ class KMapSummaryCard extends connect(store)(LitElement) {
       0 2px 4px -1px rgba(0, 0, 0, 0.4);
 }
 .card[highlighted] {
-  filter: saturate(1.2) brightness(1.2);
+  filter: saturate(1.2) brightness(1.1);
 }
       `];
   }
@@ -71,7 +71,7 @@ class KMapSummaryCard extends connect(store)(LitElement) {
   <div class="card-header" @click="${this._clicked}">
       <span>${this.card.name}</span>
   </div>
-  ${this._layers.includes('summary')
+  ${this._layers.includes('summaries')
       ? html`
       <kmap-summary-card-summary @click="${this._clicked}" @statecolor="${this._colorizeEvent}" .key="${this._key}" .summary="${this.card.summary}"></kmap-summary-card-summary>
     ` : ''

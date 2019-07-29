@@ -104,7 +104,7 @@ mwc-list-item {
             <label section>Neuer Kurs</label>
             <div class="field">
                 <label for="newName">Name</label>
-                <input id="newName" required type="text" value=${this._newName} @change=${e => this._newName = e.target.value}/>
+                <input id="newName" required type="text" .value=${this._newName} @change=${e => this._newName = e.target.value}/>
             </div>
             <div class="field">
                 <label for="newStudents">Schüler</label>
@@ -116,7 +116,7 @@ mwc-list-item {
             <label section>Kurs bearbeiten</label>
             <div class="field">
                 <label for="editName">Name</label>
-                <input id="editName" required type="text" value=${this._editName} disabled/>
+                <input id="editName" required type="text" .value=${this._editName} disabled/>
             </div>
             <div class="field">
                 <label for="editStudents">Schüler</label>

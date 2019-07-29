@@ -9,6 +9,7 @@ import java.util.List;
  * Created by holger on 30.03.17.
  */
 public class Node {
+    String module;
     String name;
     Integer row;
     Integer column;
@@ -61,6 +62,14 @@ public class Node {
     @Override
     public int hashCode() {
         return name.hashCode();
+    }
+
+    public String getModule() {
+        return module;
+    }
+
+    public void setModule(String module) {
+        this.module = module;
     }
 
     public List<String> getDepends() {

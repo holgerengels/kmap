@@ -29,7 +29,7 @@ export const loadCourses = () => (dispatch, getState) => {
       dispatch(failLoadCourses(userid, error));
       dispatch(showMessage(error.message));
       if (error.message === "invalid session")
-        dispatch(logout({userid: state.userid}));
+        dispatch(logout({userid: userid}));
     });
 };
 
@@ -95,7 +95,7 @@ export const storeCourses = (courses) => (dispatch, getState) => {
         dispatch(failStoreCourses(userid, courses, error));
         dispatch(showMessage(error.message));
         if (error.message === "invalid session")
-          dispatch(logout({userid: state.userid}));
+          dispatch(logout({userid: userid}));
       });
   }
   else {
@@ -152,7 +152,7 @@ export const storeCourse = (course) => (dispatch, getState) => {
         dispatch(failStoreCourse(userid, course.name, error));
         dispatch(showMessage(error.message));
         if (error.message === "invalid session")
-          dispatch(logout({userid: state.userid}));
+          dispatch(logout({userid: userid}));
       });
   }
   else {

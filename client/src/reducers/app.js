@@ -23,7 +23,7 @@ const INITIAL_STATE = {
   title: "KnowledgeMap",
   userid: null,
   roles: [],
-  layers: ['summary'],
+  layers: ['summaries'],
   loginFailure: false,
   loginFetching: false,
   loginResponse: null,

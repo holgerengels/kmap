@@ -65,7 +65,7 @@ public class EditServlet
         }
         catch (Exception e) {
             e.printStackTrace();
-            throw new ServletException(e);
+            sendError(req, resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
         }
         finally {
             Server.CLIENT.remove();
@@ -120,7 +120,7 @@ public class EditServlet
         }
         catch (Exception e) {
             e.printStackTrace();
-            throw new ServletException(e);
+            sendError(req, resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
         }
         finally {
             Server.CLIENT.remove();

@@ -231,7 +231,7 @@ kmap-summary-card {
       }
 
       if (changeMap)
-        store.dispatch(fetchMapIfNeeded({subject: this.routeSubject, chapter: this.routeChapter}));
+        store.dispatch(fetchMapIfNeeded(this.routeSubject, this.routeChapter));
     }
 
     if (state.maps.map) {
@@ -259,7 +259,7 @@ kmap-summary-card {
 
   activeChanged(active) {
     if (active && this.routeSubject && this.routeChapter)
-      store.dispatch(fetchMapIfNeeded({subject: this.routeSubject, chapter: this.routeChapter}));
+      store.dispatch(fetchMapIfNeeded(this.routeSubject, this.routeChapter));
   }
 }
 

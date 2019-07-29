@@ -7,10 +7,7 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.AuthCache;
 import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.methods.*;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
@@ -34,11 +31,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class Cloud extends Server
 {
@@ -59,6 +54,14 @@ public class Cloud extends Server
         "    <oc:display-name/>\n" +
         "</d:prop>\n" +
         "</d:propfind>";
+
+    static final String PROPFIND_TAGS = "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n" +
+            "<a:propfind xmlns:a=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\">\n" +
+            "  <a:prop>\n" +
+            "    <oc:display-name/>\n" +
+            "    <oc:id/>\n" +
+            "  </a:prop>\n" +
+            "</a:propfind>";
 
     private final Namespace d = Namespace.getNamespace("d", "DAV:");
     private final Namespace oc = Namespace.getNamespace("oc", "http://owncloud.org/ns");
@@ -115,9 +118,7 @@ public class Cloud extends Server
 
         String files = getProperty("cloud.url") + getProperty("cloud.files") + "/" + Server.CLIENT.get();
 
-        String path = "";
-        for (String dir : dirs)
-            path += "/" + encode(dir);
+        String path = Arrays.stream(dirs).map(this::encode).collect(Collectors.joining("/"));
 
         HttpGet get = new HttpGet(files + path);
         try (CloseableHttpResponse response = client.execute(get, context)) {
@@ -146,7 +147,7 @@ public class Cloud extends Server
             CloseableHttpClient client = client();
             HttpClientContext context = clientContext();
 
-            String uri = getProperty("cloud.url") + getProperty("cloud.files") + "/" + Server.CLIENT.get() + encode(subject) + "/" + encode(chapter) + "/" + encode(topic) + "/";
+            String uri = getProperty("cloud.url") + getProperty("cloud.files") + "/" + Server.CLIENT.get() + "/" + encode(subject) + "/" + encode(chapter) + "/" + encode(topic) + "/";
             System.out.println("uri = " + uri);
             HttpPropFind propfind = new HttpPropFind(uri);
             propfind.setEntity(new StringEntity(PROPFIND_DIR, ContentType.APPLICATION_XML));
@@ -207,6 +208,15 @@ public class Cloud extends Server
         }
     }
 
+    private String dirName(Element element) {
+        Element child = element.getChild("href", d);
+        String path = child.getText();
+        path = decode(path);
+        path = path.substring(0, path.length() - 1);
+        int pos = path.lastIndexOf('/');
+        return path.substring(pos + 1);
+    }
+
     private String encode(String string) {
         try {
             return URLEncoder.encode(string, "UTF-8").replace("+", "%20");
@@ -225,10 +235,122 @@ public class Cloud extends Server
         }
     }
 
+    Map<String,String> listTags(String path) {
+        Map<String,String> map = new HashMap<>();
+        try {
+            CloseableHttpClient client = client();
+            HttpClientContext context = clientContext();
+
+            String uri = getProperty("cloud.url") + getProperty("cloud.files") + "/" + Server.CLIENT.get() + "/" + path;
+            HttpPropFind propfind = new HttpPropFind(uri);
+            propfind.setEntity(new StringEntity(PROPFIND_DIR, ContentType.APPLICATION_XML));
+            try (CloseableHttpResponse response = client.execute(propfind, context)) {
+                Document dom = new SAXBuilder().build(response.getEntity().getContent());
+                boolean first = true;
+                for (Element element : dom.getRootElement().getDescendants(new ElementFilter("response", d))) {
+                    if (first) {
+                        first = false;
+                        continue;
+                    }
+                    if (element.getDescendants(new ElementFilter("collection", d)).hasNext()) {
+                        String dirName = dirName(element);
+                        System.out.println("dir:  " + dirName);
+                        map.putAll(listTags(path + "/" + encode(dirName)));
+                    }
+                    else {
+                        String fileId = fileId(element);
+                        String fileName = fileName(element);
+                        String fileTag = fileTag(client, context, fileId);
+
+                        if (fileTag != null) {
+                            map.put(path + "/" + encode(fileName), fileTag);
+                        }
+                    }
+                }
+            }
+        }
+        catch (IOException | JDOMException e) {
+            throw new RuntimeException(e);
+        }
+        return map;
+    }
+
+    public void transferTags(Map<String,String> map) {
+        try {
+            CloseableHttpClient client = client();
+            HttpClientContext context = clientContext();
+
+            Map<String, String> ids = new HashMap<>();
+
+            String uri = getProperty("cloud.url") + getProperty("cloud.tags");
+            HttpPropFind propfind = new HttpPropFind(uri);
+            propfind.setEntity(new StringEntity(PROPFIND_TAGS, ContentType.APPLICATION_XML));
+            try (CloseableHttpResponse response = client.execute(propfind, context)) {
+                Document dom = new SAXBuilder().build(response.getEntity().getContent());
+                for (Element element : dom.getRootElement().getDescendants(new ElementFilter("response", d))) {
+                    String id = tagId(element);
+                    String name = tagName(element);
+                    if (name.startsWith("kmap-"))
+                        ids.put(name, id);
+                }
+            }
+            System.out.println("ids = " + ids);
+            for (Map.Entry<String, String> entry : map.entrySet()) {
+                String file = entry.getKey();
+                String tag = entry.getValue();
+                System.out.println(file + "/" + tag);
+
+                String fileId = fileId(file);
+                String tagId = ids.get(tag);
+                uri = getProperty("cloud.url") + getProperty("cloud.tags-relations") + "/" + fileId + "/" + tagId;
+                HttpPut put = new HttpPut(uri);
+                try (CloseableHttpResponse response = client.execute(put, context)) {
+                    System.out.println("response = " + response);
+                }
+            }
+        }
+        catch (IOException | JDOMException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private String fileId(String path) {
+        try {
+            CloseableHttpClient client = client();
+            HttpClientContext context = clientContext();
+            String uri = getProperty("cloud.url") + getProperty("cloud.files") + "/" + Server.CLIENT.get() + "/" + path;
+            HttpPropFind propfind = new HttpPropFind(uri);
+            propfind.setEntity(new StringEntity(PROPFIND_DIR, ContentType.APPLICATION_XML));
+            try (CloseableHttpResponse response = client.execute(propfind, context)) {
+                Document dom = new SAXBuilder().build(response.getEntity().getContent());
+                for (Element element : dom.getRootElement().getDescendants(new ElementFilter("response", d))) {
+                    return fileId(element);
+                }
+                return null;
+            }
+        }
+        catch (IOException | JDOMException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private String tagId(Element element) {
+        return element.getDescendants(new ElementFilter("id", oc)).next().getText();
+    }
+
+    private String tagName(Element element) {
+        return element.getDescendants(new ElementFilter("display-name", oc)).next().getText();
+    }
+
     public static void main(String[] args) throws IOException {
         Cloud cloud = new Cloud(readProperties(args[0]));
-        List<Attachment> attachments = cloud.findAttachments("mathe", "Differentialrechnung", "Graphisches Ableiten");
-        System.out.println("attachments = " + attachments);
+        //List<Attachment> attachments = cloud.findAttachments("mathe", "Differentialrechnung", "Graphisches Ableiten");
+        //System.out.println("attachments = " + attachments);
+        CLIENT.set("");
+        Map<String, String> tags = cloud.listTags("Mathematik");
+        System.out.println("tags = " + tags);
+        CLIENT.set("test");
+        cloud.transferTags(tags);
     }
 
     protected String getProperty(String key) {
@@ -299,7 +421,7 @@ public class Cloud extends Server
 
         @Override
         public String toString() {
-            return "Attachment{" +
+            return "{" +
                 "id='" + id + '\'' +
                 ", name='" + name + '\'' +
                 ", tag='" + tag + '\'' +

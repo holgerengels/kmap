@@ -1,41 +1,52 @@
-/**
- * @license
- * Copyright (c) 2018 The Polymer Project Authors. All rights reserved.
- * This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
- * The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
- * The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
- * Code distributed by Google as part of the polymer project is also
- * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
- */
-
 import {
-    RECEIVE_MAP,
-    FAIL_MAP,
-    REQUEST_MAP,
+    LOAD_MAP,
     SELECT_SUMMARY_CARD
 } from '../actions/maps.js';
 
-const map = (state = {}, action) => {
+const INITIAL_STATE = {
+  loadFailure: false,
+  loadFetching: false,
+  loadResponse: null,
+  map: {},
+  invalidated: false,
+};
+
+const map = (state = INITIAL_STATE, action) => {
     switch (action.type) {
-        case REQUEST_MAP:
+      case LOAD_MAP:
+        switch (action.status) {
+          case 'pending':
             return {
-                ...state,
-                failure: false,
-                isFetching: true
+              ...state,
+              loadFetching: true,
+              loadFailure: false,
+              loadResponse: null,
             };
-        case RECEIVE_MAP:
+          case 'success':
             return {
-                ...state,
-                failure: false,
-                isFetching: false,
-                map: action.map
+              ...state,
+              loadFetching: false,
+              loadFailure: false,
+              loadResponse: null,
+              invalidated: false,
+              map: action.map
             };
-        case FAIL_MAP:
+          case 'error':
             return {
-                ...state,
-                failure: true,
-                isFetching: false
+              ...state,
+              loadFetching: false,
+              loadFailure: true,
+              loadResponse: action.response,
             };
+          case 'invalidate':
+            return {
+              ...state,
+              loadFetching: false,
+              loadFailure: false,
+              loadResponse: null,
+              invalidated: true,
+            };
+        }
         case SELECT_SUMMARY_CARD:
             return {
                 ...state,
