@@ -120,7 +120,7 @@ public class Cloud extends Server
 
         String path = Arrays.stream(dirs).map(this::encode).collect(Collectors.joining("/"));
 
-        HttpGet get = new HttpGet(files + path);
+        HttpGet get = new HttpGet(files + "/" + path);
         try (CloseableHttpResponse response = client.execute(get, context)) {
             StatusLine statusLine = response.getStatusLine();
             sender.accept(statusLine.getStatusCode() == 200

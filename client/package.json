@@ -26,7 +26,7 @@
     "@open-wc/prettier-config": "^0.1.0",
     "@open-wc/testing": "^0.11.1",
     "@open-wc/testing-karma": "^2.0.11",
-    "@open-wc/testing-karma-bs": "^1.1.11",
+    "@open-wc/testing-karma-bs": "^1.1.30",
     "eslint-plugin-lit": "^1.1.1",
     "http-server": "^0.11.1",
     "husky": "^1.0.0",
@@ -47,13 +47,13 @@
   "name": "kmap-main",
   "license": "MIT",
   "dependencies": {
+    "asciimath2tex": "^1.1.0",
+    "lit-element": "^2.2.1",
     "lit-html": "^1.0.0",
-    "lit-element": "^2.0.1",
     "mega-material": "1.0.0-alpha.1",
     "pwa-helpers": "^0.9.1",
     "redux": "^4.0.0",
     "redux-thunk": "^2.3.0",
-    "reselect": "^3.0.1",
-    "asciimath2tex": "^1.1.0"
+    "reselect": "^3.0.1"
   }
 }

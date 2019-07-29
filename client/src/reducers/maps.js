@@ -8,7 +8,7 @@ const INITIAL_STATE = {
   loadFetching: false,
   loadResponse: null,
   map: {},
-  invalidated: false,
+  invalidated: true,
 };
 
 const map = (state = INITIAL_STATE, action) => {
