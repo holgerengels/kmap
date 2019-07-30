@@ -23,10 +23,10 @@ import 'mega-material/snackbar';
 
 import './components/kmap-login-popup';
 import './components/kmap-subjects';
-import './components/kmap-course-selector';
 import './components/kmap-editor';
 import './components/kmap-summaries'
 import './components/kmap-averages'
+import './components/kmap-editor-edit-dialog'
 
 class KmapMain extends connect(store)(LitElement) {
 
@@ -98,6 +98,7 @@ class KmapMain extends connect(store)(LitElement) {
   }
 
   render() {
+    // language=HTML
     return html`
   <mwc-drawer id="drawer" hasheader dismissible>
     <span slot="title">KMap</span>
@@ -122,7 +123,7 @@ class KmapMain extends connect(store)(LitElement) {
       ${this._layers.includes('editor') ? html`<kmap-editor></kmap-editor>` : ''}
     </div>
     <div slot="app-content">
-    <main role="main" class="main-content">
+      <main role="main" class="main-content">
         <kmap-login-popup></kmap-login-popup>
 
         <kmap-subjects ?active="${this._page === 'home'}" class="page" ></kmap-subjects>
@@ -130,10 +131,11 @@ class KmapMain extends connect(store)(LitElement) {
         <kmap-test ?active="${this._page === 'test'}" class="page" ></kmap-test>
         <kmap-courses ?active="${this._page === 'courses'}" class="page" ></kmap-courses>
         <kmap-content-manager ?active="${this._page === 'content-manager'}" class="page" ></kmap-content-manager>
-    </main>
-      </div>
-   </mwc-drawer>
-   <mwc-snackbar id="snackbar">${this._renderMessages()}</mwc-snackbar>
+      </main>
+      ${this._layers.includes('editor') ? html`<kmap-editor-edit-dialog></kmap-editor-edit-dialog>` : ''}
+    </div>
+  </mwc-drawer>
+  <mwc-snackbar id="snackbar">${this._renderMessages()}</mwc-snackbar>
 `;
   }
 

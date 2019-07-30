@@ -1,5 +1,7 @@
 import {
   MODULES,
+  FORGET_MODULES,
+  SELECT_MODULE,
   IMPORT_MAP,
   DELETE_MAP,
 } from '../actions/content-maps';
@@ -9,6 +11,7 @@ const INITIAL_STATE = {
   modulesFetching: false,
   modulesResponse: null,
   modules: [],
+  selectedModule: null,
   importMapFailure: false,
   importMapFetching: false,
   importMapResponse: null,
@@ -68,6 +71,11 @@ const state = (state = INITIAL_STATE, action) => {
             importMapResponse: action.response,
           };
       }
+    case FORGET_MODULES:
+      return {
+        ...state,
+        modules: []
+      };
     case DELETE_MAP:
       switch (action.status) {
         case 'pending':
@@ -92,6 +100,12 @@ const state = (state = INITIAL_STATE, action) => {
             deleteMapResponse: action.response,
           };
       }
+    case SELECT_MODULE:
+      return {
+        ...state,
+        selectedModule: action.module
+      };
+
     default:
       return state;
   }

@@ -17,6 +17,11 @@ class KMapSummaryCardEditor extends connect(store)(LitElement) {
   background-color: var(--color-lightest);
   transition: background-color .5s ease-in-out;
 }
+mwc-button[disabled] {
+  pointer-events: none;
+  color: var(--color-darkgray);
+  opacity: .5;
+}
       `
     ];
   }
@@ -24,38 +29,44 @@ class KMapSummaryCardEditor extends connect(store)(LitElement) {
   render() {
     return html`
       <div class="content">
-        <mwc-button icon="edit" @click="${this._showEdit}"></mwc-button>
-        <mwc-button icon="delete" @click="${this._showDelete}"></mwc-button>
+        <mwc-button icon="edit" ?disabled="${!this._enabled}" @click="${this._showEdit}"></mwc-button>
+        <mwc-button icon="delete" ?disabled="${!this._enabled}" @click="${this._showDelete}"></mwc-button>
       </div>
     `;
   }
 
   static get properties() {
     return {
+      _subject: {type: String},
+      _selectedModule: {type: Object},
       key: {type: String},
       card: {type: Object},
+      _enabled: {type: Boolean},
     };
   }
 
   constructor() {
     super();
+    this._subject = '';
     this.key = '';
     this.card = null;
+    this._enabled = false;
   }
 
   firstUpdated(changedProperties) {
   }
 
   updated(changedProperties) {
-    /*
-    if (changedProperties.has('card') && this.card.topic) {
-      if (card.links === null)
-        card.links = '';
+    if (changedProperties.has("card") || changedProperties.has("_selectedModule")) {
+      this._enabled = this.card && this._selectedModule
+        && this._subject === this._selectedModule.subject
+        && this.card.module === this._selectedModule.module;
     }
-    */
   }
 
   stateChanged(state) {
+    this._subject = state.maps.map.subject;
+    this._selectedModule = state.contentMaps.selectedModule;
   }
 
   _showEdit() {

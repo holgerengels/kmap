@@ -3,6 +3,7 @@ import {connect} from "pwa-helpers/connect-mixin";
 import {store} from "../store";
 import {fontStyles, colorStyles} from "./kmap-styles";
 import {fetchAverageStateIfNeeded, forgetAverageState} from "../actions/average-states";
+import './kmap-course-selector';
 
 class KMapAverages extends connect(store)(LitElement) {
 

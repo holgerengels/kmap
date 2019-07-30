@@ -3,6 +3,8 @@ import {config} from "../config";
 import {logout, showMessage} from "./app";
 
 export const MODULES = 'MODULES';
+export const FORGET_MODULES = 'FORGET_MODULES';
+export const SELECT_MODULE = 'SELECT_MODULE';
 export const IMPORT_MAP = 'IMPORT_MAP';
 export const EXPORT_MAP = 'EXPORT_MAP';
 export const DELETE_MAP = 'DELETE_MAP';
@@ -49,6 +51,20 @@ const failModules = (response) => {
     type: MODULES,
     status: 'error',
     response: response.message,
+  };
+};
+
+export const forgetModules = (userid) => {
+  return {
+    type: FORGET_MODULES,
+    userid,
+  };
+};
+
+export const selectModule = (module) => {
+  return {
+    type: SELECT_MODULE,
+    module,
   };
 };
 
