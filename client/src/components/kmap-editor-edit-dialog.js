@@ -1,17 +1,17 @@
 import {css, html, LitElement} from 'lit-element';
 import {connect} from "pwa-helpers/connect-mixin";
 import {store} from "../store";
-import {logout, setCardForEdit, showMessage} from "../actions/app";
+import {logout, unsetCardForEdit, showMessage} from "../actions/app";
+import {saveTopic} from "../actions/editor";
+import {fetchMapIfNeeded, invalidateMap} from "../actions/maps";
+import {handleErrors} from "../actions/fetchy";
+import {config} from "../config";
 import {colorStyles, fontStyles} from "./kmap-styles";
 import 'mega-material/button';
 import 'mega-material/dialog';
 import 'mega-material/list';
 import './kmap-summary-card-summary';
 import './kmap-knowledge-card-description';
-import {saveTopic} from "../actions/editor";
-import {fetchMapIfNeeded, invalidateMap} from "../actions/maps";
-import {config} from "../config";
-import {handleErrors} from "../actions/fetchy";
 
 class KMapEditorEditDialog extends connect(store)(LitElement) {
 
@@ -21,7 +21,7 @@ class KMapEditorEditDialog extends connect(store)(LitElement) {
       fontStyles,
       colorStyles,
       css`
-.form {
+form {
   width: 510px;
 }
 textarea {
@@ -95,17 +95,17 @@ kmap-knowledge-card-description {
     // language=HTML
     return html`
 <mwc-dialog id="editDialog" title="Editor">
-${this.card ? html`
-  <div id="form" class="form" @focus="${this._focus}">
+${this._card ? html`
+  <form @focus="${this._focus}">
     <div class="field">
       <label for="links">Thema</label>
-      <span>${this.card.name}</span>
+      <span>${this._card.name}</span>
     </div>
     <div class="field">
       <label for="links"></label>
-      <input id="links" type="text" placeholder="Verweist auf ..." .value="${this.card.links}" @change="${e => this.card.links = e.target.links}"/>
+      <input id="links" type="text" placeholder="Verweist auf ..." .value="${this._card.links}" @change="${e => this._card.links = e.target.links}"/>
       <label for="priority"></label>
-      <input id="priority" type="number" placeholder="Priorität" inputmode="numeric" min="0" step="1" .value="${this.card.priority}" @change="${e => this.card.priority = e.target.value}"/>
+      <input id="priority" type="number" placeholder="Priorität" inputmode="numeric" min="0" step="1" .value="${this._card.priority}" @change="${e => this._card.priority = e.target.value}"/>
     </div>
     <div class="field">
       <label for="depends">Basiert auf ...</label>
@@ -113,15 +113,15 @@ ${this.card ? html`
     </div>
     <div class="field">
       <label for="summary">Kurztext</label>
-      <textarea id="summary" rows="3" @keyup="${this._setSummary}" @focus="${this._focus}" @blur="${this._focus}">${this.card.summary}</textarea>
+      <textarea id="summary" rows="3" @keyup="${this._setSummary}" @focus="${this._focus}" @blur="${this._focus}">${this._card.summary}</textarea>
     </div>
     <div class="field">
       <label for="description">Langtext</label>
-      <textarea id="description" placeholder="Langtext" rows="7" @keyup="${this._setDescription}" @focus="${this._focus}" @blur="${this._focus}">${this.card.description}</textarea>
+      <textarea id="description" rows="7" @keyup="${this._setDescription}" @focus="${this._focus}" @blur="${this._focus}">${this._card.description}</textarea>
     </div>
     <div class="field attachments">
       <label for="attachments">Materialien</label>
-      ${this.card.attachments.map((attachment, i) => html`
+      ${this._card.attachments.map((attachment, i) => html`
         <div class="attachment">
           ${attachment.type === 'link' ? html`<mwc-icon @click="${() => this._deleteAttachment(attachment)}">delete</mwc-icon>` : ''}
           <span class="tag">[${_tags.get(attachment.tag)}]</span> ${attachment.name}
@@ -138,7 +138,7 @@ ${this.card ? html`
       <input id="href" type="url" placeholder="Link" .value="${this._attachmentHref}" @change="${e => this._attachmentHref = e.target.value}"/>
       <mwc-icon @click="${this._addAttachment}">add_circle</mwc-icon>
     </div>
-  </div>` : ''}
+  </form>` : ''}
   <mwc-icon-button slotd="action" icon="cached" @click=${this._syncAttachments}></mwc-icon-button>
   <mwc-button class="button" slotd="action" primary @click=${this._save}>Speichern</mwc-button>
   <mwc-button class="button" slotd="action" @click=${this._cancel}>Abbrechen</mwc-button>
@@ -148,7 +148,7 @@ ${this.card ? html`
   ${this._showDescriptionPreview ? html`<div class="preview-scroller"><kmap-knowledge-card-description 
     .subject="${this._subject}"
     .chapter="${this._chapter}"
-    .topic="${this.card.name}"
+    .topic="${this._card.name}"
     .description="${this._description}"
     ></kmap-knowledge-card-description></div>` : ''}
   </div>
@@ -160,7 +160,7 @@ ${this.card ? html`
     return {
       _subject: {type: String},
       _chapter: {type: String},
-      card: {type: Object},
+      _card: {type: Object},
       _summary: {type: String},
       _description: {type: String},
       _showSummaryPreview: {type: Boolean},
@@ -176,7 +176,7 @@ ${this.card ? html`
     super();
     this._subject = '';
     this._chapter = '';
-    this.card = null;
+    this._card = null;
     this._summary = '';
     this._description = '';
     this._showSummaryPreview = false;
@@ -194,40 +194,41 @@ ${this.card ? html`
   }
 
   updated(changedProperties) {
-    if (changedProperties.has('card') && this.card) {
+    if (changedProperties.has('_card') && this._card) {
       this._attachmentTag = '';
       this._attachmentName = '';
       this._attachmentHref = '';
       this._editDialog.open();
 
-      this._summary = this.card.summary;
-      this._description = this.card.description;
-      this._depends = this.card.depends.join(", ");
+      this._summary = this._card.summary;
+      this._description = this._card.description;
+      this._depends = this._card.depends.join(", ");
 
       this._syncAttachments();
     }
   }
 
   stateChanged(state) {
-    if (state.maps.map) {
-      this._subject = state.maps.map.subject;
-      this._chapter = state.maps.map.chapter;
+    this._card = state.app.cardForEdit;
 
-      if (this.card) {
-        if (!this.card.summary)
-          this.card.summary = '';
-        if (!this.card.description)
-          this.card.description = '';
-        if (!this.card.links)
-          this.card.links = '';
-        if (!this.card.depends)
-          this.card.depends = [];
-        if (!this.card.attachments)
-          this.card.attachments = [];
+    if (state.maps.map) {
+      if (this._card) {
+        this._subject = this._card.subject ? this._card.subject : state.maps.map.subject;
+        this._chapter = this._card.chapter ? this._card.chapter : state.maps.map.chapter;
+
+        if (!this._card.summary)
+          this._card.summary = '';
+        if (!this._card.description)
+          this._card.description = '';
+        if (!this._card.links)
+          this._card.links = '';
+        if (!this._card.depends)
+          this._card.depends = [];
+        if (!this._card.attachments)
+          this._card.attachments = [];
       }
     }
 
-    this.card = state.app.cardForEdit;
   }
 
   _focus(e) {
@@ -245,25 +246,25 @@ ${this.card ? html`
 
   _save() {
     this._editDialog.close();
-    this.card.subject = this._subject;
-    this.card.chapter = this._chapter;
-    this.card.topic = this.card.name;
-    this.card.summary = this._summary;
-    this.card.description = this._description;
-    this.card.depends = this._depends.split(",").map(d => d.trim());
-    console.log(this.card);
-    store.dispatch(saveTopic(this._subject, this.card.module, {
+    this._card.subject = this._subject;
+    this._card.chapter = this._chapter;
+    this._card.topic = this._card.name;
+    this._card.summary = this._summary;
+    this._card.description = this._description;
+    this._card.depends = this._depends.split(",").map(d => d.trim()).filter(d => d.length > 0);
+    console.log(this._card);
+    store.dispatch(saveTopic(this._subject, this._card.module, {
       summary: this._summary,
       description: this._description,
-    } = this.card))
+    } = this._card))
       .then(store.dispatch(invalidateMap(this._subject, this._chapter)))
-      .then(store.dispatch(fetchMapIfNeeded(this._subject, this._chapter)))
-      .then(store.dispatch(setCardForEdit(null)));
+      .then(store.dispatch(unsetCardForEdit()))
+      .then(lala => window.setTimeout(function(subject, chapter){ store.dispatch(fetchMapIfNeeded(subject, chapter)) }.bind(undefined, this._subject, this._chapter), 1000));
   }
 
   _cancel() {
     this._editDialog.close();
-    store.dispatch(setCardForEdit(null));
+    store.dispatch(unsetCardForEdit());
   }
 
   _setSummary() {
@@ -294,7 +295,7 @@ ${this.card ? html`
       store.dispatch(showMessage("unvollständig!"));
     }
     else {
-      this.card.attachments = [...this.card.attachments, {
+      this._card.attachments = [...this._card.attachments, {
         tag: this._attachmentTag,
         name: this._attachmentName,
         href: this._attachmentHref,
@@ -308,14 +309,14 @@ ${this.card ? html`
   }
 
   _deleteAttachment(attachment) {
-    let attachments = [...this.card.attachments];
+    let attachments = [...this._card.attachments];
     attachments.splice(attachments.indexOf(attachment), 1);
-    this.card.attachments = attachments;
+    this._card.attachments = attachments;
     this.requestUpdate();
   }
 
   _syncAttachments() {
-    fetch(`${config.server}edit?attachments=${this._subject}/${this._chapter}/${this.card.name}`, {
+    fetch(`${config.server}edit?attachments=${this._subject}/${this._chapter}/${this._card.name}`, {
       method: "GET",
       mode: "cors",
       cache: "no-cache",
@@ -330,8 +331,8 @@ ${this.card ? html`
         console.log(data.data);
 
         var attachments = [];
-        if (this.card.attachments)
-          attachments.push(...this.card.attachments);
+        if (this._card.attachments)
+          attachments.push(...this._card.attachments);
 
         var i = attachments.length;
         while (i--) {
@@ -348,7 +349,7 @@ ${this.card ? html`
           }
         }
 
-        this.card.attachments = attachments;
+        this._card.attachments = attachments;
         this.requestUpdate();
       })
       .catch((error) => {

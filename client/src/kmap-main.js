@@ -24,9 +24,11 @@ import 'mega-material/snackbar';
 import './components/kmap-login-popup';
 import './components/kmap-subjects';
 import './components/kmap-editor';
-import './components/kmap-summaries'
-import './components/kmap-averages'
-import './components/kmap-editor-edit-dialog'
+import './components/kmap-summaries';
+import './components/kmap-averages';
+import './components/kmap-editor-edit-dialog';
+import './components/kmap-editor-delete-dialog';
+import './components/kmap-editor-add-fabs';
 
 class KmapMain extends connect(store)(LitElement) {
 
@@ -133,6 +135,8 @@ class KmapMain extends connect(store)(LitElement) {
         <kmap-content-manager ?active="${this._page === 'content-manager'}" class="page" ></kmap-content-manager>
       </main>
       ${this._layers.includes('editor') ? html`<kmap-editor-edit-dialog></kmap-editor-edit-dialog>` : ''}
+      ${this._layers.includes('editor') ? html`<kmap-editor-delete-dialog></kmap-editor-delete-dialog>` : ''}
+      ${this._layers.includes('editor') ? html`<kmap-editor-add-fabs></kmap-editor-add-fabs>` : ''}
     </div>
   </mwc-drawer>
   <mwc-snackbar id="snackbar">${this._renderMessages()}</mwc-snackbar>

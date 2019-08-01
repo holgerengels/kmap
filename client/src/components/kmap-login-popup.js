@@ -4,7 +4,6 @@ import {store} from "../store.js";
 
 import 'mega-material/button';
 import 'mega-material/dialog';
-import 'mega-material/fab';
 import 'mega-material/surface';
 import {login, logout, showMessage} from "../actions/app";
 import {fontStyles} from "./kmap-styles";

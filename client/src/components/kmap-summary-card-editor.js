@@ -1,7 +1,7 @@
 import { LitElement, html, css } from 'lit-element';
 import {connect} from "pwa-helpers/connect-mixin";
 import {store} from "../store";
-import {setCardForEdit} from "../actions/app";
+import {setCardForEdit, setCardForDelete} from "../actions/app";
 import {colorStyles, fontStyles} from "./kmap-styles";
 import 'mega-material/button';
 import './modal-dialog';
@@ -22,6 +22,10 @@ mwc-button[disabled] {
   color: var(--color-darkgray);
   opacity: .5;
 }
+.warn {
+  color: darkred;
+  margin: 16px;  
+}
       `
     ];
   }
@@ -31,6 +35,9 @@ mwc-button[disabled] {
       <div class="content">
         <mwc-button icon="edit" ?disabled="${!this._enabled}" @click="${this._showEdit}"></mwc-button>
         <mwc-button icon="delete" ?disabled="${!this._enabled}" @click="${this._showDelete}"></mwc-button>
+      </div>
+      <div class="content">
+        ${this.card.annotations ? html`<div class="warn">${this.card.annotations}</div>` : ''}
       </div>
     `;
   }
@@ -71,6 +78,10 @@ mwc-button[disabled] {
 
   _showEdit() {
     store.dispatch(setCardForEdit(this.card));
+  }
+
+  _showDelete() {
+    store.dispatch(setCardForDelete(this.card));
   }
 }
 

@@ -19,6 +19,7 @@ public class Node {
     private String description;
     private String summary;
     private JsonArray attachments;
+    private List<String> annotations = new ArrayList<>();
 
     public Node(String name) {
         this.name = name;
@@ -114,5 +115,9 @@ public class Node {
 
     public void setAttachments(JsonArray attachments) {
         this.attachments = attachments;
+    }
+
+    public List<String> getAnnotations() {
+        return annotations;
     }
 }

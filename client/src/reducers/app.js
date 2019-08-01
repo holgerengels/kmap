@@ -12,6 +12,7 @@ import {
   ADD_LAYER,
   REMOVE_LAYER,
   CARD_FOR_EDIT,
+  CARD_FOR_DELETE,
 } from '../actions/app.js';
 
 const INITIAL_STATE = {
@@ -31,6 +32,7 @@ const INITIAL_STATE = {
   logoutFetching: false,
   logoutResponse: null,
   cardForEdit: null,
+  cardForDelete: null,
 };
 
 const app = (state = INITIAL_STATE, action) => {
@@ -146,6 +148,11 @@ const app = (state = INITIAL_STATE, action) => {
         ...state,
         cardForEdit: action.card
       };
+    case CARD_FOR_DELETE:
+      return {
+        ...state,
+        cardForDelete: action.card
+      };
     default:
       return state;
   }
@@ -155,5 +162,6 @@ Array.prototype.unique = function() {
   return this.filter(function (value, index, self) {
     return self.indexOf(value) === index;
   });
-}
+};
+
 export default app;

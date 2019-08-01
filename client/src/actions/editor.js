@@ -19,7 +19,7 @@ export const saveTopic = (subject, module, card) => (dispatch, getState) => {
       headers: {
         "Content-Type": "application/json; charset=utf-8",
       },
-      body: JSON.stringify({old: card, changed: card})
+      body: JSON.stringify(card.added ? {changed: card} : {old: card, changed: card})
     })
       .then(handleErrors)
       .then(res => res.json())

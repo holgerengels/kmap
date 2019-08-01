@@ -184,6 +184,7 @@ public class Couch extends Server {
             else {
                 command = "add:";
                 changed.addProperty("subject", subject);
+                changed.remove("added");
                 if (checks(changed))
                     client.save(changed);
                 else
@@ -268,15 +269,22 @@ public class Couch extends Server {
                 for (JsonElement depend : depends) {
                     String dependsOn = depend.getAsString();
                     //System.out.println("--> " + dependsOn);
-                    connections.computeIfAbsent(dependsOn + ":" + topicName, s -> {
+                    Connection connection = connections.computeIfAbsent(dependsOn + ":" + topicName, s -> {
                         Node source = nodes.get(dependsOn);
-                        if (source == null)
+                        if (source == null) {
                             System.out.println("source node " + dependsOn + " missing");
+                            return null;
+                        }
                         Node target = nodes.get(topicName);
-                        if (target == null)
+                        if (target == null) {
                             System.out.println("target node" + topicName + " missing");
+                            return null;
+                        }
                         return new Connection(source, target);
                     });
+                    if (connection == null)
+                        node.getAnnotations().add("inconsistent dependency");
+
                     node.getDepends().add(dependsOn);
                 }
             }
@@ -339,6 +347,7 @@ public class Couch extends Server {
                 depends.add(dependName);
             }
             card.add("depends", depends);
+            card.addProperty("annotations", String.join(", ", node.getAnnotations()));
             addProperty(card, "priority", node.getPriority());
             cards.add(card);
         }
