@@ -77,8 +77,7 @@ class KMapKnowledgeCard extends connect(store)(LitElement) {
 }
 .attachments > div {
   align-content: start;
-  margin-left: 12px;
-  margin-right: 12px;
+  margin: 12px;
 }
       `
         ];

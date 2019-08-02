@@ -53,9 +53,13 @@ box img {
   render() {
     // language=HTML
     return html`
+    ${this._description
+      ? html`
 <div class="content">
     ${unsafeHTML(this._description)}
 </div>
+        `
+      : ''}
     `;
   }
 

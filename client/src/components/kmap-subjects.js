@@ -21,9 +21,11 @@ class KMapSubjects extends connect(store)(LitElement) {
     padding-bottom: 36px;
 }
 kmap-subject-card {
-  vertical-align: top;
+  display: inline-block;
+  margin-bottom: 16px;
   margin-left: 6px;
   margin-right: 6px;
+  vertical-align: top;
 }
         `
     ];

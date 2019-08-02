@@ -98,12 +98,12 @@ kmap-knowledge-card-description {
 ${this._card ? html`
   <form @focus="${this._focus}">
     <div class="field">
-      <label for="links">Thema</label>
-      <span>${this._card.name}</span>
+      <label for="topic">Thema</label>
+      <span id="topic">${this._card.name}</span>
     </div>
     <div class="field">
       <label for="links"></label>
-      <input id="links" type="text" placeholder="Verweist auf ..." .value="${this._card.links}" @change="${e => this._card.links = e.target.links}"/>
+      <input id="links" type="text" placeholder="Verweist auf ..." .value="${this._card.links}" @change="${e => this._card.links = e.target.value}"/>
       <label for="priority"></label>
       <input id="priority" type="number" placeholder="Priorität" inputmode="numeric" min="0" step="1" .value="${this._card.priority}" @change="${e => this._card.priority = e.target.value}"/>
     </div>

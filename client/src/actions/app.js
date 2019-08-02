@@ -24,6 +24,7 @@ export const LOGOUT = 'LOGOUT';
 export const ADD_LAYER = 'ADD_LAYER';
 export const REMOVE_LAYER = 'REMOVE_LAYER';
 export const CARD_FOR_EDIT = 'CARD_FOR_EDIT';
+export const CARD_FOR_RENAME = 'CARD_FOR_RENAME';
 export const CARD_FOR_DELETE = 'CARD_FOR_DELETE';
 
 export const navigate = (path) => (dispatch, getState) => {
@@ -296,6 +297,20 @@ export const setCardForEdit = (card) => {
 export const unsetCardForEdit = () => {
   return {
     type: CARD_FOR_EDIT,
+    card: null
+  };
+};
+
+export const setCardForRename = (card) => {
+  return {
+    type: CARD_FOR_RENAME,
+    card
+  };
+};
+
+export const unsetCardForRename = () => {
+  return {
+    type: CARD_FOR_RENAME,
     card: null
   };
 };

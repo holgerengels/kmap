@@ -5,6 +5,7 @@ import {modules, forgetModules, selectModule} from "../actions/content-maps";
 import {fontStyles, colorStyles} from "./kmap-styles";
 import 'mega-material/fab';
 import {setCardForEdit} from "../actions/app";
+import {fetchMapIfNeeded} from "../actions/maps";
 
 class KMapEditorAddFabs extends connect(store)(LitElement) {
 
@@ -43,6 +44,7 @@ mwc-fab {
 }
 
 .secondary {
+  --mdc-theme-secondary: var(--color-secondary-light);
   opacity: 1;
   transition: bottom .3s ease-in-out, opacity .2s ease-in;
 }
@@ -63,7 +65,7 @@ input {
   render() {
     // language=HTML
     return html`
-      <mwc-fab icon="${this._opened ? 'remove' : 'add'}" class="primary" @click="${this._open}"></mwc-fab>
+      <mwc-fab icon="${this._opened ? 'remove' : 'add'}" class="primary" ?exited="${!this._fabs}" @click="${this._open}"></mwc-fab>
       <mwc-fab icon="add" label="Fach"         mini class="secondary one"   ?exited="${!this._opened}" @click="${this._addSubject}"></mwc-fab>
       <mwc-fab icon="add" label="Modul"        mini class="secondary two"   ?exited="${!this._opened || !this._currentSubject}" @click="${this._addModule}"></mwc-fab>
       <mwc-fab icon="add" label="Landkarte"    mini class="secondary three" ?exited="${!this._opened || !this._currentModule}" @click="${this._addChapter}"></mwc-fab>
@@ -107,6 +109,8 @@ input {
       _chapter: {type: String},
       _topic: {type: String},
       _mode: {type: String},
+      _layers: {type: Array},
+      _fabs: {type: Boolean},
     };
   }
 
@@ -121,9 +125,14 @@ input {
     this._chapter = '';
     this._topic = '';
     this._mode = 'topic';
+    this._layers = [];
   }
 
   updated(changedProperties) {
+    if (changedProperties.has("_layers"))
+      window.setTimeout(function (that) {
+        that._fabs = that._layers.includes('editor');
+      }.bind(undefined, this), 300);
   }
 
   stateChanged(state) {
@@ -133,14 +142,16 @@ input {
     }
     if (state.contentMaps.selectedModule)
       this._currentModule = state.contentMaps.selectedModule.module;
+
+    this._layers = state.app.layers;
   }
 
   _title() {
     switch (this._mode) {
       case "topic":
-        return 'Neue Wissenskarte';
+        return 'Neues Thema';
       case "chapter":
-        return 'Neue Wissenslandkarte';
+        return 'Neues Kapitel';
       case "module":
         return 'Neues Modul';
       case "subject":

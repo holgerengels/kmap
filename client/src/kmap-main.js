@@ -27,6 +27,7 @@ import './components/kmap-editor';
 import './components/kmap-summaries';
 import './components/kmap-averages';
 import './components/kmap-editor-edit-dialog';
+import './components/kmap-editor-rename-dialog';
 import './components/kmap-editor-delete-dialog';
 import './components/kmap-editor-add-fabs';
 
@@ -75,13 +76,18 @@ class KmapMain extends connect(store)(LitElement) {
         line-height: 40px;
         padding: 0 24px;
       }
-
       .drawer-list > a[selected] {
         color: var(--app-drawer-selected-color);
+      }
+      .app-content {
+        height: 100%;
+        overflow: hidden;
       }
 
       .page {
         display: none;
+        height: 100%;
+        overflow-y: auto;
       }
 
       .page[active] {
@@ -124,17 +130,17 @@ class KmapMain extends connect(store)(LitElement) {
       <mwc-button @click="${e => this._toggleLayer('editor')}" icon="edit" outlined ?raised="${this._layers.includes('editor')}" ?disabled="${!this._roles.includes("teacher")}">editor</mwc-button>
       ${this._layers.includes('editor') ? html`<kmap-editor></kmap-editor>` : ''}
     </div>
-    <div slot="app-content">
-      <main role="main" class="main-content">
-        <kmap-login-popup></kmap-login-popup>
+    <div slot="app-content" class="app-content" role="main">
+      <kmap-login-popup></kmap-login-popup>
 
-        <kmap-subjects ?active="${this._page === 'home'}" class="page" ></kmap-subjects>
-        <kmap-browser ?active="${this._page === 'browser'}" class="page" ></kmap-browser>
-        <kmap-test ?active="${this._page === 'test'}" class="page" ></kmap-test>
-        <kmap-courses ?active="${this._page === 'courses'}" class="page" ></kmap-courses>
-        <kmap-content-manager ?active="${this._page === 'content-manager'}" class="page" ></kmap-content-manager>
-      </main>
+      <kmap-subjects ?active="${this._page === 'home'}" class="page" ></kmap-subjects>
+      <kmap-browser ?active="${this._page === 'browser'}" class="page" ></kmap-browser>
+      <kmap-test ?active="${this._page === 'test'}" class="page" ></kmap-test>
+      <kmap-courses ?active="${this._page === 'courses'}" class="page" ></kmap-courses>
+      <kmap-content-manager ?active="${this._page === 'content-manager'}" class="page" ></kmap-content-manager>
+
       ${this._layers.includes('editor') ? html`<kmap-editor-edit-dialog></kmap-editor-edit-dialog>` : ''}
+      ${this._layers.includes('editor') ? html`<kmap-editor-rename-dialog></kmap-editor-rename-dialog>` : ''}
       ${this._layers.includes('editor') ? html`<kmap-editor-delete-dialog></kmap-editor-delete-dialog>` : ''}
       ${this._layers.includes('editor') ? html`<kmap-editor-add-fabs></kmap-editor-add-fabs>` : ''}
     </div>
@@ -217,10 +223,10 @@ class KmapMain extends connect(store)(LitElement) {
         store.dispatch(removeLayer('averages'));
       else if (layer === 'averages' && this._layers.includes('summaries'))
         store.dispatch(removeLayer('summaries'));
-      else if (layer === 'summaries' && this._layers.includes('editor'))
+      else if (layer === 'averages' && this._layers.includes('editor'))
         store.dispatch(removeLayer('editor'));
-      else if (layer === 'editor' && this._layers.includes('summaries'))
-        store.dispatch(removeLayer('summaries'));
+      else if (layer === 'editor' && this._layers.includes('averages'))
+        store.dispatch(removeLayer('averages'));
 
       store.dispatch(addLayer(layer));
     }

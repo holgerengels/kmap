@@ -12,6 +12,7 @@ import {
   ADD_LAYER,
   REMOVE_LAYER,
   CARD_FOR_EDIT,
+  CARD_FOR_RENAME,
   CARD_FOR_DELETE,
 } from '../actions/app.js';
 
@@ -32,6 +33,7 @@ const INITIAL_STATE = {
   logoutFetching: false,
   logoutResponse: null,
   cardForEdit: null,
+  cardForRename: null,
   cardForDelete: null,
 };
 
@@ -147,6 +149,11 @@ const app = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         cardForEdit: action.card
+      };
+    case CARD_FOR_RENAME:
+      return {
+        ...state,
+        cardForRename: action.card
       };
     case CARD_FOR_DELETE:
       return {
