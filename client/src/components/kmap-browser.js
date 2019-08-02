@@ -93,9 +93,9 @@ class KMapBrowser extends connect(store)(LitElement) {
 
   render() {
     return html`
-      <mwc-top-app-bar fixed>
+      <mwc-top-app-bar>
         <mwc-icon-button icon="menu" slot="navigationIcon"></mwc-icon-button>
-        <div slot="title">${this.subject}</div>
+        <div slot="title">${this.chapter}</div>
       </mwc-top-app-bar>
         <div class="page map" ?active="${this.page === 'map'}" @rated="${this._rated}">
             ${this.lines.map((line, i) => html`

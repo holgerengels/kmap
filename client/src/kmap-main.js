@@ -40,6 +40,7 @@ class KmapMain extends connect(store)(LitElement) {
       colorStyles,
       css`
       :host {
+        overflow: unset;
         --app-drawer-background-color: var(--app-secondary-color);
         --app-drawer-text-color: var(--app-light-text-color);
         --app-drawer-selected-color: #c67100;
@@ -81,13 +82,15 @@ class KmapMain extends connect(store)(LitElement) {
       }
       .app-content {
         height: 100%;
-        overflow: hidden;
+        overflow: unset;
       }
 
       .page {
-        display: none;
+        position: absolute;
         height: 100%;
+        width: 100%;
         overflow-y: auto;
+        display: none;
       }
 
       .page[active] {

@@ -1,7 +1,7 @@
 import {css, html, LitElement} from 'lit-element';
 import {connect} from "pwa-helpers/connect-mixin";
 import {store} from "../store";
-import {logout, unsetCardForEdit, showMessage} from "../actions/app";
+import {navigate, logout, unsetCardForEdit, showMessage} from "../actions/app";
 import {saveTopic} from "../actions/editor";
 import {fetchMapIfNeeded, invalidateMap} from "../actions/maps";
 import {handleErrors} from "../actions/fetchy";
@@ -169,6 +169,7 @@ ${this._card ? html`
       _attachmentTag: {type: String},
       _attachmentName: {type: String},
       _attachmentHref: {type: String},
+      _navigateAfterSafe: {type: String},
     };
   }
 
@@ -187,6 +188,7 @@ ${this._card ? html`
     this._attachmentTag = '';
     this._attachmentName = '';
     this._attachmentHref = '';
+    this._navigateAfterSafe = null;
   }
 
   firstUpdated(changedProperties) {
@@ -215,6 +217,10 @@ ${this._card ? html`
       if (this._card) {
         this._subject = this._card.subject ? this._card.subject : state.maps.map.subject;
         this._chapter = this._card.chapter ? this._card.chapter : state.maps.map.chapter;
+
+        this._navigateAfterSafe = state.maps.map.subject !== this._subject || state.maps.map.chapter !== this._chapter
+          ? "#browser/" + this._subject + "/" + this._chapter
+          : null;
 
         if (!this._card.summary)
           this._card.summary = '';
@@ -253,13 +259,18 @@ ${this._card ? html`
     this._card.description = this._description;
     this._card.depends = this._depends.split(",").map(d => d.trim()).filter(d => d.length > 0);
     console.log(this._card);
-    store.dispatch(saveTopic(this._subject, this._card.module, {
-      summary: this._summary,
-      description: this._description,
-    } = this._card))
+
+    store.dispatch(saveTopic(this._subject, this._card.module, this._card))
       .then(store.dispatch(invalidateMap(this._subject, this._chapter)))
       .then(store.dispatch(unsetCardForEdit()))
-      .then(lala => window.setTimeout(function(subject, chapter){ store.dispatch(fetchMapIfNeeded(subject, chapter)) }.bind(undefined, this._subject, this._chapter), 1000));
+      .then(lala => window.setTimeout(function(subject, chapter, navigateAfterSafe) {
+        if (navigateAfterSafe) {
+          window.location = navigateAfterSafe;
+          store.dispatch(navigate(navigateAfterSafe));
+        }
+        else
+          store.dispatch(fetchMapIfNeeded(subject, chapter));
+      }.bind(undefined, this._subject, this._chapter, this._navigateAfterSafe), 1000));
   }
 
   _cancel() {
