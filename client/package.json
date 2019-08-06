@@ -16,7 +16,7 @@
     "build": "rimraf dist && rollup -c rollup.config.js",
     "start:build": "owc-dev-server dist/ --open",
     "watch:build": "rimraf dist && rollup --watch -c rollup.config.js & http-server dist -o -c-1",
-    "start": "owc-dev-server --open --hostname gollum"
+    "start": "owc-dev-server --open --hostname localhost"
   },
   "devDependencies": {
     "@commitlint/cli": "^7.0.0",

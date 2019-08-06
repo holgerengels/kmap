@@ -139,7 +139,8 @@ ${this._card ? html`
       <mwc-icon @click="${this._addAttachment}">add_circle</mwc-icon>
     </div>
   </form>` : ''}
-  <mwc-icon-button slotd="action" icon="cached" @click=${this._syncAttachments}></mwc-icon-button>
+  <mwc-icon-button slotd="action" icon="cached" title="Materialien aus Cloud synchronisieren" @click=${this._syncAttachments}></mwc-icon-button>
+  <mwc-icon-button slotd="action" icon="folder_open" title="Cloud Verzeichnis öffnen" @click=${this._createDirectory}></mwc-icon-button>
   <mwc-button class="button" slotd="action" primary @click=${this._save}>Speichern</mwc-button>
   <mwc-button class="button" slotd="action" @click=${this._cancel}>Abbrechen</mwc-button>
   <div class="preview" slot="action">
@@ -369,6 +370,29 @@ ${this._card ? html`
           store.dispatch(logout({userid: this._userid}));
       });
   }
+
+  _createDirectory() {
+    fetch(`${config.server}edit?directory=${this._subject}/${this._chapter}/${this._card.name}`, {
+      method: "GET",
+      mode: "cors",
+      cache: "no-cache",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+      }
+    })
+      .then(handleErrors)
+      .then(res => res.json())
+      .then(data => {
+        console.log(data.data);
+        window.open(data.data, '_blank');
+      })
+      .catch((error) => {
+        store.dispatch(showMessage(error.message));
+        if (error.message === "invalid session")
+          store.dispatch(logout({userid: this._userid}));
+      });
+  }
 }
 
 const _tags = new Map([
@@ -380,20 +404,3 @@ const _tags = new Map([
 ]);
 
 window.customElements.define('kmap-editor-edit-dialog', KMapEditorEditDialog);
-
-
-/*
-  synchronize: function () {
-      this.$$('#cloudSynchronizer').params = { attachments: this.subject + "/" + this.chapter + "/" + this.topic };
-      this.$$('#cloudSynchronizer').body = { subject: this.subject, chapter: this.chapter, topic: this.topic };
-      console.log(this.$$('#cloudSynchronizer').headers);
-      this.$$('#cloudSynchronizer').generateRequest();
-  },
-
-  createDirectory: function () {
-      this.$$('#cloudDirectory').params = { directory: this.subject + "/" + this.chapter + "/" + this.topic };
-      this.$$('#cloudDirectory').body = { subject: this.subject, chapter: this.chapter, topic: this.topic };
-      this.$$('#cloudDirectory').generateRequest();
-  },
-
- */

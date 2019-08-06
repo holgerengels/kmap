@@ -1,11 +1,9 @@
 import {LitElement, html, css} from 'lit-element';
 import {connect} from "pwa-helpers/connect-mixin";
 import {store} from "../store";
-import {modules, forgetModules, selectModule} from "../actions/content-maps";
 import {fontStyles, colorStyles} from "./kmap-styles";
 import 'mega-material/fab';
 import {setCardForEdit} from "../actions/app";
-import {fetchMapIfNeeded} from "../actions/maps";
 
 class KMapEditorAddFabs extends connect(store)(LitElement) {
 
@@ -65,11 +63,11 @@ input {
   render() {
     // language=HTML
     return html`
-      <mwc-fab icon="${this._opened ? 'remove' : 'add'}" class="primary" ?exited="${!this._fabs}" @click="${this._open}"></mwc-fab>
-      <mwc-fab icon="add" label="Fach"         mini class="secondary one"   ?exited="${!this._opened}" @click="${this._addSubject}"></mwc-fab>
-      <mwc-fab icon="add" label="Modul"        mini class="secondary two"   ?exited="${!this._opened || !this._currentSubject}" @click="${this._addModule}"></mwc-fab>
-      <mwc-fab icon="add" label="Landkarte"    mini class="secondary three" ?exited="${!this._opened || !this._currentModule}" @click="${this._addChapter}"></mwc-fab>
-      <mwc-fab icon="add" label="Wissenskarte" mini class="secondary four"  ?exited="${!this._opened || !this._currentModule || !this._currentChapter}" @click="${this._addTopic}"></mwc-fab>
+      <mwc-fab icon="${this._opened ? 'clear' : 'add'}" class="primary" ?exited="${!this._fabs}" @click="${this._open}"></mwc-fab>
+      <mwc-fab icon="add" label="Fach"    mini class="secondary one"   ?exited="${!this._opened}" @click="${this._addSubject}"></mwc-fab>
+      <mwc-fab icon="add" label="Modul"   mini class="secondary two"   ?exited="${!this._opened || !this._currentSubject}" @click="${this._addModule}"></mwc-fab>
+      <mwc-fab icon="add" label="Kapitel" mini class="secondary three" ?exited="${!this._opened || !this._currentModule}" @click="${this._addChapter}"></mwc-fab>
+      <mwc-fab icon="add" label="Thema"   mini class="secondary four"  ?exited="${!this._opened || !this._currentModule || !this._currentChapter}" @click="${this._addTopic}"></mwc-fab>
       
       <mwc-dialog id="addDialog" title="${this._title()}">
         <form id="addForm" @keyup="${this._maybeEnter}">
@@ -164,13 +162,13 @@ input {
   _explanation() {
     switch (this._mode) {
       case "topic":
-        return `Der Wissenslandkarte ${this._currentChapter} wird eine neue Wissenskarte hinzugefügt. Die Wissenskarte wird im Modul ${this._currentModule} gespeichert.`;
+        return `Dem Kapitel ${this._currentChapter} wird eine neues Thema hinzugefügt. Das Thema wird im Modul ${this._currentModule} gespeichert.`;
       case "chapter":
-        return `Es wird eine neue Wissenslandkarte mit einer ersten Wissenskarte erzeugt. Die Wissenskarte wird im Modul ${this._currentModule} gespeichert.`;
+        return `Es wird ein neues Kapitel mit einem ersten Thema erzeugt. Das Thema wird im Modul ${this._currentModule} gespeichert.`;
       case "module":
-        return `Es wird ein neues Modul erzeugt, indem eine erste Wissenskarte auf einer neuen Wissenslandkarte erstellt wird.`;
+        return `Es wird ein neues Modul erzeugt, indem eine erstes Thema in einem neuen Kapitel erstellt wird.`;
       case "subject":
-        return `Es wird ein neues Fach erzeugt, indem eine erste Wissenskarte auf der Wissenslandkarte mit dem Namen des Fachs erstellt wird. Gespeichert wird in einem neuen Modul.`;
+        return `Es wird ein neues Fach erzeugt, indem ein erstes Thema im Kaptitel mit dem Namen des Fachs erstellt wird. Gespeichert wird in einem neuen Modul.`;
       default:
         return '';
     }

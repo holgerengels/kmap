@@ -3,20 +3,22 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="Description" content="Put your description here.">
+  <meta name="Description" content="KMap kartographiert Wissen, so dass die Zusammenhänge sichtbar werden.">
 
   <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#5eb8ff">
   <!-- Performance tip: hint to the browser to start the handshake for the fonts site -->
   <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+
   <script>
       // Load and register pre-caching Service Worker
       /*
       if ('serviceWorker' in navigator) {
           window.addEventListener('load', function() {
-              console.log("lolo");
-              navigator.serviceWorker.register('service-worker.js', {
-                  scope: '/',
-              });
+              navigator.serviceWorker.register('/service-worker.js', { scope: '/' })
+                  .then((reg) => {
+                      console.log('Service worker registered.', reg);
+                  });
           });
       }
       */
@@ -25,7 +27,7 @@
       // https://github.com/reactjs/redux/issues/2907
       window.process = { env: { NODE_ENV: 'production' } };
   </script>
-  <script type="module" src="./src/mathjax3/tex-svg.js" id="MathJax-script"></script>
+  <script type="module" src="./src/mathjax3/tex-svg.js" id="MathJax-script" async></script>
 
   <style>
     html, body {
@@ -56,12 +58,13 @@
       --mdc-theme-on-primary: white;
     }
   </style>
-  <title>kmap-main</title>
+  <title>KMap</title>
 </head>
 <body>
   <kmap-main></kmap-main>
 
   <script type="module" src="./src/kmap-main.js"></script>
+  <noscript>JavaScript wird benötigt!</noscript>
 </body>
 
 </html>

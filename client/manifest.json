@@ -1,5 +1,6 @@
 {
-    "name": "KMap",
+    "name": "Knowledge Map",
+    "short_name": "KMap",
     "icons": [
         {
             "src": "/android-chrome-192x192.png",
