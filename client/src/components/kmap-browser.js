@@ -244,7 +244,8 @@ class KMapBrowser extends connect(store)(LitElement) {
       this.subject = state.maps.map.subject;
       this.chapter = state.maps.map.chapter;
       this.lines = state.maps.map.lines;
-    } else {
+    }
+    else {
       this.subject = "";
       this.chapter = "";
       this.lines = [];

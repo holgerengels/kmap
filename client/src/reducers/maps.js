@@ -7,7 +7,6 @@ const INITIAL_STATE = {
   loadFailure: false,
   loadFetching: false,
   loadResponse: null,
-  map: {},
   invalidated: true,
 };
 

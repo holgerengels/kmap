@@ -7,7 +7,7 @@ export const SELECT_SUMMARY_CARD = 'SELECT_SUMMARY_CARD';
 
 export const fetchMapIfNeeded = (subject, chapter) => (dispatch, getState) => {
   let state = getState();
-  if ((subject !== state.maps.map.subject || chapter !== state.maps.map.chapter || state.maps.invalidated) && !state.maps.loadFetching) {
+  if ((!state.maps.map || subject !== state.maps.map.subject || chapter !== state.maps.map.chapter || state.maps.invalidated) && !state.maps.loadFetching) {
     dispatch(requestMap(subject, chapter));
     return fetch(`${config.server}data?subject=${subject}&load=${chapter}`, {
       method: "GET",
