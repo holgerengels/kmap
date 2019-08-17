@@ -59,10 +59,9 @@ const failLoadCourses = (userid, response) => {
   };
 };
 
-export const forgetCourses = (userid) => {
+export const forgetCourses = () => {
   return {
     type: FORGET_COURSES,
-    userid,
   };
 };
 

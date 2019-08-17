@@ -10,12 +10,11 @@ import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.*;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.entity.ContentType;
+import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.DefaultConnectionReuseStrategy;
 import org.apache.http.impl.auth.BasicScheme;
-import org.apache.http.impl.client.BasicAuthCache;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.*;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -24,7 +23,6 @@ import org.jdom2.Namespace;
 import org.jdom2.filter.ElementFilter;
 import org.jdom2.input.SAXBuilder;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -71,64 +69,6 @@ public class Cloud extends Server
         super(properties);
     }
 
-    public String createDirectory(String... dirs) {
-        try {
-            CloseableHttpClient client = client();
-            HttpClientContext context = clientContext();
-
-            String files = getProperty("cloud.url") + getProperty("cloud.files") + "/" + Server.CLIENT.get();
-
-            String path = "";
-            for (String dir : dirs) {
-                path += "/" + encode(dir);
-                try (CloseableHttpResponse ignored = client.execute(new HttpMKCol(files + path), context)){}
-            }
-
-            return (getProperty("cloud.url") + getProperty("cloud.links") + "/" + Server.CLIENT.get()) + path;
-        }
-        catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    class AttachmentStream {
-        public AttachmentStream(InputStream stream, String mimeType, long contentLength) {
-            this.stream = stream;
-            this.mimeType = mimeType;
-            this.contentLength = contentLength;
-            this.responseCode = 200;
-        }
-
-        public AttachmentStream(int responseCode, String responseMessage) {
-            this.responseCode = responseCode;
-            this.responseMessage = responseMessage;
-        }
-
-        int responseCode;
-        String responseMessage;
-        InputStream stream;
-        String mimeType;
-        long contentLength;
-    }
-
-    public void loadAttachment(Consumer<AttachmentStream> sender, String... dirs) throws IOException {
-        CloseableHttpClient client = client();
-
-        HttpClientContext context = clientContext();
-
-        String files = getProperty("cloud.url") + getProperty("cloud.files") + "/" + Server.CLIENT.get();
-
-        String path = Arrays.stream(dirs).map(this::encode).collect(Collectors.joining("/"));
-
-        HttpGet get = new HttpGet(files + "/" + path);
-        try (CloseableHttpResponse response = client.execute(get, context)) {
-            StatusLine statusLine = response.getStatusLine();
-            sender.accept(statusLine.getStatusCode() == 200
-                    ? new AttachmentStream(response.getEntity().getContent(), response.getEntity().getContentType().getValue(), response.getEntity().getContentLength())
-                    : new AttachmentStream(statusLine.getStatusCode(), statusLine.getReasonPhrase()));
-        }
-    }
-
     private HttpClientContext clientContext() {
         HttpHost targetHost = new HttpHost(getProperty("cloud.host"), Integer.valueOf(getProperty("cloud.port")), "https");
         CredentialsProvider credsProvider = new BasicCredentialsProvider();
@@ -142,13 +82,84 @@ public class Cloud extends Server
         return context;
     }
 
-    List<Attachment> findAttachments(String subject, String chapter, String topic) {
+    synchronized CloseableHttpClient client() {
+        if (client == null) {
+            PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
+            connectionManager.setMaxTotal(90);
+            connectionManager.setDefaultMaxPerRoute(90);
+            client = HttpClientBuilder.create()
+                    .setKeepAliveStrategy(DefaultConnectionKeepAliveStrategy.INSTANCE)
+                    .setConnectionReuseStrategy(DefaultConnectionReuseStrategy.INSTANCE)
+                    .setConnectionManager(connectionManager).build();
+        }
+        return client;
+    }
+
+    public String createDirectory(String... dirs) {
+        try {
+            CloseableHttpClient client = client();
+            HttpClientContext context = clientContext();
+
+            String files = getProperty("cloud.url") + getProperty("cloud.files") + "/" + Server.CLIENT.get();
+
+            try (CloseableHttpResponse ignored = client.execute(new HttpMKCol(files), context)){}
+            String path = "";
+            for (String dir : dirs) {
+                path += "/" + encode(dir);
+                try (CloseableHttpResponse ignored = client.execute(new HttpMKCol(files + path), context)){}
+            }
+
+            return (getProperty("cloud.url") + getProperty("cloud.links") + "/" + Server.CLIENT.get()) + path;
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void loadAttachment(Consumer<AttachmentInputStream> sender, String... dirs) throws IOException {
+        CloseableHttpClient client = client();
+        HttpClientContext context = clientContext();
+
+        String files = getProperty("cloud.url") + getProperty("cloud.files") + "/" + Server.CLIENT.get();
+        String path = Arrays.stream(dirs).map(Cloud::encode).collect(Collectors.joining("/"));
+
+        HttpGet get = new HttpGet(files + "/" + path);
+        try (CloseableHttpResponse response = client.execute(get, context)) {
+            StatusLine statusLine = response.getStatusLine();
+            sender.accept(statusLine.getStatusCode() == 200
+                    ? new AttachmentInputStream(response.getEntity().getContent(), response.getEntity().getContentType().getValue(), response.getEntity().getContentLength())
+                    : new AttachmentInputStream(statusLine.getStatusCode(), statusLine.getReasonPhrase()));
+        }
+    }
+
+    public int storeAttachment(InputStream in, String... dirs) throws IOException {
+        String[] lessDirs = Arrays.copyOf(dirs, dirs.length - 1);
+        createDirectory(lessDirs);
+
+        CloseableHttpClient client = client();
+        HttpClientContext context = clientContext();
+
+        String files = getProperty("cloud.url") + getProperty("cloud.files") + "/" + Server.CLIENT.get();
+        String path = Arrays.stream(dirs).map(Cloud::encode).collect(Collectors.joining("/"));
+
+        HttpPut put = new HttpPut(files + "/" + path);
+        put.setEntity(new InputStreamEntity(in));
+        try (CloseableHttpResponse response = client.execute(put, context)) {
+            StatusLine statusLine = response.getStatusLine();
+            return statusLine.getStatusCode();
+        }
+    }
+
+    List<Attachment> findAttachments(String subject, String chapter, String topic, boolean tests) {
         try {
             CloseableHttpClient client = client();
             HttpClientContext context = clientContext();
 
             String uri = getProperty("cloud.url") + getProperty("cloud.files") + "/" + Server.CLIENT.get() + "/" + encode(subject) + "/" + encode(chapter) + "/" + encode(topic) + "/";
+            if (tests)
+                uri += "/tests/";
             System.out.println("uri = " + uri);
+
             HttpPropFind propfind = new HttpPropFind(uri);
             propfind.setEntity(new StringEntity(PROPFIND_DIR, ContentType.APPLICATION_XML));
             try (CloseableHttpResponse response = client.execute(propfind, context)) {
@@ -217,7 +228,7 @@ public class Cloud extends Server
         return path.substring(pos + 1);
     }
 
-    private String encode(String string) {
+    public static String encode(String string) {
         try {
             return URLEncoder.encode(string, "UTF-8").replace("+", "%20");
         }
@@ -226,7 +237,7 @@ public class Cloud extends Server
         }
     }
 
-    private String decode(String string) {
+    public static String decode(String string) {
         try {
             return URLDecoder.decode(string, "UTF-8");
         }
@@ -346,11 +357,11 @@ public class Cloud extends Server
         Cloud cloud = new Cloud(readProperties(args[0]));
         //List<Attachment> attachments = cloud.findAttachments("mathe", "Differentialrechnung", "Graphisches Ableiten");
         //System.out.println("attachments = " + attachments);
-        CLIENT.set("");
-        Map<String, String> tags = cloud.listTags("Mathematik");
-        System.out.println("tags = " + tags);
-        CLIENT.set("test");
-        cloud.transferTags(tags);
+        //CLIENT.set("");
+        //Map<String, String> tags = cloud.listTags("Mathematik");
+        //System.out.println("tags = " + tags);
+        //CLIENT.set("test");
+        //cloud.transferTags(tags);
     }
 
     protected String getProperty(String key) {
@@ -358,19 +369,6 @@ public class Cloud extends Server
         if (value == null)
             System.err.println("WARNING: Property " + key + " is not configured");
         return value;
-    }
-
-    private static Properties readProperties(String fileName) throws IOException {
-        Properties properties = new Properties();
-        properties.load(new FileInputStream(fileName));
-        return properties;
-    }
-
-    synchronized CloseableHttpClient client() {
-        if (client == null) {
-            client = HttpClientBuilder.create().setConnectionManager(new PoolingHttpClientConnectionManager()).build();
-        }
-        return client;
     }
 
     @NotThreadSafe
@@ -428,5 +426,25 @@ public class Cloud extends Server
                 ", type='" + type + '\'' +
                 '}';
         }
+    }
+
+    static class AttachmentInputStream {
+        public AttachmentInputStream(InputStream stream, String mimeType, long contentLength) {
+            this.stream = stream;
+            this.mimeType = mimeType;
+            this.contentLength = contentLength;
+            this.responseCode = 200;
+        }
+
+        public AttachmentInputStream(int responseCode, String responseMessage) {
+            this.responseCode = responseCode;
+            this.responseMessage = responseMessage;
+        }
+
+        int responseCode;
+        String responseMessage;
+        InputStream stream;
+        String mimeType;
+        long contentLength;
     }
 }

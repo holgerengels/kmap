@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -41,7 +42,7 @@ public class TestsServlet
                 String delete = req.getParameter("delete");
                 if (save != null) {
                     log("save test = " + save);
-                    String json = IOUtils.toString(new InputStreamReader(req.getInputStream(), "UTF-8"));
+                    String json = IOUtils.toString(new InputStreamReader(req.getInputStream(), StandardCharsets.UTF_8));
                     String command = tests.storeTest(subject, save, json);
                     if (command.startsWith("error:"))
                         writeResponse(req, resp, "error", command.substring("error:".length()));
@@ -50,7 +51,7 @@ public class TestsServlet
                 }
                 else if (imp != null) {
                     log("import set = " + imp);
-                    String json = IOUtils.toString(new InputStreamReader(req.getInputStream(), "UTF-8"));
+                    String json = IOUtils.toString(new InputStreamReader(req.getInputStream(), StandardCharsets.UTF_8));
                     JsonObject set = tests.importSet(subject, imp, json);
                     writeResponse(req, resp, "success", set);
                 }
@@ -115,7 +116,7 @@ public class TestsServlet
             else if (attachments != null) {
                 log("attachments for = " + attachments);
                 String[] split = attachments.split("/");
-                List<Cloud.Attachment> list = cloud.findAttachments(split[0], split[1], split[2]);
+                List<Cloud.Attachment> list = cloud.findAttachments(split[0], split[1], split[2], false);
                 if (list != null) {
                     JsonArray array = new JsonArray();
                     for (Cloud.Attachment attachment : list) {

@@ -104,7 +104,7 @@ public class EditServlet
             else if (attachments != null) {
                 log("attachments for = " + attachments);
                 String[] split = attachments.split("/");
-                List<Cloud.Attachment> list = cloud.findAttachments(split[0], split[1], split[2]);
+                List<Cloud.Attachment> list = cloud.findAttachments(split[0], split[1], split[2], false);
                 if (list != null) {
                     JsonArray array = new JsonArray();
                     for (Cloud.Attachment attachment : list) {

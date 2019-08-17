@@ -23,17 +23,11 @@ public class Couch extends Server {
         super(properties);
     }
 
-    protected String getProperty(String key) {
-        String value = properties.getProperty(key);
-        if (value == null)
-            System.err.println("WARNING: Property " + key + " is not configured");
-        return value;
-    }
 
     protected CouchDbClient createClient(String name) {
         CouchDbProperties couchProperties = new CouchDbProperties()
             .setDbName(Server.CLIENT.get() + "-" + name)
-            .setCreateDbIfNotExist(true)
+            .setCreateDbIfNotExist(false)
             .setProtocol("http")
             .setHost(getProperty("kmap.host"))
             .setPort(Integer.parseInt(getProperty("kmap.port")))
@@ -42,6 +36,10 @@ public class Couch extends Server {
             .setMaxConnections(10)
             .setConnectionTimeout(0);
         return new CouchDbClient(couchProperties);
+    }
+
+    Gson getGson() {
+        return createClient("map").getGson();
     }
 
     public synchronized JsonArray loadModule(String subject, String module) {
@@ -575,6 +573,8 @@ public class Couch extends Server {
             JsonObject object = (JsonObject)element;
             object.addProperty("subject", subject);
             object.addProperty("module", module);
+            object.remove("_id");
+            object.remove("_rev");
             newTopics.add(object);
         }
         List<JsonObject> oldTopics = loadModuleAsList(subject, module);
@@ -583,8 +583,8 @@ public class Couch extends Server {
         }
         System.out.println("oldTopics = " + oldTopics);
         System.out.println("newTopics = " + newTopics);
-        client.bulk(oldTopics, false);
-        client.bulk(newTopics, false);
+        List<Response> olds = client.bulk(oldTopics, false);
+        List<Response> news = client.bulk(newTopics, false);
 
         JsonObject object = new JsonObject();
         object.addProperty("subject", subject);
@@ -612,16 +612,26 @@ public class Couch extends Server {
 
     public static void main(String[] args) throws IOException {
         Couch couch = new Couch(readProperties(args[0]));
+        couch.instances();
         //JsonObject object = couch.chapter("mathe", "Mathematik");
         //System.out.println("object = " + object);
         //JsonObject states = couch.statesAndProgress("h.engels", "Mathematik");
         //System.out.println("states = " + states);
     }
 
-    private static Properties readProperties(String fileName) throws IOException {
-        Properties properties = new Properties();
-        properties.load(new FileInputStream(fileName));
-        return properties;
+    public JsonArray instances() {
+        CouchDbClient client = createClient("lala");
+        String uri = client.getBaseUri().toString();
+        JsonArray array = new JsonArray();
+        JsonArray result = client.findAny(JsonArray.class, uri + "/_all_dbs");
+        result.forEach(element -> {
+            String name = element.getAsString();
+            if (name.endsWith("-map"))
+                array.add(name.substring(0, name.length() - "-map".length()));
+        });
+        System.out.println("result = " + result);
+        System.out.println("array = " + array);
+        return array;
     }
 
     static class WeightedSum {

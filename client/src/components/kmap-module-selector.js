@@ -2,7 +2,7 @@ import {LitElement, html, css} from 'lit-element';
 import {connect} from "pwa-helpers/connect-mixin";
 import {store} from "../store";
 import 'mega-material/list';
-import {modules, forgetModules, selectModule} from "../actions/content-maps";
+import {loadModules, forgetModules, selectModule} from "../actions/content-maps";
 import {fontStyles, colorStyles} from "./kmap-styles";
 
 class KMapModuleSelector extends connect(store)(LitElement) {
@@ -53,7 +53,7 @@ class KMapModuleSelector extends connect(store)(LitElement) {
     if (this._userid !== state.app.userid) {
       this._userid = state.app.userid;
       if (this._userid)
-        store.dispatch(modules());
+        store.dispatch(loadModules());
       else
         store.dispatch(forgetModules())
     }

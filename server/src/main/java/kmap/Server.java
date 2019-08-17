@@ -1,5 +1,7 @@
 package kmap;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -24,5 +26,18 @@ public abstract class Server
     protected void stop(String text) {
         System.out.println(getClass().getSimpleName() + " " + text + " " + (System.currentTimeMillis() - millis) + "ms");
         millis = System.currentTimeMillis();
+    }
+
+    public static Properties readProperties(String fileName) throws IOException {
+        Properties properties = new Properties();
+        properties.load(new FileInputStream(fileName));
+        return properties;
+    }
+
+    protected String getProperty(String key) {
+        String value = properties.getProperty(key);
+        if (value == null)
+            System.err.println("WARNING: Property " + key + " is not configured");
+        return value;
     }
 }

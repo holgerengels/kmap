@@ -125,7 +125,7 @@ class KmapMain extends connect(store)(LitElement) {
       </nav>
       <hr/>
       <br/>
-      <label section>Layer</label><br/><br/>
+      <label section>Layer ein-/ausblenden</label><br/><br/>
       <mwc-button @click="${e => this._toggleLayer('summaries')}" icon="short_text" outlined ?raised="${this._layers.includes('summaries')}">Kurztexte</mwc-button>
       ${this._layers.includes('summaries') ? html`<kmap-summaries></kmap-summaries>` : ''}
       <mwc-button @click="${e => this._toggleLayer('averages')}" icon="group_work" outlined ?raised="${this._layers.includes('averages')}" ?disabled="${!this._roles.includes("teacher")}">Mittelwerte</mwc-button>

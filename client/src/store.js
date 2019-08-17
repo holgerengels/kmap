@@ -18,6 +18,7 @@ import maps from './reducers/maps';
 import states from './reducers/states';
 import averageStates from './reducers/average-states';
 import tests from './reducers/tests';
+import instances from './reducers/instances';
 import contentMaps from './reducers/content-maps';
 import contentSets from './reducers/content-sets';
 import courses from './reducers/courses';
@@ -39,5 +40,6 @@ store.addReducers({
   tests,
   contentMaps,
   contentSets,
+  instances,
   courses,
 });

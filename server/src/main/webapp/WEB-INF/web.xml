@@ -10,6 +10,11 @@
     </servlet>
 
     <servlet>
+        <servlet-name>content</servlet-name>
+        <servlet-class>kmap.ContentManagerServlet</servlet-class>
+    </servlet>
+
+    <servlet>
         <servlet-name>data</servlet-name>
         <servlet-class>kmap.DataServlet</servlet-class>
     </servlet>
@@ -42,6 +47,11 @@
     <servlet-mapping>
         <servlet-name>edit</servlet-name>
         <url-pattern>/edit</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>content</servlet-name>
+        <url-pattern>/content</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>

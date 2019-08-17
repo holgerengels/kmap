@@ -43,6 +43,14 @@ const state = (state = INITIAL_STATE, action) => {
             setsFailure: true,
             setsResponse: action.response,
           };
+        case 'forget':
+          return {
+            ...state,
+            setsFetching: false,
+            setsFailure: false,
+            setsResponse: null,
+            sets: [],
+          };
       }
     case IMPORT_SET:
       switch (action.status) {

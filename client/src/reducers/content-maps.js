@@ -1,6 +1,5 @@
 import {
   MODULES,
-  FORGET_MODULES,
   SELECT_MODULE,
   IMPORT_MAP,
   DELETE_MAP,
@@ -46,6 +45,14 @@ const state = (state = INITIAL_STATE, action) => {
             modulesFailure: true,
             modulesResponse: action.response,
           };
+        case 'forget':
+          return {
+            ...state,
+            modulesFetching: false,
+            modulesFailure: false,
+            modulesResponse: null,
+            modules: [],
+          };
       }
     case IMPORT_MAP:
       switch (action.status) {
@@ -71,11 +78,6 @@ const state = (state = INITIAL_STATE, action) => {
             importMapResponse: action.response,
           };
       }
-    case FORGET_MODULES:
-      return {
-        ...state,
-        modules: []
-      };
     case DELETE_MAP:
       switch (action.status) {
         case 'pending':
