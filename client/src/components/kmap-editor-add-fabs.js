@@ -138,8 +138,15 @@ input {
       this._currentSubject = state.maps.map.subject;
       this._currentChapter = state.maps.map.chapter;
     }
+    else {
+      this._currentSubject = '';
+      this._currentChapter = '';
+    }
+
     if (state.contentMaps.selectedModule)
       this._currentModule = state.contentMaps.selectedModule.module;
+    else
+      this._currentModule = '';
 
     this._layers = state.app.layers;
   }

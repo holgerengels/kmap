@@ -159,6 +159,7 @@ ${this._card ? html`
 
   static get properties() {
     return {
+      _userid: {type: String},
       _subject: {type: String},
       _chapter: {type: String},
       _card: {type: Object},
@@ -176,6 +177,7 @@ ${this._card ? html`
 
   constructor() {
     super();
+    this._userid = '';
     this._subject = '';
     this._chapter = '';
     this._card = null;
@@ -212,6 +214,7 @@ ${this._card ? html`
   }
 
   stateChanged(state) {
+    this._userid = state.app.userid;
     this._card = state.app.cardForEdit;
 
     if (state.maps.map) {

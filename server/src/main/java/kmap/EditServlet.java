@@ -1,6 +1,5 @@
 package kmap;
 
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
@@ -31,8 +30,7 @@ public class EditServlet
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-        throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
         try {
             Server.CLIENT.set(extractClient(req));
 
@@ -42,6 +40,7 @@ public class EditServlet
                 String imp = req.getParameter("import");
                 String delete = req.getParameter("delete");
                 if (save != null) {
+                    authentication.checkRole(req, "teacher");
                     log("save topic = " + save);
                     String json = IOUtils.toString(new InputStreamReader(req.getInputStream(), "UTF-8"));
                     String command = couch.storeTopic(subject, save, json);
@@ -50,6 +49,7 @@ public class EditServlet
                     else
                         writeResponse(req, resp, "success", new JsonPrimitive(command));
                 }
+                /*
                 else if (imp != null) {
                     log("import module = " + imp);
                     String json = IOUtils.toString(new InputStreamReader(req.getInputStream(), "UTF-8"));
@@ -61,7 +61,11 @@ public class EditServlet
                     JsonObject module = couch.deleteModule(subject, delete);
                     writeResponse(req, resp, "success", module);
                 }
+                 */
             }
+        }
+        catch (Authentication.AuthException e) {
+            sendError(req, resp, HttpServletResponse.SC_FORBIDDEN, e.getMessage());
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -72,8 +76,7 @@ public class EditServlet
         }
     }
 
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-        throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
         try {
             Server.CLIENT.set(extractClient(req));
 
@@ -95,7 +98,7 @@ public class EditServlet
                 if (array != null)
                     writeResponse(req, resp, "data", array);
             }
-            else if (directory != null) {
+            else if (directory != null) { // TODO: move to POST
                 log("directory for = " + directory);
                 String[] split = directory.split("/");
                 String link = cloud.createDirectory(split[0], split[1], split[2]);

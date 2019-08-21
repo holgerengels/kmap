@@ -14,10 +14,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static javax.swing.text.html.CSS.getAttribute;
 
 public class Authentication {
     private Properties properties;
@@ -150,7 +153,7 @@ public class Authentication {
     }
 
     private Set<String> authenticate(String user, String password) {
-        boolean authenticate = Boolean.valueOf(getProperty("ldap.authenticate"));
+        boolean authenticate = Boolean.parseBoolean(getProperty("ldap.authenticate"));
         if (!authenticate && "admin".equals(password)) {
             Set<String> roles = new HashSet<>();
             for (List<String> list : groupConfig.values()) {
@@ -225,6 +228,14 @@ public class Authentication {
         return groups;
     }
 
+    void checkRole(HttpServletRequest request, String role) throws AuthException {
+        HttpSession session = request.getSession();
+        Object user = session.getAttribute("user");
+        Set<String> roles = (Set<String>)session.getAttribute("roles");
+        if (user == null || !roles.contains(role))
+            throw new AuthException("teacher");
+    }
+
     class Account {
         String userid;
         String password;
@@ -242,6 +253,16 @@ public class Authentication {
 
         boolean match(String password) {
             return this.password.equals(password);
+        }
+    }
+
+    class AuthException extends Exception {
+        public AuthException(String role) {
+            super(role);
+        }
+
+        public String getMissingRole() {
+            return getMessage();
         }
     }
 }

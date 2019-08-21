@@ -4,6 +4,7 @@ import {logout, showMessage} from "./app";
 import {store} from "../store";
 
 export const SETS = 'SETS';
+export const SELECT_SET = 'SELECT_SET';
 export const IMPORT_SET = 'IMPORT_SET';
 export const EXPORT_SET = 'EXPORT_SET';
 export const DELETE_SET = 'DELETE_SET';
@@ -54,6 +55,13 @@ export const invalidateSets = () => {
 
 export const forgetSets = () => {
   return { type: SETS, status: 'forget', };
+};
+
+export const selectSet = (set) => {
+  return {
+    type: SELECT_SET,
+    set,
+  };
 };
 
 export const importSet = (files) => (dispatch, getState) => {
@@ -168,7 +176,7 @@ export const deleteSet = (subject, set) => (dispatch, getState) => {
     })
       .then(handleErrors)
       .then(res => res.json())
-      .then(response => dispatch(receiveDeleteSet(subject, module)))
+      .then(response => dispatch(receiveDeleteSet(subject, set)))
       .then(lala => window.setTimeout(function() { store.dispatch(loadSets()); }.bind(undefined), 1000))
       .catch(error => {
         dispatch(failDeleteSet(subject, set, error));

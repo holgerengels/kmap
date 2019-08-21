@@ -147,7 +147,10 @@ public class Tests {
                         existing.add("answer", changed.get("answer"));
                         existing.add("values", changed.get("values"));
                         existing.add("balance", changed.get("balance"));
-                        client.update(element);
+                        if (checks(changed))
+                            client.update(element);
+                        else
+                            return "error:set, subject, chapter, topic or key missing";
                     }
                 }
             }
@@ -157,7 +160,7 @@ public class Tests {
                 if (checks(changed))
                     client.save(changed);
                 else
-                    return "error:set, subject, chapter or topic missing";
+                    return "error:set, subject, chapter, topic or key missing";
             }
 
             // determine new position
@@ -185,6 +188,7 @@ public class Tests {
         return !isNull(object, "set") && string(object, "set") != null
             && !isNull(object, "subject") && string(object, "subject") != null
             && !isNull(object, "chapter") && string(object, "chapter") != null
+            && !isNull(object, "topic") && string(object, "topic") != null
             && !isNull(object, "key") && string(object, "key") != null;
     }
 

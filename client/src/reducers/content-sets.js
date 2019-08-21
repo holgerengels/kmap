@@ -1,5 +1,6 @@
 import {
   SETS,
+  SELECT_SET,
   IMPORT_SET,
   DELETE_SET,
 } from '../actions/content-sets';
@@ -9,6 +10,7 @@ const INITIAL_STATE = {
   setsFetching: false,
   setsResponse: null,
   sets: [],
+  selectedSet: null,
   importSetFailure: false,
   importSetFetching: false,
   importSetResponse: null,
@@ -50,6 +52,7 @@ const state = (state = INITIAL_STATE, action) => {
             setsFailure: false,
             setsResponse: null,
             sets: [],
+            selectedSet: null,
           };
       }
     case IMPORT_SET:
@@ -100,6 +103,12 @@ const state = (state = INITIAL_STATE, action) => {
             deleteSetResponse: action.response,
           };
       }
+    case SELECT_SET:
+      return {
+        ...state,
+        selectedSet: action.set
+      };
+
     default:
       return state;
   }

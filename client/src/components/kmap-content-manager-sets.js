@@ -103,7 +103,7 @@ mwc-icon {
             <label section>Set exportieren</label>
             <div class="field">
               ${this._selected
-                ? html`<label>Modul '${this._selected.subject} - ${this._selected.set}' exportieren?</label>`
+                ? html`<label>Set '${this._selected.subject} - ${this._selected.set}' exportieren?</label>`
                 : ''}
             </div>
             <mwc-button @click="${e => this._showPage('')}">Abbrechen</mwc-button>

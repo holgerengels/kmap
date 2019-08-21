@@ -2,9 +2,9 @@ import {css, html, LitElement} from 'lit-element';
 import {connect} from "pwa-helpers/connect-mixin";
 import {store} from "../store";
 import {colorStyles, fontStyles} from "./kmap-styles";
-import './kmap-module-selector';
+import './kmap-set-selector';
 
-class KMapEditor extends connect(store)(LitElement) {
+class KMapTestEditor extends connect(store)(LitElement) {
 
   static get styles() {
     // language=CSS
@@ -19,7 +19,7 @@ class KMapEditor extends connect(store)(LitElement) {
 
   render() {
     return html`
-        <kmap-module-selector></kmap-module-selector>
+        <kmap-set-selector></kmap-set-selector>
     `;
   }
 
@@ -39,4 +39,4 @@ class KMapEditor extends connect(store)(LitElement) {
   }
 }
 
-window.customElements.define('kmap-editor', KMapEditor);
+window.customElements.define('kmap-test-editor', KMapTestEditor);

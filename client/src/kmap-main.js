@@ -24,12 +24,15 @@ import 'mega-material/snackbar';
 import './components/kmap-login-popup';
 import './components/kmap-subjects';
 import './components/kmap-editor';
+import './components/kmap-test-editor';
 import './components/kmap-summaries';
 import './components/kmap-averages';
 import './components/kmap-editor-edit-dialog';
 import './components/kmap-editor-rename-dialog';
 import './components/kmap-editor-delete-dialog';
 import './components/kmap-editor-add-fabs';
+import './components/kmap-test-editor-edit-dialog';
+import './components/kmap-test-editor-add-fabs';
 
 class KmapMain extends connect(store)(LitElement) {
 
@@ -131,7 +134,10 @@ class KmapMain extends connect(store)(LitElement) {
       <mwc-button @click="${e => this._toggleLayer('averages')}" icon="group_work" outlined ?raised="${this._layers.includes('averages')}" ?disabled="${!this._roles.includes("teacher")}">Mittelwerte</mwc-button>
       ${this._layers.includes('averages') ? html`<kmap-averages></kmap-averages>` : ''}
       <mwc-button @click="${e => this._toggleLayer('editor')}" icon="edit" outlined ?raised="${this._layers.includes('editor')}" ?disabled="${!this._roles.includes("teacher")}">editor</mwc-button>
-      ${this._layers.includes('editor') ? html`<kmap-editor></kmap-editor>` : ''}
+      ${this._layers.includes('editor') ? html`
+        ${this._page === 'home' || this._page === 'browser' ? html`<kmap-editor></kmap-editor>` : ''}
+        ${this._page === 'test' ? html`<kmap-test-editor></kmap-test-editor>` : ''}
+      ` : ''}
     </div>
     <div slot="app-content" class="app-content" role="main">
       <kmap-login-popup></kmap-login-popup>
@@ -142,10 +148,17 @@ class KmapMain extends connect(store)(LitElement) {
       <kmap-courses ?active="${this._page === 'courses'}" class="page" ></kmap-courses>
       <kmap-content-manager ?active="${this._page === 'content-manager'}" class="page" ></kmap-content-manager>
 
-      ${this._layers.includes('editor') ? html`<kmap-editor-edit-dialog></kmap-editor-edit-dialog>` : ''}
-      ${this._layers.includes('editor') ? html`<kmap-editor-rename-dialog></kmap-editor-rename-dialog>` : ''}
-      ${this._layers.includes('editor') ? html`<kmap-editor-delete-dialog></kmap-editor-delete-dialog>` : ''}
-      ${this._layers.includes('editor') ? html`<kmap-editor-add-fabs></kmap-editor-add-fabs>` : ''}
+      ${this._page === 'home' || this._page === 'browser' ? html`
+        ${this._layers.includes('editor') ? html`<kmap-editor-edit-dialog></kmap-editor-edit-dialog>` : ''}
+        ${this._layers.includes('editor') ? html`<kmap-editor-rename-dialog></kmap-editor-rename-dialog>` : ''}
+        ${this._layers.includes('editor') ? html`<kmap-editor-delete-dialog></kmap-editor-delete-dialog>` : ''}
+        ${this._layers.includes('editor') ? html`<kmap-editor-add-fabs></kmap-editor-add-fabs>` : ''}
+      ` : ''}
+      ${this._page === 'test' ? html`
+        ${this._layers.includes('editor') ? html`<kmap-test-editor-edit-dialog></kmap-test-editor-edit-dialog>` : ''}
+        ${this._layers.includes('editor') ? html`<kmap-test-editor-delete-dialog></kmap-test-editor-delete-dialog>` : ''}
+        ${this._layers.includes('editor') ? html`<kmap-test-editor-add-fabs></kmap-test-editor-add-fabs>` : ''}
+      ` : ''}
     </div>
   </mwc-drawer>
   <mwc-snackbar id="snackbar">${this._renderMessages()}</mwc-snackbar>
@@ -188,7 +201,7 @@ class KmapMain extends connect(store)(LitElement) {
       });
     }
 
-    if (changedProps.has('_page'))
+    if (changedProps.has('_page') && !this._layers.includes('editor'))
       this._drawer.close();
 
     if (changedProps.has('_messages')) {

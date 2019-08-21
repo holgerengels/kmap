@@ -14,6 +14,8 @@ import {
   CARD_FOR_EDIT,
   CARD_FOR_RENAME,
   CARD_FOR_DELETE,
+  TEST_FOR_EDIT,
+  TEST_FOR_DELETE,
 } from '../actions/app.js';
 
 const INITIAL_STATE = {
@@ -35,6 +37,8 @@ const INITIAL_STATE = {
   cardForEdit: null,
   cardForRename: null,
   cardForDelete: null,
+  testForEdit: null,
+  testForDelete: null,
 };
 
 const app = (state = INITIAL_STATE, action) => {
@@ -159,6 +163,16 @@ const app = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         cardForDelete: action.card
+      };
+    case TEST_FOR_EDIT:
+      return {
+        ...state,
+        testForEdit: action.test
+      };
+    case TEST_FOR_DELETE:
+      return {
+        ...state,
+        testForDelete: action.test
       };
     default:
       return state;

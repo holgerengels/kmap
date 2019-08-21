@@ -77,7 +77,7 @@ mwc-icon {
         <div slot="title">Content Manager</div>
       </mwc-top-app-bar>
       <div class="board">
-        ${this._roles.includes('teacher') ? html`<kmap-content-manager-instances></kmap-content-manager-instances>` : ''}
+        ${this._roles.includes('admin') ? html`<kmap-content-manager-instances></kmap-content-manager-instances>` : ''}
         ${this._roles.includes('teacher') ? html`<kmap-content-manager-modules></kmap-content-manager-modules>` : ''}
         ${this._roles.includes('teacher') ? html`<kmap-content-manager-sets></kmap-content-manager-sets>` : ''}
       </div>
@@ -95,6 +95,7 @@ mwc-icon {
   }
 
   firstUpdated(changedProperties) {
+    store.dispatch(updateTitle("Content Manager"));
   }
 
   updated(changedProperties) {

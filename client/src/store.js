@@ -22,6 +22,7 @@ import instances from './reducers/instances';
 import contentMaps from './reducers/content-maps';
 import contentSets from './reducers/content-sets';
 import courses from './reducers/courses';
+import testEditor from './reducers/test-editor';
 
 const devCompose = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
@@ -38,8 +39,9 @@ store.addReducers({
   states,
   averageStates,
   tests,
+  courses,
+  instances,
   contentMaps,
   contentSets,
-  instances,
-  courses,
+  testEditor,
 });

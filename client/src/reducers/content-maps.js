@@ -52,6 +52,7 @@ const state = (state = INITIAL_STATE, action) => {
             modulesFailure: false,
             modulesResponse: null,
             modules: [],
+            selectedModule: bull,
           };
       }
     case IMPORT_MAP:

@@ -26,6 +26,8 @@ export const REMOVE_LAYER = 'REMOVE_LAYER';
 export const CARD_FOR_EDIT = 'CARD_FOR_EDIT';
 export const CARD_FOR_RENAME = 'CARD_FOR_RENAME';
 export const CARD_FOR_DELETE = 'CARD_FOR_DELETE';
+export const TEST_FOR_EDIT = 'TEST_FOR_EDIT';
+export const TEST_FOR_DELETE = 'TEST_FOR_DELETE';
 
 export const navigate = (path) => (dispatch, getState) => {
   console.log(path);
@@ -326,6 +328,34 @@ export const unsetCardForDelete = () => {
   return {
     type: CARD_FOR_DELETE,
     card: null
+  };
+};
+
+export const setTestForEdit = (test) => {
+  return {
+    type: TEST_FOR_EDIT,
+    test
+  };
+};
+
+export const unsetTestForEdit = () => {
+  return {
+    type: TEST_FOR_EDIT,
+    test: null
+  };
+};
+
+export const setTestForDelete = (test) => {
+  return {
+    type: TEST_FOR_DELETE,
+    test
+  };
+};
+
+export const unsetTestForDelete = () => {
+  return {
+    type: TEST_FOR_DELETE,
+    test: null
   };
 };
 

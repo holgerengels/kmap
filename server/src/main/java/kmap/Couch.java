@@ -175,7 +175,10 @@ public class Couch extends Server {
                         existing.add("description", changed.get("description"));
                         existing.add("summary", changed.get("summary"));
                         existing.add("attachments", changed.get("attachments"));
-                        client.update(element);
+                        if (checks(changed))
+                            client.update(element);
+                        else
+                            return "error:module, subject, chapter or topic missing";
                     }
                 }
             }

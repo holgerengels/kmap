@@ -44,6 +44,7 @@ public class ContentManagerServlet
                 String importSet = req.getParameter("import-set");
 
                 if (importModule != null) {
+                    authentication.checkRole(req, "teacher");
                     List<String> modules = new ArrayList<>();
                     log("import module " + importModule);
                     for (Part part : req.getParts()) {
@@ -57,6 +58,7 @@ public class ContentManagerServlet
                     writeResponse(req, resp, "success", modules.toString());
                 }
                 else if (importSet != null) {
+                    authentication.checkRole(req, "teacher");
                     List<String> sets = new ArrayList<>();
                     log("import set " + importSet);
                     for (Part part : req.getParts()) {
@@ -70,14 +72,19 @@ public class ContentManagerServlet
                     writeResponse(req, resp, "success", sets.toString());
                 }
                 else if (create != null) {
+                    authentication.checkRole(req, "admin");
                     contentManager.createInstance(create);
                     writeResponse(req, resp, "success", create);
                 }
                 else if (drop != null) {
+                    authentication.checkRole(req, "admin");
                     contentManager.dropInstance(drop);
                     writeResponse(req, resp, "success", drop);
                 }
             }
+        }
+        catch (Authentication.AuthException e) {
+            sendError(req, resp, HttpServletResponse.SC_FORBIDDEN, e.getMessage());
         }
         catch (Exception e) {
             e.printStackTrace();

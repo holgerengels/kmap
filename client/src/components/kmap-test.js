@@ -2,6 +2,7 @@ import {LitElement, html, css} from 'lit-element';
 import {updateTitle, showMessage} from "../actions/app";
 import 'mega-material/button';
 import 'mega-material/icon-button';
+import 'mega-material/list';
 import 'mega-material/slider';
 import 'mega-material/textfield';
 import 'mega-material/top-app-bar';
@@ -12,6 +13,7 @@ import {connect} from "pwa-helpers/connect-mixin";
 
 import './kmap-test-card';
 import './kmap-test-result-card';
+import './kmap-test-editor-scroller';
 import {colorStyles, fontStyles} from "./kmap-styles";
 import {storeState} from "../actions/states";
 
@@ -157,6 +159,9 @@ class KmapTest extends connect(store)(LitElement) {
     <mwc-button @click="${this._back}">Zurück zum Start</mwc-button>
   </mwc-surface>
 </div>
+  ${this._layers.includes('editor') ? html`
+    <kmap-test-editor-scroller></kmap-test-editor-scroller>
+  ` : ''}
     `;
   }
 
@@ -180,11 +185,13 @@ class KmapTest extends connect(store)(LitElement) {
       summary: {type: Object},
       _currentIndex: {type: Number},
       _currentTest: {type: Object},
+      _layers: {type: Array},
     };
   }
 
   constructor() {
     super();
+    this._layers = [];
     this._page = "start";
     this._number = 3;
     this._maxNumber = 3;
@@ -193,6 +200,72 @@ class KmapTest extends connect(store)(LitElement) {
   }
 
   firstUpdated(changedProperties) {
+    store.dispatch(updateTitle("Test"));
+  }
+
+  updated(changedProperties) {
+    if (changedProperties.has("_page")) {
+      switch (this._page) {
+        case 'start':
+        case 'tests':
+          store.dispatch(updateTitle("Test"));
+          break;
+        case 'result':
+          store.dispatch(updateTitle("Testergebnis"));
+          break;
+      }
+    }
+
+    if (changedProperties.has("active") && this.active)
+      store.dispatch(fetchSubjectsIfNeeded());
+
+    if (changedProperties.has("subject")) {
+      store.dispatch(fetchChaptersIfNeeded(this.subject));
+      store.dispatch(fetchTreeIfNeeded(this.subject));
+    }
+
+    if ((changedProperties.has("chapters") || changedProperties.has("tree")) && this.chapters.length > 0 && this.tree.length > 0) {
+      this.arrange(this.chapters, this.tree);
+    }
+
+    if (changedProperties.has("chapter")) {
+      store.dispatch(fetchTestsIfNeeded(this.subject, this.chapter));
+    }
+  }
+
+  stateChanged(state) {
+    this._userid = state.app.userid;
+    this._layers = state.app.layers;
+
+    if (this.subjects !== state.tests.subjects) {
+      this.subjects = state.tests.subjects;
+    }
+    if (!this.subjects)
+      this.subjects = [];
+
+    if (this.chapters !== state.tests.chapters) {
+      this.chapters = state.tests.chapters;
+    }
+    if (!this.chapters)
+      this.chapters = [];
+
+    if (this.tree !== state.tests.tree) {
+      this.tree = state.tests.tree;
+    }
+    if (!this.tree)
+      this.tree = {};
+
+    if (this._allTests !== state.tests.tests) {
+      this._allTests = state.tests.tests;
+
+      var topics = [];
+      for (var test of this._allTests) {
+        if (!topics.includes(test.chapter + "." + test.topic))
+          topics.push(test.chapter + "." + test.topic);
+      }
+      this.topics = topics;
+      this._maxNumber = this._allTests.length - this._allTests.length % 3;
+    }
   }
 
   arrange(chapters, tree) {
@@ -358,71 +431,6 @@ class KmapTest extends connect(store)(LitElement) {
 
   _numberChange(event) {
     this._number = event.target.value;
-  }
-
-  stateChanged(state) {
-    console.log(state);
-    this._userid = state.app.userid;
-
-    if (this.subjects !== state.tests.subjects) {
-      this.subjects = state.tests.subjects;
-    }
-    if (!this.subjects)
-      this.subjects = [];
-
-    if (this.chapters !== state.tests.chapters) {
-      this.chapters = state.tests.chapters;
-    }
-    if (!this.chapters)
-      this.chapters = [];
-
-    if (this.tree !== state.tests.tree) {
-      this.tree = state.tests.tree;
-    }
-    if (!this.tree)
-      this.tree = {};
-
-    if (this._allTests !== state.tests.tests) {
-      this._allTests = state.tests.tests;
-
-      var topics = [];
-      for (var test of this._allTests) {
-        if (!topics.includes(test.chapter + "." + test.topic))
-          topics.push(test.chapter + "." + test.topic);
-      }
-      this.topics = topics;
-      this._maxNumber = this._allTests.length - this._allTests.length % 3;
-    }
-  }
-
-  updated(changedProperties) {
-    if (changedProperties.has("_page")) {
-      switch (this._page) {
-        case 'start':
-        case 'tests':
-          store.dispatch(updateTitle("Test"));
-          break;
-        case 'result':
-          store.dispatch(updateTitle("Testergebnis"));
-          break;
-      }
-    }
-
-    if (changedProperties.has("active") && this.active)
-      store.dispatch(fetchSubjectsIfNeeded());
-
-    if (changedProperties.has("subject")) {
-      store.dispatch(fetchChaptersIfNeeded(this.subject));
-      store.dispatch(fetchTreeIfNeeded(this.subject));
-    }
-
-    if ((changedProperties.has("chapters") || changedProperties.has("tree")) && this.chapters.length > 0 && this.tree.length > 0) {
-      this.arrange(this.chapters, this.tree);
-    }
-
-    if (changedProperties.has("chapter")) {
-      store.dispatch(fetchTestsIfNeeded(this.subject, this.chapter));
-    }
   }
 }
 customElements.define('kmap-test', KmapTest);
