@@ -102,6 +102,7 @@ export const deleteTest = (subject, set, test) => (dispatch, getState) => {
   let userid = getState().app.userid;
 
   if (userid && subject && set && test) {
+    test.delete = true;
     dispatch(requestDeleteTest(subject, set, test.title));
     return fetch(`${config.server}tests?userid=${userid}&subject=${subject}&save=${set}`, {
       method: "POST",

@@ -35,7 +35,7 @@ class KMapKnowledgeCard extends connect(store)(LitElement) {
   color: var(--color-darkgray);
   font-family: Roboto,sans-serif;
   -webkit-font-smoothing: antialiased;
-  font-size: 1.00rem;
+  font-size: 0.95rem;
   font-weight: 400;
   background-color: var(--color-lightest);
 }

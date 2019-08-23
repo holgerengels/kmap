@@ -2,8 +2,8 @@ import {LitElement, html, css} from 'lit-element';
 import {connect} from "pwa-helpers/connect-mixin";
 import {store} from "../store";
 import {loadSet, forgetSet} from "../actions/test-editor";
+import {setTestForDelete, setTestForEdit} from "../actions/app";
 import {fontStyles, colorStyles} from "./kmap-styles";
-import 'mega-material/list';
 import 'mega-material/surface';
 import './kmap-test-card';
 
@@ -16,6 +16,12 @@ class KMapTestEditorScroller extends connect(store)(LitElement) {
           colorStyles,
           css`
               mwc-surface {
+                  position: absolute;
+                  overflow: auto;
+                  top: 0;
+                  bottom: 0;
+                  left: 0;
+                  right: 0;
                   margin: 16px;
                   padding: 16px;
                   box-shadow: var(--elevation);
@@ -25,8 +31,21 @@ class KMapTestEditorScroller extends connect(store)(LitElement) {
                 
             }
             .scroller {
-                height: 128px;
+                height: 102px;
                 overflow-y: auto;
+            }
+            .item {
+                padding: 8px;
+            }
+            .item[activated] {
+                color: var(--color-primary-dark);
+                background-color: var(--color-primary-lighter);
+            }
+            .item mwc-icon {
+                pointer-events: all;
+                cursor: pointer;
+                vertical-align: middle;
+                float: right;
             }
           `];
     }
@@ -35,11 +54,13 @@ class KMapTestEditorScroller extends connect(store)(LitElement) {
     return html`
   <mwc-surface style="--elevation: var(--elevation-01)">
     <div class="scroller">
-      <mwc-list dense>
           ${this._tests.map((test, i) => html`
-            <mwc-list-item dense ?activated="${this._selectedIndex === i}" @click="${e => this._select(i)}">${test.key}</mwc-list-item>
+            <div class="item" ?activated="${this._selectedIndex === i}" @click="${e => this._select(i)}">${test.key}
+                <span class="secondary">${test.chapter} - ${test.topic}</span> 
+                <mwc-icon @click="${e => { e.stopPropagation(); this._deleteTest(test)}}">delete</mwc-icon>
+                <mwc-icon @click="${e => { e.stopPropagation(); this._editTest(test)}}">edit</mwc-icon>
+            </div>
           `)}
-      </mwc-list>
     </div>
     <div style="margin: 32px">
     ${this._selected ? html`<kmap-test-card
@@ -73,14 +94,7 @@ class KMapTestEditorScroller extends connect(store)(LitElement) {
     this._selectedIndex = -1;
   }
 
-  _select(index) {
-    if (this._selectedIndex === index)
-      this._selectedIndex = -1;
-    else
-      this._selectedIndex = index;
-
-    if (this._selectedIndex !== -1)
-      this._selected = this._tests[this._selectedIndex];
+  updated(changedProperties) {
   }
 
   stateChanged(state) {
@@ -95,7 +109,24 @@ class KMapTestEditorScroller extends connect(store)(LitElement) {
     this._tests = state.testEditor.tests;
   }
 
-  updated(changedProperties) {
+  _select(index) {
+    if (this._selectedIndex === index)
+      this._selectedIndex = -1;
+    else
+      this._selectedIndex = index;
+
+    if (this._selectedIndex !== -1)
+      this._selected = this._tests[this._selectedIndex];
+  }
+
+  _deleteTest(test) {
+    console.log("delete " + test.key);
+    store.dispatch(setTestForDelete(test));
+  }
+
+  _editTest(test) {
+    console.log("edit " + test.key);
+    store.dispatch(setTestForEdit(test));
   }
 }
 

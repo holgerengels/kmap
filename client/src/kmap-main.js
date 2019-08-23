@@ -31,8 +31,9 @@ import './components/kmap-editor-edit-dialog';
 import './components/kmap-editor-rename-dialog';
 import './components/kmap-editor-delete-dialog';
 import './components/kmap-editor-add-fabs';
-import './components/kmap-test-editor-edit-dialog';
 import './components/kmap-test-editor-add-fabs';
+import './components/kmap-test-editor-edit-dialog';
+import './components/kmap-test-editor-delete-dialog';
 
 class KmapMain extends connect(store)(LitElement) {
 

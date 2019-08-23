@@ -24,47 +24,49 @@ class KmapTest extends connect(store)(LitElement) {
       fontStyles,
       colorStyles,
       css`
-            .board {
-                height: auto;
-                outline: none;
-                padding: 8px;
-                padding-bottom: 36px;
-            }
-                .page {
-                    display: none;
-                }
-
-                .page[active] {
-                    display: block;
-                }
-            label {
-                font-weight: 500;
-            }
-            label.secondary {
-                font-weight: 400;
-                color: var(--paper-grey-500);
-            }
-            [hidden] {
-                display: none;
-            }
-            mwc-surface {
-              margin: 16px;
-              padding: 16px;
-              box-shadow: var(--elevation);
-              background-color: whitesmoke;
-            }
-            mwc-button[disabled] {
-              pointer-events: none;
-              color: var(--color-darkgray);
-              opacity: .5;
-            }
-            .result-cards {
-              display: flex;
-              flex-wrap: wrap;
-            }
-            kmap-test-result-card {
-              margin: 16px;
-            }
+.page {
+    position: absolute;
+    top: 64px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow-y: auto;
+    visibility: hidden;
+    opacity: 0.0;
+    transition: opacity .8s;
+}
+kmap-test-editor-scroller {
+    position: absolute;
+    top: 348px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+.page[active] {
+    visibility: visible;
+    opacity: 1.0;
+}
+[hidden] {
+    display: none;
+}
+mwc-surface {
+  margin: 16px;
+  padding: 16px;
+  box-shadow: var(--elevation);
+  background-color: whitesmoke;
+}
+mwc-button[disabled] {
+  pointer-events: none;
+  color: var(--color-darkgray);
+  opacity: .5;
+}
+.result-cards {
+  display: flex;
+  flex-wrap: wrap;
+}
+kmap-test-result-card {
+  margin: 16px;
+}
         `
     ];
   }
@@ -78,7 +80,7 @@ class KmapTest extends connect(store)(LitElement) {
 
 <div class="page" ?active="${this._page === 'start'}">
   <mwc-surface style="--elevation: var(--elevation-01)">
-    <label>Thema auswählen</label>
+    <label section>Thema auswählen</label>
     <br/><br/>
     <div>
       <mwc-formfield alignend="" label="Fach">
