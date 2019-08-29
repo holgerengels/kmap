@@ -88,6 +88,7 @@ box img {
     if (changedProperties.has("description")) {
       if (this.description) {
         let description = this.description.replace(/inline:/g, config.server + "data/" + this.subject + "/" + this.chapter + "/" + this.topic + "/");
+        description = description.replace(/link:/g, config.server + config.client + "/#browser/");
         let buffer = "";
         let t = false;
         description.split("`").reverse().forEach(function (element) {
