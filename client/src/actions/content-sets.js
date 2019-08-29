@@ -134,7 +134,7 @@ export const exportSet = (subject, set) => (dispatch, getState) => {
         a.click();
         a.remove();
         URL.revokeObjectURL(url);
-        dispatch(receiveExportMap())
+        dispatch(receiveExportSet(subject, set))
       })
       .catch(error => {
         dispatch(failExportSet(subject, set, error));

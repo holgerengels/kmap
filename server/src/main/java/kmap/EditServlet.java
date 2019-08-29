@@ -65,7 +65,7 @@ public class EditServlet
             }
         }
         catch (Authentication.AuthException e) {
-            sendError(req, resp, HttpServletResponse.SC_FORBIDDEN, e.getMessage());
+            sendError(req, resp, HttpServletResponse.SC_FORBIDDEN, e.getMissingRole());
         }
         catch (Exception e) {
             e.printStackTrace();

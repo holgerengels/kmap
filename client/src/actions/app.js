@@ -32,9 +32,17 @@ export const TEST_FOR_DELETE = 'TEST_FOR_DELETE';
 export const navigate = (path) => (dispatch, getState) => {
   console.log(path);
   path = path === '' ? 'home' : path.slice(1);
+  if (path.startsWith("/")) {
+    let page = path.slice(1);
+    page = page.charAt(0).toLowerCase() + page.substring(1);
+    console.log("legacy: " + page);
+    dispatch(updateLocation('#' + page));
+    return;
+  }
+
   if (path.endsWith('/'))
     path = path.substring(0, path.length - 1);
-  const page = path.split("/")[0];
+  let page = path.split("/")[0];
   const dataPath = path.split("/").slice(1);
   //console.log(page);
   //console.log(dataPath);
