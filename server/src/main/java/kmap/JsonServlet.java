@@ -98,7 +98,7 @@ public class JsonServlet extends HttpServlet {
     String extractClient(HttpServletRequest request) {
         String client = request.getHeader("referer");
         if (client == null || client.length() == 0) {
-            client = request.getParameter("client");
+            client = request.getParameter("instance");
         }
         else {
             int start = client.indexOf("/", 9);
