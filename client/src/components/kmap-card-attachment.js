@@ -57,11 +57,22 @@ class KMapCardAttachment extends LitElement {
             <a href="${this._handler}${this.attachment.href}" target="_blank">${this.attachment.name}&nbsp;<mega-icon>open_in_new</mega-icon></a>
             <a href="${config.server}${this.attachment.href}?instance=${config.instance}" download="${this._isDownload}" target="${this._isTarget}"><mega-icon>cloud_download</mega-icon></a>
         `;
+      else if (this._isDownload && this._isTarget)
+        return html `
+            <a href="${config.server}${this.attachment.href}?instance=${config.instance}" download="${this._isDownload}" target="${this._isTarget}">${this.attachment.name}</a>
+        `;
+      else if (this._isDownload)
+        return html `
+            <a href="${config.server}${this.attachment.href}?instance=${config.instance}" download="${this._isDownload}">${this.attachment.name}</a>
+        `;
+      else if (this._isTarget)
+        return html `
+            <a href="${config.server}${this.attachment.href}?instance=${config.instance}" target="${this._isTarget}">${this.attachment.name}</a>
+        `;
       else
         return html `
-            <a href="${config.server}${this.attachment.href}?instance=${config.instance}" ?download="${this._isDownload}" ?target="${this._isTarget}">${this.attachment.name}</a>
+            <a href="${config.server}${this.attachment.href}?instance=${config.instance}">${this.attachment.name}</a>
         `;
-
     }
 
     static get properties() {

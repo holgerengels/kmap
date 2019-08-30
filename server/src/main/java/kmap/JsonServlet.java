@@ -103,7 +103,7 @@ public class JsonServlet extends HttpServlet {
         else {
             int start = client.indexOf("/", 9);
             int end = client.indexOf("/", start + 1);
-            client = end != -1 ? client.substring(start + 1, end) : "test";
+            client = end != -1 ? client.substring(start + 1, end) : "lala";
         }
         System.out.println("client " + client);
         return client;
