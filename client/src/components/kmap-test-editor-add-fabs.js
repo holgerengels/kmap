@@ -13,12 +13,12 @@ class KMapTestEditorAddFabs extends connect(store)(LitElement) {
       fontStyles,
       colorStyles,
       css`
-mwc-fab {
+mega-fab {
   position: absolute;
   right: 16px;
   z-index: 100;
-  --mdc-theme-secondary: var(--color-secondary);
-  --mdc-theme-on-secondary: black;
+  --mega-theme-secondary: var(--color-secondary);
+  --mega-theme-on-secondary: black;
 }
 
 .primary {
@@ -42,7 +42,7 @@ mwc-fab {
 }
 
 .secondary {
-  --mdc-theme-secondary: var(--color-secondary-light);
+  --mega-theme-secondary: var(--color-secondary-light);
   opacity: 1;
   transition: bottom .3s ease-in-out, opacity .2s ease-in;
 }
@@ -63,11 +63,11 @@ input {
   render() {
     // language=HTML
     return html`
-      <mwc-fab icon="${this._opened ? 'clear' : 'add'}" class="primary" ?exited="${!this._fabs}" @click="${this._open}"></mwc-fab>
-      <mwc-fab icon="add" label="Set"   mini class="secondary one"   ?exited="${!this._opened}" @click="${this._addSet}"></mwc-fab>
-      <mwc-fab icon="add" label="Test"   mini class="secondary two"  ?exited="${!this._opened || !this._currentSet}" @click="${this._addTest}"></mwc-fab>
+      <mega-fab icon="${this._opened ? 'clear' : 'add'}" class="primary" ?exited="${!this._fabs}" @click="${this._open}"></mega-fab>
+      <mega-fab icon="add" label="Set"   mini class="secondary one"   ?exited="${!this._opened}" @click="${this._addSet}"></mega-fab>
+      <mega-fab icon="add" label="Test"   mini class="secondary two"  ?exited="${!this._opened || !this._currentSet}" @click="${this._addTest}"></mega-fab>
       
-      <mwc-dialog id="addDialog" title="${this._header()}">
+      <mega-dialog id="addDialog" title="${this._header()}">
         <form id="addForm" @keyup="${this._maybeEnter}">
           <label>${this._explanation()}</label>
           <br/>
@@ -84,9 +84,9 @@ input {
             <input id="key" name="key" type="text" .value="${this._key}" @change="${e => this._key = e.target.value}"/>
           </div>
         </form>
-        <mwc-button slot="action" primary close @click="${this._ok}">Erstellen</mwc-button>
-        <mwc-button slot="action" primary close @click="${this._cancel}">Abbrechen</mwc-button>
-      </mwc-dialog>
+        <mega-button slot="action" primary close @click="${this._ok}">Erstellen</mega-button>
+        <mega-button slot="action" primary close @click="${this._cancel}">Abbrechen</mega-button>
+      </mega-dialog>
     `;
   }
 

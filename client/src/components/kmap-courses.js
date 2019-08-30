@@ -51,11 +51,11 @@ textarea {
   height: 208px;
   overflow-y: auto;
 }
-mwc-icon {
+mega-icon {
   pointer-events: all;
   cursor: pointer;
 }
-mwc-list-item {
+mega-list-item {
   cursor: pointer;
 }
 [disabled], [disabled] svg {
@@ -78,25 +78,25 @@ mwc-list-item {
 
   render() {
     return html`
-      <mwc-top-app-bar>
-        <mwc-icon-button icon="menu" slot="navigationIcon"></mwc-icon-button>
+      <mega-top-app-bar>
+        <mega-icon-button icon="menu" slot="navigationIcon"></mega-icon-button>
         <div slot="title">Kurse</div>
-      </mwc-top-app-bar>
+      </mega-top-app-bar>
       <div class="board">
         <div class="form">
           <label section>Kurse</label>
           <span style="float: right">
-          <mwc-icon @click="${e => this._showPage('new')}" ?disabled="${!this._userid}">add</mwc-icon>
-          <mwc-icon @click="${e => this._showPage('edit')}" ?disabled="${!this._userid || this._selectedIndex === -1}">edit</mwc-icon>
-          <mwc-icon @click="${e => this._showPage('delete')}" ?disabled="${!this._userid || this._selectedIndex === -1}">delete</mwc-icon>
+          <mega-icon @click="${e => this._showPage('new')}" ?disabled="${!this._userid}">add</mega-icon>
+          <mega-icon @click="${e => this._showPage('edit')}" ?disabled="${!this._userid || this._selectedIndex === -1}">edit</mega-icon>
+          <mega-icon @click="${e => this._showPage('delete')}" ?disabled="${!this._userid || this._selectedIndex === -1}">delete</mega-icon>
           </span>
           <br style="clear: right"/>
           <div class="scroll">
-          <mwc-list>
+          <mega-list>
             ${this._courses.map((course, i) => html`
-              <mwc-list-item icon="group" ?activated="${this._selectedIndex === i}" @click="${e => this._select(i)}">${course}</mwc-list-item>
+              <mega-list-item icon="group" ?activated="${this._selectedIndex === i}" @click="${e => this._select(i)}">${course}</mega-list-item>
             `)}
-          </mwc-list>
+          </mega-list>
           </div>
         </div>
         <div class="form">
@@ -110,7 +110,7 @@ mwc-list-item {
                 <label for="newStudents">Schüler</label>
                 <textarea id="editStudents" required rows="7" @change=${e => this._editStudents = e.target.value}>${this._editStudents}</textarea>
             </div>
-            <mwc-button @click="${this._new}">Speichern</mwc-button>
+            <mega-button @click="${this._new}">Speichern</mega-button>
           </div>
           <div class="page" ?active="${this._page === 'edit'}">
             <label section>Kurs bearbeiten</label>
@@ -122,7 +122,7 @@ mwc-list-item {
                 <label for="editStudents">Schüler</label>
                 <textarea id="editStudents" required rows="7" @change=${e => this._editStudents = e.target.value}>${this._editStudents}</textarea>
             </div>
-            <mwc-button @click="${this._edit}">Speichern</mwc-button>
+            <mega-button @click="${this._edit}">Speichern</mega-button>
           </div>
           <div class="page" ?active="${this._page === 'delete'}">
             <label section>Kurs löschen</label>
@@ -131,7 +131,7 @@ mwc-list-item {
                 ? html`<label>Soll der Kurs '${this._selected}' wirklich gelöscht werden?</label>`
                 : ''}
             </div>
-            <mwc-button @click="${this._delete}">Löschen</mwc-button>
+            <mega-button @click="${this._delete}">Löschen</mega-button>
           </div>
           <div class="page" ?active="${this._page === 'default'}">
             <label section>Kurs</label>

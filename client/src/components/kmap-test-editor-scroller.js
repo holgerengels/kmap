@@ -15,7 +15,7 @@ class KMapTestEditorScroller extends connect(store)(LitElement) {
           fontStyles,
           colorStyles,
           css`
-              mwc-surface {
+              mega-surface {
                   position: absolute;
                   overflow: auto;
                   top: 0;
@@ -41,7 +41,7 @@ class KMapTestEditorScroller extends connect(store)(LitElement) {
                 color: var(--color-primary-dark);
                 background-color: var(--color-primary-lighter);
             }
-            .item mwc-icon {
+            .item mega-icon {
                 pointer-events: all;
                 cursor: pointer;
                 vertical-align: middle;
@@ -52,13 +52,13 @@ class KMapTestEditorScroller extends connect(store)(LitElement) {
 
   render() {
     return html`
-  <mwc-surface style="--elevation: var(--elevation-01)">
+  <mega-surface style="--elevation: var(--elevation-01)">
     <div class="scroller">
           ${this._tests.map((test, i) => html`
             <div class="item" ?activated="${this._selectedIndex === i}" @click="${e => this._select(i)}">${test.key}
                 <span class="secondary">${test.chapter} - ${test.topic}</span> 
-                <mwc-icon @click="${e => { e.stopPropagation(); this._deleteTest(test)}}">delete</mwc-icon>
-                <mwc-icon @click="${e => { e.stopPropagation(); this._editTest(test)}}">edit</mwc-icon>
+                <mega-icon @click="${e => { e.stopPropagation(); this._deleteTest(test)}}">delete</mega-icon>
+                <mega-icon @click="${e => { e.stopPropagation(); this._editTest(test)}}">edit</mega-icon>
             </div>
           `)}
     </div>
@@ -73,7 +73,7 @@ class KMapTestEditorScroller extends connect(store)(LitElement) {
                                 .answer="${this._selected.answer}"
                                 .num="1" .of="1"></kmap-test-card>` : ''}
     </div>
-  </mwc-surface>
+  </mega-surface>
     `;
     }
 

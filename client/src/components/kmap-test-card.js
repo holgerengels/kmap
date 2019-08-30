@@ -125,10 +125,10 @@ class KMapTestCard extends connect(store)(LitElement) {
             </div>
             ${this.showActions ? html`
               <div class="card-footer">
-                  <mwc-button @click="${this.showAnswer}">Richtige Antwort zeigen</mwc-button>
+                  <mega-button @click="${this.showAnswer}">Richtige Antwort zeigen</mega-button>
                   <div style="flex: 1 0 auto"></div>
-                  <mwc-button @click="${this.sendAnswer}" ?hidden="${this.sent}">Antwort abschicken</mwc-button>
-                  <mwc-button @click="${this.next}" ?hidden="${!this.correct}">Weiter</mwc-button>
+                  <mega-button @click="${this.sendAnswer}" ?hidden="${this.sent}">Antwort abschicken</mega-button>
+                  <mega-button @click="${this.next}" ?hidden="${!this.correct}">Weiter</mega-button>
               </div>`
       : ''}
         </div>

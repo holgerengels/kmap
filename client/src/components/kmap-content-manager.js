@@ -48,7 +48,7 @@ class KMapContentManager extends connect(store)(LitElement) {
   height: 160px;
   overflow-y: auto;
 }
-mwc-icon {
+mega-icon {
   pointer-events: all;
   cursor: default;
 }
@@ -72,10 +72,10 @@ mwc-icon {
 
   render() {
     return html`
-      <mwc-top-app-bar>
-        <mwc-icon-button icon="menu" slot="navigationIcon"></mwc-icon-button>
+      <mega-top-app-bar>
+        <mega-icon-button icon="menu" slot="navigationIcon"></mega-icon-button>
         <div slot="title">Content Manager</div>
-      </mwc-top-app-bar>
+      </mega-top-app-bar>
       <div class="board">
         ${this._roles.includes('admin') ? html`<kmap-content-manager-instances></kmap-content-manager-instances>` : ''}
         ${this._roles.includes('teacher') ? html`<kmap-content-manager-modules></kmap-content-manager-modules>` : ''}

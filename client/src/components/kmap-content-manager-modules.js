@@ -47,7 +47,7 @@ class KMapContentManagerModules extends connect(store)(LitElement) {
   height: 160px;
   overflow-y: auto;
 }
-mwc-icon {
+mega-icon {
   pointer-events: all;
   cursor: default;
 }
@@ -74,19 +74,19 @@ mwc-icon {
         <div class="form">
           <label section>Module</label>
           <span style="float: right">
-          <mwc-icon @click="${e => this._showPage('import')}"><svg viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet" focusable="false" style="display: block; width: 24px; height: 24px;"><g><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"></path></g></svg></mwc-icon>
-          <mwc-icon @click="${e => this._showPage('export')}" ?disabled="${this._selectedIndex === -1}"><svg viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet" focusable="false" style="display: block; width: 24px; height: 24px;"><g><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"></path></g></svg></mwc-icon>
-          <mwc-icon @click="${e => this._showPage('delete')}" ?disabled="${this._selectedIndex === -1}">delete</mwc-icon>
+          <mega-icon @click="${e => this._showPage('import')}"><svg viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet" focusable="false" style="display: block; width: 24px; height: 24px;"><g><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"></path></g></svg></mega-icon>
+          <mega-icon @click="${e => this._showPage('export')}" ?disabled="${this._selectedIndex === -1}"><svg viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet" focusable="false" style="display: block; width: 24px; height: 24px;"><g><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"></path></g></svg></mega-icon>
+          <mega-icon @click="${e => this._showPage('delete')}" ?disabled="${this._selectedIndex === -1}">delete</mega-icon>
           </span>
           <br style="clear: right"/>
           <div class="scroll">
-          <mwc-list>
+          <mega-list>
             ${this._modules.map((module, i) => html`
-              <mwc-list-item icon="folder" ?activated="${this._selectedIndex === i}" @click="${e => this._select(i)}">${module.subject} - ${module.module}
+              <mega-list-item icon="folder" ?activated="${this._selectedIndex === i}" @click="${e => this._select(i)}">${module.subject} - ${module.module}
               <span slot="secondary">${module.count} Karten</span>
-              </mwc-list-item>
+              </mega-list-item>
             `)}
-          </mwc-list>
+          </mega-list>
           </div>
         </div>
         <div class="form">
@@ -96,8 +96,8 @@ mwc-icon {
                 <label for="file">Datei</label>
                 <input id="file" required type="file" multiple/>
             </div>
-            <mwc-button @click="${e => this._showPage('')}">Abbrechen</mwc-button>
-            <mwc-button outlined @click="${this._import}">Importieren</mwc-button>
+            <mega-button @click="${e => this._showPage('')}">Abbrechen</mega-button>
+            <mega-button outlined @click="${this._import}">Importieren</mega-button>
           </div>
           <div class="page" ?active="${this._page === 'export'}">
             <label section>Modul exportieren</label>
@@ -106,8 +106,8 @@ mwc-icon {
                 ? html`<label>Modul '${this._selected.subject} - ${this._selected.module}' exportieren?</label>`
                 : ''}
             </div>
-            <mwc-button @click="${e => this._showPage('')}">Abbrechen</mwc-button>
-            <mwc-button outlined @click="${this._export}">Exportieren</mwc-button>
+            <mega-button @click="${e => this._showPage('')}">Abbrechen</mega-button>
+            <mega-button outlined @click="${this._export}">Exportieren</mega-button>
           </div>
           <div class="page" ?active="${this._page === 'delete'}">
             <label section>Modul löschen</label>
@@ -116,8 +116,8 @@ mwc-icon {
                 ? html`<label>Soll das Modul '${this._selected.subject} - ${this._selected.module}' wirklich gelöscht werden?</label>`
                 : ''}
             </div>
-            <mwc-button @click="${e => this._showPage('')}">Abbrechen</mwc-button>
-            <mwc-button outlined @click="${this._delete}">Löschen</mwc-button>
+            <mega-button @click="${e => this._showPage('')}">Abbrechen</mega-button>
+            <mega-button outlined @click="${this._delete}">Löschen</mega-button>
           </div>
         </div>
         <div class="space"></div>

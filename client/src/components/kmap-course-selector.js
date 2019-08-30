@@ -17,11 +17,11 @@ class KMapCourseSelector extends connect(store)(LitElement) {
 
   render() {
     return html`
-<mwc-list dense>
+<mega-list dense>
   ${this._courses.map((course, i) => html`
-    <mwc-list-item dense icon="group" ?activated="${this._selectedIndex === i}" @click="${e => this._select(i)}">${course}</mwc-list-item>
+    <mega-list-item dense icon="group" ?activated="${this._selectedIndex === i}" @click="${e => this._select(i)}">${course}</mega-list-item>
   `)}
-</mwc-list>
+</mega-list>
     `;
     }
 

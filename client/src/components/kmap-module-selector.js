@@ -17,12 +17,12 @@ class KMapModuleSelector extends connect(store)(LitElement) {
 
   render() {
     return html`
-<mwc-list dense>
+<mega-list dense>
   ${this._modules.map((module, i) => html`
-    <mwc-list-item dense ?activated="${this._selectedIndex === i}" @click="${e => this._select(i)}">
-      ${module.subject} - ${module.module}</mwc-list-item>
+    <mega-list-item dense ?activated="${this._selectedIndex === i}" @click="${e => this._select(i)}">
+      ${module.subject} - ${module.module}</mega-list-item>
   `)}
-</mwc-list>
+</mega-list>
     `;
     }
 

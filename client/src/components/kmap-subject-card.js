@@ -78,7 +78,7 @@ class KMapSubjectCard extends connect(store)(LitElement) {
             <span>${this.subject}</span>
         </div>
         <div class="card-footer">
-            <a slot="footer" href="#browser/${this.subject}/${this.subject}"><mwc-icon>open_in_new</mwc-icon></a>
+            <a slot="footer" href="#browser/${this.subject}/${this.subject}"><mega-icon>open_in_new</mega-icon></a>
         </div>
     </div>
     `;

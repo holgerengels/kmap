@@ -104,8 +104,8 @@ class KmapMain extends connect(store)(LitElement) {
         pointer-events: none;
         color: var(--color-mediumgray);
       }
-      mwc-button[disabled] {
-         --mdc-theme-primary: var(--color-mediumgray);
+      mega-button[disabled] {
+         --mega-theme-primary: var(--color-mediumgray);
          pointer-events: none;
       }
       `,
@@ -115,7 +115,7 @@ class KmapMain extends connect(store)(LitElement) {
   render() {
     // language=HTML
     return html`
-  <mwc-drawer id="drawer" hasheader dismissible>
+  <mega-drawer id="drawer" hasheader dismissible>
     <span slot="title">KMap</span>
     <span slot="subtitle">Knowledge Map</span>
     <div class="drawer-content">
@@ -130,11 +130,11 @@ class KmapMain extends connect(store)(LitElement) {
       <hr/>
       <br/>
       <label section>Layer ein-/ausblenden</label><br/><br/>
-      <mwc-button @click="${e => this._toggleLayer('summaries')}" icon="short_text" outlined ?raised="${this._layers.includes('summaries')}">Kurztexte</mwc-button>
+      <mega-button @click="${e => this._toggleLayer('summaries')}" icon="short_text" outlined ?raised="${this._layers.includes('summaries')}">Kurztexte</mega-button>
       ${this._layers.includes('summaries') ? html`<kmap-summaries></kmap-summaries>` : ''}
-      <mwc-button @click="${e => this._toggleLayer('averages')}" icon="group_work" outlined ?raised="${this._layers.includes('averages')}" ?disabled="${!this._roles.includes("teacher")}" title="Erfordert die Rolle 'Lehrer'">Mittelwerte</mwc-button>
+      <mega-button @click="${e => this._toggleLayer('averages')}" icon="group_work" outlined ?raised="${this._layers.includes('averages')}" ?disabled="${!this._roles.includes("teacher")}" title="Erfordert die Rolle 'Lehrer'">Mittelwerte</mega-button>
       ${this._layers.includes('averages') ? html`<kmap-averages></kmap-averages>` : ''}
-      <mwc-button @click="${e => this._toggleLayer('editor')}" icon="edit" outlined ?raised="${this._layers.includes('editor')}" ?disabled="${!this._roles.includes("teacher")}" title="Erfordert die Rolle 'Lehrer'">editor</mwc-button>
+      <mega-button @click="${e => this._toggleLayer('editor')}" icon="edit" outlined ?raised="${this._layers.includes('editor')}" ?disabled="${!this._roles.includes("teacher")}" title="Erfordert die Rolle 'Lehrer'">editor</mega-button>
       ${this._layers.includes('editor') ? html`
         ${this._page === 'home' || this._page === 'browser' ? html`<kmap-editor></kmap-editor>` : ''}
         ${this._page === 'test' ? html`<kmap-test-editor></kmap-test-editor>` : ''}
@@ -161,8 +161,8 @@ class KmapMain extends connect(store)(LitElement) {
         ${this._layers.includes('editor') ? html`<kmap-test-editor-add-fabs></kmap-test-editor-add-fabs>` : ''}
       ` : ''}
     </div>
-  </mwc-drawer>
-  <mwc-snackbar id="snackbar">${this._renderMessages()}</mwc-snackbar>
+  </mega-drawer>
+  <mega-snackbar id="snackbar">${this._renderMessages()}</mega-snackbar>
 `;
   }
 

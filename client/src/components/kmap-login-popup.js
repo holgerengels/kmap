@@ -54,8 +54,8 @@ class KMapLoginPopup extends connect(store)(LitElement) {
   render() {
     return html`
 <div class="fab" @click="${this._show}" ?hidden="${!this._userid}"><span>${this._initials}</span></div>
-<div class="fab" @click="${this._show}" ?hidden="${this._userid}"><mwc-icon>person_outline</mwc-icon></div>
-  <mwc-dialog id="loginDialog" title="Anmeldung">
+<div class="fab" @click="${this._show}" ?hidden="${this._userid}"><mega-icon>person_outline</mega-icon></div>
+  <mega-dialog id="loginDialog" title="Anmeldung">
     <div id="loginForm" class="form" ?hidden="${this._userid}" @keyup="${this._maybeEnter}">
       <div class="field">
         <label for="loginId">Benutzer</label>
@@ -72,9 +72,9 @@ class KMapLoginPopup extends connect(store)(LitElement) {
     <div class="layout horizontal" slot="action">
       <div id="message" style="height: 32px">${this._message}</div>
     </div>
-    <mwc-button class="button" slotd="action" primary ?hidden="${this._userid}" @click=${this._login}>Anmelden</mwc-button>
-    <mwc-button class="button" slotd="action" primary ?hidden="${!this._userid}" @click=${this._logout}>Abmelden</mwc-button>
-  </mwc-dialog>
+    <mega-button class="button" slotd="action" primary ?hidden="${this._userid}" @click=${this._login}>Anmelden</mega-button>
+    <mega-button class="button" slotd="action" primary ?hidden="${!this._userid}" @click=${this._logout}>Abmelden</mega-button>
+  </mega-dialog>
     `;
   }
 

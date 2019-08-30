@@ -12,12 +12,12 @@ class SimpleEditor extends LitElement {
     return html`
       ${this.editMode ? html`
 <div class="toolbar">
-  <mwc-icon-button @click="${() => this._exec('removeFormat')}" icon="format_clear"></mwc-icon-button>
-  <mwc-icon-button @click="${() => this._exec('bold')}" icon="format_bold"></mwc-icon-button>
-  <mwc-icon-button @click="${() => this._exec('insertUnorderedList')}" icon="format_list_bulleted"></mwc-icon-button>
-  <mwc-icon-button @click="${() => this._exec('insertOrderedList')}" icon="format_list_numbered"></mwc-icon-button>
-  <mwc-icon-button @click="${() => this._exec('indent')}" icon="format_indent_increase"></mwc-icon-button>
-  <mwc-icon-button @click="${() => this._exec('outdent')}" icon="format_indent_decrease"></mwc-icon-button>
+  <mega-icon-button @click="${() => this._exec('removeFormat')}" icon="format_clear"></mega-icon-button>
+  <mega-icon-button @click="${() => this._exec('bold')}" icon="format_bold"></mega-icon-button>
+  <mega-icon-button @click="${() => this._exec('insertUnorderedList')}" icon="format_list_bulleted"></mega-icon-button>
+  <mega-icon-button @click="${() => this._exec('insertOrderedList')}" icon="format_list_numbered"></mega-icon-button>
+  <mega-icon-button @click="${() => this._exec('indent')}" icon="format_indent_increase"></mega-icon-button>
+  <mega-icon-button @click="${() => this._exec('outdent')}" icon="format_indent_decrease"></mega-icon-button>
 </div>
     ` : ''}
 

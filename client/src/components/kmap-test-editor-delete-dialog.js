@@ -24,16 +24,16 @@ form {
   render() {
     // language=HTML
     return html`
-<mwc-dialog id="deleteDialog" title="Löschen">
+<mega-dialog id="deleteDialog" title="Löschen">
 ${this._test ? html`
   <form>
     <div class="field">
       <span>Soll der Test <i>${this._test.key}</i> aus dem Set <i>${this._test.set}</i> im Fach <i>${this._test.subject}</i> wirklich gelöscht werden?</span>
     </div>
   </form>
-  <mwc-button slot="action" primary @click=${this._delete}>Löschen</mwc-button>
-  <mwc-button slot="action" @click=${this._cancel}>Abbrechen</mwc-button>
-</mwc-dialog>
+  <mega-button slot="action" primary @click=${this._delete}>Löschen</mega-button>
+  <mega-button slot="action" @click=${this._cancel}>Abbrechen</mega-button>
+</mega-dialog>
     ` : '' }
     `;
     }

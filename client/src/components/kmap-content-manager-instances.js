@@ -47,7 +47,7 @@ class KMapContentManagerInstances extends connect(store)(LitElement) {
   height: 160px;
   overflow-y: auto;
 }
-mwc-icon {
+mega-icon {
   pointer-events: all;
   cursor: default;
 }
@@ -74,16 +74,16 @@ mwc-icon {
         <div class="form">
           <label section>Instanzen</label>
           <span style="float: right">
-          <mwc-icon @click="${e => this._showPage('create')}">add</mwc-icon>
-          <mwc-icon @click="${e => this._showPage('drop')}" ?disabled="${this._selectedIndex === -1}">delete</mwc-icon>
+          <mega-icon @click="${e => this._showPage('create')}">add</mega-icon>
+          <mega-icon @click="${e => this._showPage('drop')}" ?disabled="${this._selectedIndex === -1}">delete</mega-icon>
           </span>
           <br style="clear: right"/>
           <div class="scroll">
-          <mwc-list>
+          <mega-list>
             ${this._instances.map((instance, i) => html`
-              <mwc-list-item icon="storage" ?activated="${this._selectedIndex === i}" @click="${e => this._select(i)}">${instance}</mwc-list-item>
+              <mega-list-item icon="storage" ?activated="${this._selectedIndex === i}" @click="${e => this._select(i)}">${instance}</mega-list-item>
             `)}
-          </mwc-list>
+          </mega-list>
           </div>
         </div>
         <div class="form">
@@ -93,8 +93,8 @@ mwc-icon {
                 <label for="name">Name</label>
                 <input id="name" required type="text" .value=${this._name} @change=${e => this._name = e.target.value}/>
             </div>
-            <mwc-button @click="${e => this._showPage('')}">Abbrechen</mwc-button>
-            <mwc-button outlined @click="${this._create}">Anlegen</mwc-button>
+            <mega-button @click="${e => this._showPage('')}">Abbrechen</mega-button>
+            <mega-button outlined @click="${this._create}">Anlegen</mega-button>
           </div>
           <div class="page" ?active="${this._page === 'drop'}">
             <label section>Instanz löschen</label>
@@ -103,8 +103,8 @@ mwc-icon {
                 ? html`<label>Soll die Instanz '${this._selected}' wirklich gelöscht werden?</label>`
                 : ''}
             </div>
-            <mwc-button @click="${e => this._showPage('')}">Abbrechen</mwc-button>
-            <mwc-button outlined @click="${this._drop}">Löschen</mwc-button>
+            <mega-button @click="${e => this._showPage('')}">Abbrechen</mega-button>
+            <mega-button outlined @click="${this._drop}">Löschen</mega-button>
           </div>
         </div>
         <div class="space"></div>

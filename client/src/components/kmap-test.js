@@ -49,13 +49,13 @@ kmap-test-editor-scroller {
 [hidden] {
     display: none;
 }
-mwc-surface {
+mega-surface {
   margin: 16px;
   padding: 16px;
   box-shadow: var(--elevation);
   background-color: whitesmoke;
 }
-mwc-button[disabled] {
+mega-button[disabled] {
   pointer-events: none;
   color: var(--color-darkgray);
   opacity: .5;
@@ -73,29 +73,29 @@ kmap-test-result-card {
 
   render() {
     return html`
-<mwc-top-app-bar>
-  <mwc-icon-button icon="menu" slot="navigationIcon"></mwc-icon-button>
+<mega-top-app-bar>
+  <mega-icon-button icon="menu" slot="navigationIcon"></mega-icon-button>
   <div slot="title">Test</div>
-</mwc-top-app-bar>
+</mega-top-app-bar>
 
 <div class="page" ?active="${this._page === 'start'}">
-  <mwc-surface style="--elevation: var(--elevation-01)">
+  <mega-surface style="--elevation: var(--elevation-01)">
     <label section>Thema auswählen</label>
     <br/><br/>
     <div>
-      <mwc-formfield alignend="" label="Fach">
+      <mega-formfield alignend="" label="Fach">
         <select @change="${this._subjectChanged}">
           <option>- - -</option>
           ${this.subjects.map((subject, j) => html`<option>${subject}</option>`)}
         </select>
-      </mwc-formfield>
+      </mega-formfield>
       ${this.arrangedChapters ? html`
-        <mwc-formfield alignend="" label="Kapitel">
+        <mega-formfield alignend="" label="Kapitel">
           <select @change="${this._chapterChanged}">
             <option>- - -</option>
             ${this.arrangedChapters.map((chapter, j) => html`<option>${chapter.replace(".", " - ")}</option>`)}
           </select>
-        </mwc-formfield>
+        </mega-formfield>
       `
       : html`
         <label class="secondary" style="vertical-align: sub; padding-left: 16px">Zu diesem Fach gibt es noch keine Aufgaben</label>
@@ -109,8 +109,8 @@ kmap-test-result-card {
       <input type="range" style="display: inline-block" class="form" .value="${this._number}" step="3" min="3" max="${this._maxNumber}" @input="${this._numberChange}"/>
     </div>
     <br/><br/>
-    <mwc-button @click="${this._start}" ?disabled="${!this._allTests || this._allTests.length === 0}">Starten</mwc-button>
-  </mwc-surface>
+    <mega-button @click="${this._start}" ?disabled="${!this._allTests || this._allTests.length === 0}">Starten</mega-button>
+  </mega-surface>
 </div>
 <div class="page" ?active="${this._page === 'tests'}">
   <div style="margin: 32px">
@@ -130,7 +130,7 @@ kmap-test-result-card {
   </div>
 </div>
 <div class="page" ?active="${this._page === 'result'}">
-  <mwc-surface style="--elevation: var(--elevation-01)">
+  <mega-surface style="--elevation: var(--elevation-01)">
     ${this.summary ? html`
       <label>Ergebnis</label>
       <br/><br/>
@@ -158,8 +158,8 @@ kmap-test-result-card {
       </label>
       <br/><br/>`
       : ''}
-    <mwc-button @click="${this._back}">Zurück zum Start</mwc-button>
-  </mwc-surface>
+    <mega-button @click="${this._back}">Zurück zum Start</mega-button>
+  </mega-surface>
 </div>
   ${this._layers.includes('editor') ? html`
     <kmap-test-editor-scroller></kmap-test-editor-scroller>

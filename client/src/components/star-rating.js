@@ -12,29 +12,29 @@ class StarRating extends LitElement {
   text-align: center;
   cursor: pointer;
 }
-:host > mwc-icon {
+:host > mega-icon {
   display: inline-block;
   position: relative;
   width: 24px;
   transition: color 0.4s;
   color: var(--color-unrated);
 }
-:host > mwc-icon:hover,
-:host > mwc-icon:hover ~ mwc-icon {
+:host > mega-icon:hover,
+:host > mega-icon:hover ~ mega-icon {
   color: var(--color-rated);
 }
-:host(:not(:hover)) > mwc-icon[filled],
-:host(:not(:hover)) > mwc-icon ~ mwc-icon[filled]
+:host(:not(:hover)) > mega-icon[filled],
+:host(:not(:hover)) > mega-icon ~ mega-icon[filled]
 {
   color: var(--color-rated);
 }
-mwc-icon.cross {
+mega-icon.cross {
     opacity: 0.1;
 } 
-:host(:hover) > mwc-icon.cross {
+:host(:hover) > mega-icon.cross {
     opacity: 1;
 } 
-mwc-icon {
+mega-icon {
   pointer-events: all;
 }
         `
@@ -43,8 +43,8 @@ mwc-icon {
 
     render() {
         return html`
-<mwc-icon class="cross" @click="${this._clicked}" value="0">close</mwc-icon>
-<mwc-icon ?filled="${this.rate >= 4}" @click="${this._clicked}" value="4">done</mwc-icon><mwc-icon ?filled="${this.rate >= 3}" @click="${this._clicked}" value="3">done</mwc-icon><mwc-icon ?filled="${this.rate >= 2}" @click="${this._clicked}" value="2">done</mwc-icon><mwc-icon ?filled="${this.rate >= 1}" @click="${this._clicked}" value="1">done</mwc-icon>
+<mega-icon class="cross" @click="${this._clicked}" value="0">close</mega-icon>
+<mega-icon ?filled="${this.rate >= 4}" @click="${this._clicked}" value="4">done</mega-icon><mega-icon ?filled="${this.rate >= 3}" @click="${this._clicked}" value="3">done</mega-icon><mega-icon ?filled="${this.rate >= 2}" @click="${this._clicked}" value="2">done</mega-icon><mega-icon ?filled="${this.rate >= 1}" @click="${this._clicked}" value="1">done</mega-icon>
     `;
     }
 
@@ -71,9 +71,9 @@ mwc-icon {
 
     _clicked(event) {
         let i = 0;
-        while (event.path[i].tagName !== "MWC-ICON" && i < event.path.length)
+        while (event.path[i].tagName !== "MEGA-ICON" && i < event.path.length)
             i++;
-        if (event.path[i].tagName === "MWC-ICON") {
+        if (event.path[i].tagName === "MEGA-ICON") {
             this.rate = event.path[i].getAttribute("value");
             this.dispatchEvent(new CustomEvent('rated', {bubbles: true, detail: {rate: this.rate}}));
         }

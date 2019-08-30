@@ -50,7 +50,7 @@
     "asciimath2tex": "^1.1.0",
     "lit-element": "^2.2.1",
     "lit-html": "^1.1.2",
-    "mega-material": "1.0.0-alpha.1",
+    "mega-material": "1.0.0-alpha.2",
     "pwa-helpers": "^0.9.1",
     "redux": "^4.0.0",
     "redux-thunk": "^2.3.0",

@@ -66,7 +66,7 @@ kmap-test-card {
   render() {
     // language=HTML
     return html`
-<mwc-dialog id="editDialog" title="Editor">
+<mega-dialog id="editDialog" title="Editor">
 ${this._test ? html`
   <form @focus="${this._focus}">
     <div class="field">
@@ -102,9 +102,9 @@ ${this._test ? html`
       ${this._values.map((value, i) => html`<input type="text" .value="${this._values[i]}" @change="${e => this._values[i] = e.target.value}"/>`)}
     </div>
   </form>` : ''}
-  <mwc-icon-button slotd="action" icon="folder_open" title="Cloud Verzeichnis öffnen" @click=${this._createDirectory}></mwc-icon-button>
-  <mwc-button class="button" slotd="action" primary @click=${this._save}>Speichern</mwc-button>
-  <mwc-button class="button" slotd="action" @click=${this._cancel}>Abbrechen</mwc-button>
+  <mega-icon-button slotd="action" icon="folder_open" title="Cloud Verzeichnis öffnen" @click=${this._createDirectory}></mega-icon-button>
+  <mega-button class="button" slotd="action" primary @click=${this._save}>Speichern</mega-button>
+  <mega-button class="button" slotd="action" @click=${this._cancel}>Abbrechen</mega-button>
   <div class="preview" slot="action">
     <label style="text-align: center; display: block">» Preview «</label>
     ${this._showPreview ? html`<kmap-test-card hideHeader
@@ -117,7 +117,7 @@ ${this._test ? html`
                                 .answer="${this._answer}"
                                 .num="1" .of="1"></kmap-test-card>` : ''}
   </div>
-</mwc-dialog>
+</mega-dialog>
     `;
     }
 

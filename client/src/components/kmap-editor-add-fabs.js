@@ -13,12 +13,12 @@ class KMapEditorAddFabs extends connect(store)(LitElement) {
       fontStyles,
       colorStyles,
       css`
-mwc-fab {
+mega-fab {
   position: absolute;
   right: 16px;
   z-index: 100;
-  --mdc-theme-secondary: var(--color-secondary);
-  --mdc-theme-on-secondary: black;
+  --mega-theme-secondary: var(--color-secondary);
+  --mega-theme-on-secondary: black;
 }
 
 .primary {
@@ -42,7 +42,7 @@ mwc-fab {
 }
 
 .secondary {
-  --mdc-theme-secondary: var(--color-secondary-light);
+  --mega-theme-secondary: var(--color-secondary-light);
   opacity: 1;
   transition: bottom .3s ease-in-out, opacity .2s ease-in;
 }
@@ -63,13 +63,13 @@ input {
   render() {
     // language=HTML
     return html`
-      <mwc-fab icon="${this._opened ? 'clear' : 'add'}" class="primary" ?exited="${!this._fabs}" @click="${this._open}"></mwc-fab>
-      <mwc-fab icon="add" label="Fach"    mini class="secondary one"   ?exited="${!this._opened}" @click="${this._addSubject}"></mwc-fab>
-      <mwc-fab icon="add" label="Modul"   mini class="secondary two"   ?exited="${!this._opened || !this._currentSubject}" @click="${this._addModule}"></mwc-fab>
-      <mwc-fab icon="add" label="Kapitel" mini class="secondary three" ?exited="${!this._opened || !this._currentModule}" @click="${this._addChapter}"></mwc-fab>
-      <mwc-fab icon="add" label="Thema"   mini class="secondary four"  ?exited="${!this._opened || !this._currentModule || !this._currentChapter}" @click="${this._addTopic}"></mwc-fab>
+      <mega-fab icon="${this._opened ? 'clear' : 'add'}" class="primary" ?exited="${!this._fabs}" @click="${this._open}"></mega-fab>
+      <mega-fab icon="add" label="Fach"    mini class="secondary one"   ?exited="${!this._opened}" @click="${this._addSubject}"></mega-fab>
+      <mega-fab icon="add" label="Modul"   mini class="secondary two"   ?exited="${!this._opened || !this._currentSubject}" @click="${this._addModule}"></mega-fab>
+      <mega-fab icon="add" label="Kapitel" mini class="secondary three" ?exited="${!this._opened || !this._currentModule}" @click="${this._addChapter}"></mega-fab>
+      <mega-fab icon="add" label="Thema"   mini class="secondary four"  ?exited="${!this._opened || !this._currentModule || !this._currentChapter}" @click="${this._addTopic}"></mega-fab>
       
-      <mwc-dialog id="addDialog" title="${this._title()}">
+      <mega-dialog id="addDialog" title="${this._title()}">
         <form id="addForm" @keyup="${this._maybeEnter}">
           <label>${this._explanation()}</label>
           <br/>
@@ -90,9 +90,9 @@ input {
             <input id="topic" name="topic" type="text" .value="${this._topic}" @change="${e => this._topic = e.target.value}"/>
           </div>
         </form>
-        <mwc-button slot="action" primary close @click="${this._ok}">Erstellen</mwc-button>
-        <mwc-button slot="action" primary close @click="${this._cancel}">Abbrechen</mwc-button>
-      </mwc-dialog>
+        <mega-button slot="action" primary close @click="${this._ok}">Erstellen</mega-button>
+        <mega-button slot="action" primary close @click="${this._cancel}">Abbrechen</mega-button>
+      </mega-dialog>
     `;
   }
 

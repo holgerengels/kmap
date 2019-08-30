@@ -25,7 +25,7 @@ form {
   render() {
     // language=HTML
     return html`
-<mwc-dialog id="deleteDialog" title="Löschen">
+<mega-dialog id="deleteDialog" title="Löschen">
 ${this._card ? html`
   <form>
     <div class="field">
@@ -33,9 +33,9 @@ ${this._card ? html`
       aus dem Modul <i>${this._card.module}</i> im Fach <i>${this._subject}</i> wirklich gelöscht werden?</span>
     </div>
   </form>
-  <mwc-button slot="action" primary @click=${this._delete}>Löschen</mwc-button>
-  <mwc-button slot="action" @click=${this._cancel}>Abbrechen</mwc-button>
-</mwc-dialog>
+  <mega-button slot="action" primary @click=${this._delete}>Löschen</mega-button>
+  <mega-button slot="action" @click=${this._cancel}>Abbrechen</mega-button>
+</mega-dialog>
     ` : '' }
     `;
     }

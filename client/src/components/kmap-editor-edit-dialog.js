@@ -68,7 +68,7 @@ kmap-knowledge-card-description {
 .attachment {
   display: block;
 }
-.attachments mwc-icon {
+.attachments mega-icon {
   pointer-events: all;
   cursor: pointer;
   vertical-align: middle;
@@ -94,7 +94,7 @@ kmap-knowledge-card-description {
   render() {
     // language=HTML
     return html`
-<mwc-dialog id="editDialog" title="Editor">
+<mega-dialog id="editDialog" title="Editor">
 ${this._card ? html`
   <form @focus="${this._focus}">
     <div class="field">
@@ -123,7 +123,7 @@ ${this._card ? html`
       <label for="attachments">Materialien</label>
       ${this._card.attachments.map((attachment, i) => html`
         <div class="attachment">
-          ${attachment.type === 'link' ? html`<mwc-icon @click="${() => this._deleteAttachment(attachment)}">delete</mwc-icon>` : ''}
+          ${attachment.type === 'link' ? html`<mega-icon @click="${() => this._deleteAttachment(attachment)}">delete</mega-icon>` : ''}
           <span class="tag">[${_tags.get(attachment.tag)}]</span> ${attachment.name}
           ${attachment.type === 'link' ? html`<span slot="secondary">${attachment.href}</span>` : ''}
         </div>
@@ -136,13 +136,13 @@ ${this._card ? html`
       </select>
       <input id="name" type="text" placeholder="Name" .value="${this._attachmentName}" @change="${e => this._attachmentName = e.target.value}"/>
       <input id="href" type="url" placeholder="Link" .value="${this._attachmentHref}" @change="${e => this._attachmentHref = e.target.value}"/>
-      <mwc-icon @click="${this._addAttachment}">add_circle</mwc-icon>
+      <mega-icon @click="${this._addAttachment}">add_circle</mega-icon>
     </div>
   </form>` : ''}
-  <mwc-icon-button slotd="action" icon="cached" title="Materialien aus Cloud synchronisieren" @click=${this._syncAttachments}></mwc-icon-button>
-  <mwc-icon-button slotd="action" icon="folder_open" title="Cloud Verzeichnis öffnen" @click=${this._createDirectory}></mwc-icon-button>
-  <mwc-button class="button" slotd="action" primary @click=${this._save}>Speichern</mwc-button>
-  <mwc-button class="button" slotd="action" @click=${this._cancel}>Abbrechen</mwc-button>
+  <mega-icon-button slotd="action" icon="cached" title="Materialien aus Cloud synchronisieren" @click=${this._syncAttachments}></mega-icon-button>
+  <mega-icon-button slotd="action" icon="folder_open" title="Cloud Verzeichnis öffnen" @click=${this._createDirectory}></mega-icon-button>
+  <mega-button class="button" slotd="action" primary @click=${this._save}>Speichern</mega-button>
+  <mega-button class="button" slotd="action" @click=${this._cancel}>Abbrechen</mega-button>
   <div class="preview" slot="action">
   <label style="text-align: center; display: block">» Preview «</label>
   ${this._showSummaryPreview ? html`<kmap-summary-card-summary .summary="${this._summary}"></kmap-summary-card-summary>` : ''}
@@ -153,7 +153,7 @@ ${this._card ? html`
     .description="${this._description}"
     ></kmap-knowledge-card-description></div>` : ''}
   </div>
-</mwc-dialog>
+</mega-dialog>
     `;
     }
 
@@ -403,7 +403,7 @@ const _tags = new Map([
   ["example",     "Beispiel  "],
   ["usage",       "Anwendung "],
   ["idea",        "Anschauung"],
-  ["exercise",    "Aufgabe   "],
+  ["exercise",    "Aufgaben  "],
 ]);
 
 window.customElements.define('kmap-editor-edit-dialog', KMapEditorEditDialog);

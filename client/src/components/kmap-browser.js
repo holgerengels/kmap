@@ -93,10 +93,10 @@ class KMapBrowser extends connect(store)(LitElement) {
 
   render() {
     return html`
-      <mwc-top-app-bar>
-        <mwc-icon-button icon="menu" slot="navigationIcon"></mwc-icon-button>
+      <mega-top-app-bar>
+        <mega-icon-button icon="menu" slot="navigationIcon"></mega-icon-button>
         <div slot="title">${this.chapter}</div>
-      </mwc-top-app-bar>
+      </mega-top-app-bar>
         <div class="page map" ?active="${this.page === 'map'}" @rated="${this._rated}">
             ${this.lines.map((line, i) => html`
                 <div class="scrollpane line">

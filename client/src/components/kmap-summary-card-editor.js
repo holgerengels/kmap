@@ -17,7 +17,7 @@ class KMapSummaryCardEditor extends connect(store)(LitElement) {
   background-color: var(--color-lightest);
   transition: background-color .5s ease-in-out;
 }
-mwc-button[disabled] {
+mega-button[disabled] {
   pointer-events: none;
   color: var(--color-darkgray);
   opacity: .5;
@@ -33,9 +33,9 @@ mwc-button[disabled] {
   render() {
     return html`
       <div class="content">
-        <mwc-button icon="edit" ?disabled="${!this._enabled}" @click="${this._showEdit}"></mwc-button>
-        <mwc-button icon="label" ?disabled="${!this._enabled}" @click="${this._showRename}"></mwc-button>
-        <mwc-button icon="delete" ?disabled="${!this._enabled}" @click="${this._showDelete}"></mwc-button>
+        <mega-button icon="edit" ?disabled="${!this._enabled}" @click="${this._showEdit}"></mega-button>
+        <mega-button icon="label" ?disabled="${!this._enabled}" @click="${this._showRename}"></mega-button>
+        <mega-button icon="delete" ?disabled="${!this._enabled}" @click="${this._showDelete}"></mega-button>
       </div>
       <div class="content">
         ${this.card.annotations ? html`<div class="warn">${this.card.annotations}</div>` : ''}

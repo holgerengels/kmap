@@ -30,7 +30,7 @@ class KMapCardAttachment extends LitElement {
                 margin-top: 16px;
                 margin-bottom: 0px;
             }
-            mwc-icon {
+            mega-icon {
                 font-size: 18px;
                 vertical-align: middle;
             }
@@ -41,7 +41,7 @@ class KMapCardAttachment extends LitElement {
     render() {
         return html`
             <p>
-                <mwc-icon>${this._mimeIcon}</mwc-icon>&nbsp;
+                <mega-icon>${this._mimeIcon}</mega-icon>&nbsp;
                 ${this._renderAttachment()}
             </p>
         `;
@@ -54,12 +54,12 @@ class KMapCardAttachment extends LitElement {
         `;
       else if (this._handler)
         return html `
-            <a href="${this._handler}${this.attachment.href}" target="_blank">${this.attachment.name}&nbsp;<mwc-icon>open_in_new</mwc-icon></a>
-            <a href="${config.server}${this.attachment.href}?client=${config.instance}" download="${this._isDownload}" target="${this._isTarget}"><mwc-icon>cloud_download</mwc-icon></a>
+            <a href="${this._handler}${this.attachment.href}" target="_blank">${this.attachment.name}&nbsp;<mega-icon>open_in_new</mega-icon></a>
+            <a href="${config.server}${this.attachment.href}?instance=${config.instance}" download="${this._isDownload}" target="${this._isTarget}"><mega-icon>cloud_download</mega-icon></a>
         `;
       else
         return html `
-            <a href="${config.server}${this.attachment.href}?client=${config.instance}" ?download="${this._isDownload}" ?target="${this._isTarget}">${this.attachment.name}</a>
+            <a href="${config.server}${this.attachment.href}?instance=${config.instance}" ?download="${this._isDownload}" ?target="${this._isTarget}">${this.attachment.name}</a>
         `;
 
     }

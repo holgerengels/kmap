@@ -34,10 +34,10 @@ kmap-subject-card {
   render() {
     // language=HTML
     return html`
-      <mwc-top-app-bar>
-        <mwc-icon-button icon="menu" slot="navigationIcon"></mwc-icon-button>
+      <mega-top-app-bar>
+        <mega-icon-button icon="menu" slot="navigationIcon"></mega-icon-button>
         <div slot="title">Fächer</div>
-      </mwc-top-app-bar>
+      </mega-top-app-bar>
         <div id="subjects" class="board" tabindex="0">
             ${this.subjects.map((subject, j) => html`
                 <kmap-subject-card .subject="${subject}"></kmap-subject-card>

@@ -25,7 +25,7 @@ form {
   render() {
     // language=HTML
     return html`
-<mwc-dialog id="renameDialog" title="Umbenennen">
+<mega-dialog id="renameDialog" title="Umbenennen">
 ${this._card ? html`
   <form>
     <div class="field">
@@ -37,9 +37,9 @@ ${this._card ? html`
       <input id="rename" type="text" .value="${this._newName}" @change="${e => this._newName = e.target.value}"/>
     </div>
   </form>
-  <mwc-button slot="action" primary @click=${this._rename}>Umbenennen</mwc-button>
-  <mwc-button slot="action" @click=${this._cancel}>Abbrechen</mwc-button>
-</mwc-dialog>
+  <mega-button slot="action" primary @click=${this._rename}>Umbenennen</mega-button>
+  <mega-button slot="action" @click=${this._cancel}>Abbrechen</mega-button>
+</mega-dialog>
     ` : '' }
     `;
     }
