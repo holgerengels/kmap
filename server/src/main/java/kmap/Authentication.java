@@ -1,6 +1,7 @@
 package kmap;
 
 import com.google.gson.*;
+import com.opencsv.CSVReader;
 import org.apache.commons.io.IOUtils;
 
 import javax.naming.*;
@@ -18,9 +19,6 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
-import java.util.stream.Collectors;
-
-import static javax.swing.text.html.CSS.getAttribute;
 
 public class Authentication {
     private Properties properties;
@@ -51,7 +49,9 @@ public class Authentication {
             Path path = Paths.get(properties.getProperty("ldap.csv") + Server.CLIENT.get() + "-users.csv");
             if (Files.exists(path)) {
                 try {
-                    Map<String, Account> csv = Files.readAllLines(path).stream().map(l -> l.split(",")).collect(Collectors.toMap(c -> c[0], Account::new));
+                    CSVReader reader = new CSVReader(Files.newBufferedReader(path));
+                    Map<String, Account> csv = new HashMap<>();
+                    reader.forEach(line -> csv.put(line[0], new Account(line)));
                     csvs.put(Server.CLIENT.get(), csv);
                 }
                 catch (IOException e) {
