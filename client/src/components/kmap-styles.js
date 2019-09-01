@@ -6,25 +6,25 @@ h1, .font-title {
   font-family: Roboto, Noto, sans-serif;
   -webkit-font-smoothing: antialiased;
   font-size: 1.15rem;
-  font-weight: 500;
+  font-weight: 600;
 }
 h2, .font-subtitle, label[section] {
   font-family: Roboto,sans-serif;
   -webkit-font-smoothing: antialiased;
   font-size: 1.05rem;
-  font-weight: 500;
+  font-weight: 600;
 }
-h3, .font-subsubtitle {
+h3, .font-subsubtitle, th {
+  font-family: Roboto,sans-serif;
+  -webkit-font-smoothing: antialiased;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+p, .font-body, label, td {
   font-family: Roboto,sans-serif;
   -webkit-font-smoothing: antialiased;
   font-size: 0.95rem;
   font-weight: 500;
-}
-p, .font-body, label {
-  font-family: Roboto,sans-serif;
-  -webkit-font-smoothing: antialiased;
-  font-size: 0.95rem;
-  font-weight: 400;
 }
 .secondary {
   font-family: Roboto,sans-serif;

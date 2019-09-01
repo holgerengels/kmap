@@ -166,6 +166,9 @@ public class Authentication {
         if (roles == null && csv != null) {
             Account account = csv.get(user);
             roles = account != null && account.match(password) ? account.roles : null;
+
+            if (roles == null)
+                System.out.println("csv auth failed");
         }
         return roles;
     }
@@ -209,6 +212,7 @@ public class Authentication {
             return roles;
         }
         catch (AuthenticationException e) {
+            System.out.println("ldap auth failed");
             return null;
         }
         catch (NamingException e) {
