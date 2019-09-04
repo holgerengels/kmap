@@ -89,8 +89,11 @@ class KMapSummaryCard extends connect(store)(LitElement) {
   <div class="card-footer">
       ${this.card.links
       ? html`<a slot="footer" href="#browser/${this.subject}/${this.card.links}"><mega-icon>open_in_new</mega-icon></a>`
-      : html`<star-rating .rate="${this.state}" @rated="${this._rated}" .color_unrated="${this._lightest}" .color_rated="${this._opaque}"></star-rating>`
-      }
+      : html`
+        ${this._layers.includes('summaries') ? html`
+          <star-rating .rate="${this.state}" @rated="${this._rated}" .color_unrated="${this._lightest}" .color_rated="${this._opaque}"></star-rating>
+        ` : '' }
+      `}
                       
       <div slot="footer" style="flex: 1 0 auto"></div>
       <a slot="footer" href="#browser/${this.subject}/${this.chapter}/${this.card.name}"><mega-icon>fullscreen</mega-icon></a>
