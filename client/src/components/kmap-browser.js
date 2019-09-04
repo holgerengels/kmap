@@ -113,7 +113,7 @@ class KMapBrowser extends connect(store)(LitElement) {
           ${this.preline ? html`
             <div class="preline">
             <b>Voraussetzung für das Kapitel ${this.chapter}:</b> ${this.preline.cards.map((card, j) => html`
-                <a href="#browser/${this.subject}/${card.links}">${card.name}</a>
+                <a href="#browser/${this.subject}/${card.links}">${card.name}</a>&nbsp;
               `)}
             </div>
           ` : ''}
