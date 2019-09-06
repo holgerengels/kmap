@@ -29,7 +29,7 @@ form {
 ${this._card ? html`
   <form>
     <div class="field">
-      <span>Soll die Wissenskarte zum Thema <i>${this._card.name}</i> von der Wissenslandkarte zum Kapitel <i>${this._chapter}</i>
+      <span>Soll die Wissenskarte zum Thema <i>${this._card.topic}</i> von der Wissenslandkarte zum Kapitel <i>${this._chapter}</i>
       aus dem Modul <i>${this._card.module}</i> im Fach <i>${this._subject}</i> wirklich gelöscht werden?</span>
     </div>
   </form>
@@ -80,7 +80,7 @@ ${this._card ? html`
     this._deleteDialog.close();
     this._card.subject = this._subject;
     this._card.chapter = this._chapter;
-    this._card.topic = this._card.name;
+    this._card.topic = this._card.topic;
     console.log(this._card);
     store.dispatch(deleteTopic(this._subject, this._card.module, this._card))
       .then(store.dispatch(invalidateMap(this._subject, this._chapter)))

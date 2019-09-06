@@ -3,7 +3,6 @@ package kmap;
 import com.google.gson.*;
 import org.lightcouch.*;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -246,6 +245,7 @@ public class Couch extends Server {
             JsonObject topic = iterator.next();
             String topicName = string(topic, "topic");
             if ("_".equals(topicName)) {
+                board.addProperty("module", string(topic, "module"));
                 board.addProperty("description", string(topic, "description"));
                 board.addProperty("summary", string(topic, "summary"));
                 add(board, "attachments", (JsonArray)topic.get("attachments"));
@@ -308,7 +308,7 @@ public class Couch extends Server {
             int col = 0;
             for (Node node : transitives) {
                 JsonObject card = new JsonObject();
-                card.addProperty("name", node.getName());
+                card.addProperty("topic", node.getTopic());
                 card.addProperty("row", -1);
                 card.addProperty("col", col++);
                 addProperty(card, "summary", node.getSummary());
@@ -318,7 +318,7 @@ public class Couch extends Server {
             lines.add(line);
 
             JsonArray dependsArray = new JsonArray();
-            transitives.forEach(node -> dependsArray.add(node.getName()));
+            transitives.forEach(node -> dependsArray.add(node.getTopic()));
             add(board, "depends", dependsArray);
         }
 
@@ -335,14 +335,14 @@ public class Couch extends Server {
             }
             JsonObject card = new JsonObject();
             card.addProperty("module", node.getModule());
-            card.addProperty("name", node.getName());
+            card.addProperty("topic", node.getTopic());
             card.addProperty("row", node.getRow());
             card.addProperty("col", node.getColumn());
             addProperty(card, "description", node.getDescription());
             addProperty(card, "summary", node.getSummary());
             addProperty(card, "links", node.getLinks());
             add(card, "attachments", node.getAttachments());
-            cloudLinks(node.getAttachments(), subject, name, node.getName());
+            cloudLinks(node.getAttachments(), subject, name, node.getTopic());
             JsonArray depends = new JsonArray();
             for (String dependName : node.getDepends()) {
                 depends.add(dependName);

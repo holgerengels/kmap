@@ -37,15 +37,15 @@ export const saveTopic = (subject, module, card) => (dispatch, getState) => {
 };
 
 const requestSaveTopic = (subject, module, card) => {
-  return { type: SAVE_TOPIC, status: 'pending', subject, module, topic: card.name, card, };
+  return { type: SAVE_TOPIC, status: 'pending', subject, module, topic: card.topic, card, };
 };
 
 const receiveSaveTopic = (subject, module, card) => {
-  return { type: SAVE_TOPIC, status: 'success', subject, module, topic: card.name, card, };
+  return { type: SAVE_TOPIC, status: 'success', subject, module, topic: card.topic, card, };
 };
 
 const failSaveTopic = (subject, module, card, response) => {
-  return { type: SAVE_TOPIC, status: 'error', subject, module, topic: card.name, response: response.message, };
+  return { type: SAVE_TOPIC, status: 'error', subject, module, topic: card.topic, response: response.message, };
 };
 
 export const renameTopic = (subject, module, card, name) => (dispatch, getState) => {
@@ -79,15 +79,15 @@ export const renameTopic = (subject, module, card, name) => (dispatch, getState)
 };
 
 const requestRenameTopic = (subject, module, card, name) => {
-  return { type: RENAME_TOPIC, status: 'pending', subject, module, topic: card.name, name, };
+  return { type: RENAME_TOPIC, status: 'pending', subject, module, topic: card.topic, name, };
 };
 
 const receiveRenameTopic = (subject, module, card, name) => {
-  return { type: RENAME_TOPIC, status: 'success', subject, module, topic: card.name, name, };
+  return { type: RENAME_TOPIC, status: 'success', subject, module, topic: card.topic, name, };
 };
 
 const failRenameTopic = (subject, module, card, name, response) => {
-  return { type: RENAME_TOPIC, status: 'error', subject, module, topic: card.name, name, response: response.message, };
+  return { type: RENAME_TOPIC, status: 'error', subject, module, topic: card.topic, name, response: response.message, };
 };
 
 export const deleteTopic = (subject, module, card) => (dispatch, getState) => {
@@ -121,13 +121,13 @@ export const deleteTopic = (subject, module, card) => (dispatch, getState) => {
 };
 
 const requestDeleteTopic = (subject, module, card) => {
-  return { type: DELETE_TOPIC, status: 'pending', subject, module, topic: card.name, card, };
+  return { type: DELETE_TOPIC, status: 'pending', subject, module, topic: card.topic, card, };
 };
 
 const receiveDeleteTopic = (subject, module, card) => {
-  return { type: DELETE_TOPIC, status: 'success', subject, module, topic: card.name, card, };
+  return { type: DELETE_TOPIC, status: 'success', subject, module, topic: card.topic, card, };
 };
 
 const failDeleteTopic = (subject, module, card, response) => {
-  return { type: DELETE_TOPIC, status: 'error', subject, module, topic: card.name, response: response.message, };
+  return { type: DELETE_TOPIC, status: 'error', subject, module, topic: card.topic, response: response.message, };
 };

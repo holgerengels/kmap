@@ -25,14 +25,14 @@ public class Test {
 
             for (JsonElement topicElement : topics) {
                 JsonObject topic = (JsonObject)topicElement;
-                String name = topic.getAsJsonPrimitive("topic").getAsString();
-                Node node = nodes.computeIfAbsent(name, s3 -> new Node(name));
+                String topicName = topic.getAsJsonPrimitive("topic").getAsString();
+                Node node = nodes.computeIfAbsent(topicName, s3 -> new Node(topicName));
                 //System.out.println(node);
                 JsonArray depends = topic.getAsJsonArray("depends");
                 for (JsonElement depend : depends) {
                     String dependsOn = depend.getAsString();
                     //System.out.println("--> " + dependsOn);
-                    connections.computeIfAbsent(dependsOn + ":" + name, s -> new Connection(nodes.get(dependsOn), nodes.get(name)));
+                    connections.computeIfAbsent(dependsOn + ":" + topicName, s -> new Connection(nodes.get(dependsOn), nodes.get(topicName)));
                 }
             }
 
@@ -67,7 +67,7 @@ public class Test {
             else if (!new Integer(0).equals(node.column)) {
                 System.out.print(", ");
             }
-            System.out.print(node.name);
+            System.out.print(node.topic);
         }
         System.out.println();
         System.out.println();

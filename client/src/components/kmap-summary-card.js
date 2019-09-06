@@ -24,7 +24,7 @@ class KMapSummaryCard extends connect(store)(LitElement) {
   --color-lightest: #9e9e9e;
 }
 .card {
-  display: inline-block;
+  display: block;
   box-sizing: border-box;
   overflow: overlay;
   width: 300px;
@@ -43,7 +43,7 @@ class KMapSummaryCard extends connect(store)(LitElement) {
   color: var(--color-darkgray);
   background-color: var(--color-light);
   transition: background-color .5s ease-in-out;
-  padding: 8px;
+  padding: 4px 8px;
   font-size: 0px;
   line-height: 0px;
   display: flex;
@@ -54,13 +54,13 @@ class KMapSummaryCard extends connect(store)(LitElement) {
   color: var(--color-darkgray);
 }
 .card[selected] {
-  filter: saturate(1.2) brightness(1.1);
+  filter: saturate(1.3) brightness(1.1);
   box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14),
       0 1px 10px 0 rgba(0, 0, 0, 0.12),
       0 2px 4px -1px rgba(0, 0, 0, 0.4);
 }
 .card[highlighted] {
-  filter: saturate(1.2) brightness(1.1);
+  filter: saturate(1.3) brightness(1.1);
 }
       `];
   }
@@ -69,7 +69,7 @@ class KMapSummaryCard extends connect(store)(LitElement) {
     return html`
 <div class="card font-body" ?selected="${this._selected}" ?highlighted="${this._highlighted}">
   <div class="card-header" @click="${this._clicked}">
-      <span>${this.card.name}</span>
+      <span>${this.card.topic}</span>
   </div>
   ${this._layers.includes('summaries')
       ? html`
@@ -96,7 +96,7 @@ class KMapSummaryCard extends connect(store)(LitElement) {
       `}
                       
       <div slot="footer" style="flex: 1 0 auto"></div>
-      <a slot="footer" href="#browser/${this.subject}/${this.chapter}/${this.card.name}"><mega-icon>fullscreen</mega-icon></a>
+      <a slot="footer" href="#browser/${this.subject}/${this.chapter}/${this.card.topic}"><mega-icon>fullscreen</mega-icon></a>
   </div>
 </div>
     `;
@@ -156,14 +156,14 @@ class KMapSummaryCard extends connect(store)(LitElement) {
   }
 
   stateChanged(state) {
-    this._highlighted = state.maps.selectedCardDependencies && state.maps.selectedCardDependencies.includes(this.card.name);
-    this._selected = state.maps.selectedCardName === this.card.name;
+    this._highlighted = state.maps.selectedCardDependencies && state.maps.selectedCardDependencies.includes(this.card.topic);
+    this._selected = state.maps.selectedCardName === this.card.topic;
     this._layers = state.app.layers;
   }
 
   updated(changedProperties) {
     if (changedProperties.has("card"))
-      this._key = this.card.links ? this.card.links : this.chapter + "." + this.card.name;
+      this._key = this.card.links ? this.card.links : this.chapter + "." + this.card.topic;
     if (changedProperties.has("_layers"))
       if (!this._layers.includes(this._stateLayer))
         this._colorize(0);

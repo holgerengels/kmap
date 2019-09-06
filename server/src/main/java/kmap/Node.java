@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class Node {
     String module;
-    String name;
+    String topic;
     Integer row;
     Integer column;
     private List<String> depends = new ArrayList<>();
@@ -21,12 +21,12 @@ public class Node {
     private JsonArray attachments;
     private List<String> annotations = new ArrayList<>();
 
-    public Node(String name) {
-        this.name = name;
+    public Node(String topic) {
+        this.topic = topic;
     }
 
-    public String getName() {
-        return name;
+    public String getTopic() {
+        return topic;
     }
 
     public Integer getRow() {
@@ -47,7 +47,7 @@ public class Node {
 
     @Override
     public String toString() {
-        return name;
+        return topic;
     }
 
     @Override
@@ -57,12 +57,12 @@ public class Node {
 
         Node node = (Node)o;
 
-        return name.equals(node.name);
+        return topic.equals(node.topic);
     }
 
     @Override
     public int hashCode() {
-        return name.hashCode();
+        return topic.hashCode();
     }
 
     public String getModule() {

@@ -99,15 +99,15 @@ ${this._card ? html`
   <form @focus="${this._focus}">
     <div class="field">
       <label for="topic">Thema</label>
-      <span id="topic">${this._card.name}</span>
+      <span id="topic">${this._card.topic !== '_' ? this._card.topic : "Allgemeines zu " + this._card.chapter}</span>
     </div>
-    <div class="field">
+    <div class="field" ?hidden="${this._card.topic === '_'}">
       <label for="links"></label>
       <input id="links" type="text" placeholder="Verweist auf ..." .value="${this._card.links}" @change="${e => this._card.links = e.target.value}"/>
       <label for="priority"></label>
       <input id="priority" type="number" placeholder="Priorität" inputmode="numeric" min="0" step="1" .value="${this._card.priority}" @change="${e => this._card.priority = e.target.value}"/>
     </div>
-    <div class="field">
+    <div class="field" ?hidden="${this._card.topic === '_'}">
       <label for="depends">Basiert auf ...</label>
       <textarea id="depends" rows="3" @change="${e => this._depends = e.target.value}">${this._depends}</textarea>
     </div>
@@ -115,7 +115,7 @@ ${this._card ? html`
       <label for="summary">Kurztext</label>
       <textarea id="summary" rows="3" @keyup="${this._setSummary}" @focus="${this._focus}" @blur="${this._focus}">${this._card.summary}</textarea>
     </div>
-    <div class="field">
+    <div class="field" ?hidden="${this._card.topic === '_'}">
       <label for="description">Langtext</label>
       <textarea id="description" rows="7" @keyup="${this._setDescription}" @focus="${this._focus}" @blur="${this._focus}">${this._card.description}</textarea>
     </div>
@@ -149,7 +149,7 @@ ${this._card ? html`
   ${this._showDescriptionPreview ? html`<div class="preview-scroller"><kmap-knowledge-card-description 
     .subject="${this._subject}"
     .chapter="${this._chapter}"
-    .topic="${this._card.name}"
+    .topic="${this._card.topic}"
     .description="${this._description}"
     ></kmap-knowledge-card-description></div>` : ''}
   </div>
@@ -258,7 +258,6 @@ ${this._card ? html`
     this._editDialog.close();
     this._card.subject = this._subject;
     this._card.chapter = this._chapter;
-    this._card.topic = this._card.name;
     this._card.summary = this._summary;
     this._card.description = this._description;
     this._card.depends = this._depends.split(",").map(d => d.trim()).filter(d => d.length > 0);
@@ -331,7 +330,7 @@ ${this._card ? html`
   }
 
   _syncAttachments() {
-    fetch(`${config.server}edit?attachments=${this._subject}/${this._chapter}/${this._card.name}`, {
+    fetch(`${config.server}edit?attachments=${this._subject}/${this._chapter}/${this._card.topic}`, {
       method: "GET",
       mode: "cors",
       cache: "no-cache",
@@ -375,7 +374,7 @@ ${this._card ? html`
   }
 
   _createDirectory() {
-    fetch(`${config.server}edit?directory=${this._subject}/${this._chapter}/${this._card.name}`, {
+    fetch(`${config.server}edit?directory=${this._subject}/${this._chapter}/${this._card.topic}`, {
       method: "GET",
       mode: "cors",
       cache: "no-cache",

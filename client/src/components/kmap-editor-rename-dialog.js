@@ -30,7 +30,7 @@ ${this._card ? html`
   <form>
     <div class="field">
       <label for="topic">Thema</label>
-      <span id="topic">${this._card.name}</span>
+      <span id="topic">${this._card.topic}</span>
     </div>
     <div class="field">
       <label for="links">Umbenennen in</label>
@@ -87,7 +87,7 @@ ${this._card ? html`
     this._renameDialog.close();
     this._card.subject = this._subject;
     this._card.chapter = this._chapter;
-    this._card.topic = this._card.name;
+    this._card.topic = this._card.topic;
     console.log(this._card);
     store.dispatch(renameTopic(this._subject, this._card.module, this._card, this._newName))
       .then(store.dispatch(invalidateMap(this._subject, this._chapter)))

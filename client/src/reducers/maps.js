@@ -49,7 +49,7 @@ const map = (state = INITIAL_STATE, action) => {
         case SELECT_SUMMARY_CARD:
             return {
                 ...state,
-                selectedCardName: action.card.name,
+                selectedCardName: action.card.topic,
                 selectedCardDependencies: action.card.depends,
             };
         default:

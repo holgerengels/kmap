@@ -9,6 +9,7 @@ import 'mega-material/icon-button';
 import 'mega-material/top-app-bar';
 import './kmap-summary-card';
 import './kmap-knowledge-card';
+import './kmap-browser-chapter-editor';
 
 class KMapBrowser extends connect(store)(LitElement) {
   static get styles() {
@@ -54,17 +55,17 @@ class KMapBrowser extends connect(store)(LitElement) {
           outline: none;
           padding: 8px;
         }
-        .preline {
+        .chapter-line {
             margin: 12px;
             color: var(--color-darkgray);
         }
-        .preline a {
+        .chapter-line a {
             color: var(--color-mediumgray);
             text-decoration: none;
             font-weight: bold;
         }
 
-        .preline a:hover {
+        .chapter-line a:hover {
             text-decoration: underline;
         }
         .line {
@@ -97,8 +98,8 @@ class KMapBrowser extends connect(store)(LitElement) {
 
         kmap-summary-card {
           vertical-align: top;
-          margin-left: 6px;
-          margin-right: 6px;
+          margin: 6px;
+            margin-top: 0px;
         }
       `];
   }
@@ -107,26 +108,37 @@ class KMapBrowser extends connect(store)(LitElement) {
     return html`
       <mega-top-app-bar>
         <mega-icon-button icon="menu" slot="navigationIcon"></mega-icon-button>
-        <div slot="title">${this.chapter}</div>
+        <div slot="title">${this._chapter}</div>
       </mega-top-app-bar>
         <div class="page map" ?active="${this.page === 'map'}" @rated="${this._rated}">
-          ${this.preline ? html`
-            <div class="preline">
-            <b>Voraussetzung für das Kapitel ${this.chapter}:</b> ${this.preline.cards.map((card, j) => html`
-                <a href="#browser/${this.subject}/${card.links}">${card.name}</a>&nbsp;
+          ${this.chapterLine ? html`
+            <div class="chapter-line">
+            <b>Voraussetzung für das Kapitel ${this._chapter}:</b> ${this.chapterLine.cards.map((card, j) => html`
+                <a href="#browser/${this._subject}/${card.links}">${card.topic}</a>&nbsp;
               `)}
             </div>
           ` : ''}
+          ${this._layers.includes('summaries') && this._summary ? html`
+            <div class="chapter-line">
+              ${this._summary}
+            </div>
+          ` : ''}
+          ${this._layers.includes('editor') ? html`
+             <kmap-browser-chapter-editor .module="${this._module}" .subject="${this._subject}" .chapter="${this._chapter}"
+                .summary="${this._summary}"
+                .attachments="${this._attachments}"></kmap-browser-chapter-editor>
+           ` : ''
+          }
           ${this.lines.map((line, i) => html`
             <div class="scrollpane line">
               ${line.cards.map((card, j) => html`
-                <kmap-summary-card .subject="${this.subject}" .chapter="${this.chapter}" .card="${card}"></kmap-summary-card>
+                <kmap-summary-card .subject="${this._subject}" .chapter="${this._chapter}" .card="${card}"></kmap-summary-card>
               `)}
             </div>
           `)}
         </div>
         <div class="page topic" ?active="${this.page === 'topic'}" @rated="${this._rated}">
-            <kmap-knowledge-card .subject="${this.subject}" .chapter="${this.chapter}" .card="${this.topicCard}"></kmap-knowledge-card>
+            <kmap-knowledge-card .subject="${this._subject}" .chapter="${this._chapter}" .card="${this.topicCard}"></kmap-knowledge-card>
         </div>
         <div class="page search" ?active="${this.page === 'search'}">
             search
@@ -142,14 +154,15 @@ class KMapBrowser extends connect(store)(LitElement) {
       routeSubject: {type: String},
       routeChapter: {type: String},
       routeTopic: {type: String},
-      loadingSubject: {type: String},
-      loadingChapter: {type: String},
-      subject: {type: String},
-      chapter: {type: String},
+      _layers: {type: Array},
+      _subject: {type: String},
+      _chapter: {type: String},
+      _summary: {type: String},
+      _attachments: {type: Array},
       topic: {type: String},
       topicCard: {type: Object},
       board: {type: Object},
-      preline: {type: Array},
+      chapterLine: {type: Array},
       lines: {type: Array},
       page: {type: String},
       mapHeight: {type: Number},
@@ -162,9 +175,10 @@ class KMapBrowser extends connect(store)(LitElement) {
 
   constructor() {
     super();
-    this.preline = null;
+    this.chapterLine = null;
     this.lines = [];
     this.topicCard = {};
+    this._layers = [];
   }
 
   viewport() {
@@ -262,21 +276,25 @@ class KMapBrowser extends connect(store)(LitElement) {
     }
 
     if (state.maps.map) {
-      this.subject = state.maps.map.subject;
-      this.chapter = state.maps.map.chapter;
+      this._subject = state.maps.map.subject;
+      this._chapter = state.maps.map.chapter;
+      this._module = state.maps.map.module;
+      this._summary = state.maps.map.summary;
+      this._attachments = state.maps.map.attachments;
+
       let lines = state.maps.map.lines;
       if (lines[0].cards[0].row === -1) {
-        this.preline = lines[0];
+        this.chapterLine = lines[0];
         this.lines = lines.slice(1);
       }
       else {
-        this.preline = null;
+        this.chapterLine = null;
         this.lines = lines;
       }
     }
     else {
-      this.subject = "";
-      this.chapter = "";
+      this._subject = "";
+      this._chapter = "";
       this.lines = [];
     }
 
@@ -284,12 +302,14 @@ class KMapBrowser extends connect(store)(LitElement) {
       let lala = {};
       for (let line of this.lines) {
         for (let card of line.cards) {
-          if (card.name === this.routeTopic)
+          if (card.topic === this.routeTopic)
             lala = card;
         }
       }
       this.topicCard = lala;
     }
+
+    this._layers = state.app.layers;
   }
 
   activeChanged(active) {

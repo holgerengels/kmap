@@ -58,7 +58,7 @@ class KMapKnowledgeCard extends connect(store)(LitElement) {
   color: var(--color-darkgray);
   background-color: var(--color-light);
   transition: background-color .5s ease-in-out;
-  padding: 8px 12px;
+  padding: 4px 8px;
   font-size: 0px;
   line-height: 0px;
   display: flex;
@@ -87,7 +87,7 @@ render() {
         return html`
 <div class="card" ?selected="${this._selected}" ?highlighted="${this._highlighted}">
   <div class="card-header">
-      <span>${this.card.name}</span>
+      <span>${this.card.topic}</span>
   </div>
   <kmap-knowledge-card-depends .key="${this._key}"
       .subject="${this.subject}"
@@ -103,7 +103,7 @@ render() {
   <kmap-knowledge-card-description .key="${this._key}"
       .subject="${this.subject}"
       .chapter="${this.chapter}"
-      .topic="${this.card.name}"
+      .topic="${this.card.topic}"
       .description="${this.card.description}"
       .links="${this.card.links}"
       .depends="${this.card.depends}"
@@ -212,13 +212,13 @@ render() {
     }
 
     _rated(e) {
-        let key = this.chapter + "." + this.card.name;
+        let key = this.chapter + "." + this.card.topic;
         this.dispatchEvent(new CustomEvent('rated', { bubbles: true, detail: {key: key, rate: e.detail.rate}}));
     }
 
     _rating(state) {
         if (state.states && state.states.state) {
-            let key = this.chapter + "." + this.card.name;
+            let key = this.chapter + "." + this.card.topic;
             this.state = this._getStateValue(state, key);
             this.progressNum = this._getStateValue(state, key + "*");
             this.progressOf = this._getStateValue(state, key + "#");
@@ -233,8 +233,8 @@ render() {
     }
 
     stateChanged(state) {
-        this._selected = state.maps.selectedCardName === this.card.name;
-        this._highlighted = state.maps.selectedCardDependencies && state.maps.selectedCardDependencies.includes(this.card.name);
+        this._selected = state.maps.selectedCardName === this.card.topic;
+        this._highlighted = state.maps.selectedCardDependencies && state.maps.selectedCardDependencies.includes(this.card.topic);
         this._rating(state);
     }
 
