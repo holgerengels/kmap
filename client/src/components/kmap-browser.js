@@ -56,7 +56,9 @@ class KMapBrowser extends connect(store)(LitElement) {
           padding: 8px;
         }
         .chapter-line {
-            margin: 12px;
+            margin: 8px 6px;
+            padding: 4px 0px;
+            line-height: 24px;
             color: var(--color-darkgray);
         }
         .chapter-line a {
@@ -111,22 +113,22 @@ class KMapBrowser extends connect(store)(LitElement) {
         <div slot="title">${this._chapter}</div>
       </mega-top-app-bar>
         <div class="page map" ?active="${this.page === 'map'}" @rated="${this._rated}">
-          ${this.chapterLine ? html`
+          ${this._chapterCard ? html`
             <div class="chapter-line">
-            <b>Voraussetzung für das Kapitel ${this._chapter}:</b> ${this.chapterLine.cards.map((card, j) => html`
-                <a href="#browser/${this._subject}/${card.links}">${card.topic}</a>&nbsp;
-              `)}
-            </div>
-          ` : ''}
-          ${this._layers.includes('summaries') && this._summary ? html`
-            <div class="chapter-line">
-              ${this._summary}
+              <a href="#browser/${this._subject}/${this._chapter}/_"><mega-icon style="float: right">fullscreen</mega-icon></a>
+              ${this.chapterLine ? html`
+                <b>Voraussetzung für das Kapitel ${this._chapter}:</b> ${this.chapterLine.cards.map((card, j) => html`
+                  <a href="#browser/${this._subject}/${card.links}">${card.topic}</a>&nbsp;
+                `)}
+              ` : ''}
+              ${this._layers.includes('summaries') && this._chapterCard.summary ? html`
+                  <br/>${this._chapterCard.summary}
+                </div>
+              ` : ''}
             </div>
           ` : ''}
           ${this._layers.includes('editor') ? html`
-             <kmap-browser-chapter-editor .module="${this._module}" .subject="${this._subject}" .chapter="${this._chapter}"
-                .summary="${this._summary}"
-                .attachments="${this._attachments}"></kmap-browser-chapter-editor>
+             <kmap-browser-chapter-editor .subject="${this._subject}" .chapter="${this._chapter}" .chapterCard="${this._chapterCard}"></kmap-browser-chapter-editor>
            ` : ''
           }
           ${this.lines.map((line, i) => html`
@@ -157,8 +159,7 @@ class KMapBrowser extends connect(store)(LitElement) {
       _layers: {type: Array},
       _subject: {type: String},
       _chapter: {type: String},
-      _summary: {type: String},
-      _attachments: {type: Array},
+      _chapterCard: {type: Object},
       topic: {type: String},
       topicCard: {type: Object},
       board: {type: Object},
@@ -276,11 +277,10 @@ class KMapBrowser extends connect(store)(LitElement) {
     }
 
     if (state.maps.map) {
+      this._chapterCard = state.maps.map.chapterCard;
       this._subject = state.maps.map.subject;
       this._chapter = state.maps.map.chapter;
       this._module = state.maps.map.module;
-      this._summary = state.maps.map.summary;
-      this._attachments = state.maps.map.attachments;
 
       let lines = state.maps.map.lines;
       if (lines[0].cards[0].row === -1) {
@@ -298,7 +298,10 @@ class KMapBrowser extends connect(store)(LitElement) {
       this.lines = [];
     }
 
-    if (this.routeTopic && this.lines) {
+    if (this.routeTopic === "_") {
+      this.topicCard = this._chapterCard;
+    }
+    else if (this.routeTopic && this.lines) {
       let lala = {};
       for (let line of this.lines) {
         for (let card of line.cards) {

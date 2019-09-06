@@ -87,7 +87,7 @@ render() {
         return html`
 <div class="card" ?selected="${this._selected}" ?highlighted="${this._highlighted}">
   <div class="card-header">
-      <span>${this.card.topic}</span>
+      <span>${this.card.topic !== "_" ? this.card.topic : this.chapter}</span>
   </div>
   <kmap-knowledge-card-depends .key="${this._key}"
       .subject="${this.subject}"

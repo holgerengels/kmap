@@ -31,13 +31,9 @@ mega-button[disabled] {
 
   static get properties() {
     return {
-      module: {type: String},
       subject: {type: String},
       chapter: {type: String},
-      summary: {type: String},
-      attachments: {type: Array},
-      key: {type: String},
-      card: {type: Object},
+      chapterCard: {type: Object},
       _selectedModule: {type: Object},
       _enabled: {type: Boolean},
     };
@@ -50,7 +46,6 @@ mega-button[disabled] {
     this.chapter = '';
     this.summary = '';
     this.attachments = [];
-    this.key = '';
     this._enabled = false;
   }
 
@@ -59,10 +54,10 @@ mega-button[disabled] {
 
   updated(changedProperties) {
     if (changedProperties.has("module") || changedProperties.has("subject") || changedProperties.has("_selectedModule")) {
-      this._enabled = (this._selectedModule
+      this._enabled = this._selectedModule && ((this.chapterCard
         && this.subject === this._selectedModule.subject
-        && this.module === this._selectedModule.module)
-        || !this.module;
+        && this.chapterCard.module === this._selectedModule.module)
+        || !this.chapterCard);
     }
   }
 
@@ -71,13 +66,14 @@ mega-button[disabled] {
   }
 
   _showEdit() {
-    let card = this.module ? {
-      module: this.module,
+    let card = this.chapterCard ? {
+      module: this.chapterCard.module,
       subject: this.subject,
       chapter: this.chapter,
       topic: '_',
-      summary: this.summary,
-      attachments: this.attachments,
+      summary: this.chapterCard.summary,
+      description: this.chapterCard.description,
+      attachments: this.chapterCard.attachments,
     } : {
       added: true,
       module: this._selectedModule.module,

@@ -52,7 +52,7 @@ const state = (state = INITIAL_STATE, action) => {
             modulesFailure: false,
             modulesResponse: null,
             modules: [],
-            selectedModule: bull,
+            selectedModule: null,
           };
       }
     case IMPORT_MAP:

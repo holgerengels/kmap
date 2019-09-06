@@ -115,7 +115,7 @@ ${this._card ? html`
       <label for="summary">Kurztext</label>
       <textarea id="summary" rows="3" @keyup="${this._setSummary}" @focus="${this._focus}" @blur="${this._focus}">${this._card.summary}</textarea>
     </div>
-    <div class="field" ?hidden="${this._card.topic === '_'}">
+    <div class="field">
       <label for="description">Langtext</label>
       <textarea id="description" rows="7" @keyup="${this._setDescription}" @focus="${this._focus}" @blur="${this._focus}">${this._card.description}</textarea>
     </div>

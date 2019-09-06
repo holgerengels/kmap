@@ -46,7 +46,7 @@ class KMapModuleSelector extends connect(store)(LitElement) {
     else
       this._selectedIndex = index;
 
-    store.dispatch(selectModule(this._selectedIndex !== -1 ? this._modules[this._selectedIndex] : ''));
+    store.dispatch(selectModule(this._selectedIndex !== -1 ? this._modules[this._selectedIndex] : null));
   }
 
   stateChanged(state) {

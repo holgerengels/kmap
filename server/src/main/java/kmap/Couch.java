@@ -241,14 +241,16 @@ public class Couch extends Server {
         JsonArray lines = new JsonArray();
         board.add("lines", lines);
 
+        Node chapterNode = null;
         for (Iterator<JsonObject> iterator = objects.iterator(); iterator.hasNext(); ) {
             JsonObject topic = iterator.next();
             String topicName = string(topic, "topic");
             if ("_".equals(topicName)) {
-                board.addProperty("module", string(topic, "module"));
-                board.addProperty("description", string(topic, "description"));
-                board.addProperty("summary", string(topic, "summary"));
-                add(board, "attachments", (JsonArray)topic.get("attachments"));
+                chapterNode = new Node("_");
+                chapterNode.setModule(string(topic, "module"));
+                chapterNode.setDescription(string(topic, "description"));
+                chapterNode.setSummary(string(topic, "summary"));
+                chapterNode.setAttachments((JsonArray)topic.get("attachments"));
                 iterator.remove();
             }
             else {
@@ -352,7 +354,17 @@ public class Couch extends Server {
             addProperty(card, "priority", node.getPriority());
             cards.add(card);
         }
-        cloudLinks(board.getAsJsonArray("attachments"), subject, name, "_");
+
+        if (chapterNode != null) {
+            JsonObject card = new JsonObject();
+            card.addProperty("module", chapterNode.getModule());
+            card.addProperty("topic", "_");
+            addProperty(card, "description", chapterNode.getDescription());
+            addProperty(card, "summary", chapterNode.getSummary());
+            add(card, "attachments", chapterNode.getAttachments());
+            cloudLinks(chapterNode.getAttachments(), subject, name, "_");
+            board.add("chapterCard", card);
+        }
         return board;
     }
 
