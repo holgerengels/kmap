@@ -65,7 +65,6 @@ box img {
 
   static get properties() {
     return {
-      key: {type: String},
       subject: {type: String},
       chapter: {type: String},
       topic: {type: String},
@@ -76,7 +75,6 @@ box img {
 
   constructor() {
     super();
-    this.key = '';
     this.subject = '';
     this.chapter = '';
     this.topic = '';

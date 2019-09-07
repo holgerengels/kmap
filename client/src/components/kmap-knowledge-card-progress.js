@@ -39,7 +39,6 @@ class KMapKnowledgeCardProgress extends LitElement {
 
   static get properties() {
     return {
-      key: {type: String},
       progressNum: {type: String},
       progressOf: {type: String},
     };
@@ -47,7 +46,6 @@ class KMapKnowledgeCardProgress extends LitElement {
 
   constructor() {
     super();
-    this.key = '';
     this.progressNum = 0;
     this.progressOf = 0;
   }

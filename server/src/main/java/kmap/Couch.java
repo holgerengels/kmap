@@ -293,38 +293,23 @@ public class Couch extends Server {
             }
         }
 
-        List<Node> transitives = new ArrayList<>();
+        List<String> transitiveDepends = new ArrayList<>();
         deps.entrySet().stream().filter(entry -> entry.getKey().equals(name)).flatMap(entry -> entry.getValue().stream()).forEach(depend -> {
             int i = depend.indexOf('.');
             String dependChapter = depend.substring(0, i);
             String dependTopic = depend.substring(i + 1);
-            Node node = new Node(dependTopic);
-            node.setLinks(links.containsKey(depend) ? links.get(depend) : dependChapter + "/" + dependTopic);
-            node.setSummary(dependTopic + " ist Voraussetzung für das Kapitel " + name);
-            transitives.add(node);
+            transitiveDepends.add(links.containsKey(depend) ? links.get(depend) : dependChapter + "/" + dependTopic);
         });
-        JsonObject line = new JsonObject();
-        JsonArray cards = new JsonArray();
-        line.add("cards", cards);
-        if (!transitives.isEmpty()) {
-            int col = 0;
-            for (Node node : transitives) {
-                JsonObject card = new JsonObject();
-                card.addProperty("topic", node.getTopic());
-                card.addProperty("row", -1);
-                card.addProperty("col", col++);
-                addProperty(card, "summary", node.getSummary());
-                addProperty(card, "links", node.getLinks());
-                cards.add(card);
-            }
-            lines.add(line);
 
-            JsonArray dependsArray = new JsonArray();
-            transitives.forEach(node -> dependsArray.add(node.getTopic()));
-            add(board, "depends", dependsArray);
+        if (!transitiveDepends.isEmpty()) {
+            chapterNode = new Node("_");
+            chapterNode.getDepends().addAll(transitiveDepends);
         }
 
         List<Node> list = layout(nodes, connections);
+
+        JsonObject line;
+        JsonArray cards = new JsonArray();
 
         int row = 0;
         for (Node node : list) {
@@ -359,6 +344,11 @@ public class Couch extends Server {
             JsonObject card = new JsonObject();
             card.addProperty("module", chapterNode.getModule());
             card.addProperty("topic", "_");
+            if (!chapterNode.getDepends().isEmpty()) {
+                JsonArray array = new JsonArray();
+                chapterNode.getDepends().forEach(array::add);
+                add(card, "depends", array);
+            }
             addProperty(card, "description", chapterNode.getDescription());
             addProperty(card, "summary", chapterNode.getSummary());
             add(card, "attachments", chapterNode.getAttachments());
@@ -424,9 +414,9 @@ public class Couch extends Server {
         }
     }
 
-    private void add(JsonObject card, String name, JsonArray attachments) {
-        if (attachments != null)
-            card.add(name, attachments);
+    private void add(JsonObject card, String name, JsonArray array) {
+        if (array != null)
+            card.add(name, array);
     }
 
     private void addProperty(JsonObject card, String name, String value) {

@@ -36,7 +36,11 @@ class KMapKnowledgeCardDepends extends LitElement {
       ? html`
         <div class="content">
           <b>Voraussetzungen:</b> ${this.depends.map((depend, i) => html`
-            &nbsp;<a href="#browser/${this.subject}/${this.chapter}/${depend}">${depend}</a>
+            ${this.chapterDepends ? html`
+              &nbsp;<a href="#browser/${this.subject}/${depend}">${depend}</a>
+            ` : html`
+              &nbsp;<a href="#browser/${this.subject}/${this.chapter}/${depend}">${depend}</a>
+            `}
           `)}
         </div>
         `
@@ -46,19 +50,19 @@ class KMapKnowledgeCardDepends extends LitElement {
 
   static get properties() {
     return {
-      key: {type: String},
       subject: {type: String},
       chapter: {type: String},
       depends: {type: Array},
+      chapterDepends: {type: Boolean},
     };
   }
 
   constructor() {
     super();
-    this.key = '';
     this.subject = '';
     this.chapter = '';
     this.depends = [];
+    this.chapterDepends = false;
   }
 }
 

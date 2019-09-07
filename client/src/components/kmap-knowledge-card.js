@@ -89,18 +89,18 @@ render() {
   <div class="card-header">
       <span>${this.card.topic !== "_" ? this.card.topic : this.chapter}</span>
   </div>
-  <kmap-knowledge-card-depends .key="${this._key}"
+  <kmap-knowledge-card-depends ?chapterDepends="${this.card.topic === "_"}"
       .subject="${this.subject}"
       .chapter="${this.chapter}"
       .depends="${this.card.depends}">
   </kmap-knowledge-card-depends>
     ${this.links ? html`
-  <kmap-knowledge-card-progress .key="${this._key}"
+  <kmap-knowledge-card-progress
       .progressNum="${this.progressNum}"
       .progressOf="${this.progressOf}">
   </kmap-knowledge-card-progress>
     ` : ''}
-  <kmap-knowledge-card-description .key="${this._key}"
+  <kmap-knowledge-card-description
       .subject="${this.subject}"
       .chapter="${this.chapter}"
       .topic="${this.card.topic}"

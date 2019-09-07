@@ -116,9 +116,9 @@ class KMapBrowser extends connect(store)(LitElement) {
           ${this._chapterCard ? html`
             <div class="chapter-line">
               <a href="#browser/${this._subject}/${this._chapter}/_"><mega-icon style="float: right">fullscreen</mega-icon></a>
-              ${this.chapterLine ? html`
-                <b>Voraussetzung für das Kapitel ${this._chapter}:</b> ${this.chapterLine.cards.map((card, j) => html`
-                  <a href="#browser/${this._subject}/${card.links}">${card.topic}</a>&nbsp;
+              ${this._chapterCard.depends ? html`
+                <b>Voraussetzung für das Kapitel ${this._chapter}:</b> ${this._chapterCard.depends.map((depend, j) => html`
+                  <a href="#browser/${this._subject}/${depend}">${depend}</a>&nbsp;
                 `)}
               ` : ''}
               ${this._layers.includes('summaries') && this._chapterCard.summary ? html`
