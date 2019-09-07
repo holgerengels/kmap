@@ -2,7 +2,8 @@ import { LitElement, html, css } from 'lit-element';
 import {unsafeHTML} from 'lit-html/directives/unsafe-html';
 import {colorStyles, fontStyles} from "./kmap-styles";
 import {config} from "../config";
-import {mathjaxStyles} from "./mathjax-styles";
+import "mathjax/es5/tex-svg"
+
 import AsciiMathParser from "asciimath2tex";
 
 class KMapKnowledgeCardDescription extends LitElement {
@@ -11,7 +12,6 @@ class KMapKnowledgeCardDescription extends LitElement {
     return [
       fontStyles,
       colorStyles,
-      mathjaxStyles,
       css`
 .content {
   padding: 12px;
@@ -87,11 +87,12 @@ box img {
       if (this.description) {
         let description = this.description.replace(/inline:/g, config.server + "data/" + this.subject + "/" + this.chapter + "/" + this.topic + "/");
         description = description.replace(/link:/g, config.client + config.instance + "/#browser/");
+
         let buffer = "";
         let t = false;
+        const parser = new AsciiMathParser();
         description.split("`").reverse().forEach(function (element) {
           if (t) {
-            const parser = new AsciiMathParser();
             element = parser.parse(element);
             MathJax.texReset();
             buffer = " " + MathJax.tex2svg(element).getElementsByTagName("svg")[0].outerHTML + " " + buffer;

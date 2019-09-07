@@ -1,14 +1,13 @@
 import {LitElement, html, css} from 'lit-element';
-import {unsafeHTML} from 'lit-html/directives/unsafe-html';
 import {connect} from "pwa-helpers/connect-mixin";
 import {store} from "../store";
 import {config} from '../config';
 import {STATE_COLORS} from './state-colors';
+import {fontStyles, colorStyles} from "./kmap-styles";
 import './star-rating';
 import 'mega-material/icon';
 import 'mega-material/button';
-import {fontStyles, colorStyles} from "./kmap-styles";
-import {mathjaxStyles} from "./mathjax-styles";
+import "mathjax/es5/tex-svg"
 import AsciiMathParser from "asciimath2tex";
 
 class KMapTestCard extends connect(store)(LitElement) {
@@ -18,7 +17,6 @@ class KMapTestCard extends connect(store)(LitElement) {
     return [
       fontStyles,
       colorStyles,
-      mathjaxStyles,
       css`
           :host {
               --color-opaque: #f5f5f5;
@@ -222,9 +220,9 @@ class KMapTestCard extends connect(store)(LitElement) {
 
       let buffer = "";
       let t = false;
+      const parser = new AsciiMathParser();
       replace.split("`").reverse().forEach(function (element) {
         if (t) {
-          const parser = new AsciiMathParser();
           element = parser.parse(element);
           MathJax.texReset();
           buffer = " " + MathJax.tex2svg(element).getElementsByTagName("svg")[0].outerHTML + " " + buffer;
