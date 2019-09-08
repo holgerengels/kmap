@@ -157,6 +157,7 @@ public class Tests {
             else {
                 command = "add:";                                               // save
                 changed.addProperty("subject", subject);
+                changed.remove("added");
                 if (checks(changed))
                     client.save(changed);
                 else

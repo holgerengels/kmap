@@ -115,7 +115,8 @@ public class States {
             client.save(courses);
             object = client.find(JsonObject.class, user + ".courses");
         }
-        return object.getAsJsonArray("courses");
+
+        return JSON.sort(object.getAsJsonArray("courses"));
     }
 
     public JsonArray course(String user, String name) {
@@ -136,6 +137,7 @@ public class States {
         try {
             JsonObject object = client.find(JsonObject.class, user + ".courses");
             JsonArray courses = data.getAsJsonArray("courses");
+            courses = JSON.sort(courses);
             object.add("courses", courses);
             for (Iterator<Map.Entry<String, JsonElement>> iterator = object.entrySet().iterator(); iterator.hasNext(); ) {
                 Map.Entry<String, JsonElement> entry = iterator.next();

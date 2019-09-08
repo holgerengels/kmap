@@ -73,12 +73,12 @@ ${this._test ? html`
       <label for="chapter">Kapitel</label>
       <select required @change="${e => this._chapter = e.target.value}">
         <option>- - -</option>
-        ${this._chapters.map((chapter, i) => html`<option>${chapter}</option>`)}
+        ${this._chapters.map((chapter, i) => html`<option ?selected="${chapter === this._chapter}">${chapter}</option>`)}
       </select>
       <label for="topic">Thema</label>
       <select required @change="${e => this._topic = e.target.value}">
         <option>- - -</option>
-        ${this._topics.map((topic, i) => html`<option>${topic}</option>`)}
+        ${this._topics.map((topic, i) => html`<option ?selected="${topic === this._topic}">${topic}</option>`)}
       </select>
     </div>
     <div class="field">
@@ -93,9 +93,9 @@ ${this._test ? html`
     </div>
     <div class="field">
       <label for="question">Frage</label>
-      <textarea id="question" rows="5" @keyup="${this._setQuestion}" @focus="${this._focus}" @blur="${this._focus}">${this._question}</textarea>
+      <textarea id="question" rows="5" .value="${this._question}" @keyup="${this._setQuestion}" @focus="${this._focus}" @blur="${this._focus}"></textarea>
       <label for="answer">Antwort</label>
-      <textarea id="answer" rows="5" @keyup="${this._setAnswer}" @focus="${this._focus}" @blur="${this._focus}">${this._answer}</textarea>
+      <textarea id="answer" rows="5" .value="${this._answer}" @keyup="${this._setAnswer}" @focus="${this._focus}" @blur="${this._focus}"></textarea>
     </div>
     <div class="field values">
       <label for="attachments">Werte (Checkboxen: true/false, Dezimalzahlen mit Punkt statt Komma)</label>

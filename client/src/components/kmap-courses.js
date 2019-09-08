@@ -108,7 +108,7 @@ mega-list-item {
             </div>
             <div class="field">
                 <label for="newStudents">Schüler</label>
-                <textarea id="editStudents" required rows="7" @change=${e => this._editStudents = e.target.value}>${this._editStudents}</textarea>
+                <textarea id="newStudents" required rows="7" .value="${this._newStudents}" @change=${e => this._newStudents = e.target.value}></textarea>
             </div>
             <mega-button @click="${this._new}">Speichern</mega-button>
           </div>
@@ -120,7 +120,7 @@ mega-list-item {
             </div>
             <div class="field">
                 <label for="editStudents">Schüler</label>
-                <textarea id="editStudents" required rows="7" @change=${e => this._editStudents = e.target.value}>${this._editStudents}</textarea>
+                <textarea id="editStudents" required rows="7" .value="${this._editStudents}" @change=${e => this._editStudents = e.target.value}></textarea>
             </div>
             <mega-button @click="${this._edit}">Speichern</mega-button>
           </div>

@@ -109,15 +109,15 @@ ${this._card ? html`
     </div>
     <div class="field" ?hidden="${this._card.topic === '_'}">
       <label for="depends">Basiert auf ...</label>
-      <textarea id="depends" rows="3" @change="${e => this._depends = e.target.value}">${this._depends}</textarea>
+      <textarea id="depends" rows="3" .value="${this._depends}" @change="${e => this._depends = e.target.value}"></textarea>
     </div>
     <div class="field">
       <label for="summary">Kurztext</label>
-      <textarea id="summary" rows="3" @keyup="${this._setSummary}" @focus="${this._focus}" @blur="${this._focus}">${this._card.summary}</textarea>
+      <textarea id="summary" rows="3" .value="${this._card.summary}" @keyup="${this._setSummary}" @focus="${this._focus}" @blur="${this._focus}"></textarea>
     </div>
     <div class="field">
       <label for="description">Langtext</label>
-      <textarea id="description" rows="7" @keyup="${this._setDescription}" @focus="${this._focus}" @blur="${this._focus}">${this._card.description}</textarea>
+      <textarea id="description" rows="7" .value="${this._card.description}" @keyup="${this._setDescription}" @focus="${this._focus}" @blur="${this._focus}"></textarea>
     </div>
     <div class="field attachments">
       <label for="attachments">Materialien</label>
