@@ -2,9 +2,6 @@ import { LitElement, html, css } from 'lit-element';
 import {unsafeHTML} from 'lit-html/directives/unsafe-html';
 import {colorStyles, fontStyles} from "./kmap-styles";
 import {config} from "../config";
-import "mathjax/es5/tex-svg"
-
-import AsciiMathParser from "asciimath2tex";
 
 class KMapKnowledgeCardDescription extends LitElement {
   static get styles() {
@@ -90,12 +87,9 @@ box img {
 
         let buffer = "";
         let t = false;
-        const parser = new AsciiMathParser();
         description.split("`").reverse().forEach(function (element) {
           if (t) {
-            element = parser.parse(element);
-            MathJax.texReset();
-            buffer = " " + MathJax.tex2svg(element).getElementsByTagName("svg")[0].outerHTML + " " + buffer;
+            buffer = " " + MathJax.asciimath2svg(element).getElementsByTagName("svg")[0].outerHTML + " " + buffer;
           }
           else
             buffer = element + buffer;
@@ -103,9 +97,9 @@ box img {
         });
         this._description = buffer;
       }
-      else this._description = "";
+      else
+        this._description = "";
     }
-
   }
 }
 

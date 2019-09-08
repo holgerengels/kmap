@@ -7,8 +7,6 @@ import {fontStyles, colorStyles} from "./kmap-styles";
 import './star-rating';
 import 'mega-material/icon';
 import 'mega-material/button';
-import "mathjax/es5/tex-svg"
-import AsciiMathParser from "asciimath2tex";
 
 class KMapTestCard extends connect(store)(LitElement) {
 
@@ -220,27 +218,17 @@ class KMapTestCard extends connect(store)(LitElement) {
 
       let buffer = "";
       let t = false;
-      const parser = new AsciiMathParser();
       replace.split("`").reverse().forEach(function (element) {
         if (t) {
-          element = parser.parse(element);
-          MathJax.texReset();
-          buffer = " " + MathJax.tex2svg(element).getElementsByTagName("svg")[0].outerHTML + " " + buffer;
-        } else
+          buffer = " " + MathJax.asciimath2svg(element).getElementsByTagName("svg")[0].outerHTML + " " + buffer;
+        }
+        else
           buffer = element + buffer;
         t = !t;
       });
-      replace = buffer;
-
-      element.innerHTML = replace;
-
-      /*
-        function layout() {
-            console.log("typesetting done");
-            that.fire('typesetting-done', {topic: that.topic});
-        }
-        */
-    } else
+      element.innerHTML = buffer;
+    }
+    else
       element.innerHTML = "";
   }
 

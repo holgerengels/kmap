@@ -47,10 +47,8 @@
   "name": "kmap-main",
   "license": "MIT",
   "dependencies": {
-    "asciimath2tex": "^1.1.0",
     "lit-element": "^2.2.1",
     "lit-html": "^1.1.2",
-    "mathjax": "^3.0.0",
     "mega-material": "1.0.0-alpha.2",
     "pwa-helpers": "^0.9.1",
     "redux": "^4.0.0",
