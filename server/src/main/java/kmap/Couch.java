@@ -302,7 +302,8 @@ public class Couch extends Server {
         });
 
         if (!transitiveDepends.isEmpty()) {
-            chapterNode = new Node("_");
+            if (chapterNode == null)
+                chapterNode = new Node("_");
             chapterNode.getDepends().addAll(transitiveDepends);
         }
 

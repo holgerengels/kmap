@@ -56,7 +56,7 @@ mega-button[disabled] {
     if (changedProperties.has("module") || changedProperties.has("subject") || changedProperties.has("_selectedModule")) {
       this._enabled = this._selectedModule && ((this.chapterCard
         && this.subject === this._selectedModule.subject
-        && this.chapterCard.module === this._selectedModule.module)
+        && (this.chapterCard.module === this._selectedModule.module || this.chapterCard.module === null))
         || !this.chapterCard);
     }
   }
@@ -66,7 +66,7 @@ mega-button[disabled] {
   }
 
   _showEdit() {
-    let card = this.chapterCard ? {
+    let card = this.chapterCard && this.chapterCard.module ? {
       module: this.chapterCard.module,
       subject: this.subject,
       chapter: this.chapter,
