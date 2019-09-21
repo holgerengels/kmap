@@ -210,11 +210,11 @@ class KMapTestCard extends connect(store)(LitElement) {
       let replace = text.replace(/inline:/g, config.server + "data/" + this.subject + "/" + this.chapter + "/" + this.topic + "/tests/");
       replace = replace.replace(/<check\/>/g, "<input type='checkbox'/>");
       replace = replace.replace(/<text\/>/g, "<input type='text' inputmode='text'/>");
-      replace = replace.replace(/<text ([0-9])\/>/g, "<input type='text' inputmode='text' maxlength='$1' style='width: $1em'/>");
+      replace = replace.replace(/<text ([0-9]+)\/>/g, "<input type='text' inputmode='text' maxlength='$1' style='width: $1em'/>");
       replace = replace.replace(/<integer\/>/g, "<input type='number' inputmode='numeric'/>");
-      replace = replace.replace(/<integer ([0-9])\/>/g, "<input type='number' inputmode='numeric' maxlength='$1' style='width: $1em'/>");
+      replace = replace.replace(/<integer ([0-9]+)\/>/g, "<input type='number' inputmode='numeric' maxlength='$1' style='width: $1em'/>");
       replace = replace.replace(/<decimal\/>/g, "<input type='number' inputmode='decimal' step='any'/>");
-      replace = replace.replace(/<decimal ([0-9])\/>/g, "<input type='number' inputmode='decimal' step='any' maxlength='$1' style='width: $1em'/>");
+      replace = replace.replace(/<decimal ([0-9]+)\/>/g, "<input type='number' inputmode='decimal' step='any' maxlength='$1' style='width: $1em'/>");
 
       let buffer = "";
       let t = false;
