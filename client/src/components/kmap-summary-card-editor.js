@@ -50,6 +50,7 @@ mega-button[disabled] {
       key: {type: String},
       card: {type: Object},
       _enabled: {type: Boolean},
+      _annotated: {type: Boolean},
     };
   }
 
@@ -59,6 +60,7 @@ mega-button[disabled] {
     this.key = '';
     this.card = null;
     this._enabled = false;
+    this._annotated = false;
   }
 
   firstUpdated(changedProperties) {
@@ -88,6 +90,8 @@ mega-button[disabled] {
   _showDelete() {
     store.dispatch(setCardForDelete(this.card));
   }
+
+  getState() { return 0; }
 }
 
 window.customElements.define('kmap-summary-card-editor', KMapSummaryCardEditor);

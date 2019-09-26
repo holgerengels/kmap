@@ -7,6 +7,7 @@ import './star-rating';
 import './kmap-summary-card-summary';
 import './kmap-summary-card-averages';
 import './kmap-summary-card-editor';
+import './kmap-summary-card-rating';
 import 'mega-material/icon';
 import {fontStyles, colorStyles} from "./kmap-styles";
 
@@ -67,31 +68,31 @@ class KMapSummaryCard extends connect(store)(LitElement) {
 
   render() {
     return html`
-<div class="card font-body" ?selected="${this._selected}" ?highlighted="${this._highlighted}">
+<div class="card font-body" ?selected="${this._selected}" ?highlighted="${this._highlighted}" @statecolor="${this._colorizeEvent}">
   <div class="card-header" @click="${this._clicked}">
       <span>${this.card.topic}</span>
   </div>
   ${this._layers.includes('summaries')
       ? html`
-      <kmap-summary-card-summary @click="${this._clicked}" @statecolor="${this._colorizeEvent}" .key="${this._key}" .summary="${this.card.summary}"></kmap-summary-card-summary>
+      <kmap-summary-card-summary @click="${this._clicked}" .key="${this._key}" .summary="${this.card.summary}"></kmap-summary-card-summary>
     ` : ''
       }
   ${this._layers.includes('averages')
       ? html`
-      <kmap-summary-card-averages @click="${this._clicked}" @statecolor="${this._colorizeEvent}" .key="${this._key}"></kmap-summary-card-summary>
+      <kmap-summary-card-averages id="averages" @click="${this._clicked}" .key="${this._key}"></kmap-summary-card-summary>
     ` : ''
       }
   ${this._layers.includes('editor')
       ? html`
-      <kmap-summary-card-editor @click="${this._clicked}" .key="${this._key}" .card="${this.card}" ></kmap-summary-card-editor>
+      <kmap-summary-card-editor id="editor" @click="${this._clicked}" .key="${this._key}" .card="${this.card}" ></kmap-summary-card-editor>
     ` : ''
       }
   <div class="card-footer">
       ${this.card.links
       ? html`<a slot="footer" href="#browser/${this.subject}/${this.card.links}"><mega-icon>open_in_new</mega-icon></a>`
       : html`
-        ${this._layers.includes('summaries') ? html`
-          <star-rating .rate="${this.state}" @rated="${this._rated}" .color_unrated="${this._lightest}" .color_rated="${this._opaque}"></star-rating>
+        ${!this._layers.includes('averages') ? html`
+          <kmap-summary-card-rating id="rating" .key="${this._key}" .lightest="${this._lightest}" .opaque="${this._opaque}" @rated="${this._rated}"></kmap-summary-card-rating>
         ` : '' }
       `}
                       
@@ -104,20 +105,17 @@ class KMapSummaryCard extends connect(store)(LitElement) {
 
   static get properties() {
     return {
+      _userid: {type: String},
       subject: {type: String},
       chapter: {type: String},
       card: {type: Object},
       _key: {type: String},
-      state: {type: Number},
-      progressNum: {type: Number},
-      progressOf: {type: Number},
       _selected: {type: Boolean},
       _highlighted: {type: Boolean},
       _opaque: {type: String},
       _light: {type: String},
       _lightest: {type: String},
       _layers: {type: Array},
-      _stateLayer: {type: String},
     };
   }
 
@@ -126,16 +124,23 @@ class KMapSummaryCard extends connect(store)(LitElement) {
     this.subject = '';
     this.chapter = '';
     this.card = {};
-    this.state = 0;
     this._layers = [];
-    this._stateLayer = '';
     this._colorize(0);
   }
 
   _colorizeEvent(e) {
-    let detail = e.detail;
-    this._stateLayer = detail.layer;
-    this._colorize(detail.state);
+    let source;
+    if (this._layers.includes("averages")) {
+      source = this.shadowRoot.getElementById('averages');
+    }
+    else if (this._layers.includes("editor")) {
+      source = this.shadowRoot.getElementById('editor');
+    }
+    else if (this._userid) {
+      source = this.shadowRoot.getElementById('rating');
+    }
+
+    this._colorize(source ? source.getState() : 0);
   }
 
   _colorize(state) {
@@ -156,6 +161,7 @@ class KMapSummaryCard extends connect(store)(LitElement) {
   }
 
   stateChanged(state) {
+    this._userid = state.app.userid;
     this._highlighted = state.maps.selectedCardDependencies && state.maps.selectedCardDependencies.includes(this.card.topic);
     this._selected = state.maps.selectedCardName === this.card.topic;
     this._layers = state.app.layers;
@@ -164,9 +170,8 @@ class KMapSummaryCard extends connect(store)(LitElement) {
   updated(changedProperties) {
     if (changedProperties.has("card"))
       this._key = this.card.links ? this.card.links : this.chapter + "." + this.card.topic;
-    if (changedProperties.has("_layers"))
-      if (!this._layers.includes(this._stateLayer))
-        this._colorize(0);
+    if (changedProperties.has("_userid") || changedProperties.has("_layers") || changedProperties.has("_key"))
+      this._colorizeEvent({ lala: "lala"} );
   }
 }
 

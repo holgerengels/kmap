@@ -13,67 +13,57 @@ import {connect} from "pwa-helpers/connect-mixin";
 import {store} from "../store";
 import 'mega-material/icon';
 import {STATE_COLORS} from "./state-colors";
+import {colorStyles, fontStyles} from "./kmap-styles";
 
 class KMapSubjectCard extends connect(store)(LitElement) {
-    static get styles() {
-      // language=CSS
-        return [
-            css`
-      :host {
-        --color-opaque: #f5f5f5;
-        --color-light: #e0e0e0;
-        --color-lightest: #9e9e9e;
-      }
-            .card {
-                display: inline-block;
-                box-sizing: border-box;
-                overflow: overlay;
-                width: 300px;
-                border-radius: 3px;
-                box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
-                    0 1px 5px 0 rgba(0, 0, 0, 0.12),
-                    0 3px 1px -2px rgba(0, 0, 0, 0.2);
-    color: var(--color-darkgray);
-  font-family: Roboto,sans-serif;
-  -webkit-font-smoothing: antialiased;
-  font-size: 0.95rem;
-  font-weight: 400;
-            }
-            .card-header {
-                padding: 8px;
-                color: black;
-                background-color: var(--color-opaque);
-                display: flex;
-                flex-direction: row;
-                justify-content: space-between;
-            }
-            .card-footer {
-                color: black;
-                background-color: var(--color-light);
-                transition: background-color .5s ease-in-out;
-                padding: 8px;
-                font-size: 0px;
-                line-height: 0px;
-                display: flex;
-                flex-direction: row;
-                justify-content: space-between;
-            }
-            .card-footer a {
-                color: black;
-            }
-            .card[selected] {
-                filter: saturate(1.2) brightness(1.1);
-                box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14),
-                    0 1px 10px 0 rgba(0, 0, 0, 0.12),
-                    0 2px 4px -1px rgba(0, 0, 0, 0.4);
-            }
+  static get styles() {
+    // language=CSS
+    return [
+      fontStyles,
+      colorStyles,
+      css`
+:host {
+  --color-opaque: #f5f5f5;
+  --color-light: #e0e0e0;
+  --color-lightest: #9e9e9e;
+}
+.card {
+  display: inline-block;
+  box-sizing: border-box;
+  overflow: overlay;
+  width: 300px;
+  border-radius: 3px;
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
+      0 1px 5px 0 rgba(0, 0, 0, 0.12),
+      0 3px 1px -2px rgba(0, 0, 0, 0.2);
+  color: var(--color-darkgray);
+}
+.card-header {
+  padding: 8px;
+  color: black;
+  background-color: var(--color-opaque);
+}
+.card-footer {
+  color: var(--color-darkgray);
+  background-color: var(--color-light);
+  transition: background-color .5s ease-in-out;
+  padding: 4px 8px;
+  font-size: 0px;
+  line-height: 0px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.card-footer a {
+  color: var(--color-darkgray);
+}
       `
         ];
     }
 
     render() {
         return html`
-    <div class="card" ?selected="${this._selected}">
+    <div class="card font-body">
         <div class="card-header">
             <span>${this.subject}</span>
         </div>

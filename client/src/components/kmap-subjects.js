@@ -79,7 +79,7 @@ kmap-subject-card {
   }
 
     updated(changedProperties) {
-        console.log(changedProperties);
+      //console.log(changedProperties);
     }
 
     stateChanged(state) {

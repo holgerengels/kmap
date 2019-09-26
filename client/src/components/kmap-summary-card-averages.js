@@ -31,8 +31,10 @@ class KMapSummaryCardAverages extends connect(store)(LitElement) {
     return html`
       <div class="content">
         <b>Selbsteinschätzungen</b><br>
+        ${this._hasStates ? html`
         Abgegebene: ${this._averageNum} / ${this._averageOf} ≙ ${this._averagePercent} %<br>
         Mittelwert: ${this._averageState}
+        ` : html`...`}
       </div>
     `;
   }
@@ -41,6 +43,7 @@ class KMapSummaryCardAverages extends connect(store)(LitElement) {
     return {
       key: {type: String},
       _states: {type: Array},
+      _hasStates: {type: Boolean},
       _averageState: {type: String},
       _averageNum: {type: String},
       _averageOf: {type: String},
@@ -52,6 +55,7 @@ class KMapSummaryCardAverages extends connect(store)(LitElement) {
     super();
     this.key = '';
     this._states = [];
+    this._hasStates = false;
     this._averageState = 0;
     this._averageNum = 0;
     this._averageOf = 0;
@@ -65,6 +69,7 @@ class KMapSummaryCardAverages extends connect(store)(LitElement) {
 
   stateChanged(state) {
     this._states = state.averageStates;
+    this._hasStates = this._states && this._states.state.length !== 0;
     this._rating();
   }
 
@@ -72,7 +77,9 @@ class KMapSummaryCardAverages extends connect(store)(LitElement) {
     if (this._states && this._states.state) {
       this._averageState = this._getStateValue(this.key);
       this._averageNum = this._getStateValue(this.key + "*");
-      this._averageOf = this._getStateValue(this.key + "#") * this._getStateValue(this.key + "@");
+      let count = this._getStateValue("@");
+      let of = this._getStateValue(this.key + "#");
+      this._averageOf = (of !== 0 ? of : 1) * (count !== 0 ? count : 1);
       this._averagePercent = Math.round(100 * this._averageNum / this._averageOf);
     }
     else {
@@ -82,12 +89,16 @@ class KMapSummaryCardAverages extends connect(store)(LitElement) {
       this._averagePercent = 0;
     }
 
-    this.dispatchEvent(new CustomEvent('statecolor', { bubbles: true, detail: {layer: 'averages', key: this.key, state: this._averageState} }));
+    this.dispatchEvent(new CustomEvent('statecolor', { bubbles: true, detail: {source: 'averages', key: this.key, state: this._averageState} }));
   }
 
   _getStateValue(key) {
     let value = this._states.state[key];
     return value !== undefined ? value : 0;
+  }
+
+  getState() {
+    return this._averageState;
   }
 }
 

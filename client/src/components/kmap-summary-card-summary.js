@@ -38,10 +38,6 @@ class KMapSummaryCardSummary extends connect(store)(LitElement) {
   static get properties() {
     return {
       key: {type: String},
-      _states: {type: Array},
-      _state: {type: String},
-      _progressNum: {type: String},
-      _progressOf: {type: String},
       summary: {type: String},
     };
   }
@@ -49,22 +45,10 @@ class KMapSummaryCardSummary extends connect(store)(LitElement) {
   constructor() {
     super();
     this.key = '';
-    this._states = [];
-    this._state = 0;
-    this._progressNum = 0;
-    this._progressOf = 0;
     this.summary = '';
   }
 
-  updated(changedProperties) {
-    if (changedProperties.has("_states") || changedProperties.has("key"))
-      this._rating(this._states);
-  }
-
-  stateChanged(state) {
-    this._states = state.states;
-  }
-
+/*
   _rating() {
     if (this._states && this._states.state && this._states.state.length !== 0) {
       this._state = this._getStateValue(this.key);
@@ -79,11 +63,7 @@ class KMapSummaryCardSummary extends connect(store)(LitElement) {
 
     this.dispatchEvent(new CustomEvent('statecolor', { bubbles: true, detail: {layer: 'summary', key: this.key, state: this._state} }));
   }
-
-  _getStateValue(key) {
-    let value = this._states.state[key];
-    return value !== undefined ? value : 0;
-  }
+ */
 }
 
 window.customElements.define('kmap-summary-card-summary', KMapSummaryCardSummary);
