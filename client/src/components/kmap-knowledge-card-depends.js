@@ -8,24 +8,22 @@ class KMapKnowledgeCardDepends extends LitElement {
       fontStyles,
       colorStyles,
       css`
-        .content {
-          padding: 12px;
-          transition: background-color .5s ease-in-out;
-        }
-
-        .content img {
-          max-width: calc(100vw - 44px);
-        }
-
-        .content a {
-          color: var(--color-opaque);
-          text-decoration: none;
-          font-weight: bold;
-        }
-
-        .content a:hover {
-          text-decoration: underline;
-        }
+:host {
+  display: block;
+  padding: 12px;
+  transition: background-color .5s ease-in-out;
+}
+img {
+  max-width: calc(100vw - 44px);
+}
+a {
+  color: var(--color-opaque);
+  text-decoration: none;
+  font-weight: bold;
+}
+a:hover {
+  text-decoration: underline;
+}
       `
     ];
   }
@@ -34,7 +32,6 @@ class KMapKnowledgeCardDepends extends LitElement {
     return html`
     ${this.depends && this.depends.length > 0
       ? html`
-        <div class="content">
           <b>Voraussetzungen:</b> ${this.depends.map((depend, i) => html`
             ${this.chapterDepends ? html`
               &nbsp;<a href="#browser/${this.subject}/${depend}">${depend}</a>
@@ -42,7 +39,6 @@ class KMapKnowledgeCardDepends extends LitElement {
               &nbsp;<a href="#browser/${this.subject}/${this.chapter}/${depend}">${depend}</a>
             `}
           `)}
-        </div>
         `
       : ''}
     `;

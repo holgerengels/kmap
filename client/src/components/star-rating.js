@@ -71,12 +71,16 @@ mega-icon {
 
     _clicked(event) {
         let i = 0;
+        /*
         while (event.path[i].tagName !== "MEGA-ICON" && i < event.path.length)
             i++;
         if (event.path[i].tagName === "MEGA-ICON") {
             this.rate = event.path[i].getAttribute("value");
-            this.dispatchEvent(new CustomEvent('rated', {bubbles: true, detail: {rate: this.rate}}));
+            this.dispatchEvent(new CustomEvent('clicked', {bubbles: true, composed: true, detail: {rate: this.rate}}));
         }
+         */
+      this.rate = event.srcElement.getAttribute("value");
+      this.dispatchEvent(new CustomEvent('clicked', {bubbles: true, composed: true, detail: {rate: this.rate}}));
     }
 }
 

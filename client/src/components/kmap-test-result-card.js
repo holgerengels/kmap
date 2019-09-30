@@ -79,7 +79,7 @@ class KMapTestResultCard extends connect(store)(LitElement) {
                 <mega-icon class="wrong">thumb_down</mega-icon> ${this.card.wrong} falsch<br/>
             </div>
             <div class="card-footer">
-                <star-rating .rate="${this._state}" @rated="${this._rated}" .color_unrated="${this._lightest}" .color_rated="${this._opaque}"></star-rating>
+                <star-rating .rate="${this._state}" @clicked="${this._rated}" .color_unrated="${this._lightest}" .color_rated="${this._opaque}"></star-rating>
                 <div slot="footer" style="flex: 1 0 auto"></div>
                 <a slot="footer" href="#browser/${this.card.subject}/${this.card.chapter}/${this.card.topic}"><mega-icon>open_in_new</mega-icon></a>
             </div>
@@ -161,7 +161,7 @@ class KMapTestResultCard extends connect(store)(LitElement) {
   _rated(e) {
     this._rateModified = true;
     let key = this.chapter + "." + this.card.topic;
-    this.dispatchEvent(new CustomEvent('rated', { bubbles: true, detail: {key: key, rate: e.detail.rate}}));
+    this.dispatchEvent(new CustomEvent('rated', { bubbles: true, composed: true, detail: {key: key, rate: e.detail.rate}}));
   }
 }
 

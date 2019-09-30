@@ -10,19 +10,20 @@ class KMapKnowledgeCardDescription extends LitElement {
       fontStyles,
       colorStyles,
       css`
-.content {
+:host {
+  display: block;
   padding: 12px;
   transition: background-color .5s ease-in-out;
 }
-.content img {
+img {
   max-width: calc(100vw - 44px);
 }
-.content a {
+a {
   color: var(--color-opaque);
   text-decoration: none;
   font-weight: bold;
 }
-.content a:hover {
+a:hover {
   text-decoration: underline;
 }
 container {
@@ -52,9 +53,7 @@ box img {
     return html`
     ${this._description
       ? html`
-<div class="content">
     ${unsafeHTML(this._description)}
-</div>
         `
       : ''}
     `;

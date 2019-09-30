@@ -20,27 +20,17 @@ class KMapBrowser extends connect(store)(LitElement) {
           white-space: nowrap;
           display: block;
           -webkit-overflow-scrolling: touch;
-          -webkit-background-clip: text;
-          background-color: rgba(0, 0, 0, 0);
-          transition: background-color .8s;
         }
-
-        .scrollpane:hover {
-          background-color: rgba(0, 0, 0, 0.18);
+        .scrollpane:hover::-webkit-scrollbar-thumb {
+            background-color: var(--color-mediumgray);
         }
-
         .scrollpane::-webkit-scrollbar {
           width: 8px;
           height: 8px;
         }
-
-        .scrollpane::-webkit-scrollbar-track {
-          display: none;
-        }
-
         .scrollpane::-webkit-scrollbar-thumb {
+            transition: background-color;
           border-radius: 10px;
-          background-color: inherit;
         }
 
         .board {
@@ -73,10 +63,6 @@ class KMapBrowser extends connect(store)(LitElement) {
         .line {
           outline: none;
           overflow-x: scroll;
-          display: flex;
-          flex-direction: row;
-          flex-wrap: nowrap;
-          align-items: flex-start;
           margin-top: 2px;
         }
 

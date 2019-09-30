@@ -10,12 +10,17 @@ class KMapSummaryCardAverages extends connect(store)(LitElement) {
       fontStyles,
       colorStyles,
       css`
-.content {
+:host {
+  display: block;
   padding: 8px;
   background-color: var(--color-lightest);
   transition: background-color .5s ease-in-out;
+    font-family: Roboto,sans-serif;
+    -webkit-font-smoothing: antialiased;
+    font-size: 0.95rem;
+    font-weight: 500;
 }
-.content span {
+span {
   white-space: normal;
   hyphens: auto;
   overflow : hidden;
@@ -29,13 +34,13 @@ class KMapSummaryCardAverages extends connect(store)(LitElement) {
 
   render() {
     return html`
-      <div class="content">
+      <span>
         <b>Selbsteinschätzungen</b><br>
         ${this._hasStates ? html`
         Abgegebene: ${this._averageNum} / ${this._averageOf} ≙ ${this._averagePercent} %<br>
         Mittelwert: ${this._averageState}
         ` : html`...`}
-      </div>
+      </span>
     `;
   }
 
@@ -89,7 +94,7 @@ class KMapSummaryCardAverages extends connect(store)(LitElement) {
       this._averagePercent = 0;
     }
 
-    this.dispatchEvent(new CustomEvent('statecolor', { bubbles: true, detail: {source: 'averages', key: this.key, state: this._averageState} }));
+    this.dispatchEvent(new CustomEvent('statecolor', { bubbles: true, composed: true, detail: {source: 'averages', key: this.key, state: this._averageState} }));
   }
 
   _getStateValue(key) {

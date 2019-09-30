@@ -13,9 +13,14 @@ class KMapSummaryCardEditor extends connect(store)(LitElement) {
       fontStyles,
       colorStyles,
       css`
-.content {
+:host {
+  display: block;
   background-color: var(--color-lightest);
   transition: background-color .5s ease-in-out;
+    font-family: Roboto,sans-serif;
+    -webkit-font-smoothing: antialiased;
+    font-size: 0.95rem;
+    font-weight: 500;
 }
 mega-button[disabled] {
   pointer-events: none;
@@ -32,14 +37,10 @@ mega-button[disabled] {
 
   render() {
     return html`
-      <div class="content">
-        <mega-button icon="edit" ?disabled="${!this._enabled}" @click="${this._showEdit}"></mega-button>
-        <mega-button icon="label" ?disabled="${!this._enabled}" @click="${this._showRename}"></mega-button>
-        <mega-button icon="delete" ?disabled="${!this._enabled}" @click="${this._showDelete}"></mega-button>
-      </div>
-      <div class="content">
-        ${this.card.annotations ? html`<div class="warn">${this.card.annotations}</div>` : ''}
-      </div>
+      <mega-button icon="edit" ?disabled="${!this._enabled}" @click="${this._showEdit}"></mega-button>
+      <mega-button icon="label" ?disabled="${!this._enabled}" @click="${this._showRename}"></mega-button>
+      <mega-button icon="delete" ?disabled="${!this._enabled}" @click="${this._showDelete}"></mega-button>
+      ${this.card.annotations ? html`<div class="warn">${this.card.annotations}</div>` : ''}
     `;
   }
 

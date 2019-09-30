@@ -16,7 +16,7 @@ class KMapSummaryCardRating extends connect(store)(LitElement) {
 
   render() {
     return html`
-      <star-rating .rate="${this._state}" @rated="${this._rated}" .color_unrated="${this.lightest}" .color_rated="${this.opaque}"></star-rating>
+      <star-rating .rate="${this._state}" @clicked="${this._rated}" .color_unrated="${this.lightest}" .color_rated="${this.opaque}"></star-rating>
     `;
   }
 
@@ -54,11 +54,11 @@ class KMapSummaryCardRating extends connect(store)(LitElement) {
       this._state = 0;
     }
 
-    this.dispatchEvent(new CustomEvent('statecolor', { bubbles: true, detail: {layer: 'user', key: this.key, state: this._state} }));
+    this.dispatchEvent(new CustomEvent('statecolor', { bubbles: true, composed: true, detail: {layer: 'user', key: this.key, state: this._state} }));
   }
 
   _rated(e) {
-    this.dispatchEvent(new CustomEvent('rated', {bubbles: true, detail: {key: this._key, rate: e.detail.rate}}));
+    this.dispatchEvent(new CustomEvent('rated', {bubbles: true, composed: true, detail: {key: this.key, rate: e.detail.rate}}));
   }
 
   _getStateValue(key) {

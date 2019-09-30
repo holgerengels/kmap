@@ -26,13 +26,11 @@ class KMapSubjectCard extends connect(store)(LitElement) {
   --color-opaque: #f5f5f5;
   --color-light: #e0e0e0;
   --color-lightest: #9e9e9e;
-}
-.card {
+
   display: inline-block;
   box-sizing: border-box;
-  overflow: overlay;
   width: 300px;
-  border-radius: 3px;
+  border-radius: 4px;
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
       0 1px 5px 0 rgba(0, 0, 0, 0.12),
       0 3px 1px -2px rgba(0, 0, 0, 0.2);
@@ -42,6 +40,8 @@ class KMapSubjectCard extends connect(store)(LitElement) {
   padding: 8px;
   color: black;
   background-color: var(--color-opaque);
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
 }
 .card-footer {
   color: var(--color-darkgray);
@@ -53,24 +53,23 @@ class KMapSubjectCard extends connect(store)(LitElement) {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
 }
 .card-footer a {
   color: var(--color-darkgray);
 }
-      `
-        ];
-    }
+      `];
+  }
 
     render() {
-        return html`
-    <div class="card font-body">
-        <div class="card-header">
-            <span>${this.subject}</span>
-        </div>
-        <div class="card-footer">
-            <a slot="footer" href="#browser/${this.subject}/${this.subject}"><mega-icon>open_in_new</mega-icon></a>
-        </div>
-    </div>
+      return html`
+  <div class="card-header font-body">
+    <span>${this.subject}</span>
+  </div>
+  <div class="card-footer font-body">
+    <a slot="footer" href="#browser/${this.subject}/${this.subject}"><mega-icon>open_in_new</mega-icon></a>
+  </div>
     `;
     }
 

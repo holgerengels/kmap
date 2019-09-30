@@ -16,118 +16,105 @@ class KMapTestCard extends connect(store)(LitElement) {
       fontStyles,
       colorStyles,
       css`
-          :host {
-              --color-opaque: #f5f5f5;
-              --color-light: #e0e0e0;
-              --color-lightest: #9e9e9e;
-          }
+:host {
+  --color-opaque: #f5f5f5;
+  --color-light: #e0e0e0;
+  --color-lightest: #9e9e9e;
 
-          .card {
-              display: block;
-              box-sizing: border-box;
-              overflow: overlay;
-              width: 800px;
-              border-radius: 3px;
-              box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
-              0 1px 5px 0 rgba(0, 0, 0, 0.12),
-              0 3px 1px -2px rgba(0, 0, 0, 0.2);
-              color: var(--color-darkgray);
-              font-family: Roboto, sans-serif;
-              -webkit-font-smoothing: antialiased;
-              font-size: 0.95rem;
-              font-weight: 400;
-          }
+  display: block;
+  box-sizing: border-box;
+  width: 800px;
+  border-radius: 4px;
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
+      0 1px 5px 0 rgba(0, 0, 0, 0.12),
+      0 3px 1px -2px rgba(0, 0, 0, 0.2);
+  color: var(--color-darkgray);
+}
+.card-header {
+    padding: 8px 12px;
+    color: black;
+    background-color: var(--color-opaque);
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+}
+.card-header[hidden] {
+    display: none;
+}
+.card-header a {
+    color: white;
+}
+.card-content {
+    padding: 12px;
+    background-color: var(--color-lightest);
+    transition: background-color .5s ease-in-out;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+.card-content img {
+    max-width: calc(100vw - 44px);
+}
+.card-footer {
+  color: var(--color-darkgray);
+  background-color: var(--color-light);
+  transition: background-color .5s ease-in-out;
+  padding: 8px 12px;
+  font-size: 0px;
+  line-height: 0px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
+}
+.card-footer a {
+    color: black;
+}
+#question {
+    margin-right: 16px;
+}
 
-          .card-header {
-              padding: 8px 12px;
-              color: black;
-              background-color: var(--color-opaque);
-              display: flex;
-              flex-direction: row;
-              justify-content: space-between;
-          }
-          .card-header[hidden] {
-              display: none;
-          }
-          .card-header a {
-              color: white;
-          }
+[hidden] {
+    display: none !important;
+}
 
-          .card-content {
-              padding: 8px;
-              background-color: var(--color-lightest);
-              transition: background-color .5s ease-in-out;
-              display: flex;
-              flex-direction: row;
-              flex-wrap: wrap;
-          }
-
-          .card-content img {
-              max-width: calc(100vw - 44px);
-          }
-
-          .card-footer {
-              color: var(--color-darkgray);
-              background-color: var(--color-light);
-              transition: background-color .5s ease-in-out;
-              padding: 8px 12px;
-              font-size: 0px;
-              line-height: 0px;
-              display: flex;
-              flex-direction: row;
-              justify-content: space-between;
-          }
-
-          .card-footer a {
-              color: black;
-          }
-
-          #question {
-              margin-right: 16px;
-          }
-
-          [hidden] {
-              display: none !important;
-          }
-
-          input {
-              margin: 0.5em;
-              outline: 3px solid transparent;
-              transition: outline-color .5s ease-in-out;
-              height: 1.3em;
-          }
-
-          input[correction=correct] {
-              outline-color: var(--color-green);
-          }
-
-          input[correction=incorrect] {
-              outline-color: var(--color-red);
-          }
+input {
+  margin: 0.5em;
+  outline: 3px solid transparent;
+  transition: outline-color .5s ease-in-out;
+  height: 1.3em;
+}
+input[correction=correct] {
+  outline-color: var(--color-green);
+}
+input[correction=incorrect] {
+  outline-color: var(--color-red);
+}
       `];
   }
 
   render() {
     return html`
-        <div class="card">
-            <div class="card-header" ?hidden="${this.hideHeader}">
-                <span>Aufgabe ${this.num + 1} von ${this.of} (${this._levelText()})</span>
-                <div style="flex: 1 0 auto"></div>
-                <a href="#browser/${this.subject}/${this.chapter}/${this.topic}" target="_blank">Wissenskarte ansehen <iron-icon icon="icons:open-in-new"></iron-icon></a>
-            </div>
-            <div class="card-content">
-                <div id="question" style="${this.questionFlex}"></div>
-                <div id="answer" style="${this.answerFlex}"></div>
-            </div>
-            ${this.showActions ? html`
-              <div class="card-footer">
-                  <mega-button @click="${this.showAnswer}">Richtige Antwort zeigen</mega-button>
-                  <div style="flex: 1 0 auto"></div>
-                  <mega-button @click="${this.sendAnswer}" ?hidden="${this.sent}">Antwort abschicken</mega-button>
-                  <mega-button @click="${this.next}" ?hidden="${!this.correct}">Weiter</mega-button>
-              </div>`
+  <div class="card-header" ?hidden="${this.hideHeader}">
+      <span>Aufgabe ${this.num + 1} von ${this.of} (${this._levelText()})</span>
+      <div style="flex: 1 0 auto"></div>
+      <a href="#browser/${this.subject}/${this.chapter}/${this.topic}" target="_blank">Wissenskarte ansehen <iron-icon icon="icons:open-in-new"></iron-icon></a>
+  </div>
+  <div class="card-content">
+      <div id="question" style="${this.questionFlex}"></div>
+      <div id="answer" style="${this.answerFlex}"></div>
+  </div>
+  ${this.showActions ? html`
+    <div class="card-footer">
+        <mega-button @click="${this.showAnswer}">Richtige Antwort zeigen</mega-button>
+        <div style="flex: 1 0 auto"></div>
+        <mega-button @click="${this.sendAnswer}" ?hidden="${this.sent}">Antwort abschicken</mega-button>
+        <mega-button @click="${this.next}" ?hidden="${!this.correct}">Weiter</mega-button>
+    </div>`
       : ''}
-        </div>
     `;
   }
 
@@ -299,7 +286,7 @@ class KMapTestCard extends connect(store)(LitElement) {
 
   next(e) {
     this.dispatchEvent(new CustomEvent('next', {
-      bubbles: true, detail: {
+      bubbles: true, composed: true, detail: {
         "chapter": this.chapter,
         "topic": this.topic,
         "key": this.key,

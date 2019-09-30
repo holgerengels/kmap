@@ -12,48 +12,33 @@ import './kmap-card-attachment';
 
 class KMapKnowledgeCard extends connect(store)(LitElement) {
 
-    static get styles() {
-      // language=CSS
-        return [
-          fontStyles,
-          colorStyles,
-            css`
+  static get styles() {
+    // language=CSS
+    return [
+      fontStyles,
+      colorStyles,
+      css`
 :host {
   --color-opaque: #f5f5f5;
   --color-light: #e0e0e0;
   --color-lightest: #9e9e9e;
-}
-.card {
+
   display: block;
   box-sizing: border-box;
-  overflow: overlay;
   width: 100%;
-  border-radius: 3px;
+  border-radius: 4px;
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
       0 1px 5px 0 rgba(0, 0, 0, 0.12),
       0 3px 1px -2px rgba(0, 0, 0, 0.2);
   color: var(--color-darkgray);
-  font-family: Roboto,sans-serif;
-  -webkit-font-smoothing: antialiased;
-  font-size: 0.95rem;
-  font-weight: 400;
-  background-color: var(--color-lightest);
-}
-.card[selected] {
-    filter: saturate(1.2) brightness(1.1);
-    box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14),
-        0 1px 10px 0 rgba(0, 0, 0, 0.12),
-        0 2px 4px -1px rgba(0, 0, 0, 0.4);
-}
-.card[highlighted] {
-    filter: saturate(1.2) brightness(1.1);
 }
 .card-header {
   padding: 8px 12px;
   color: black;
   background-color: var(--color-opaque);
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
 }
-
 .card-footer {
   color: var(--color-darkgray);
   background-color: var(--color-light);
@@ -64,6 +49,8 @@ class KMapKnowledgeCard extends connect(store)(LitElement) {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
 }
 .card-footer a {
   color: black;
@@ -79,17 +66,15 @@ class KMapKnowledgeCard extends connect(store)(LitElement) {
   align-content: start;
   margin: 12px;
 }
-      `
-        ];
-    }
+      `];
+  }
 
-render() {
-        return html`
-<div class="card" ?selected="${this._selected}" ?highlighted="${this._highlighted}">
-  <div class="card-header">
+  render() {
+    return html`
+  <div class="card-header font-body">
       <span>${this.card.topic !== "_" ? this.card.topic : this.chapter}</span>
   </div>
-  <kmap-knowledge-card-depends ?chapterDepends="${this.card.topic === "_"}"
+  <kmap-knowledge-card-depends ?chapterDepends="${this.card.topic === '_'}"
       .subject="${this.subject}"
       .chapter="${this.chapter}"
       .depends="${this.card.depends}">
@@ -111,7 +96,7 @@ render() {
       .progressOf="${this.progressOf}">
   </kmap-knowledge-card-description>
 
-  <div class="attachments">
+  <div class="attachments font-body">
       ${this._explanations && this._explanations.length > 0
           ? html`<div>
               <b>Erklärungen</b>
@@ -166,12 +151,11 @@ render() {
   <div class="card-footer">
     ${this.card.links
       ? html`<a slot="footer" href="#browser/${this.subject}/${this.card.links}"><mega-icon>open_in_new</mega-icon></a>`
-      : html`<star-rating .rate="${this.state}" @rated="${this._rated}" .color_unrated="${this._lightest}" .color_rated="${this._opaque}"></star-rating>`
+      : html`<star-rating .rate="${this.state}" @clicked="${this._rated}" .color_unrated="${this._lightest}" .color_rated="${this._opaque}"></star-rating>`
     }
     <div slot="footer" style="flex: 1 0 auto"></div>
     <a slot="footer" href="#browser/${this.subject}/${this.chapter}"><mega-icon>fullscreen_exit</mega-icon></a>
   </div>
-</div>
     `;
     }
 
@@ -184,8 +168,6 @@ render() {
             state: {type: Number},
             progressNum: {type: Number},
             progressOf: {type: Number},
-            _selected: {type: Boolean},
-            _highlighted: {type: Boolean},
             _explanations: {type: Array},
             _examples: {type: Array},
             _usages: {type: Array},
@@ -213,7 +195,7 @@ render() {
 
     _rated(e) {
         let key = this.chapter + "." + this.card.topic;
-        this.dispatchEvent(new CustomEvent('rated', { bubbles: true, detail: {key: key, rate: e.detail.rate}}));
+        this.dispatchEvent(new CustomEvent('rated', { bubbles: true, composed: true, detail: {key: key, rate: e.detail.rate}}));
     }
 
     _rating(state) {
@@ -233,8 +215,6 @@ render() {
     }
 
     stateChanged(state) {
-        this._selected = state.maps.selectedCardName === this.card.topic;
-        this._highlighted = state.maps.selectedCardDependencies && state.maps.selectedCardDependencies.includes(this.card.topic);
         this._rating(state);
     }
 
