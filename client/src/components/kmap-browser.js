@@ -16,6 +16,9 @@ class KMapBrowser extends connect(store)(LitElement) {
     // language=CSS
     return [
       css`
+        :host {
+            overflow: hidden;
+        }
         .scrollpane {
           white-space: nowrap;
           display: block;
@@ -68,10 +71,11 @@ class KMapBrowser extends connect(store)(LitElement) {
 
         .page {
           position: absolute;
-          top: 64px;
+          top: 0px;
           left: 0;
           right: 0;
           bottom: 0;
+          margin-top: 64px;
           overflow-y: auto;
           visibility: hidden;
           opacity: 0.0;

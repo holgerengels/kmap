@@ -23,7 +23,7 @@ class KMapTestCard extends connect(store)(LitElement) {
 
   display: block;
   box-sizing: border-box;
-  width: 800px;
+  max-width: 800px;
   border-radius: 4px;
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
       0 1px 5px 0 rgba(0, 0, 0, 0.12),

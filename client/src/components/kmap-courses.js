@@ -18,6 +18,9 @@ class KCourses extends connect(store)(LitElement) {
       fontStyles,
       colorStyles,
       css`
+          :host {
+              overflow-y: auto;
+          }
 .board {
   height: auto;
   padding: 8px;

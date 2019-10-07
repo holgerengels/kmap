@@ -14,6 +14,9 @@ class KMapSubjects extends connect(store)(LitElement) {
     // language=CSS
     return [
       css`
+          :host {
+              overflow-y: auto;
+          }
 .board {
     height: auto;
     outline: none;

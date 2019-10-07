@@ -24,12 +24,16 @@ class KmapTest extends connect(store)(LitElement) {
       fontStyles,
       colorStyles,
       css`
+          :host {
+              overflow-y: hidden;
+          }
 .page {
     position: absolute;
-    top: 64px;
+    top: 0px;
     left: 0;
     right: 0;
     bottom: 0;
+    margin-top: 64px;
     overflow-y: auto;
     visibility: hidden;
     opacity: 0.0;
