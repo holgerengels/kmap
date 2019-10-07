@@ -1,12 +1,13 @@
-import {LitElement, html, css} from 'lit-element';
+import { LitElement, html, css } from 'lit-element';
+import {styleMap} from 'lit-html/directives/style-map.js';
+import { fontStyles, colorStyles } from "./kmap-styles";
+import { STATE_COLORS } from './state-colors';
 import {connect} from "pwa-helpers/connect-mixin";
 import {store} from "../store";
 import {selectSummaryCard} from '../actions/maps.js';
-import {STATE_COLORS} from './state-colors';
-import './star-rating';
 import 'mega-material/icon';
 import 'mega-material/list';
-import {fontStyles, colorStyles} from "./kmap-styles";
+import './star-rating';
 
 class KMapTestResultCard extends connect(store)(LitElement) {
 
@@ -20,20 +21,22 @@ class KMapTestResultCard extends connect(store)(LitElement) {
   --color-opaque: #f5f5f5;
   --color-light: #e0e0e0;
   --color-lightest: #9e9e9e;
-}
-.card {
+
   display: inline-block;
   box-sizing: border-box;
   width: 300px;
-  border-radius: 3px;
+  border-radius: 4px;
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
       0 1px 5px 0 rgba(0, 0, 0, 0.12),
       0 3px 1px -2px rgba(0, 0, 0, 0.2);
+  color: var(--color-darkgray);
 }
 .card-header {
-  padding: 8px;
+  padding: 8px 12px;
   color: black;
   background-color: var(--color-opaque);
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
 }
 .card-content {
   padding: 8px;
@@ -44,12 +47,14 @@ class KMapTestResultCard extends connect(store)(LitElement) {
   color: var(--color-darkgray);
   background-color: var(--color-light);
   transition: background-color .5s ease-in-out;
-  padding: 8px;
+  padding: 4px 8px;
   font-size: 0px;
   line-height: 0px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
 }
 .card-footer a {
   color: var(--color-darkgray);
@@ -68,22 +73,20 @@ class KMapTestResultCard extends connect(store)(LitElement) {
       `];
     }
 
-    render() {
-        return html`
-    <div class="card font-body" ?selected="${this._selected}" ?highlighted="${this._highlighted}">
-            <div class="card-header" @click="${this._clicked}">
-                <span>${this.card.chapter} → ${this.card.topic}</span>
-            </div>
-            <div class="card-content">
-                <mega-icon class="correct">thumb_up</mega-icon> ${this.card.correct} richtig<br/><br/>
-                <mega-icon class="wrong">thumb_down</mega-icon> ${this.card.wrong} falsch<br/>
-            </div>
-            <div class="card-footer">
-                <star-rating .rate="${this._state}" @clicked="${this._rated}" .color_unrated="${this._lightest}" .color_rated="${this._opaque}"></star-rating>
-                <div slot="footer" style="flex: 1 0 auto"></div>
-                <a slot="footer" href="#browser/${this.card.subject}/${this.card.chapter}/${this.card.topic}"><mega-icon>open_in_new</mega-icon></a>
-            </div>
-</div>
+  render() {
+    return html`
+        <div class="card-header">
+          <span>${this.card.chapter} → ${this.card.topic}</span>
+        </div>
+        <div class="card-content">
+            <mega-icon class="correct">thumb_up</mega-icon> ${this.card.correct} richtig<br/><br/>
+            <mega-icon class="wrong">thumb_down</mega-icon> ${this.card.wrong} falsch<br/>
+        </div>
+        <div class="card-footer">
+            <star-rating .rate="${this._state}" @clicked="${this._rated}" style=${styleMap(this._colorStyles)}></star-rating>
+            <div slot="footer" style="flex: 1 0 auto"></div>
+            <a slot="footer" href="#browser/${this.card.subject}/${this.card.chapter}/${this.card.topic}"><mega-icon>open_in_new</mega-icon></a>
+        </div>
     `;
   }
 
@@ -103,6 +106,7 @@ class KMapTestResultCard extends connect(store)(LitElement) {
       _light: {type: String},
       _lightest: {type: String},
       _rateModified: {type: Boolean},
+      _colorStyles: {type: Object},
     };
   }
 
@@ -112,6 +116,7 @@ class KMapTestResultCard extends connect(store)(LitElement) {
     this._state = 0;
     this.state = 0;
     this._rateModified = false;
+    this._colorStyles = { "--color-rated":  "--color-darkgray", "--color-unrated": "--color-lightgray" };
     this._colorize("0");
   }
 
@@ -152,10 +157,7 @@ class KMapTestResultCard extends connect(store)(LitElement) {
     this.style.setProperty('--color-opaque', this._opaque);
     this.style.setProperty('--color-light', this._light);
     this.style.setProperty('--color-lightest', this._lightest);
-  }
-
-  _clicked() {
-    store.dispatch(selectSummaryCard(this.card));
+    this._colorStyles = { "--color-rated":  this._opaque, "--color-unrated": this._lightest };
   }
 
   _rated(e) {

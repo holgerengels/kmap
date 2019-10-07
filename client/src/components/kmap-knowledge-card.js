@@ -54,7 +54,7 @@ class KMapKnowledgeCard extends connect(store)(LitElement) {
   border-bottom-right-radius: 4px;
 }
 .card-footer a {
-  color: black;
+  color: var(--color-darkgray);
 }
 .attachments {
   display: flex;
@@ -187,6 +187,17 @@ class KMapKnowledgeCard extends connect(store)(LitElement) {
     this._colorize("0");
   }
 
+  updated(changedProperties) {
+    if (changedProperties.has("subject") || changedProperties.has("chapter") || changedProperties.has("card"))
+      this._rating(store.getState());
+    if (changedProperties.has("card") && this.card && this.card.attachments)
+      this.divideAttachments(this.card.attachments);
+  }
+
+  stateChanged(state) {
+    this._rating(state);
+  }
+
   _colorize(rate) {
     this._opaque = STATE_COLORS[rate][0];
     this._light = STATE_COLORS[rate][1];
@@ -217,17 +228,6 @@ class KMapKnowledgeCard extends connect(store)(LitElement) {
 
         this._colorize(this.state);
     }
-
-    stateChanged(state) {
-        this._rating(state);
-    }
-
-  updated(changedProperties) {
-    if (changedProperties.has("subject") || changedProperties.has("chapter") || changedProperties.has("card"))
-      this._rating(store.getState());
-    if (changedProperties.has("card") && this.card && this.card.attachments)
-      this.divideAttachments(this.card.attachments);
-  }
 
     _getStateValue(state, key) {
         var value = state.states.state[key];
