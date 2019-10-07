@@ -1,6 +1,7 @@
 import { LitElement, html, css } from 'lit-element';
+import {styleMap} from 'lit-html/directives/style-map.js';
+import { fontStyles, colorStyles } from "./kmap-styles";
 import {connect} from "pwa-helpers/connect-mixin";
-import { colorStyles, fontStyles } from "./kmap-styles";
 import {store} from "../store";
 
 class KMapSummaryCardRating extends connect(store)(LitElement) {
@@ -16,7 +17,7 @@ class KMapSummaryCardRating extends connect(store)(LitElement) {
 
   render() {
     return html`
-      <star-rating .rate="${this._state}" @clicked="${this._rated}" .color_unrated="${this.lightest}" .color_rated="${this.opaque}"></star-rating>
+      <star-rating .rate="${this._state}" @clicked="${this._rated}" style=${styleMap(this._colorStyles)}></star-rating>
     `;
   }
 
@@ -27,6 +28,7 @@ class KMapSummaryCardRating extends connect(store)(LitElement) {
       _state: {type: String},
       lightest: {type: String},
       opaque: {type: String},
+      _colorStyles: {type: Object},
     };
   }
 
@@ -35,11 +37,14 @@ class KMapSummaryCardRating extends connect(store)(LitElement) {
     this.key = '';
     this._states = [];
     this._state = 0;
+    this._colorStyles = { "--color-rated":  "--color-darkgray", "--color-unrated": "--color-lightgray" };
   }
 
   updated(changedProperties) {
     if (changedProperties.has("_states") || changedProperties.has("key"))
       this._rating(this._states);
+    if (changedProperties.has("lightest") || changedProperties.has("opaque"))
+      this._colorStyles = { "--color-rated":  this.opaque, "--color-unrated": this.lightest };
   }
 
   stateChanged(state) {

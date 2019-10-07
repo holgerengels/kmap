@@ -1,8 +1,9 @@
-import {LitElement, html, css} from 'lit-element';
+import { LitElement, html, css } from 'lit-element';
+import {styleMap} from 'lit-html/directives/style-map.js';
+import { fontStyles, colorStyles } from "./kmap-styles";
+import { STATE_COLORS } from './state-colors';
 import {connect} from "pwa-helpers/connect-mixin";
 import {store} from "../store";
-import { STATE_COLORS } from './state-colors';
-import {fontStyles, colorStyles} from "./kmap-styles";
 import 'mega-material/icon';
 import './star-rating';
 import './kmap-knowledge-card-depends';
@@ -151,7 +152,7 @@ class KMapKnowledgeCard extends connect(store)(LitElement) {
   <div class="card-footer">
     ${this.card.links
       ? html`<a slot="footer" href="#browser/${this.subject}/${this.card.links}"><mega-icon>open_in_new</mega-icon></a>`
-      : html`<star-rating .rate="${this.state}" @clicked="${this._rated}" .color_unrated="${this._lightest}" .color_rated="${this._opaque}"></star-rating>`
+      : html`<star-rating .rate="${this.state}" @clicked="${this._rated}" style=${styleMap(this._colorStyles)}></star-rating>`
     }
     <div slot="footer" style="flex: 1 0 auto"></div>
     <a slot="footer" href="#browser/${this.subject}/${this.chapter}"><mega-icon>fullscreen_exit</mega-icon></a>
@@ -159,39 +160,42 @@ class KMapKnowledgeCard extends connect(store)(LitElement) {
     `;
     }
 
-    static get properties() {
-        return {
-            subject: {type: String},
-            chapter: {type: String},
-            card: {type: Object},
-            _description: {type: String},
-            state: {type: Number},
-            progressNum: {type: Number},
-            progressOf: {type: Number},
-            _explanations: {type: Array},
-            _examples: {type: Array},
-            _usages: {type: Array},
-            _ideas: {type: Array},
-            _exercises: {type: Array},
-            _opaque: {type: String},
-            _light: {type: String},
-            _lightest: {type: String},
-        };
-    }
+  static get properties() {
+    return {
+      subject: {type: String},
+      chapter: {type: String},
+      card: {type: Object},
+      _description: {type: String},
+      state: {type: Number},
+      progressNum: {type: Number},
+      progressOf: {type: Number},
+      _explanations: {type: Array},
+      _examples: {type: Array},
+      _usages: {type: Array},
+      _ideas: {type: Array},
+      _exercises: {type: Array},
+      _opaque: {type: String},
+      _light: {type: String},
+      _lightest: {type: String},
+      _colorStyles: {type: Object},
+    };
+  }
 
-    constructor() {
-        super();
-        this._colorize("0");
-    }
+  constructor() {
+    super();
+    this._colorStyles = { "--color-rated":  "--color-darkgray", "--color-unrated": "--color-lightgray" };
+    this._colorize("0");
+  }
 
-    _colorize(rate) {
-        this._opaque = STATE_COLORS[rate][0];
-        this._light = STATE_COLORS[rate][1];
-        this._lightest = STATE_COLORS[rate][2];
-        this.style.setProperty('--color-opaque', this._opaque);
-        this.style.setProperty('--color-light', this._light);
-        this.style.setProperty('--color-lightest', this._lightest);
-    }
+  _colorize(rate) {
+    this._opaque = STATE_COLORS[rate][0];
+    this._light = STATE_COLORS[rate][1];
+    this._lightest = STATE_COLORS[rate][2];
+    this.style.setProperty('--color-opaque', this._opaque);
+    this.style.setProperty('--color-light', this._light);
+    this.style.setProperty('--color-lightest', this._lightest);
+    this._colorStyles = { "--color-rated":  this._opaque, "--color-unrated": this._lightest };
+  }
 
     _rated(e) {
         let key = this.chapter + "." + this.card.topic;
@@ -218,12 +222,12 @@ class KMapKnowledgeCard extends connect(store)(LitElement) {
         this._rating(state);
     }
 
-    updated(changedProperties) {
-        if (changedProperties.has("subject") || changedProperties.has("chapter") || changedProperties.has("card"))
-            this._rating(store.getState());
-        if (changedProperties.has("card") && this.card && this.card.attachments)
-            this.divideAttachments(this.card.attachments);
-    }
+  updated(changedProperties) {
+    if (changedProperties.has("subject") || changedProperties.has("chapter") || changedProperties.has("card"))
+      this._rating(store.getState());
+    if (changedProperties.has("card") && this.card && this.card.attachments)
+      this.divideAttachments(this.card.attachments);
+  }
 
     _getStateValue(state, key) {
         var value = state.states.state[key];

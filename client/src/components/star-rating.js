@@ -50,23 +50,10 @@ mega-icon {
 
     static get properties() { return {
         rate: { type: Number },
-        color_rated: { type: String },
-        color_unrated: { type: String },
     }}
 
     constructor() {
         super();
-        this.color_rated = "gold";
-        this.color_unrated = "gray";
-        this.style.setProperty("--color-rated", this.color_rated);
-        this.style.setProperty("--color-unrated", this.color_unrated);
-    }
-
-    updated(changedProperties) {
-        if (changedProperties.has("color_rated"))
-            this.style.setProperty("--color-rated", this.color_rated);
-        if (changedProperties.has("color_unrated"))
-            this.style.setProperty("--color-unrated", this.color_unrated);
     }
 
     _clicked(event) {
