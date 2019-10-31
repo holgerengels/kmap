@@ -3,7 +3,7 @@ import {connect} from "pwa-helpers/connect-mixin";
 import {store} from "../store";
 import {setCardForEdit, setCardForRename, setCardForDelete} from "../actions/app";
 import {colorStyles, fontStyles} from "./kmap-styles";
-import 'mega-material/button';
+import '@material/mwc-button';
 import './modal-dialog';
 
 class KMapBrowserChapterEditor extends connect(store)(LitElement) {
@@ -13,7 +13,7 @@ class KMapBrowserChapterEditor extends connect(store)(LitElement) {
       fontStyles,
       colorStyles,
       css`
-mega-button[disabled] {
+mwc-button[disabled] {
   pointer-events: none;
   color: var(--color-darkgray);
   opacity: .5;
@@ -24,8 +24,8 @@ mega-button[disabled] {
 
   render() {
     return html`
-      <mega-button icon="edit" ?disabled="${!this._enabled}" @click="${this._showEdit}"></mega-button>
-      <mega-button icon="delete" ?disabled="${!this._enabled}" @click="${this._showDelete}"></mega-button>
+      <mwc-button icon="edit" ?disabled="${!this._enabled}" @click="${this._showEdit}"></mwc-button>
+      <mwc-button icon="delete" ?disabled="${!this._enabled}" @click="${this._showDelete}"></mwc-button>
     `;
   }
 

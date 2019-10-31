@@ -5,8 +5,8 @@ import {config} from '../config';
 import {STATE_COLORS} from './state-colors';
 import {fontStyles, colorStyles} from "./kmap-styles";
 import './star-rating';
-import 'mega-material/icon';
-import 'mega-material/button';
+import '@material/mwc-icon';
+import '@material/mwc-button';
 
 class KMapTestCard extends connect(store)(LitElement) {
 
@@ -109,10 +109,10 @@ input[correction=incorrect] {
   </div>
   ${this.showActions ? html`
     <div class="card-footer">
-        <mega-button @click="${this.showAnswer}">Richtige Antwort zeigen</mega-button>
+        <mwc-button @click="${this.showAnswer}">Richtige Antwort zeigen</mwc-button>
         <div style="flex: 1 0 auto"></div>
-        <mega-button @click="${this.sendAnswer}" ?hidden="${this.sent}">Antwort abschicken</mega-button>
-        <mega-button @click="${this.next}" ?hidden="${!this.correct}">Weiter</mega-button>
+        <mwc-button @click="${this.sendAnswer}" ?hidden="${this.sent}">Antwort abschicken</mwc-button>
+        <mwc-button @click="${this.next}" ?hidden="${!this.correct}">Weiter</mwc-button>
     </div>`
       : ''}
     `;

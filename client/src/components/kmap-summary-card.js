@@ -3,13 +3,15 @@ import {connect} from "pwa-helpers/connect-mixin";
 import {store} from "../store";
 import {selectSummaryCard} from '../actions/maps.js';
 import {STATE_COLORS} from './state-colors';
+import {fontStyles, colorStyles} from "./kmap-styles";
+
+import '@material/mwc-icon';
+import '@material/mwc-ripple';
 import './star-rating';
 import './kmap-summary-card-summary';
 import './kmap-summary-card-averages';
 import './kmap-summary-card-editor';
 import './kmap-summary-card-rating';
-import 'mega-material/icon';
-import {fontStyles, colorStyles} from "./kmap-styles";
 
 class KMapSummaryCard extends connect(store)(LitElement) {
 
@@ -20,10 +22,15 @@ class KMapSummaryCard extends connect(store)(LitElement) {
       colorStyles,
       css`
 :host {
+  display: contents;
   --color-opaque: #f5f5f5;
-  --color-light: #e0e0e0;
-  --color-lightest: #9e9e9e;
-
+  --color-light: var(--color-mediumgray);
+  --color-lightest: #e0e0e0;
+}
+div.card {
+  vertical-align: top;
+  margin: 6px;
+  margin-top: 0px;
   display: inline-block;
   box-sizing: border-box;
   width: 300px;
@@ -33,13 +40,13 @@ class KMapSummaryCard extends connect(store)(LitElement) {
       0 4px 1px -2px rgba(0, 0, 0, 0.2);
   color: var(--color-darkgray);
 }
-:host([selected]) {
+div.card[selected] {
     filter: saturate(1.3) brightness(1.1);
     box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14),
     0 1px 10px 0 rgba(0, 0, 0, 0.12),
     0 2px 4px -1px rgba(0, 0, 0, 0.4);
 }
-:host([highlighted]) {
+div.card[highlighted] {
     filter: saturate(1.3) brightness(1.1);
 }
 
@@ -71,27 +78,28 @@ class KMapSummaryCard extends connect(store)(LitElement) {
 
   render() {
     return html`
-  <div class="card-header font-body" @click="${this._clicked}">
-      <span>${this.card.topic}</span>
+<div class="card" @click="${this._clicked}" ?selected="${this.selected}" ?highlighted="${this.highlighted}">
+  <div class="card-header font-body">
+    <span>${this.card.topic}</span>
   </div>
   ${this._layers.includes('summaries')
       ? html`
-      <kmap-summary-card-summary @click="${this._clicked}" .key="${this._key}" .summary="${this.card.summary}" @statecolor="${this._colorizeEvent}"></kmap-summary-card-summary>
+      <kmap-summary-card-summary .key="${this._key}" .summary="${this.card.summary}" @statecolor="${this._colorizeEvent}"></kmap-summary-card-summary>
     ` : ''
       }
   ${this._layers.includes('averages')
       ? html`
-      <kmap-summary-card-averages id="averages" @click="${this._clicked}" .key="${this._key}" @statecolor="${this._colorizeEvent}"></kmap-summary-card-summary>
+      <kmap-summary-card-averages id="averages" .key="${this._key}" @statecolor="${this._colorizeEvent}"></kmap-summary-card-summary>
     ` : ''
       }
   ${this._layers.includes('editor')
       ? html`
-      <kmap-summary-card-editor id="editor" @click="${this._clicked}" .key="${this._key}" .card="${this.card}" @statecolor="${this._colorizeEvent}"></kmap-summary-card-editor>
+      <kmap-summary-card-editor id="editor" .key="${this._key}" .card="${this.card}" @statecolor="${this._colorizeEvent}"></kmap-summary-card-editor>
     ` : ''
       }
   <div class="card-footer font-body">
       ${this.card.links
-      ? html`<a slot="footer" href="#browser/${this.subject}/${this.card.links}"><mega-icon>open_in_new</mega-icon></a>`
+      ? html`<a slot="footer" href="#browser/${this.subject}/${this.card.links}"><mwc-icon>open_in_new</mwc-icon></a>`
       : html`
         ${!this._layers.includes('averages') ? html`
           <kmap-summary-card-rating id="rating" .key="${this._key}" .lightest="${this._lightest}" .opaque="${this._opaque}" @statecolor="${this._colorizeEvent}"></kmap-summary-card-rating>
@@ -99,8 +107,10 @@ class KMapSummaryCard extends connect(store)(LitElement) {
       `}
                       
       <div slot="footer" style="flex: 1 0 auto"></div>
-      <a slot="footer" href="#browser/${this.subject}/${this.chapter}/${this.card.topic}"><mega-icon>fullscreen</mega-icon></a>
+      <a slot="footer" href="#browser/${this.subject}/${this.chapter}/${this.card.topic}"><mwc-icon>fullscreen</mwc-icon></a>
   </div>
+    <mwc-ripple id="ripple"></mwc-ripple>
+    </div>
     `;
   }
 

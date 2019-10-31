@@ -1,11 +1,12 @@
 import {LitElement, html, css} from 'lit-element';
 import {connect} from 'pwa-helpers/connect-mixin.js';
-import {store} from "../store";
-
-import 'mega-material/icon-button';
-import 'mega-material/list';
-import {colorStyles, fontStyles} from "./kmap-styles";
 import {loadInstances, forgetInstances, createInstance, dropInstance} from "../actions/instances";
+import {store} from "../store";
+import {colorStyles, fontStyles} from "./kmap-styles";
+
+import 'mega-material/list';
+import '@material/mwc-icon-button';
+import '@material/mwc-textfield';
 
 class KMapContentManagerInstances extends connect(store)(LitElement) {
   static get styles() {
@@ -35,19 +36,11 @@ class KMapContentManagerInstances extends connect(store)(LitElement) {
   margin: 12px;
   flex: 1 1 100%;
 }
-.field {
-  display: flex;
-  justify-content: space-between;
-  margin: 12px;
-}
-.field input {
-  width: 180px;
-}
 .scroll {
   height: 160px;
   overflow-y: auto;
 }
-mega-icon {
+mwc-icon {
   pointer-events: all;
   cursor: default;
 }
@@ -74,8 +67,8 @@ mega-icon {
         <div class="form">
           <label section>Instanzen</label>
           <span style="float: right">
-          <mega-icon @click="${e => this._showPage('create')}">add</mega-icon>
-          <mega-icon @click="${e => this._showPage('drop')}" ?disabled="${this._selectedIndex === -1}">delete</mega-icon>
+          <mwc-icon @click="${e => this._showPage('create')}">add</mwc-icon>
+          <mwc-icon @click="${e => this._showPage('drop')}" ?disabled="${this._selectedIndex === -1}">delete</mwc-icon>
           </span>
           <br style="clear: right"/>
           <div class="scroll">
@@ -89,12 +82,9 @@ mega-icon {
         <div class="form">
           <div class="page" ?active="${this._page === 'create'}">
             <label section>Instanz anlegen</label>
-            <div class="field">
-                <label for="name">Name</label>
-                <input id="name" required type="text" .value=${this._name} @change=${e => this._name = e.target.value}/>
-            </div>
-            <mega-button @click="${e => this._showPage('')}">Abbrechen</mega-button>
-            <mega-button outlined @click="${this._create}">Anlegen</mega-button>
+            <mwc-textfield label="Name" type="text" .value="${this._name}" @change="${e => this._name = e.target.value}"></mwc-textfield>
+            <mwc-button @click="${e => this._showPage('')}">Abbrechen</mwc-button>
+            <mwc-button outlined @click="${this._create}">Anlegen</mwc-button>
           </div>
           <div class="page" ?active="${this._page === 'drop'}">
             <label section>Instanz löschen</label>
@@ -103,8 +93,8 @@ mega-icon {
                 ? html`<label>Soll die Instanz '${this._selected}' wirklich gelöscht werden?</label>`
                 : ''}
             </div>
-            <mega-button @click="${e => this._showPage('')}">Abbrechen</mega-button>
-            <mega-button outlined @click="${this._drop}">Löschen</mega-button>
+            <mwc-button @click="${e => this._showPage('')}">Abbrechen</mwc-button>
+            <mwc-button outlined @click="${this._drop}">Löschen</mwc-button>
           </div>
         </div>
         <div class="space"></div>

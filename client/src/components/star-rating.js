@@ -1,5 +1,5 @@
 import { LitElement, html, css } from 'lit-element';
-import 'mega-material/icon';
+import '@material/mwc-icon';
 
 class StarRating extends LitElement {
     static get styles() {
@@ -12,29 +12,29 @@ class StarRating extends LitElement {
   text-align: center;
   cursor: pointer;
 }
-:host > mega-icon {
+:host > mwc-icon {
   display: inline-block;
   position: relative;
   width: 24px;
   transition: color 0.4s;
   color: var(--color-unrated);
 }
-:host > mega-icon:hover,
-:host > mega-icon:hover ~ mega-icon {
+:host > mwc-icon:hover,
+:host > mwc-icon:hover ~ mwc-icon {
   color: var(--color-rated);
 }
-:host(:not(:hover)) > mega-icon[filled],
-:host(:not(:hover)) > mega-icon ~ mega-icon[filled]
+:host(:not(:hover)) > mwc-icon[filled],
+:host(:not(:hover)) > mwc-icon ~ mwc-icon[filled]
 {
   color: var(--color-rated);
 }
-mega-icon.cross {
+mwc-icon.cross {
     opacity: 0.1;
 } 
-:host(:hover) > mega-icon.cross {
+:host(:hover) > mwc-icon.cross {
     opacity: 1;
 } 
-mega-icon {
+mwc-icon {
   pointer-events: all;
 }
         `
@@ -43,8 +43,8 @@ mega-icon {
 
     render() {
         return html`
-<mega-icon class="cross" @click="${this._clicked}" value="0">close</mega-icon>
-<mega-icon ?filled="${this.rate >= 4}" @click="${this._clicked}" value="4">done</mega-icon><mega-icon ?filled="${this.rate >= 3}" @click="${this._clicked}" value="3">done</mega-icon><mega-icon ?filled="${this.rate >= 2}" @click="${this._clicked}" value="2">done</mega-icon><mega-icon ?filled="${this.rate >= 1}" @click="${this._clicked}" value="1">done</mega-icon>
+<mwc-icon class="cross" @click="${this._clicked}" value="0">close</mwc-icon>
+<mwc-icon ?filled="${this.rate >= 4}" @click="${this._clicked}" value="4">done</mwc-icon><mwc-icon ?filled="${this.rate >= 3}" @click="${this._clicked}" value="3">done</mwc-icon><mwc-icon ?filled="${this.rate >= 2}" @click="${this._clicked}" value="2">done</mwc-icon><mwc-icon ?filled="${this.rate >= 1}" @click="${this._clicked}" value="1">done</mwc-icon>
     `;
     }
 
@@ -59,9 +59,9 @@ mega-icon {
     _clicked(event) {
         let i = 0;
         /*
-        while (event.path[i].tagName !== "MEGA-ICON" && i < event.path.length)
+        while (event.path[i].tagName !== "mwc-icon" && i < event.path.length)
             i++;
-        if (event.path[i].tagName === "MEGA-ICON") {
+        if (event.path[i].tagName === "mwc-icon") {
             this.rate = event.path[i].getAttribute("value");
             this.dispatchEvent(new CustomEvent('clicked', {bubbles: true, composed: true, detail: {rate: this.rate}}));
         }

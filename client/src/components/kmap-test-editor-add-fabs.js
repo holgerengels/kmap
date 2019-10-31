@@ -1,61 +1,59 @@
 import {LitElement, html, css} from 'lit-element';
 import {connect} from "pwa-helpers/connect-mixin";
 import {store} from "../store";
-import {fontStyles, colorStyles} from "./kmap-styles";
-import 'mega-material/fab';
 import {setTestForEdit} from "../actions/app";
+import {fontStyles, colorStyles} from "./kmap-styles";
+
+import '@material/mwc-button';
+import '@material/mwc-dialog';
+import '@material/mwc-fab';
+import '@material/mwc-textfield';
 
 class KMapTestEditorAddFabs extends connect(store)(LitElement) {
-
   static get styles() {
     // language=CSS
     return [
       fontStyles,
       colorStyles,
       css`
-mega-fab {
-  position: absolute;
+:host {
+    display: contents;
+}
+mwc-textfield {
+    margin-bottom: 4px;
+}
+mwc-fab {
+  position: fixed;
   right: 16px;
   z-index: 100;
-  --mega-theme-secondary: var(--color-secondary);
-  --mega-theme-on-secondary: black;
+  overflow: visible;
+  --mdc-theme-secondary: var(--color-secondary);
+  --mdc-theme-on-secondary: black;
 }
-
 .primary {
   bottom: 16px;
 }
-
 .one {
   bottom: 104px;
 }
-
 .two {
   bottom: 184px;
 }
-
 .three {
   bottom: 264px;
 }
-
 .four {
   bottom: 344px;
 }
-
 .secondary {
-  --mega-theme-secondary: var(--color-secondary-light);
+  --mdc-theme-secondary: var(--color-secondary-light);
   opacity: 1;
   transition: bottom .3s ease-in-out, opacity .2s ease-in;
 }
-
 .secondary[exited] {
   bottom: 20px !important;
   opacity: 0;
-}
-input {
-  float: right;
-}
-[readonly] {
-  background-color: var(--color-lightgray);
+  pointer-events: none;
 }
       `];
   }
@@ -63,30 +61,21 @@ input {
   render() {
     // language=HTML
     return html`
-      <mega-fab icon="${this._opened ? 'clear' : 'add'}" class="primary" ?exited="${!this._fabs}" @click="${this._open}"></mega-fab>
-      <mega-fab icon="add" label="Set"   mini class="secondary one"   ?exited="${!this._opened}" @click="${this._addSet}"></mega-fab>
-      <mega-fab icon="add" label="Test"   mini class="secondary two"  ?exited="${!this._opened || !this._currentSet}" @click="${this._addTest}"></mega-fab>
+      <mwc-fab icon="${this._opened ? 'clear' : 'add'}" class="primary" ?exited="${!this._fabs}" @click="${this._open}"></mwc-fab>
+      <mwc-fab icon="add" label="Set"    extended mini class="secondary one"  ?exited="${!this._opened}" @click="${this._addSet}"></mwc-fab>
+      <mwc-fab icon="add" label="Test"   extended mini class="secondary two"  ?exited="${!this._opened || !this._currentSet}" @click="${this._addTest}"></mwc-fab>
       
-      <mega-dialog id="addDialog" title="${this._header()}">
+      <mwc-dialog id="addDialog" title="${this._header()}">
         <form id="addForm" @keyup="${this._maybeEnter}">
           <label>${this._explanation()}</label>
           <br/>
-          <div class="field">
-            <label for="subject">Fach</label>
-            <input id="subject" name="subject" type="text" .value="${this._subject}" @change="${e => this._subject = e.target.value}" ?readonly="${this._mode !== 'set'}"/>
-          </div>
-          <div class="field">
-            <label for="set">Set</label>
-            <input id="set" name="set" type="text" .value="${this._set}" @change="${e => this._set = e.target.value}" ?readonly="${this._mode !== 'set'}"/>
-          </div>
-          <div class="field">
-            <label for="key">Titel</label>
-            <input id="key" name="key" type="text" .value="${this._key}" @change="${e => this._key = e.target.value}"/>
-          </div>
+        <mwc-textfield label="Fach" type="text" .value="${this._subject}" @change="${e => this._subject = e.target.value }" ?disabled="${this._mode !== 'set'}"></mwc-textfield>
+        <mwc-textfield label="Set" type="text" .value="${this._set}" @change="${e => this._set = e.target.value}" ?disabled="${this._mode !== 'set'}"></mwc-textfield>
+        <mwc-textfield label="Titel" type="text" .value="${this._key}" @change="${e => this._key = e.target.value}"></mwc-textfield>
         </form>
-        <mega-button slot="action" primary close @click="${this._ok}">Erstellen</mega-button>
-        <mega-button slot="action" primary close @click="${this._cancel}">Abbrechen</mega-button>
-      </mega-dialog>
+        <mwc-button slot="secondaryAction" dialogAction="cancel">Abbrechen</mwc-button>
+        <mwc-button slot="primaryAction" @click="${this._ok}">Erstellen</mwc-button>
+      </mwc-dialog>
     `;
   }
 
@@ -167,7 +156,7 @@ input {
     this._subject = this._currentSubject;
     this._set = this._currentSet;
     this._key = '';
-    this.shadowRoot.getElementById('addDialog').open();
+    this.shadowRoot.getElementById('addDialog').open = true;
   }
 
   _addSet() {
@@ -176,7 +165,7 @@ input {
     this._subject = this._currentSubject;
     this._set = '';
     this._key = '';
-    this.shadowRoot.getElementById('addDialog').open();
+    this.shadowRoot.getElementById('addDialog').open = true;
   }
 
   _ok() {
@@ -188,6 +177,7 @@ input {
     };
     console.log(test);
     store.dispatch(setTestForEdit(test));
+    this.shadowRoot.getElementById('addDialog').open = false;
   }
 }
 

@@ -4,11 +4,12 @@ import {store} from "../store";
 import {unsetTestForDelete} from "../actions/app";
 import {deleteTest, loadSet} from "../actions/test-editor";
 import {colorStyles, fontStyles} from "./kmap-styles";
-import 'mega-material/button';
-import 'mega-material/dialog';
+
+import '@material/mwc-button';
+import '@material/mwc-dialog';
+import '@material/mwc-textfield';
 
 class KMapTestEditorDeleteDialog extends connect(store)(LitElement) {
-
   static get styles() {
     // language=CSS
     return [
@@ -24,17 +25,17 @@ form {
   render() {
     // language=HTML
     return html`
-<mega-dialog id="deleteDialog" title="Löschen">
-${this._test ? html`
+<mwc-dialog id="deleteDialog" title="Löschen">
+  ${this._test ? html`
   <form>
     <div class="field">
       <span>Soll der Test <i>${this._test.key}</i> aus dem Set <i>${this._test.set}</i> im Fach <i>${this._test.subject}</i> wirklich gelöscht werden?</span>
     </div>
   </form>
-  <mega-button slot="action" primary @click=${this._delete}>Löschen</mega-button>
-  <mega-button slot="action" @click=${this._cancel}>Abbrechen</mega-button>
-</mega-dialog>
-    ` : '' }
+  ` : '' }
+  <mwc-button slot="secondaryAction" @click=${this._cancel}>Abbrechen</mwc-button>
+  <mwc-button slot="primaryAction" @click=${this._delete}>Löschen</mwc-button>
+</mwc-dialog>
     `;
     }
 
@@ -55,7 +56,7 @@ ${this._test ? html`
 
   updated(changedProperties) {
     if (changedProperties.has('_test') && this._test) {
-      this._deleteDialog.open();
+      this._deleteDialog.open = true;
     }
   }
 
@@ -64,7 +65,7 @@ ${this._test ? html`
   }
 
   _delete() {
-    this._deleteDialog.close();
+    this._deleteDialog.open = false;
     console.log(this._test);
 
     let test = this._test;
@@ -76,7 +77,7 @@ ${this._test ? html`
   }
 
   _cancel() {
-    this._deleteDialog.close();
+    this._deleteDialog.open = false;
     store.dispatch(unsetTestForDelete());
   }
 

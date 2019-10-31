@@ -41,7 +41,7 @@ class KMapTestEditorScroller extends connect(store)(LitElement) {
                 color: var(--color-primary-dark);
                 background-color: var(--color-primary-lighter);
             }
-            .item mega-icon {
+            .item mwc-icon {
                 pointer-events: all;
                 cursor: pointer;
                 vertical-align: middle;
@@ -57,8 +57,8 @@ class KMapTestEditorScroller extends connect(store)(LitElement) {
           ${this._tests.map((test, i) => html`
             <div class="item" ?activated="${this._selectedIndex === i}" @click="${e => this._select(i)}">${test.key}
                 <span class="secondary">${test.chapter} - ${test.topic}</span> 
-                <mega-icon @click="${e => { e.stopPropagation(); this._deleteTest(test)}}">delete</mega-icon>
-                <mega-icon @click="${e => { e.stopPropagation(); this._editTest(test)}}">edit</mega-icon>
+                <mwc-icon @click="${e => { e.stopPropagation(); this._deleteTest(test)}}">delete</mwc-icon>
+                <mwc-icon @click="${e => { e.stopPropagation(); this._editTest(test)}}">edit</mwc-icon>
             </div>
           `)}
     </div>

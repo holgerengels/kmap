@@ -5,11 +5,11 @@ import {unsetCardForDelete} from "../actions/app";
 import {deleteTopic} from "../actions/editor";
 import {fetchMapIfNeeded, invalidateMap} from "../actions/maps";
 import {colorStyles, fontStyles} from "./kmap-styles";
-import 'mega-material/button';
-import 'mega-material/dialog';
+
+import '@material/mwc-button';
+import '@material/mwc-dialog';
 
 class KMapEditorDeleteDialog extends connect(store)(LitElement) {
-
   static get styles() {
     // language=CSS
     return [
@@ -25,18 +25,18 @@ form {
   render() {
     // language=HTML
     return html`
-<mega-dialog id="deleteDialog" title="Löschen">
-${this._card ? html`
+<mwc-dialog id="deleteDialog" title="Löschen">
+  ${this._card ? html`
   <form>
     <div class="field">
       <span>Soll die Wissenskarte zum Thema <i>${this._card.topic}</i> von der Wissenslandkarte zum Kapitel <i>${this._chapter}</i>
       aus dem Modul <i>${this._card.module}</i> im Fach <i>${this._subject}</i> wirklich gelöscht werden?</span>
     </div>
   </form>
-  <mega-button slot="action" primary @click=${this._delete}>Löschen</mega-button>
-  <mega-button slot="action" @click=${this._cancel}>Abbrechen</mega-button>
-</mega-dialog>
-    ` : '' }
+  ` : '' }
+  <mwc-button slot="secondaryAction" @click=${this._cancel}>Abbrechen</mwc-button>
+  <mwc-button slot="primaryAction" @click=${this._delete}>Löschen</mwc-button>
+</mwc-dialog>
     `;
     }
 
@@ -61,7 +61,7 @@ ${this._card ? html`
 
   updated(changedProperties) {
     if (changedProperties.has('_card') && this._card) {
-      this._deleteDialog.open();
+      this._deleteDialog.open = true;
     }
   }
 
@@ -75,9 +75,10 @@ ${this._card ? html`
       }
     }
   }
-  
+
   _delete() {
-    this._deleteDialog.close();
+    this._deleteDialog.open = false;
+
     this._card.subject = this._subject;
     this._card.chapter = this._chapter;
     this._card.topic = this._card.topic;
@@ -89,7 +90,7 @@ ${this._card ? html`
   }
 
   _cancel() {
-    this._deleteDialog.close();
+    this._deleteDialog.open = false;
     store.dispatch(unsetCardForDelete());
   }
 

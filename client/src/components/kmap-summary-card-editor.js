@@ -3,7 +3,7 @@ import {connect} from "pwa-helpers/connect-mixin";
 import {store} from "../store";
 import {setCardForEdit, setCardForRename, setCardForDelete} from "../actions/app";
 import {colorStyles, fontStyles} from "./kmap-styles";
-import 'mega-material/button';
+import '@material/mwc-button';
 import './modal-dialog';
 
 class KMapSummaryCardEditor extends connect(store)(LitElement) {
@@ -22,7 +22,7 @@ class KMapSummaryCardEditor extends connect(store)(LitElement) {
     font-size: 0.95rem;
     font-weight: 500;
 }
-mega-button[disabled] {
+mwc-button[disabled] {
   pointer-events: none;
   color: var(--color-darkgray);
   opacity: .5;
@@ -37,9 +37,9 @@ mega-button[disabled] {
 
   render() {
     return html`
-      <mega-button icon="edit" ?disabled="${!this._enabled}" @click="${this._showEdit}"></mega-button>
-      <mega-button icon="label" ?disabled="${!this._enabled}" @click="${this._showRename}"></mega-button>
-      <mega-button icon="delete" ?disabled="${!this._enabled}" @click="${this._showDelete}"></mega-button>
+      <mwc-button icon="edit" ?disabled="${!this._enabled}" @click="${this._showEdit}"></mwc-button>
+      <mwc-button icon="label" ?disabled="${!this._enabled}" @click="${this._showRename}"></mwc-button>
+      <mwc-button icon="delete" ?disabled="${!this._enabled}" @click="${this._showDelete}"></mwc-button>
       ${this.card.annotations ? html`<div class="warn">${this.card.annotations}</div>` : ''}
     `;
   }

@@ -11,7 +11,7 @@
 import {LitElement, html, css} from 'lit-element';
 import {connect} from "pwa-helpers/connect-mixin";
 import {store} from "../store";
-import 'mega-material/icon';
+import '@material/mwc-icon';
 import {STATE_COLORS} from "./state-colors";
 import {colorStyles, fontStyles} from "./kmap-styles";
 
@@ -68,7 +68,7 @@ class KMapSubjectCard extends connect(store)(LitElement) {
     <span>${this.subject}</span>
   </div>
   <div class="card-footer font-body">
-    <a slot="footer" href="#browser/${this.subject}/${this.subject}"><mega-icon>open_in_new</mega-icon></a>
+    <a slot="footer" href="#browser/${this.subject}/${this.subject}"><mwc-icon>open_in_new</mwc-icon></a>
   </div>
     `;
     }

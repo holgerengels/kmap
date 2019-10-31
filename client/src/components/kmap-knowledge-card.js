@@ -4,7 +4,7 @@ import { fontStyles, colorStyles } from "./kmap-styles";
 import { STATE_COLORS } from './state-colors';
 import {connect} from "pwa-helpers/connect-mixin";
 import {store} from "../store";
-import 'mega-material/icon';
+import '@material/mwc-icon';
 import './star-rating';
 import './kmap-knowledge-card-depends';
 import './kmap-knowledge-card-progress';
@@ -151,11 +151,11 @@ class KMapKnowledgeCard extends connect(store)(LitElement) {
   </div>
   <div class="card-footer">
     ${this.card.links
-      ? html`<a slot="footer" href="#browser/${this.subject}/${this.card.links}"><mega-icon>open_in_new</mega-icon></a>`
+      ? html`<a slot="footer" href="#browser/${this.subject}/${this.card.links}"><mwc-icon>open_in_new</mwc-icon></a>`
       : html`<star-rating .rate="${this.state}" @clicked="${this._rated}" style=${styleMap(this._colorStyles)}></star-rating>`
     }
     <div slot="footer" style="flex: 1 0 auto"></div>
-    <a slot="footer" href="#browser/${this.subject}/${this.chapter}"><mega-icon>fullscreen_exit</mega-icon></a>
+    <a slot="footer" href="#browser/${this.subject}/${this.chapter}"><mwc-icon>fullscreen_exit</mwc-icon></a>
   </div>
     `;
     }

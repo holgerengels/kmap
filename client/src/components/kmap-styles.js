@@ -33,11 +33,16 @@ p, .font-body, label, td {
   font-weight: 300;
 }
 a {
+  color: var(--color-darkgray);
   text-decoration: none;
   font-weight: bold;
 }
 a:hover {
   text-decoration: underline;
+}
+a[disabled] {
+    pointer-events: none;
+    color: var(--color-mediumgray) !important;
 }
 `;
 

@@ -5,7 +5,7 @@ import { STATE_COLORS } from './state-colors';
 import {connect} from "pwa-helpers/connect-mixin";
 import {store} from "../store";
 import {selectSummaryCard} from '../actions/maps.js';
-import 'mega-material/icon';
+import '@material/mwc-icon';
 import 'mega-material/list';
 import './star-rating';
 
@@ -59,7 +59,7 @@ class KMapTestResultCard extends connect(store)(LitElement) {
 .card-footer a {
   color: var(--color-darkgray);
 }
-.card-content mega-icon {
+.card-content mwc-icon {
   vertical-align: bottom;
   padding-left: 16px;
   padding-right: 16px;
@@ -79,13 +79,13 @@ class KMapTestResultCard extends connect(store)(LitElement) {
           <span>${this.card.chapter} → ${this.card.topic}</span>
         </div>
         <div class="card-content">
-            <mega-icon class="correct">thumb_up</mega-icon> ${this.card.correct} richtig<br/><br/>
-            <mega-icon class="wrong">thumb_down</mega-icon> ${this.card.wrong} falsch<br/>
+            <mwc-icon class="correct">thumb_up</mwc-icon> ${this.card.correct} richtig<br/><br/>
+            <mwc-icon class="wrong">thumb_down</mwc-icon> ${this.card.wrong} falsch<br/>
         </div>
         <div class="card-footer">
             <star-rating .rate="${this._state}" @clicked="${this._rated}" style=${styleMap(this._colorStyles)}></star-rating>
             <div slot="footer" style="flex: 1 0 auto"></div>
-            <a slot="footer" href="#browser/${this.card.subject}/${this.card.chapter}/${this.card.topic}"><mega-icon>open_in_new</mega-icon></a>
+            <a slot="footer" href="#browser/${this.card.subject}/${this.card.chapter}/${this.card.topic}"><mwc-icon>open_in_new</mwc-icon></a>
         </div>
     `;
   }

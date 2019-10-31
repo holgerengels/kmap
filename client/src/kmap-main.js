@@ -16,10 +16,10 @@ import {
     addLayer, removeLayer
 } from './actions/app.js';
 
-import 'mega-material/button';
-import 'mega-material/drawer';
-import 'mega-material/icon-button';
-import 'mega-material/snackbar';
+import '@material/mwc-button';
+import '@material/mwc-drawer';
+import '@material/mwc-icon-button';
+import '@material/mwc-snackbar';
 
 import './components/kmap-login-popup';
 import './components/kmap-subjects';
@@ -44,19 +44,12 @@ class KmapMain extends connect(store)(LitElement) {
       colorStyles,
       css`
       :host {
-        overflow: unset;
+          display: contents;
         --app-drawer-background-color: var(--app-secondary-color);
         --app-drawer-text-color: var(--app-light-text-color);
         --app-drawer-selected-color: #c67100;
       }
 
-      :host {
-        position: absolute;
-        top: 0px;
-        left: 0px;
-        right: 0px;
-        bottom: 0px;
-      }
       kmap-login-popup {
         position: absolute;
         top: 16px;
@@ -67,45 +60,27 @@ class KmapMain extends connect(store)(LitElement) {
         padding: 0px 16px 0 16px;
       }
       .drawer-list {
-        box-sizing: border-box;
-        width: 100%;
-        height: 100%;
-        padding-top: 24px;
-        background: var(--app-drawer-background-color);
-        position: relative;
+        padding: 16px;
+      }
+      .drawer-list > * {
+          display: block;
+          margin: 8px 0px;
       }
       .drawer-list > a {
-        display: block;
-        text-decoration: none;
+        line-height: 32px; 
         color: var(--app-drawer-text-color);
-        line-height: 40px;
-        padding: 0 24px;
       }
       .drawer-list > a[selected] {
         color: var(--app-drawer-selected-color);
       }
-      .app-content {
-        height: 100%;
-        overflow: unset;
+      .main-content {
+          width: 100% !important;
       }
-
       .page {
-        position: absolute;
-        height: 100%;
-        width: 100%;
         display: none;
       }
-
       .page[active] {
-        display: block;
-      }
-      a[disabled] {
-        pointer-events: none;
-        color: var(--color-mediumgray);
-      }
-      mega-button[disabled] {
-         --mega-theme-primary: var(--color-mediumgray);
-         pointer-events: none;
+        display: contents;
       }
       `,
     ];
@@ -114,7 +89,7 @@ class KmapMain extends connect(store)(LitElement) {
   render() {
     // language=HTML
     return html`
-  <mega-drawer id="drawer" hasheader dismissible>
+  <mwc-drawer id="drawer" hasheader type="dismissible" ?open="${this._drawerOpen}">
     <span slot="title">KMap</span>
     <span slot="subtitle">Knowledge Map</span>
     <div class="drawer-content">
@@ -127,21 +102,20 @@ class KmapMain extends connect(store)(LitElement) {
         <a href="#browser/Hilfe/Hilfe">Hilfe</a>
       </nav>
       <hr/>
-      <br/>
-      <label section>Layer ein-/ausblenden</label><br/><br/>
-      <mega-button @click="${e => this._toggleLayer('summaries')}" icon="short_text" outlined ?raised="${this._layers.includes('summaries')}">Kurztexte</mega-button>
-      ${this._layers.includes('summaries') ? html`<kmap-summaries></kmap-summaries>` : ''}
-      <mega-button @click="${e => this._toggleLayer('averages')}" icon="group_work" outlined ?raised="${this._layers.includes('averages')}" ?disabled="${!this._roles.includes("teacher")}" title="Erfordert die Rolle 'Lehrer'">Mittelwerte</mega-button>
-      ${this._layers.includes('averages') ? html`<kmap-averages></kmap-averages>` : ''}
-      <mega-button @click="${e => this._toggleLayer('editor')}" icon="edit" outlined ?raised="${this._layers.includes('editor')}" ?disabled="${!this._roles.includes("teacher")}" title="Erfordert die Rolle 'Lehrer'">editor</mega-button>
-      ${this._layers.includes('editor') ? html`
-        ${this._page === 'home' || this._page === 'browser' ? html`<kmap-editor></kmap-editor>` : ''}
-        ${this._page === 'test' ? html`<kmap-test-editor></kmap-test-editor>` : ''}
-      ` : ''}
+      <nav class="drawer-list">
+        <label section>Layer ein-/ausblenden</label>
+        <mwc-button @click="${e => this._toggleLayer('summaries')}" icon="short_text" outlined ?raised="${this._layers.includes('summaries')}">Kurztexte</mwc-button>
+        ${this._layers.includes('summaries') ? html`<kmap-summaries></kmap-summaries>` : ''}
+        <mwc-button @click="${e => this._toggleLayer('averages')}" icon="group_work" outlined ?raised="${this._layers.includes('averages')}" ?disabled="${!this._roles.includes("teacher")}" title="Erfordert die Rolle 'Lehrer'">Mittelwerte</mwc-button>
+        ${this._layers.includes('averages') ? html`<kmap-averages></kmap-averages>` : ''}
+        <mwc-button @click="${e => this._toggleLayer('editor')}" icon="edit" outlined ?raised="${this._layers.includes('editor')}" ?disabled="${!this._roles.includes("teacher")}" title="Erfordert die Rolle 'Lehrer'">editor</mwc-button>
+        ${this._layers.includes('editor') ? html`
+          ${this._page === 'home' || this._page === 'browser' ? html`<kmap-editor></kmap-editor>` : ''}
+          ${this._page === 'test' ? html`<kmap-test-editor></kmap-test-editor>` : ''}
+        ` : ''}
+      </nav>
     </div>
-    <div slot="app-content" class="app-content" role="main">
-      <kmap-login-popup></kmap-login-popup>
-
+    <div slot="appContent" class="main-content" role="main" @toggleDrawer="${e => this._drawerOpen = !this._drawerOpen}" @lclick="${this._showLogin}">
       <kmap-subjects ?active="${this._page === 'home'}" class="page" ></kmap-subjects>
       <kmap-browser ?active="${this._page === 'browser'}" class="page" ></kmap-browser>
       <kmap-test ?active="${this._page === 'test'}" class="page" ></kmap-test>
@@ -160,8 +134,9 @@ class KmapMain extends connect(store)(LitElement) {
         ${this._layers.includes('editor') ? html`<kmap-test-editor-add-fabs></kmap-test-editor-add-fabs>` : ''}
       ` : ''}
     </div>
-  </mega-drawer>
-  <mega-snackbar id="snackbar">${this._renderMessages()}</mega-snackbar>
+  </mwc-drawer>
+  <kmap-login-popup id="login-popup"></kmap-login-popup>
+  <mwc-snackbar id="snackbar" labeltext="${this._renderMessages()}"></mwc-snackbar>
 `;
   }
 
@@ -173,6 +148,7 @@ class KmapMain extends connect(store)(LitElement) {
       _title: {type: String},
       _messages: {type: Array},
       _layers: {type: Array},
+      _drawerOpen: {type: Boolean},
     };
   }
 
@@ -182,6 +158,7 @@ class KmapMain extends connect(store)(LitElement) {
     this._page = "home";
     this._title = 'KMap';
     this._layers = [];
+    this._drawerOpen = false;
   }
 
   firstUpdated(changedProperties) {
@@ -190,6 +167,7 @@ class KmapMain extends connect(store)(LitElement) {
     installMediaQueryWatcher(`(min-width: 460px)`, () => {});
     this._drawer = this.shadowRoot.getElementById('drawer');
     this._snackbar = this.shadowRoot.getElementById('snackbar');
+    this._loginPopup = this.shadowRoot.getElementById('login-popup');
   }
 
   updated(changedProps) {
@@ -202,7 +180,7 @@ class KmapMain extends connect(store)(LitElement) {
     }
 
     if (changedProps.has('_page') && !this._layers.includes('editor'))
-      this._drawer.close();
+      this._drawerOpen = false;
 
     if (changedProps.has('_messages')) {
       if (this._messages.length > 0) {
@@ -224,11 +202,7 @@ class KmapMain extends connect(store)(LitElement) {
   }
 
   _renderMessages() {
-    return html`
-            ${this._messages.map((message, i) => html`
-                <li>${message}</li>
-            `)}
-      `;
+    return this._messages.join("\n");
   }
 
   _toggleLayer(layer) {
@@ -246,6 +220,10 @@ class KmapMain extends connect(store)(LitElement) {
 
       store.dispatch(addLayer(layer));
     }
+  }
+
+  _showLogin() {
+    this._loginPopup.show();
   }
 }
 

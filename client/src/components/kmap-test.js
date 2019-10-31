@@ -1,21 +1,19 @@
 import {LitElement, html, css} from 'lit-element';
 import {updateTitle, showMessage} from "../actions/app";
-import 'mega-material/button';
-import 'mega-material/icon-button';
-import 'mega-material/list';
-import 'mega-material/slider';
-import 'mega-material/textfield';
-import 'mega-material/top-app-bar';
-import 'mega-material/surface';
 import {store} from "../store";
 import {fetchSubjectsIfNeeded, fetchChaptersIfNeeded, fetchTreeIfNeeded, fetchTestsIfNeeded} from "../actions/tests";
 import {connect} from "pwa-helpers/connect-mixin";
+import {storeState} from "../actions/states";
 
+import {colorStyles, fontStyles} from "./kmap-styles";
+import '@material/mwc-button';
+import '@material/mwc-icon-button';
+import '@material/mwc-formfield';
+import '@material/mwc-slider';
+import '@material/mwc-top-app-bar';
 import './kmap-test-card';
 import './kmap-test-result-card';
 import './kmap-test-editor-scroller';
-import {colorStyles, fontStyles} from "./kmap-styles";
-import {storeState} from "../actions/states";
 
 class KmapTest extends connect(store)(LitElement) {
   static get styles() {
@@ -24,20 +22,16 @@ class KmapTest extends connect(store)(LitElement) {
       fontStyles,
       colorStyles,
       css`
-          :host {
-              overflow-y: hidden;
-          }
+:host {
+  display: contents;
+}
 .page {
-    position: absolute;
-    top: 0px;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    margin-top: 64px;
-    overflow-y: auto;
-    visibility: hidden;
-    opacity: 0.0;
-    transition: opacity .8s;
+  display: none;
+  transition: opacity .8s;
+  padding: 8px;
+}
+.page[active] {
+  display: block;
 }
 kmap-test-editor-scroller {
     position: absolute;
@@ -45,10 +39,6 @@ kmap-test-editor-scroller {
     left: 0;
     right: 0;
     bottom: 0;
-}
-.page[active] {
-    visibility: visible;
-    opacity: 1.0;
 }
 [hidden] {
     display: none;
@@ -59,10 +49,6 @@ mega-surface {
   box-shadow: var(--elevation);
   background-color: whitesmoke;
 }
-mega-button[disabled] {
-  pointer-events: none;
-  color: var(--color-darkgray);
-  opacity: .5;
 }
 .result-cards {
   display: flex;
@@ -76,30 +62,32 @@ kmap-test-result-card {
   }
 
   render() {
+    // language=HTML
     return html`
-<mega-top-app-bar>
-  <mega-icon-button icon="menu" slot="navigationIcon"></mega-icon-button>
-  <div slot="title">Test</div>
-</mega-top-app-bar>
+      <mwc-top-app-bar id="bar" dense>
+        <mwc-icon-button icon="menu" slot="navigationIcon" @click="${e => this._fire('toggleDrawer')}"></mwc-icon-button>
+        <div slot="title">Test</div>
+        <kmap-login-button slot="actionItems" @lclick="${e => this._fire('login')}"></kmap-login-button>
+      </mwc-top-app-bar>
 
-<div class="page" ?active="${this._page === 'start'}">
+<div id="start" class="page" ?active="${this._page === 'start'}">
   <mega-surface style="--elevation: var(--elevation-01)">
     <label section>Thema auswählen</label>
     <br/><br/>
-    <div>
-      <mega-formfield alignend="" label="Fach">
-        <select @change="${this._subjectChanged}">
+    <div class="mdc-elevation--z1">
+      <mwc-formfield alignend="" label="Fach">
+        <select @change="${e => this.subject = e.target.value}">
           <option>- - -</option>
           ${this.subjects.map((subject, j) => html`<option>${subject}</option>`)}
         </select>
-      </mega-formfield>
+      </mwc-formfield>
       ${this.arrangedChapters ? html`
-        <mega-formfield alignend="" label="Kapitel">
-          <select @change="${this._chapterChanged}">
+        <mwc-formfield alignend="" label="Kapitel">
+          <select @change="${e => this.chapter = e.target.value.split(" - ").pop()}">
             <option>- - -</option>
             ${this.arrangedChapters.map((chapter, j) => html`<option>${chapter.replace(".", " - ")}</option>`)}
           </select>
-        </mega-formfield>
+        </mwc-formfield>
       `
       : html`
         <label class="secondary" style="vertical-align: sub; padding-left: 16px">Zu diesem Fach gibt es noch keine Aufgaben</label>
@@ -110,13 +98,12 @@ kmap-test-result-card {
     <br/><br/>
     <div>
       <span style="vertical-align: top; display: inline-block; width: 36px">${this._number}</span>
-      <input type="range" style="display: inline-block" class="form" .value="${this._number}" step="3" min="3" max="${this._maxNumber}" @input="${this._numberChange}"/>
+      <mwc-slider id="slider" ?disabled="${!this._allTests || this._allTests.length === 0}" style="display: inline-block" class="form" value="${this._number}" discrete="" markers="" step="3" min="3" max="${this._maxNumber}" @MDCSlider:change=${e => this._number = e.target.value}></mwc-slider>
     </div>
-    <br/><br/>
-    <mega-button @click="${this._start}" ?disabled="${!this._allTests || this._allTests.length === 0}">Starten</mega-button>
+    <mwc-button @click="${this._start}" ?disabled="${!this._allTests || this._allTests.length === 0}">Starten</mwc-button>
   </mega-surface>
 </div>
-<div class="page" ?active="${this._page === 'tests'}">
+<div id="tests" class="page" ?active="${this._page === 'tests'}">
   <div style="margin: 32px">
     ${this._currentTest ? html`
       <kmap-test-card id="test-card" @next="${this._next}"
@@ -133,7 +120,7 @@ kmap-test-result-card {
       : ''}
   </div>
 </div>
-<div class="page" ?active="${this._page === 'result'}">
+<div id="result" class="page" ?active="${this._page === 'result'}">
   <mega-surface style="--elevation: var(--elevation-01)">
     ${this.summary ? html`
       <label>Ergebnis</label>
@@ -162,7 +149,7 @@ kmap-test-result-card {
       </label>
       <br/><br/>`
       : ''}
-    <mega-button @click="${this._back}">Zurück zum Start</mega-button>
+    <mwc-button @click="${this._back}">Zurück zum Start</mwc-button>
   </mega-surface>
 </div>
   ${this._layers.includes('editor') ? html`
@@ -211,6 +198,10 @@ kmap-test-result-card {
 
   updated(changedProperties) {
     if (changedProperties.has("_page")) {
+      let bar = this.shadowRoot.getElementById('bar');
+      let page = this.shadowRoot.getElementById(this._page);
+      bar.scrollTarget = page;
+
       switch (this._page) {
         case 'start':
         case 'tests':
@@ -426,17 +417,8 @@ kmap-test-result-card {
     }
   }
 
-  _subjectChanged(event) {
-    this.subject = event.target.value;
-  }
-
-  _chapterChanged(event) {
-    let path = event.target.value.split(" - ");
-    this.chapter = path[path.length - 1];
-  }
-
-  _numberChange(event) {
-    this._number = event.target.value;
+  _fire(name) {
+    this.dispatchEvent(new CustomEvent(name, {bubbles: true, composed: true}));
   }
 }
 customElements.define('kmap-test', KmapTest);

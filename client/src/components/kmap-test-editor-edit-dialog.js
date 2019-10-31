@@ -3,18 +3,22 @@ import {connect} from "pwa-helpers/connect-mixin";
 import {store} from "../store";
 import {logout, unsetTestForEdit, showMessage} from "../actions/app";
 import {handleErrors} from "../actions/fetchy";
-import {config} from "../config";
-import {colorStyles, fontStyles} from "./kmap-styles";
-import 'mega-material/button';
-import 'mega-material/dialog';
-import 'mega-material/list';
-import './kmap-summary-card-summary';
-import './kmap-knowledge-card-description';
 import {loadSets, selectSet} from "../actions/content-sets";
 import {loadSet, saveTest} from "../actions/test-editor";
+import {config} from "../config";
+import {colorStyles, fontStyles} from "./kmap-styles";
+
+import '@material/mwc-button';
+import '@material/mwc-icon-button';
+import '@material/mwc-dialog';
+import '@material/mwc-formfield';
+import '@material/mwc-slider';
+import '@material/mwc-textarea';
+import '@material/mwc-textfield';
+import './kmap-summary-card-summary';
+import './kmap-knowledge-card-description';
 
 class KMapTestEditorEditDialog extends connect(store)(LitElement) {
-
   static get styles() {
     // language=CSS
     return [
@@ -24,12 +28,11 @@ class KMapTestEditorEditDialog extends connect(store)(LitElement) {
 form {
   width: 510px;
 }
-textarea {
-  width: 100%;
-  resize: vertical;
+mwc-icon-button, mwc-button {
+  vertical-align: middle
 }
 .preview {
-  height: 52px;
+  position: static;
   width: 100%;
   pointer-events: none;
   text-align: left;
@@ -49,9 +52,9 @@ textarea {
 }
 kmap-test-card {
   position: absolute;
-  top: -20px;
-  left: 24px;
-  width: 300px;
+  top: 4px;
+  left: 0px;
+  width: 100%;
   display: block;
   box-sizing: border-box;
   background-color: var(--color-lightgray);
@@ -66,47 +69,38 @@ kmap-test-card {
   render() {
     // language=HTML
     return html`
-<mega-dialog id="editDialog" title="Editor">
+<mwc-dialog id="editDialog" title="Editor">
 ${this._test ? html`
   <form @focus="${this._focus}">
-    <div class="field">
-      <label for="chapter">Kapitel</label>
+    <mwc-formfield alignend="" label="Kapitel">
       <select required @change="${e => this._chapter = e.target.value}">
         <option>- - -</option>
         ${this._chapters.map((chapter, i) => html`<option ?selected="${chapter === this._chapter}">${chapter}</option>`)}
       </select>
-      <label for="topic">Thema</label>
+      </mwc-formfield>
+      <mwc-formfield alignend="" label="Thema">
       <select required @change="${e => this._topic = e.target.value}">
         <option>- - -</option>
         ${this._topics.map((topic, i) => html`<option ?selected="${topic === this._topic}">${topic}</option>`)}
       </select>
-    </div>
-    <div class="field">
-      <label for="key"></label>
-      <input id="key" type="text" placeholder="Titel ..." .value="${this._key}" @change="${e => this._key = e.target.value}"/>
-      <label for="level"></label>
-      <input id="level" type="number" placeholder="Level" inputmode="numeric" min="1" max="3" step="1" .value="${this._level}" @change="${e => this._level = e.target.value}"/>
-    </div>
-    <div class="field">
-      <label for="balance">Layout Verhältnis Frage zu Antwort: ${this._balance} zu ${6 - this._balance}</label>
-      <input type="range" id="balance" name="balance" min="0" max="5" value="${this._balance}" @change="${e => this._balance = e.target.value}">
-    </div>
-    <div class="field">
-      <label for="question">Frage</label>
-      <textarea id="question" rows="5" .value="${this._question}" @keyup="${this._setQuestion}" @focus="${this._focus}" @blur="${this._focus}"></textarea>
-      <label for="answer">Antwort</label>
-      <textarea id="answer" rows="5" .value="${this._answer}" @keyup="${this._setAnswer}" @focus="${this._focus}" @blur="${this._focus}"></textarea>
-    </div>
+    </mwc-formfield>
+    <br/>
+    <mwc-textfield id="key" name="key" label="Titel" dense type="text" .value="${this._key}" @change="${e => this._key = e.target.value}"></mwc-textfield>
+    <mwc-textfield id="level" name="level" label="Level" dense type="number" inputmode="numeric" min="1" max="3" step="1" .value="${this._level}" @change="${e => this._level = e.target.value}"></mwc-textfield>
+    <br/>
+    <mwc-formfield alignend="" label="Layout Verhältnis Frage zu Antwort: ${this._balance} zu ${6 - this._balance}   ">
+      <mwc-slider id="balance" style="vertical-align:middle" .value="${this._balance}" discrete="" markers="" min="0" max="5" @MDCSlider:change=${e => this._balance = e.target.value}></mwc-slider>
+    </mwc-formfield>
+    <br/>
+    <mwc-textarea id="question" placeholder="Frage" fullwidth rows="4" .value=${this._question} @keyup="${this._setQuestion}" @focus="${this._focus}" @blur="${this._focus}"></mwc-textarea>
+    <mwc-textarea id="answer" placeholder="Antwort" required fullwidth rows="4" .value=${this._answer} @keyup="${this._setAnswer}" @focus="${this._focus}" @blur="${this._focus}"></mwc-textarea>
+
     <div class="field values">
       <label for="attachments">Werte (Checkboxen: true/false, Dezimalzahlen mit Punkt statt Komma)</label>
       ${this._values.map((value, i) => html`<input type="text" .value="${this._values[i]}" @change="${e => this._values[i] = e.target.value}"/>`)}
     </div>
   </form>` : ''}
-  <mega-icon-button slotd="action" icon="folder_open" title="Cloud Verzeichnis öffnen" @click=${this._createDirectory}></mega-icon-button>
-  <mega-button class="button" slotd="action" primary @click=${this._save}>Speichern</mega-button>
-  <mega-button class="button" slotd="action" @click=${this._cancel}>Abbrechen</mega-button>
-  <div class="preview" slot="action">
-    <label style="text-align: center; display: block">» Preview «</label>
+  <div class="preview">
     ${this._showPreview ? html`<kmap-test-card hideHeader
                                 .subject="${this._subject}"
                                 .chapter="${this._chapter}"
@@ -117,7 +111,11 @@ ${this._test ? html`
                                 .answer="${this._answer}"
                                 .num="1" .of="1"></kmap-test-card>` : ''}
   </div>
-</mega-dialog>
+
+  <mwc-icon-button slot="secondaryAction" icon="folder_open" title="Cloud Verzeichnis öffnen" @click=${this._createDirectory}></mwc-icon-button>
+  <mwc-button slot="secondaryAction" @click=${this._cancel}>Abbrechen</mwc-button>
+  <mwc-button slot="primaryAction" @click=${this._save}>Speichern</mwc-button>
+</mwc-dialog>
     `;
     }
 
@@ -170,7 +168,7 @@ ${this._test ? html`
 
   updated(changedProperties) {
     if (changedProperties.has('_test') && this._test) {
-      this._editDialog.open();
+      this._editDialog.open = true
 
       this._subject  = this._test.subject;
       this._chapter  = this._test.chapter;
@@ -181,6 +179,8 @@ ${this._test ? html`
       this._answer   = this._test.answer;
       this._values   = this._test.values || [];
       this._oldValues = [...this._values];
+
+      this._editDialog.forceLayout();
     }
 
     if (changedProperties.has('_subject'))
@@ -282,16 +282,16 @@ ${this._test ? html`
 
   _focus(e) {
     if (e.type === "blur") {
-      this._showPreview = false;
+      this._showPreview = true;
     }
     else if (e.type === "focus") {
-      if (e.path[0].id === "question" || e.path[0].id === "answer" || e.path[0].id === "balance")
+      if (e.srcElement.id === "question" || e.srcElement.id === "answer" || e.srcElement.id === "balance")
         this._showPreview = true;
     }
   }
 
   _save() {
-    this._editDialog.close();
+    this._editDialog.open = false;
 
     this._test.subject  = this._subject;
     this._test.chapter  = this._chapter;
@@ -318,7 +318,7 @@ ${this._test ? html`
   }
 
   _cancel() {
-    this._editDialog.close();
+    this._editDialog.open = false;
     store.dispatch(unsetTestForEdit());
   }
 

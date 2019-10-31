@@ -1,61 +1,59 @@
 import {LitElement, html, css} from 'lit-element';
 import {connect} from "pwa-helpers/connect-mixin";
 import {store} from "../store";
-import {fontStyles, colorStyles} from "./kmap-styles";
-import 'mega-material/fab';
 import {setCardForEdit} from "../actions/app";
+import {fontStyles, colorStyles} from "./kmap-styles";
+
+import '@material/mwc-button';
+import '@material/mwc-dialog';
+import '@material/mwc-fab';
+import '@material/mwc-textfield';
 
 class KMapEditorAddFabs extends connect(store)(LitElement) {
-
   static get styles() {
     // language=CSS
     return [
       fontStyles,
       colorStyles,
       css`
-mega-fab {
-  position: absolute;
+:host {
+    display: contents;
+}
+mwc-textfield {
+    margin-bottom: 4px;
+}
+mwc-fab {
+  position: fixed;
   right: 16px;
   z-index: 100;
-  --mega-theme-secondary: var(--color-secondary);
-  --mega-theme-on-secondary: black;
+  overflow: visible;
+  --mdc-theme-secondary: var(--color-secondary);
+  --mdc-theme-on-secondary: black;
 }
-
 .primary {
   bottom: 16px;
 }
-
 .one {
   bottom: 104px;
 }
-
 .two {
   bottom: 184px;
 }
-
 .three {
   bottom: 264px;
 }
-
 .four {
   bottom: 344px;
 }
-
 .secondary {
-  --mega-theme-secondary: var(--color-secondary-light);
+  --mdc-theme-secondary: var(--color-secondary-light);
   opacity: 1;
   transition: bottom .3s ease-in-out, opacity .2s ease-in;
 }
-
 .secondary[exited] {
   bottom: 20px !important;
   opacity: 0;
-}
-input {
-  float: right;
-}
-[readonly] {
-  background-color: var(--color-lightgray);
+  pointer-events: none;
 }
       `];
   }
@@ -63,36 +61,24 @@ input {
   render() {
     // language=HTML
     return html`
-      <mega-fab icon="${this._opened ? 'clear' : 'add'}" class="primary" ?exited="${!this._fabs}" @click="${this._open}"></mega-fab>
-      <mega-fab icon="add" label="Fach"    mini class="secondary one"   ?exited="${!this._opened}" @click="${this._addSubject}"></mega-fab>
-      <mega-fab icon="add" label="Modul"   mini class="secondary two"   ?exited="${!this._opened || !this._currentSubject}" @click="${this._addModule}"></mega-fab>
-      <mega-fab icon="add" label="Kapitel" mini class="secondary three" ?exited="${!this._opened || !this._currentModule}" @click="${this._addChapter}"></mega-fab>
-      <mega-fab icon="add" label="Thema"   mini class="secondary four"  ?exited="${!this._opened || !this._currentModule || !this._currentChapter}" @click="${this._addTopic}"></mega-fab>
+      <mwc-fab icon="${this._opened ? 'clear' : 'add'}" class="primary" ?exited="${!this._fabs}" @click="${this._open}"></mwc-fab>
+      <mwc-fab icon="add" label="Fach"    extended mini class="secondary one"   ?exited="${!this._opened}" @click="${this._addSubject}"></mwc-fab>
+      <mwc-fab icon="add" label="Modul"   extended mini class="secondary two"   ?exited="${!this._opened || !this._currentSubject}" @click="${this._addModule}"></mwc-fab>
+      <mwc-fab icon="add" label="Kapitel" extended mini class="secondary three" ?exited="${!this._opened || !this._currentModule}" @click="${this._addChapter}"></mwc-fab>
+      <mwc-fab icon="add" label="Thema"   extended mini class="secondary four"  ?exited="${!this._opened || !this._currentModule || !this._currentChapter}" @click="${this._addTopic}"></mwc-fab>
       
-      <mega-dialog id="addDialog" title="${this._title()}">
+      <mwc-dialog id="addDialog" title="${this._title()}">
         <form id="addForm" @keyup="${this._maybeEnter}">
           <label>${this._explanation()}</label>
           <br/>
-          <div class="field">
-            <label for="subject">Fach</label>
-            <input id="subject" name="subject" type="text" .value="${this._subject}" @change="${e => {this._subject = e.target.value; this._chapter = this._subject}}" ?readonly="${this._mode !== 'subject'}"/>
-          </div>
-          <div class="field">
-            <label for="module">Modul</label>
-            <input id="module" name="module" type="text" .value="${this._module}" @change="${e => this._module = e.target.value}" ?readonly="${this._mode !== 'module' && this._mode !== 'subject'}"/>
-          </div>
-          <div class="field">
-            <label for="chapter">Kapitel</label>
-            <input id="chapter" name="chapter" type="text" .value="${this._chapter}" @change="${e => this._chapter = e.target.value}" ?readonly="${this._mode !== 'module' && this._mode !== 'chapter'}"/>
-          </div>
-          <div class="field">
-            <label for="topic">Thema</label>
-            <input id="topic" name="topic" type="text" .value="${this._topic}" @change="${e => this._topic = e.target.value}"/>
-          </div>
+        <mwc-textfield label="Fach" type="text" .value="${this._subject}" @change="${e => {this._subject = e.target.value; this._chapter = this._subject}}" ?disabled="${this._mode !== 'subject'}"></mwc-textfield>
+        <mwc-textfield label="Modul" type="text" .value="${this._module}" @change="${e => this._module = e.target.value}" ?disabled="${this._mode !== 'module' && this._mode !== 'subject'}"></mwc-textfield>
+        <mwc-textfield label="Kapitel" type="text" .value="${this._chapter}" @change="${e => this._chapter = e.target.value}" ?disabled="${this._mode !== 'module' && this._mode !== 'chapter'}"></mwc-textfield>
+        <mwc-textfield label="Thema" type="text" .value="${this._topic}" @change="${e => this._topic = e.target.value}"></mwc-textfield>
         </form>
-        <mega-button slot="action" primary close @click="${this._ok}">Erstellen</mega-button>
-        <mega-button slot="action" primary close @click="${this._cancel}">Abbrechen</mega-button>
-      </mega-dialog>
+        <mwc-button slot="secondaryAction" dialogAction="cancel">Abbrechen</mwc-button>
+        <mwc-button slot="primaryAction" @click="${this._ok}">Erstellen</mwc-button>
+      </mwc-dialog>
     `;
   }
 
@@ -192,7 +178,7 @@ input {
     this._module = this._currentModule;
     this._chapter = this._currentChapter;
     this._topic = '';
-    this.shadowRoot.getElementById('addDialog').open();
+    this.shadowRoot.getElementById('addDialog').open = true;
   }
 
   _addChapter() {
@@ -202,7 +188,7 @@ input {
     this._module = this._currentModule;
     this._chapter = '';
     this._topic = '';
-    this.shadowRoot.getElementById('addDialog').open();
+    this.shadowRoot.getElementById('addDialog').open = true;
   }
 
   _addModule() {
@@ -212,7 +198,7 @@ input {
     this._module = '';
     this._chapter = '';
     this._topic = '';
-    this.shadowRoot.getElementById('addDialog').open();
+    this.shadowRoot.getElementById('addDialog').open = true;
   }
 
   _addSubject() {
@@ -222,7 +208,7 @@ input {
     this._module = '';
     this._chapter = '';
     this._topic = '';
-    this.shadowRoot.getElementById('addDialog').open();
+    this.shadowRoot.getElementById('addDialog').open = true;
   }
 
   _ok() {
@@ -236,6 +222,7 @@ input {
     };
     console.log(card);
     store.dispatch(setCardForEdit(card));
+    this.shadowRoot.getElementById('addDialog').open = false;
   }
 }
 

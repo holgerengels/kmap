@@ -7,14 +7,18 @@ import {fetchMapIfNeeded, invalidateMap} from "../actions/maps";
 import {handleErrors} from "../actions/fetchy";
 import {config} from "../config";
 import {colorStyles, fontStyles} from "./kmap-styles";
-import 'mega-material/button';
-import 'mega-material/dialog';
-import 'mega-material/list';
+
+import '@material/mwc-button';
+import '@material/mwc-icon-button';
+import '@material/mwc-dialog';
+import '@material/mwc-formfield';
+import '@material/mwc-slider';
+import '@material/mwc-textarea';
+import '@material/mwc-textfield';
 import './kmap-summary-card-summary';
 import './kmap-knowledge-card-description';
 
 class KMapEditorEditDialog extends connect(store)(LitElement) {
-
   static get styles() {
     // language=CSS
     return [
@@ -24,12 +28,14 @@ class KMapEditorEditDialog extends connect(store)(LitElement) {
 form {
   width: 510px;
 }
-textarea {
-  width: 100%;
-  resize: vertical;
+mwc-icon-button, mwc-button {
+  vertical-align: middle
+}
+mwc-textfield, mwc-textarea {
+    margin-bottom: 4px;
 }
 .preview {
-  height: 52px;
+  position: static;
   width: 100%;
   pointer-events: none;
   text-align: left;
@@ -49,9 +55,9 @@ textarea {
 }
 kmap-summary-card-summary {
   position: absolute;
-  top: -20px;
-  left: 24px;
-  width: 300px;
+  top: 4px;
+  left: 0px;
+  width: 100%;
   display: block;
   box-sizing: border-box;
   background-color: var(--color-lightgray);
@@ -68,7 +74,7 @@ kmap-knowledge-card-description {
 .attachment {
   display: block;
 }
-.attachments mega-icon {
+.attachments mwc-icon {
   pointer-events: all;
   cursor: pointer;
   vertical-align: middle;
@@ -94,36 +100,22 @@ kmap-knowledge-card-description {
   render() {
     // language=HTML
     return html`
-<mega-dialog id="editDialog" title="Editor">
+<mwc-dialog id="editDialog" title="Editor">
 ${this._card ? html`
   <form @focus="${this._focus}">
-    <div class="field">
-      <label for="topic">Thema</label>
-      <span id="topic">${this._card.topic !== '_' ? this._card.topic : "Allgemeines zu " + this._card.chapter}</span>
-    </div>
-    <div class="field" ?hidden="${this._card.topic === '_'}">
-      <label for="links"></label>
-      <input id="links" type="text" placeholder="Verweist auf ..." .value="${this._card.links}" @change="${e => this._card.links = e.target.value}"/>
-      <label for="priority"></label>
-      <input id="priority" type="number" placeholder="Priorität" inputmode="numeric" min="0" step="1" .value="${this._card.priority}" @change="${e => this._card.priority = e.target.value}"/>
-    </div>
-    <div class="field" ?hidden="${this._card.topic === '_'}">
-      <label for="depends">Basiert auf ...</label>
-      <textarea id="depends" rows="3" .value="${this._depends}" @change="${e => this._depends = e.target.value}"></textarea>
-    </div>
-    <div class="field">
-      <label for="summary">Kurztext</label>
-      <textarea id="summary" rows="3" .value="${this._card.summary}" @keyup="${this._setSummary}" @focus="${this._focus}" @blur="${this._focus}"></textarea>
-    </div>
-    <div class="field">
-      <label for="description">Langtext</label>
-      <textarea id="description" rows="7" .value="${this._card.description}" @keyup="${this._setDescription}" @focus="${this._focus}" @blur="${this._focus}"></textarea>
-    </div>
+    <mwc-textfield id="topic" name="topic" disabled label="Thema" dense type="text" .value="${this._card.topic !== '_' ? this._card.topic : "Allgemeines zu " + this._card.chapter}"></mwc-textfield>
+    <br/>
+    <mwc-textfield ?hidden="${this._card.topic === '_'}" id="links" name="links" label="Verweist auf ..." dense type="text" .value="${this._card.links}" @change="${e => this._card.links = e.target.value}"></mwc-textfield>
+    <mwc-textfield ?hidden="${this._card.topic === '_'}" id="priority" name="priority" label="Priorität" dense type="number" inputmode="numeric" min="0" step="1" .value="${this._card.priority}" @change="${e => this._card.priority = e.target.value}"></mwc-textfield>
+    <mwc-textarea ?hidden="${this._card.topic === '_'}" id="depends" placeholder="Basiert auf ..." dense fullwidth rows="2" .value=${this._depends}></mwc-textarea>
+    <mwc-textarea id="summary" placeholder="Kurztext" dense fullwidth rows="2" .value=${this._card.summary} @keyup="${this._setSummary}" @focus="${this._focus}" @blur="${this._focus}"></mwc-textarea>
+    <mwc-textarea id="description" placeholder="Langtext" dense fullwidth rows="7" .value=${this._card.description} @keyup="${this._setDescription}" @focus="${this._focus}" @blur="${this._focus}"></mwc-textarea>
+
     <div class="field attachments">
       <label for="attachments">Materialien</label>
       ${this._card.attachments.map((attachment, i) => html`
         <div class="attachment">
-          ${attachment.type === 'link' ? html`<mega-icon @click="${() => this._deleteAttachment(attachment)}">delete</mega-icon>` : ''}
+          ${attachment.type === 'link' ? html`<mwc-icon @click="${() => this._deleteAttachment(attachment)}">delete</mwc-icon>` : ''}
           <span class="tag">[${_tags.get(attachment.tag)}]</span> ${attachment.name}
           ${attachment.type === 'link' ? html`<span slot="secondary">${attachment.href}</span>` : ''}
         </div>
@@ -136,15 +128,10 @@ ${this._card ? html`
       </select>
       <input id="name" type="text" placeholder="Name" .value="${this._attachmentName}" @change="${e => this._attachmentName = e.target.value}"/>
       <input id="href" type="url" placeholder="Link" .value="${this._attachmentHref}" @change="${e => this._attachmentHref = e.target.value}"/>
-      <mega-icon @click="${this._addAttachment}">add_circle</mega-icon>
+      <mwc-icon @click="${this._addAttachment}">add_circle</mwc-icon>
     </div>
   </form>` : ''}
-  <mega-icon-button slotd="action" icon="cached" title="Materialien aus Cloud synchronisieren" @click=${this._syncAttachments}></mega-icon-button>
-  <mega-icon-button slotd="action" icon="folder_open" title="Cloud Verzeichnis öffnen" @click=${this._createDirectory}></mega-icon-button>
-  <mega-button class="button" slotd="action" primary @click=${this._save}>Speichern</mega-button>
-  <mega-button class="button" slotd="action" @click=${this._cancel}>Abbrechen</mega-button>
-  <div class="preview" slot="action">
-  <label style="text-align: center; display: block">» Preview «</label>
+  <div class="preview">
   ${this._showSummaryPreview ? html`<kmap-summary-card-summary .summary="${this._summary}"></kmap-summary-card-summary>` : ''}
   ${this._showDescriptionPreview ? html`<div class="preview-scroller"><kmap-knowledge-card-description 
     .subject="${this._subject}"
@@ -153,7 +140,12 @@ ${this._card ? html`
     .description="${this._description}"
     ></kmap-knowledge-card-description></div>` : ''}
   </div>
-</mega-dialog>
+
+  <mwc-icon-button slot="secondaryAction" icon="cached" title="Materialien aus Cloud synchronisieren" @click=${this._syncAttachments}></mwc-icon-button>
+  <mwc-icon-button slot="secondaryAction" icon="folder_open" title="Cloud Verzeichnis öffnen" @click=${this._createDirectory}></mwc-icon-button>
+  <mwc-button slot="secondaryAction" @click=${this._cancel}>Abbrechen</mwc-button>
+  <mwc-button slot="primaryAction" @click=${this._save}>Speichern</mwc-button>
+</mwc-dialog>
     `;
     }
 
@@ -203,7 +195,7 @@ ${this._card ? html`
       this._attachmentTag = '';
       this._attachmentName = '';
       this._attachmentHref = '';
-      this._editDialog.open();
+      this._editDialog.open = true;
 
       this._summary = this._card.summary;
       this._description = this._card.description;
@@ -247,15 +239,16 @@ ${this._card ? html`
       this._showDescriptionPreview = false;
     }
     else if (e.type === "focus") {
-      if (e.path[0].id === "summary")
+      if (e.srcElement.id === "summary")
         this._showSummaryPreview = true;
-      else if (e.path[0].id === "description")
+      else if (e.srcElement.id === "description")
         this._showDescriptionPreview = true;
     }
   }
 
   _save() {
-    this._editDialog.close();
+    this._editDialog.open = false;
+
     this._card.subject = this._subject;
     this._card.chapter = this._chapter;
     this._card.summary = this._summary;
@@ -277,7 +270,7 @@ ${this._card ? html`
   }
 
   _cancel() {
-    this._editDialog.close();
+    this._editDialog.open = false;
     store.dispatch(unsetCardForEdit());
   }
 

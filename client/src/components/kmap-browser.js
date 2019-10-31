@@ -5,8 +5,11 @@ import {updateTitle, showMessage} from "../actions/app";
 import {fetchMapIfNeeded} from "../actions/maps";
 import {storeState} from "../actions/states";
 
-import 'mega-material/icon-button';
-import 'mega-material/top-app-bar';
+import {colorStyles, fontStyles} from "./kmap-styles";
+import '@material/mwc-icon';
+import '@material/mwc-icon-button';
+import '@material/mwc-top-app-bar';
+import './kmap-login-button';
 import './kmap-summary-card';
 import './kmap-knowledge-card';
 import './kmap-browser-chapter-editor';
@@ -15,97 +18,62 @@ class KMapBrowser extends connect(store)(LitElement) {
   static get styles() {
     // language=CSS
     return [
+      fontStyles,
+      colorStyles,
       css`
-        :host {
-            overflow: hidden;
-        }
-        .scrollpane {
-          white-space: nowrap;
-          display: block;
-          -webkit-overflow-scrolling: touch;
-        }
-        .scrollpane:hover::-webkit-scrollbar-thumb {
-            background-color: var(--color-mediumgray);
-        }
-        .scrollpane::-webkit-scrollbar {
-          width: 8px;
-          height: 8px;
-        }
-        .scrollpane::-webkit-scrollbar-thumb {
-            transition: background-color;
-          border-radius: 10px;
-        }
-
-        .board {
-          height: auto;
-          outline: none;
-          padding: 8px;
-          padding-bottom: 36px;
-        }
-
-        .detail {
-          height: auto;
-          outline: none;
-          padding: 8px;
-        }
-        .chapter-line {
-            margin: 8px 6px;
-            padding: 4px 0px;
-            line-height: 24px;
-            color: var(--color-darkgray);
-        }
-        .chapter-line a {
-            color: var(--color-mediumgray);
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        .chapter-line a:hover {
-            text-decoration: underline;
-        }
-        .line {
-          outline: none;
-          overflow-x: scroll;
-          margin-top: 2px;
-        }
-
-        .page {
-          position: absolute;
-          top: 0px;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          margin-top: 64px;
-          overflow-y: auto;
-          visibility: hidden;
-          opacity: 0.0;
-          transition: opacity .8s;
-          padding: 8px;
-        }
-
-        .page[active] {
-          visibility: visible;
-          opacity: 1.0;
-        }
-
-        kmap-summary-card {
-          vertical-align: top;
-          margin: 6px;
-            margin-top: 0px;
-        }
+:host {
+  display: contents;
+}
+.scrollpane {
+  white-space: nowrap;
+  display: block;
+  -webkit-overflow-scrolling: touch;
+  outline: none;
+  overflow-x: scroll;
+  margin-top: 2px;
+}
+.scrollpane:hover::-webkit-scrollbar-thumb {
+    background-color: var(--color-mediumgray);
+}
+.scrollpane::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.scrollpane::-webkit-scrollbar-thumb {
+  transition: background-color;
+  border-radius: 10px;
+}
+.chapter-line {
+    margin: 8px 6px;
+    padding: 4px 0px;
+    line-height: 24px;
+    color: var(--color-darkgray);
+}
+.page {
+  display: none;
+  padding: 8px;
+}
+.page[active] {
+  display: block;
+}
+a {
+  color: var(--color-mediumgray);
+}
       `];
   }
 
   render() {
+    // language=HTML
     return html`
-      <mega-top-app-bar>
-        <mega-icon-button icon="menu" slot="navigationIcon"></mega-icon-button>
+      <mwc-top-app-bar id="bar" dense>
+        <mwc-icon-button icon="menu" slot="navigationIcon" @click="${e => this._fire('toggleDrawer')}"></mwc-icon-button>
         <div slot="title">${this._chapter}</div>
-      </mega-top-app-bar>
-        <div class="page map" ?active="${this.page === 'map'}" @rated="${this._rated}">
+        <kmap-login-button slot="actionItems" @lclick="${e => this._fire('login')}"></kmap-login-button>
+      </mwc-top-app-bar>
+        <div id="map" class="page map" ?active="${this._page === 'map'}" @rated="${this._rated}">
           ${this._chapterCard ? html`
             <div class="chapter-line">
-              <a href="#browser/${this._subject}/${this._chapter}/_"><mega-icon style="float: right">fullscreen</mega-icon></a>
+              <a href="#browser/${this._subject}/${this._chapter}/_"><mwc-icon style="float: right">fullscreen</mwc-icon></a>
               ${this._chapterCard.depends ? html`
                 <div>
                   <b>Voraussetzung für das Kapitel ${this._chapter}:</b> ${this._chapterCard.depends.map((depend, j) => html`
@@ -125,17 +93,17 @@ class KMapBrowser extends connect(store)(LitElement) {
            ` : ''
           }
           ${this.lines.map((line, i) => html`
-            <div class="scrollpane line">
+            <div class="scrollpane">
               ${line.cards.map((card, j) => html`
                 <kmap-summary-card .subject="${this._subject}" .chapter="${this._chapter}" .card="${card}"></kmap-summary-card>
               `)}
             </div>
           `)}
         </div>
-        <div class="page topic" ?active="${this.page === 'topic'}" @rated="${this._rated}">
+        <div id="topic" class="page topic" ?active="${this._page === 'topic'}" @rated="${this._rated}">
             <kmap-knowledge-card .subject="${this._subject}" .chapter="${this._chapter}" .card="${this.topicCard}"></kmap-knowledge-card>
         </div>
-        <div class="page search" ?active="${this.page === 'search'}">
+        <div id="search" class="page search" ?active="${this._page === 'search'}">
             search
         </div>
     `;
@@ -158,7 +126,7 @@ class KMapBrowser extends connect(store)(LitElement) {
       board: {type: Object},
       chapterLine: {type: Array},
       lines: {type: Array},
-      page: {type: String},
+      _page: {type: String},
       mapHeight: {type: Number},
       mapScroll: {type: Number},
       detailCard: {type: Object},
@@ -175,65 +143,11 @@ class KMapBrowser extends connect(store)(LitElement) {
     this._layers = [];
   }
 
-  viewport() {
-    return window.innerHeight - 64;
-  }
-
-  adapt(height) {
-    if (height !== this.mapHeight) {
-      //console.log("adapt " + height);
-      this.mapHeight = height;
-      this.$$('#pages').style.height = height + "px";
-    }
-  }
-
-  mapChange() {
-    this.adapt(Math.max(this.$$('#board').clientHeight, this.viewport()));
-  }
-
-  filterChange() {
-    this.adapt(Math.max(this.$$('#filter').clientHeight, this.viewport()));
-  }
-
-  detailChange() {
-    this.adapt(Math.max(this.$$('#detail').clientHeight, this.viewport()));
-    console.log("dom change");
-  }
-
-  searchChanged(search) {
-    if (search === null || search.length === 0) {
-      this.filtered = null;
-    } else if (search.length >= 3) {
-      this.$$('#searchLoader').params = {search: search};
-    } else {
-      this.filtered = [];
-    }
-  }
-
-  filteredChanged(filtered) {
-    if (filtered === null) {
-      if (!this.topic) {
-        this.page = 0;
-        this.mapChange();
-        window.scrollTo(0, this.mapScroll);
-      } else {
-        this.page = 1;
-        this.detailChange();
-      }
-    } else {
-      this.page = 2;
-      this.filterChange();
-    }
-  }
-
-  _rated(e) {
-    var detail = e.detail;
-    if (this._userid) {
-      console.log("save " + detail.key + " := " + detail.rate);
-      store.dispatch(storeState({userid: this._userid, subject: this.routeSubject}, detail.key, detail.rate));
-    } else {
-      console.log("cannot save " + detail.key + " := " + detail.rate);
-      store.dispatch(showMessage("Achtung! Deine Eingaben können nur gespeichert werden, wenn Du angemeldet bist!"));
+  updated(changedProperties) {
+    if (changedProperties.has('_page')) {
+      let bar = this.shadowRoot.getElementById('bar');
+      let page = this.shadowRoot.getElementById(this._page);
+      bar.scrollTarget = page;
     }
   }
 
@@ -258,10 +172,10 @@ class KMapBrowser extends connect(store)(LitElement) {
         this.routeTopic = null;
 
       if (this.routeTopic) {
-        this.page = "topic";
+        this._page = "topic";
         store.dispatch(updateTitle(this.routeTopic));
       } else {
-        this.page = "map";
+        this._page = "map";
         store.dispatch(updateTitle(this.routeChapter));
       }
 
@@ -273,7 +187,6 @@ class KMapBrowser extends connect(store)(LitElement) {
       this._chapterCard = state.maps.map.chapterCard;
       this._subject = state.maps.map.subject;
       this._chapter = state.maps.map.chapter;
-      this._module = state.maps.map.module;
 
       let lines = state.maps.map.lines;
       if (lines[0].cards[0].row === -1) {
@@ -308,9 +221,53 @@ class KMapBrowser extends connect(store)(LitElement) {
     this._layers = state.app.layers;
   }
 
+  searchChanged(search) {
+    if (search === null || search.length === 0) {
+      this.filtered = null;
+    } else if (search.length >= 3) {
+      this.$$('#searchLoader').params = {search: search};
+    } else {
+      this.filtered = [];
+    }
+  }
+
+  /*
+  filteredChanged(filtered) {
+    if (filtered === null) {
+      if (!this.topic) {
+        this._page = 0;
+        this.mapChange();
+        window.scrollTo(0, this.mapScroll);
+      } else {
+        this._page = 1;
+        this.detailChange();
+      }
+    } else {
+      this._page = 2;
+      this.filterChange();
+    }
+  }
+   */
+
+  _rated(e) {
+    var detail = e.detail;
+    if (this._userid) {
+      console.log("save " + detail.key + " := " + detail.rate);
+      store.dispatch(storeState({userid: this._userid, subject: this.routeSubject}, detail.key, detail.rate));
+    }
+    else {
+      console.log("cannot save " + detail.key + " := " + detail.rate);
+      store.dispatch(showMessage("Achtung! Deine Eingaben können nur gespeichert werden, wenn Du angemeldet bist!"));
+    }
+  }
+
   activeChanged(active) {
     if (active && this.routeSubject && this.routeChapter)
       store.dispatch(fetchMapIfNeeded(this.routeSubject, this.routeChapter));
+  }
+
+  _fire(name) {
+    this.dispatchEvent(new CustomEvent(name, {bubbles: true, composed: true}));
   }
 }
 

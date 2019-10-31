@@ -2,14 +2,18 @@ import {LitElement, html, css} from 'lit-element';
 import {connect} from 'pwa-helpers/connect-mixin.js';
 import {store} from "../store";
 import {loadCourses, storeCourses, forgetCourses, storeCourse} from "../actions/courses";
-
-import 'mega-material/icon-button';
-import 'mega-material/list';
-import 'mega-material/top-app-bar';
-import {colorStyles, fontStyles} from "./kmap-styles";
-import {config} from "../config";
 import {logout, showMessage, updateTitle} from "../actions/app";
 import {handleErrors} from "../actions/fetchy";
+
+import {colorStyles, fontStyles} from "./kmap-styles";
+import {config} from "../config";
+import '@material/mwc-button';
+import '@material/mwc-icon';
+import '@material/mwc-icon-button';
+import '@material/mwc-textarea';
+import '@material/mwc-textfield';
+import '@material/mwc-top-app-bar';
+import 'mega-material/list';
 
 class KCourses extends connect(store)(LitElement) {
   static get styles() {
@@ -18,9 +22,9 @@ class KCourses extends connect(store)(LitElement) {
       fontStyles,
       colorStyles,
       css`
-          :host {
-              overflow-y: auto;
-          }
+:host {
+  display: contents;
+}
 .board {
   height: auto;
   padding: 8px;
@@ -39,22 +43,11 @@ class KCourses extends connect(store)(LitElement) {
   margin: 12px;
   flex: 1 1 100%;
 }
-.field {
-  display: flex;
-  justify-content: space-between;
-  margin: 12px;
-}
-.field input, .field textarea, .field div {
-  width: 210px;
-}
-textarea {
-  resize: vertical;
-}
 .scroll {
   height: 208px;
   overflow-y: auto;
 }
-mega-icon {
+mwc-icon {
   pointer-events: all;
   cursor: pointer;
 }
@@ -68,30 +61,35 @@ mega-list-item {
 }
 .page {
   display: none;
-  opacity: 0.0;
   transition: opacity .8s;
+  padding: 8px;
 }
 .page[active] {
   display: block;
-  opacity: 1.0;
 }
-        `
-    ];
+mwc-textarea, mwc-textfield {
+  width: 300px;
+  --mdc-text-field-filled-border-radius: 4px 16px 0 0;
+  margin: 4px 0;
+}        
+      `];
   }
 
   render() {
+    // language=HTML
     return html`
-      <mega-top-app-bar>
-        <mega-icon-button icon="menu" slot="navigationIcon"></mega-icon-button>
+      <mwc-top-app-bar id="bar" dense scrollTarget="board">
+        <mwc-icon-button icon="menu" slot="navigationIcon" @click="${e => this._fire('toggleDrawer')}"></mwc-icon-button>
         <div slot="title">Kurse</div>
-      </mega-top-app-bar>
-      <div class="board">
+        <kmap-login-button slot="actionItems" @lclick="${e => this._fire('login')}"></kmap-login-button>
+      </mwc-top-app-bar>
+      <div id="content" class="board">
         <div class="form">
           <label section>Kurse</label>
           <span style="float: right">
-          <mega-icon @click="${e => this._showPage('new')}" ?disabled="${!this._userid}">add</mega-icon>
-          <mega-icon @click="${e => this._showPage('edit')}" ?disabled="${!this._userid || this._selectedIndex === -1}">edit</mega-icon>
-          <mega-icon @click="${e => this._showPage('delete')}" ?disabled="${!this._userid || this._selectedIndex === -1}">delete</mega-icon>
+          <mwc-icon @click="${e => this._showPage('new')}" ?disabled="${!this._userid}">add</mwc-icon>
+          <mwc-icon @click="${e => this._showPage('edit')}" ?disabled="${!this._userid || this._selectedIndex === -1}">edit</mwc-icon>
+          <mwc-icon @click="${e => this._showPage('delete')}" ?disabled="${!this._userid || this._selectedIndex === -1}">delete</mwc-icon>
           </span>
           <br style="clear: right"/>
           <div class="scroll">
@@ -105,27 +103,15 @@ mega-list-item {
         <div class="form">
           <div class="page" ?active="${this._page === 'new'}">
             <label section>Neuer Kurs</label>
-            <div class="field">
-                <label for="newName">Name</label>
-                <input id="newName" required type="text" .value=${this._newName} @change=${e => this._newName = e.target.value}/>
-            </div>
-            <div class="field">
-                <label for="newStudents">Schüler</label>
-                <textarea id="newStudents" required rows="7" .value="${this._newStudents}" @change=${e => this._newStudents = e.target.value}></textarea>
-            </div>
-            <mega-button @click="${this._new}">Speichern</mega-button>
+            <mwc-textfield label="Name" type="text" required .value=${this._newName} @change=${e => this._newName = e.target.value}></mwc-textfield>
+            <mwc-textarea placeholder="Schüler" required rows="7" .value=${this._newStudents} @change=${e => this._newStudents = e.target.value}></mwc-textarea>
+            <mwc-button @click="${this._new}">Speichern</mwc-button>
           </div>
           <div class="page" ?active="${this._page === 'edit'}">
             <label section>Kurs bearbeiten</label>
-            <div class="field">
-                <label for="editName">Name</label>
-                <input id="editName" required type="text" .value=${this._editName} disabled/>
-            </div>
-            <div class="field">
-                <label for="editStudents">Schüler</label>
-                <textarea id="editStudents" required rows="7" .value="${this._editStudents}" @change=${e => this._editStudents = e.target.value}></textarea>
-            </div>
-            <mega-button @click="${this._edit}">Speichern</mega-button>
+            <mwc-textfield type="text" disabled .value=${this._editName}></mwc-textfield>
+            <mwc-textarea placeholder="Schüler" required rows="3" .value=${this._editStudents} @change=${e => this._editStudents = e.target.value}></mwc-textarea>
+            <mwc-button @click="${this._edit}">Speichern</mwc-button>
           </div>
           <div class="page" ?active="${this._page === 'delete'}">
             <label section>Kurs löschen</label>
@@ -134,24 +120,18 @@ mega-list-item {
                 ? html`<label>Soll der Kurs '${this._selected}' wirklich gelöscht werden?</label>`
                 : ''}
             </div>
-            <mega-button @click="${this._delete}">Löschen</mega-button>
+            <mwc-button @click="${this._delete}">Löschen</mwc-button>
           </div>
           <div class="page" ?active="${this._page === 'default'}">
             <label section>Kurs</label>
-            <div class="field">
-                <label>Name</label>
-                <div class="font-body">${this._selected}</div>
-            </div>
-            <div class="field">
-                <label>Schüler</label>
-                <div class="font-body">${this._selectedStudents}</div>
-            </div>
+            <mwc-textfield type="text" disabled .value=${this._selected}></mwc-textfield>
+            <mwc-textarea placeholder="Schüler" disabled rows="3" .value=${this._selectedStudents}></mwc-textarea>
           </div>
         </div>
         <div class="space"></div>
       </div>
     `;
-    }
+  }
 
   static get properties() {
     return {
@@ -180,6 +160,10 @@ mega-list-item {
   }
 
   firstUpdated(changedProperties) {
+    let bar = this.shadowRoot.getElementById('bar');
+    let content = this.shadowRoot.getElementById('content');
+    bar.scrollTarget = content;
+
     if (this._userid)
       store.dispatch(loadCourses());
 
@@ -293,6 +277,10 @@ mega-list-item {
     store.dispatch(storeCourses(courses)).then(() => {
       this._page = '';
     });
+  }
+
+  _fire(name) {
+    this.dispatchEvent(new CustomEvent(name, {bubbles: true, composed: true}));
   }
 }
 customElements.define('kmap-courses', KCourses);
