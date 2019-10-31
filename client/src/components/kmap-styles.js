@@ -33,7 +33,7 @@ p, .font-body, label, td {
   font-weight: 300;
 }
 a {
-  color: var(--color-darkgray);
+  color: var(--color-mediumgray);
   text-decoration: none;
   font-weight: bold;
 }

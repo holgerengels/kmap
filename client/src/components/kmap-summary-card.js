@@ -99,7 +99,7 @@ div.card[highlighted] {
       }
   <div class="card-footer font-body">
       ${this.card.links
-      ? html`<a slot="footer" href="#browser/${this.subject}/${this.card.links}"><mwc-icon>open_in_new</mwc-icon></a>`
+      ? html`<a slot="footer" href="#browser/${this.subject}/${this.card.links}"><mwc-ripple></mwc-ripple><mwc-icon>open_in_new</mwc-icon></a>`
       : html`
         ${!this._layers.includes('averages') ? html`
           <kmap-summary-card-rating id="rating" .key="${this._key}" .lightest="${this._lightest}" .opaque="${this._opaque}" @statecolor="${this._colorizeEvent}"></kmap-summary-card-rating>
@@ -107,7 +107,7 @@ div.card[highlighted] {
       `}
                       
       <div slot="footer" style="flex: 1 0 auto"></div>
-      <a slot="footer" href="#browser/${this.subject}/${this.chapter}/${this.card.topic}"><mwc-icon>fullscreen</mwc-icon></a>
+      <a slot="footer" href="#browser/${this.subject}/${this.chapter}/${this.card.topic}"><mwc-ripple></mwc-ripple><mwc-icon>fullscreen</mwc-icon></a>
   </div>
     <mwc-ripple id="ripple"></mwc-ripple>
     </div>

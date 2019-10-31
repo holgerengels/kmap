@@ -2,7 +2,7 @@ import {LitElement, html, css} from 'lit-element';
 import {connect} from 'pwa-helpers/connect-mixin.js';
 import {store} from "../store";
 import {updateTitle, showMessage} from "../actions/app";
-import {fetchMapIfNeeded} from "../actions/maps";
+import {fetchMapIfNeeded, unselectSummaryCard} from "../actions/maps";
 import {storeState} from "../actions/states";
 
 import {colorStyles, fontStyles} from "./kmap-styles";
@@ -56,9 +56,6 @@ class KMapBrowser extends connect(store)(LitElement) {
 .page[active] {
   display: block;
 }
-a {
-  color: var(--color-mediumgray);
-}
       `];
   }
 
@@ -92,7 +89,7 @@ a {
              <kmap-browser-chapter-editor .subject="${this._subject}" .chapter="${this._chapter}" .chapterCard="${this._chapterCard}"></kmap-browser-chapter-editor>
            ` : ''
           }
-          ${this.lines.map((line, i) => html`
+          ${this._lines.map((line, i) => html`
             <div class="scrollpane">
               ${line.cards.map((card, j) => html`
                 <kmap-summary-card .subject="${this._subject}" .chapter="${this._chapter}" .card="${card}"></kmap-summary-card>
@@ -113,7 +110,6 @@ a {
     return {
       _userid: {type: String},
       active: {type: Boolean, observer: 'activeChanged'},
-      dataPath: {type: String},
       routeSubject: {type: String},
       routeChapter: {type: String},
       routeTopic: {type: String},
@@ -124,8 +120,9 @@ a {
       topic: {type: String},
       topicCard: {type: Object},
       board: {type: Object},
-      chapterLine: {type: Array},
-      lines: {type: Array},
+      _map: {type: Object},
+      _chapterLine: {type: Array},
+      _lines: {type: Array},
       _page: {type: String},
       mapHeight: {type: Number},
       mapScroll: {type: Number},
@@ -137,8 +134,8 @@ a {
 
   constructor() {
     super();
-    this.chapterLine = null;
-    this.lines = [];
+    this._chapterLine = null;
+    this._lines = [];
     this.topicCard = {};
     this._layers = [];
   }
@@ -149,75 +146,71 @@ a {
       let page = this.shadowRoot.getElementById(this._page);
       bar.scrollTarget = page;
     }
+
+    if (changedProperties.has('routeChapter') || changedProperties.has('routeTopic')) {
+      this._page = this.routeTopic ? "topic" : "map";
+      store.dispatch(updateTitle(this.routeTopic ? this.routeTopic : this.routeChapter));
+    }
+    if (changedProperties.has('routeSubject') || changedProperties.has('routeChapter')) {
+      store.dispatch(fetchMapIfNeeded(this.routeSubject, this.routeChapter));
+    }
+    if (changedProperties.has('routeTopic') || changedProperties.has('_chapterCard') || changedProperties.has('_lines')) {
+      if (this.routeTopic === "_") {
+        this.topicCard = this._chapterCard;
+      }
+      else if (this.routeTopic && this._lines) {
+        let lala = {};
+        for (let line of this._lines) {
+          for (let card of line.cards) {
+            if (card.topic === this.routeTopic)
+              lala = card;
+          }
+        }
+        this.topicCard = lala;
+      }
+    }
+    if (changedProperties.has("_map")) {
+      store.dispatch(unselectSummaryCard());
+
+      if (this._map) {
+        this._chapterCard = this._map.chapterCard;
+        this._subject = this._map.subject;
+        this._chapter = this._map.chapter;
+
+        let lines = this._map.lines;
+        if (lines[0].cards[0].row === -1) {
+          this._chapterLine = lines[0];
+          this._lines = lines.slice(1);
+        }
+        else {
+          this._chapterLine = null;
+          this._lines = lines;
+        }
+      }
+      else {
+        this._subject = "";
+        this._chapter = "";
+        this._lines = [];
+      }
+    }
   }
 
   stateChanged(state) {
     this._userid = state.app.userid;
-    if (this.dataPath !== state.app.dataPath) {
-      this.dataPath = state.app.dataPath;
 
-      let changeMap = false;
+    if (state.app.dataPath.length > 0)
+      this.routeSubject = state.app.dataPath[0];
+    else
+      console.log("ERROR: malformed datapath - no subject");
 
-      if (state.app.dataPath.length > 0 && this.routeSubject !== state.app.dataPath[0]) {
-        this.routeSubject = state.app.dataPath[0];
-        changeMap = true;
-      }
-      if (state.app.dataPath.length > 1 && this.routeChapter !== state.app.dataPath[1]) {
-        this.routeChapter = state.app.dataPath[1];
-        changeMap = true;
-      }
-      if (state.app.dataPath.length > 2)
-        this.routeTopic = state.app.dataPath[2];
-      else
-        this.routeTopic = null;
+    if (state.app.dataPath.length > 1)
+      this.routeChapter = state.app.dataPath[1];
+    else
+      console.log("ERROR: malformed datapath - no chapter");
 
-      if (this.routeTopic) {
-        this._page = "topic";
-        store.dispatch(updateTitle(this.routeTopic));
-      } else {
-        this._page = "map";
-        store.dispatch(updateTitle(this.routeChapter));
-      }
+    this.routeTopic = state.app.dataPath.length > 2 ? state.app.dataPath[2] : null;
 
-      if (changeMap)
-        store.dispatch(fetchMapIfNeeded(this.routeSubject, this.routeChapter));
-    }
-
-    if (state.maps.map) {
-      this._chapterCard = state.maps.map.chapterCard;
-      this._subject = state.maps.map.subject;
-      this._chapter = state.maps.map.chapter;
-
-      let lines = state.maps.map.lines;
-      if (lines[0].cards[0].row === -1) {
-        this.chapterLine = lines[0];
-        this.lines = lines.slice(1);
-      }
-      else {
-        this.chapterLine = null;
-        this.lines = lines;
-      }
-    }
-    else {
-      this._subject = "";
-      this._chapter = "";
-      this.lines = [];
-    }
-
-    if (this.routeTopic === "_") {
-      this.topicCard = this._chapterCard;
-    }
-    else if (this.routeTopic && this.lines) {
-      let lala = {};
-      for (let line of this.lines) {
-        for (let card of line.cards) {
-          if (card.topic === this.routeTopic)
-            lala = card;
-        }
-      }
-      this.topicCard = lala;
-    }
-
+    this._map = state.maps.map;
     this._layers = state.app.layers;
   }
 

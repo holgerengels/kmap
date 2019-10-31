@@ -5,6 +5,7 @@ import { STATE_COLORS } from './state-colors';
 import {connect} from "pwa-helpers/connect-mixin";
 import {store} from "../store";
 import '@material/mwc-icon';
+import '@material/mwc-ripple';
 import './star-rating';
 import './kmap-knowledge-card-depends';
 import './kmap-knowledge-card-progress';
@@ -155,7 +156,7 @@ class KMapKnowledgeCard extends connect(store)(LitElement) {
       : html`<star-rating .rate="${this.state}" @clicked="${this._rated}" style=${styleMap(this._colorStyles)}></star-rating>`
     }
     <div slot="footer" style="flex: 1 0 auto"></div>
-    <a slot="footer" href="#browser/${this.subject}/${this.chapter}"><mwc-icon>fullscreen_exit</mwc-icon></a>
+    <a slot="footer" href="#browser/${this.subject}/${this.chapter}"><mwc-ripple></mwc-ripple><mwc-icon>fullscreen_exit</mwc-icon></a>
   </div>
     `;
     }

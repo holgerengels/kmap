@@ -1,6 +1,7 @@
 import {
     LOAD_MAP,
-    SELECT_SUMMARY_CARD
+    SELECT_SUMMARY_CARD,
+    UNSELECT_SUMMARY_CARD,
 } from '../actions/maps.js';
 
 const INITIAL_STATE = {
@@ -8,6 +9,8 @@ const INITIAL_STATE = {
   loadFetching: false,
   loadResponse: null,
   invalidated: true,
+  selectedCardName: null,
+  selectedCardDependencies: [],
 };
 
 const map = (state = INITIAL_STATE, action) => {
@@ -51,6 +54,12 @@ const map = (state = INITIAL_STATE, action) => {
                 ...state,
                 selectedCardName: action.card.topic,
                 selectedCardDependencies: action.card.depends,
+            };
+        case UNSELECT_SUMMARY_CARD:
+            return {
+                ...state,
+                selectedCardName: null,
+                selectedCardDependencies: [],
             };
         default:
             return state;

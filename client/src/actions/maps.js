@@ -4,6 +4,7 @@ import {logout, showMessage} from "./app";
 
 export const LOAD_MAP = 'LOAD_MAP';
 export const SELECT_SUMMARY_CARD = 'SELECT_SUMMARY_CARD';
+export const UNSELECT_SUMMARY_CARD = 'UNSELECT_SUMMARY_CARD';
 
 export const fetchMapIfNeeded = (subject, chapter) => (dispatch, getState) => {
   let state = getState();
@@ -52,3 +53,6 @@ export const selectSummaryCard = (card) => {
   return { type: SELECT_SUMMARY_CARD, card };
 };
 
+export const unselectSummaryCard = () => {
+  return { type: UNSELECT_SUMMARY_CARD };
+};
