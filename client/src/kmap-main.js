@@ -80,7 +80,7 @@ class KmapMain extends connect(store)(LitElement) {
         display: none;
       }
       .page[active] {
-        display: contents;
+        display: unset;
       }
       `,
     ];
