@@ -76,12 +76,6 @@ class KmapMain extends connect(store)(LitElement) {
       .main-content {
           width: 100% !important;
       }
-      .page {
-        display: none;
-      }
-      .page[active] {
-        display: unset;
-      }
       `,
     ];
   }
@@ -116,13 +110,8 @@ class KmapMain extends connect(store)(LitElement) {
       </nav>
     </div>
     <div slot="appContent" class="main-content" role="main" @toggleDrawer="${e => this._drawerOpen = !this._drawerOpen}" @lclick="${this._showLogin}">
-      <kmap-subjects ?active="${this._page === 'home'}" class="page" ></kmap-subjects>
-      <kmap-browser ?active="${this._page === 'browser'}" class="page" ></kmap-browser>
-      <kmap-test ?active="${this._page === 'test'}" class="page" ></kmap-test>
-      <kmap-courses ?active="${this._page === 'courses'}" class="page" ></kmap-courses>
-      <kmap-content-manager ?active="${this._page === 'content-manager'}" class="page" ></kmap-content-manager>
-
-      ${this._page === 'home' || this._page === 'browser' ? html`
+      ${this._renderPage()}
+    ${this._page === 'home' || this._page === 'browser' ? html`
         ${this._layers.includes('editor') ? html`<kmap-editor-edit-dialog></kmap-editor-edit-dialog>` : ''}
         ${this._layers.includes('editor') ? html`<kmap-editor-rename-dialog></kmap-editor-rename-dialog>` : ''}
         ${this._layers.includes('editor') ? html`<kmap-editor-delete-dialog></kmap-editor-delete-dialog>` : ''}
@@ -201,6 +190,22 @@ class KmapMain extends connect(store)(LitElement) {
     this._layers = state.app.layers;
   }
 
+  _renderPage() {
+    switch (this._page) {
+      case 'home':
+        return html`<kmap-subjects class="page" ></kmap-subjects>`;
+      case 'browser':
+        return html`<kmap-browser class="page" ></kmap-browser>`;
+      case 'test':
+        return html`<kmap-test class="page" ></kmap-test>`;
+      case 'courses':
+        return html`<kmap-courses class="page" ></kmap-courses>`;
+      case 'content-manager':
+        return html`<kmap-content-manager class="page" ></kmap-content-manager>`;
+      default:
+        return html`lala`;
+    }
+  }
   _renderMessages() {
     return this._messages.join("\n");
   }
