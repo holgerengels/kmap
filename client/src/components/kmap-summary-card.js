@@ -22,10 +22,17 @@ class KMapSummaryCard extends connect(store)(LitElement) {
       colorStyles,
       css`
 :host {
-  display: contents;
-  --color-opaque: #f5f5f5;
-  --color-light: var(--color-mediumgray);
-  --color-lightest: #e0e0e0;
+    display: contents;
+    --color-opaque: #f5f5f5;
+    --color-light: var(--color-mediumgray);
+    --color-lightest: #e0e0e0;
+}
+:host div.card {
+  transition: opacity .1s ease-in-out;
+  opacity: 1.0;
+}
+:host([faded]) div.card {
+  opacity: 0.0;
 }
 div.card {
   vertical-align: top;

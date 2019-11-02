@@ -110,7 +110,8 @@ class KmapMain extends connect(store)(LitElement) {
       </nav>
     </div>
     <div slot="appContent" class="main-content" role="main" @toggleDrawer="${e => this._drawerOpen = !this._drawerOpen}" @lclick="${this._showLogin}">
-      ${this._renderPage()}
+    ${this._renderPage()}
+    
     ${this._page === 'home' || this._page === 'browser' ? html`
         ${this._layers.includes('editor') ? html`<kmap-editor-edit-dialog></kmap-editor-edit-dialog>` : ''}
         ${this._layers.includes('editor') ? html`<kmap-editor-rename-dialog></kmap-editor-rename-dialog>` : ''}

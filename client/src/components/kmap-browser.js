@@ -92,7 +92,7 @@ class KMapBrowser extends connect(store)(LitElement) {
           ${this._lines.map((line, i) => html`
             <div class="scrollpane">
               ${line.cards.map((card, j) => html`
-                <kmap-summary-card .subject="${this._subject}" .chapter="${this._chapter}" .card="${card}"></kmap-summary-card>
+                <kmap-summary-card .subject="${this._subject}" .chapter="${this._chapter}" .card="${card}" ?faded="${this._faded}"></kmap-summary-card>
               `)}
             </div>
           `)}
@@ -129,6 +129,8 @@ class KMapBrowser extends connect(store)(LitElement) {
       detailCard: {type: Object},
       search: {type: String, observer: 'searchChanged'},
       filtered: {type: Array, observer: 'filteredChanged'},
+      _loadFetching: {type: Boolean},
+      _faded: {type: Boolean},
     };
   }
 
@@ -138,6 +140,8 @@ class KMapBrowser extends connect(store)(LitElement) {
     this._lines = [];
     this.topicCard = {};
     this._layers = [];
+    this._loadFetching = false;
+    this._faded = true;
   }
 
   updated(changedProperties) {
@@ -168,6 +172,8 @@ class KMapBrowser extends connect(store)(LitElement) {
         }
         this.topicCard = lala;
       }
+      if (this.routeTopic && !changedProperties.get("routeTopic"))
+        console.log("animate");
     }
     if (changedProperties.has("_map")) {
       store.dispatch(unselectSummaryCard());
@@ -193,6 +199,14 @@ class KMapBrowser extends connect(store)(LitElement) {
         this._lines = [];
       }
     }
+    if (changedProperties.has("_loadFetching")) {
+      if (!this._loadFetching) {
+        let that = this;
+        setTimeout(function () {
+          that._faded = that._loadFetching;
+        }, 100);
+      }
+    }
   }
 
   stateChanged(state) {
@@ -212,8 +226,10 @@ class KMapBrowser extends connect(store)(LitElement) {
 
     this._map = state.maps.map;
     this._layers = state.app.layers;
+    this._loadFetching = state.maps.loadFetching;
   }
 
+  /*
   searchChanged(search) {
     if (search === null || search.length === 0) {
       this.filtered = null;
@@ -224,7 +240,6 @@ class KMapBrowser extends connect(store)(LitElement) {
     }
   }
 
-  /*
   filteredChanged(filtered) {
     if (filtered === null) {
       if (!this.topic) {

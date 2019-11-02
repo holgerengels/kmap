@@ -3,7 +3,7 @@ import {connect} from 'pwa-helpers/connect-mixin.js';
 import {config} from "../config.js";
 import {store} from "../store";
 import {handleErrors} from "../actions/fetchy";
-import {logout, showMessage} from "../actions/app";
+import {logout, showMessage, updateTitle} from "../actions/app";
 
 import {colorStyles, fontStyles} from "./kmap-styles";
 import '@material/mwc-icon-button';
@@ -57,7 +57,6 @@ kmap-subject-card {
     return {
       _userid: {type: String},
       subjects: {type: Array},
-      active: {type: Boolean, observer: 'activeChanged'},
     };
   }
 
@@ -88,6 +87,7 @@ kmap-subject-card {
           if (error.message === "invalid session")
             store.dispatch(logout({userid: this._userid}));
         });
+    store.dispatch(updateTitle("Fächer"));
   }
 
   updated(changedProperties) {
@@ -97,7 +97,8 @@ kmap-subject-card {
       this._userid = state.app.userid;
     }
 
-  _fire(name) {
+
+    _fire(name) {
     this.dispatchEvent(new CustomEvent(name, {bubbles: true, composed: true}));
   }
 }
