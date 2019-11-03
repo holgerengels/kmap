@@ -5,6 +5,7 @@ import {installOfflineWatcher} from 'pwa-helpers/network.js';
 import {installRouter} from 'pwa-helpers/router.js';
 import {updateMetadata} from 'pwa-helpers/metadata.js';
 import {fontStyles, colorStyles} from "./components/kmap-styles";
+import "web-animations-js/web-animations.min";
 
 import {store} from './store.js';
 
