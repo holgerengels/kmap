@@ -25,8 +25,7 @@ class KMapBrowser extends connect(store)(LitElement) {
   display: contents;
 }
 .scrollpane {
-  white-space: nowrap;
-  display: block;
+  display: flex;
   -webkit-overflow-scrolling: touch;
   outline: none;
   overflow-x: scroll;
@@ -92,7 +91,7 @@ class KMapBrowser extends connect(store)(LitElement) {
           ${this._lines.map((line, i) => html`
             <div class="scrollpane">
               ${line.cards.map((card, j) => html`
-                <kmap-summary-card .subject="${this._subject}" .chapter="${this._chapter}" .card="${card}" ?faded="${this._faded}"></kmap-summary-card>
+                <kmap-summary-card .subject="${this._subject}" .chapter="${this._chapter}" .card="${card}" ?faded="${this._faded}" key="${card.topic}"></kmap-summary-card>
               `)}
             </div>
           `)}
@@ -172,8 +171,44 @@ class KMapBrowser extends connect(store)(LitElement) {
         }
         this.topicCard = lala;
       }
-      if (this.routeTopic && !changedProperties.get("routeTopic"))
+
+      if (this.routeTopic && !changedProperties.get("routeTopic")) {
         console.log("animate");
+        let nodes = this.shadowRoot.querySelectorAll('kmap-summary-card[key="' + this.routeTopic + '"]');
+        if (nodes.length !== 0) {
+          let scard = nodes[0];
+          this._animFrom = scard.getBoundingClientRect();
+          console.log(this._animFrom);
+        }
+      }
+    }
+    if (changedProperties.has("_page") && this._page === 'topic' && this._animFrom) {
+      let that = this;
+      setTimeout(function () {
+        let kcard = that.shadowRoot.querySelectorAll('kmap-knowledge-card')[0];
+        that._animTo = kcard.getBoundingClientRect();
+        console.log(that._animTo);
+
+        var invertTop = that._animFrom.top - that._animTo.top;
+        var invertLeft = that._animFrom.left - that._animTo.left;
+        var invertScale = that._animFrom.width / that._animTo.width;
+
+        var player = kcard.animate([{
+          transformOrigin: 'top left',
+          transform: `translate(${invertLeft}px, ${invertTop}px) scale(${invertScale}, ${invertScale})`,
+          opacity: 0.2
+        }, {
+          transformOrigin: 'top left', transform: 'none', opacity: 1
+        }],{
+          duration: 300,
+          easing: 'ease-in-out',
+          fill: 'both'
+        });
+        player.addEventListener('finish', function () {
+          that._animFrom = undefined;
+          that._animTo = undefined;
+        });
+      });
     }
     if (changedProperties.has("_map")) {
       store.dispatch(unselectSummaryCard());

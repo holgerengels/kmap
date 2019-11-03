@@ -22,7 +22,7 @@ class KMapSummaryCard extends connect(store)(LitElement) {
       colorStyles,
       css`
 :host {
-    display: contents;
+    display: block;
     --color-opaque: #f5f5f5;
     --color-light: var(--color-mediumgray);
     --color-lightest: #e0e0e0;
