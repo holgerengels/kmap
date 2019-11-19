@@ -106,7 +106,7 @@ mwc-icon {
   _chooseInstance() {
     let textfield =  this.shadowRoot.getElementById('instance');
     this.shadowRoot.getElementById('dialog').open = false;
-    document.cookie = "instance=" + textfield.value + ";path=/server/";
+    document.cookie = "instance=" + textfield.value;
     location.reload();
   }
 }

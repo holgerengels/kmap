@@ -83,6 +83,9 @@ export const importMap = (files) => (dispatch, getState) => {
       mode: "cors",
       cache: "no-cache",
       credentials: "include",
+      headers: {
+        "X-Instance": state.app.instance,
+      },
       body: formData,
     })
       .then(handleErrors)
@@ -123,6 +126,9 @@ export const exportMap = (subject, module) => (dispatch, getState) => {
       mode: "cors",
       cache: "no-cache",
       credentials: "include",
+      headers: {
+        "X-Instance": state.app.instance,
+      },
     })
       .then(handleErrors)
       .then(response => response.blob())
