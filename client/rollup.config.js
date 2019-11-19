@@ -1,5 +1,5 @@
+import createDefaultConfig from '@open-wc/building-rollup/modern-config';
 import cpy from 'rollup-plugin-cpy';
-import createDefaultConfig from '@open-wc/building-rollup';
 import deepmerge from 'deepmerge';
 const { injectManifest, generateSW } = require('rollup-plugin-workbox');
 
@@ -19,6 +19,7 @@ export default deepmerge(config, {
     generateSW({
       swDest: 'dist/sw.js',
       globDirectory: 'dist/',
+      globPatterns: ['**/*.{html,js,css,png}'],
       navigateFallback: '/',
     }),
     /*
