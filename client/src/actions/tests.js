@@ -24,7 +24,8 @@ export const fetchSubjectsIfNeeded = () => (dispatch, getState) => {
             cache: "no-cache",
             credentials: "include",
             headers: {
-                "Content-Type": "application/json; charset=utf-8",
+              "Content-Type": "application/json; charset=utf-8",
+              "X-Instance": state.app.instance,
             }
         })
           .then(handleErrors)
@@ -67,7 +68,8 @@ export const fetchChaptersIfNeeded = (subject) => (dispatch, getState) => {
             cache: "no-cache",
             credentials: "include",
             headers: {
-                "Content-Type": "application/json; charset=utf-8",
+              "Content-Type": "application/json; charset=utf-8",
+              "X-Instance": state.app.instance,
             }
         })
           .then(handleErrors)
@@ -113,7 +115,8 @@ export const fetchTreeIfNeeded = (subject) => (dispatch, getState) => {
             cache: "no-cache",
             credentials: "include",
             headers: {
-                "Content-Type": "application/json; charset=utf-8",
+              "Content-Type": "application/json; charset=utf-8",
+              "X-Instance": state.app.instance,
             }
         })
           .then(handleErrors)
@@ -159,7 +162,8 @@ export const fetchTestsIfNeeded = (subject, chapter) => (dispatch, getState) => 
             cache: "no-cache",
             credentials: "include",
             headers: {
-                "Content-Type": "application/json; charset=utf-8",
+              "Content-Type": "application/json; charset=utf-8",
+              "X-Instance": state.app.instance,
             }
         })
           .then(handleErrors)

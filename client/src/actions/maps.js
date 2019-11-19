@@ -1,4 +1,4 @@
-import {handleErrors} from "./fetchy";
+import {handleErrors, urlencode} from "./fetchy";
 import {config} from "../config";
 import {logout, showMessage} from "./app";
 
@@ -17,6 +17,7 @@ export const fetchMapIfNeeded = (subject, chapter) => (dispatch, getState) => {
       credentials: "include",
       headers: {
         "Content-Type": "application/json; charset=utf-8",
+        "X-Instance": state.app.instance,
       }
     })
       .then(handleErrors)

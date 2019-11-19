@@ -21,6 +21,7 @@ export const loadModules = () => (dispatch, getState) => {
       credentials: "include",
       headers: {
         "Content-Type": "application/json; charset=utf-8",
+        "X-Instance": state.app.instance,
       },
     })
       .then(handleErrors)
@@ -172,6 +173,7 @@ export const deleteMap = (subject, module) => (dispatch, getState) => {
       credentials: "include",
       headers: {
         "Content-Type": "application/json; charset=utf-8",
+        "X-Instance": state.app.instance,
       },
     })
       .then(handleErrors)

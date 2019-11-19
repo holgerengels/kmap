@@ -4,11 +4,13 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.sql.rowset.serial.SerialException;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Properties;
 
@@ -77,9 +79,9 @@ public class JsonServlet extends HttpServlet {
 
     static void corsHeaders(HttpServletRequest request, HttpServletResponse resp) {
         Properties properties = (Properties)request.getServletContext().getAttribute("properties");
-        if (Boolean.valueOf(properties.getProperty("kmap.cors"))) {
-            String referer = request.getHeader("referer");
-            if (referer == null || referer.length() == 0)
+        if (Boolean.parseBoolean(properties.getProperty("kmap.cors"))) {
+            String referer = getHeader(request, "referer");
+            if (referer == null)
                 throw new RuntimeException("referer header missing");
 
             int i = referer.indexOf("/", 9);
@@ -91,21 +93,38 @@ public class JsonServlet extends HttpServlet {
             resp.setHeader("Access-Control-Allow-Origin", referer);
             resp.setHeader("Access-Control-Allow-Credentials", "true");
             resp.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS, HEAD, PUT, POST");
-            resp.setHeader("Access-Control-Allow-Headers", "Origin, Accept, Content-Type, X-Requested-With, X-CSRF-Token");
+            resp.setHeader("Access-Control-Allow-Headers", "Origin, Accept, Content-Type, X-Requested-With, X-CSRF-Token, X-Instance");
         }
     }
 
     String extractClient(HttpServletRequest request) {
-        String client = request.getHeader("referer");
-        if (client == null || client.length() == 0) {
-            client = request.getParameter("instance");
+        String client;
+
+        if ((client = request.getParameter("instance")) != null) {
+            System.out.println("instance from parameter = " + client);
+            return client;
         }
-        else {
+
+        if ((client = getHeader(request, "X-Instance")) != null) {
+            System.out.println("instance from header = " + client);
+            return client;
+        }
+
+        if ((client = getHeader(request, "referer")) != null && client.length() != 0) {
             int start = client.indexOf("/", 9);
             int end = client.indexOf("/", start + 1);
-            client = end != -1 ? client.substring(start + 1, end) : "lala";
+            if (end != -1) {
+                client = client.substring(start + 1, end);
+                System.out.println("instance from referer = " + client);
+            }
         }
-        System.out.println("client " + client);
-        return client;
+
+        System.out.println("instance not specified = lala");
+        return "lala";
+    }
+
+    private static String getHeader(HttpServletRequest request, String name) {
+        String value = request.getHeader(name);
+        return value != null && value.length() != 0 ? value : null;
     }
 }

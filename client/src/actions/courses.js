@@ -10,7 +10,8 @@ export const LOAD_COURSE = 'LOAD_COURSE';
 export const STORE_COURSE = 'STORE_COURSE';
 
 export const loadCourses = () => (dispatch, getState) => {
-  let userid = getState().app.userid;
+  let state = getState();
+  let userid = state.app.userid;
   dispatch(requestLoadCourses(userid));
 
   return fetch(`${config.server}state?courses=${userid}`, {
@@ -20,6 +21,7 @@ export const loadCourses = () => (dispatch, getState) => {
     credentials: "include",
     headers: {
       "Content-Type": "application/json; charset=utf-8",
+      "X-Instance": state.app.instance,
     },
   })
     .then(handleErrors)
@@ -73,7 +75,8 @@ export const selectCourse = (course) => {
 };
 
 export const storeCourses = (courses) => (dispatch, getState) => {
-  let userid = getState().app.userid;
+  let state = getState();
+  let userid = state.app.userid;
 
   if (userid && courses) {
     dispatch(requestStoreCourses(userid, courses));
@@ -84,6 +87,7 @@ export const storeCourses = (courses) => (dispatch, getState) => {
       credentials: "include",
       headers: {
         "Content-Type": "application/json; charset=utf-8",
+        "X-Instance": state.app.instance,
       },
       body: JSON.stringify({courses: courses})
     })
@@ -130,7 +134,8 @@ const failStoreCourses = (userid, response) => {
 };
 
 export const storeCourse = (course) => (dispatch, getState) => {
-  let userid = getState().app.userid;
+  let state = getState();
+  let userid = state.app.userid;
 
   if (userid && course) {
     dispatch(requestStoreCourse(userid, course));
@@ -141,6 +146,7 @@ export const storeCourse = (course) => (dispatch, getState) => {
       credentials: "include",
       headers: {
         "Content-Type": "application/json; charset=utf-8",
+        "X-Instance": state.app.instance,
       },
       body: JSON.stringify({students: course.students})
     })

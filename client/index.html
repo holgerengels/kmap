@@ -12,17 +12,11 @@
   <link href="https://fonts.googleapis.com/css?family=Material+Icons&display=block" rel="stylesheet">
 
   <script>
-      // Load and register pre-caching Service Worker
-      /*
       if ('serviceWorker' in navigator) {
-          window.addEventListener('load', function() {
-              navigator.serviceWorker.register('/service-worker.js', { scope: '/' })
-                  .then((reg) => {
-                      console.log('Service worker registered.', reg);
-                  });
+          window.addEventListener('load', () => {
+              navigator.serviceWorker.register('./sw.js');
           });
       }
-      */
 
       // Redux assumes `process.env.NODE_ENV` exists in the ES module build.
       // https://github.com/reactjs/redux/issues/2907

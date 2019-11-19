@@ -55,6 +55,7 @@ kmap-subject-card {
 
   static get properties() {
     return {
+      _instance: {type: String},
       _userid: {type: String},
       subjects: {type: Array},
     };
@@ -62,6 +63,7 @@ kmap-subject-card {
 
   constructor() {
     super();
+    this._instance = null;
     this.subjects = [];
   }
 
@@ -76,7 +78,8 @@ kmap-subject-card {
           cache: "no-cache",
           credentials: "include",
           headers: {
-              "Content-Type": "application/json; charset=utf-8",
+            "Content-Type": "application/json; charset=utf-8",
+            "X-Instance": this._instance,
           }
       })
         .then(handleErrors)
@@ -93,9 +96,10 @@ kmap-subject-card {
   updated(changedProperties) {
   }
 
-    stateChanged(state) {
-      this._userid = state.app.userid;
-    }
+  stateChanged(state) {
+    this._instance = state.app.instance;
+    this._userid = state.app.userid;
+  }
 
 
     _fire(name) {

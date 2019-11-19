@@ -135,6 +135,7 @@ mwc-textarea, mwc-textfield {
 
   static get properties() {
     return {
+      _instance: {type: String},
       _userid: {type: String},
       _courses: {type: Array},
       _selectedIndex: {type: Number},
@@ -150,6 +151,7 @@ mwc-textarea, mwc-textfield {
 
   constructor() {
     super();
+    this._instance = null;
     this._courses = [];
     this._selectedIndex = -1;
     this._page = '';
@@ -181,6 +183,7 @@ mwc-textarea, mwc-textfield {
           credentials: "include",
           headers: {
             "Content-Type": "application/json; charset=utf-8",
+            "X-Instance": this._instance,
           }
         })
           .then(handleErrors)
@@ -197,6 +200,7 @@ mwc-textarea, mwc-textfield {
   }
 
   stateChanged(state) {
+    this._instance = state.app.instance;
     if (this._userid !== state.app.userid) {
       this._userid = state.app.userid;
       if (this._userid)
@@ -228,6 +232,7 @@ mwc-textarea, mwc-textfield {
         credentials: "include",
         headers: {
           "Content-Type": "application/json; charset=utf-8",
+          "X-Instance": this._instance,
         }
       })
         .then(handleErrors)

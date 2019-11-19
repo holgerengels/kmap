@@ -7,6 +7,7 @@ import {storeState} from "../actions/states";
 
 import {colorStyles, fontStyles} from "./kmap-styles";
 import '@material/mwc-button';
+import '@material/mwc-icon';
 import '@material/mwc-icon-button';
 import '@material/mwc-formfield';
 import '@material/mwc-slider';
@@ -44,8 +45,7 @@ kmap-test-editor-scroller {
     display: none;
 }
 mega-surface {
-  margin: 16px;
-  padding: 16px;
+  padding: 8px;
   box-shadow: var(--elevation);
   background-color: whitesmoke;
 }
@@ -56,6 +56,10 @@ mega-surface {
 }
 kmap-test-result-card {
   margin: 16px;
+}
+mwc-icon {
+  vertical-align: middle;
+  --mdc-icon-size: 1.2em;
 }
         `
     ];
@@ -104,7 +108,7 @@ kmap-test-result-card {
   </mega-surface>
 </div>
 <div id="tests" class="page" ?active="${this._page === 'tests'}">
-  <div style="margin: 32px">
+  <div>
     ${this._currentTest ? html`
       <kmap-test-card id="test-card" @next="${this._next}"
         .subject="${this.subject}"
@@ -133,7 +137,7 @@ kmap-test-result-card {
         <br/>
         ${this.summary.cards.map((card, i) => html`
           <kmap-test-result-card .subject="${card.subject}" .chapter="${card.chapter}" .card="${card}" .state="${card.state}">
-            <a slot="actions-fullscreen" href="#/Browser/${card.subject}/${card.chapter}/${card.topic}"><iron-icon icon="icons:open-in-new"></iron-icon></a>
+            <a slot="actions-fullscreen" href="#browser/${card.subject}/${card.chapter}/${card.topic}"><mwc-icon>open-in-new"></mwc-icon></a>
           </kmap-test-result-card>
         `)}
       </div>

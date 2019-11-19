@@ -17,6 +17,7 @@ export const fetchStateIfNeeded = (subject) => (dispatch, getState) => {
       credentials: "include",
       headers: {
         "Content-Type": "application/json; charset=utf-8",
+        "X-Instance": state.app.instance,
       }
     })
       .then(handleErrors)
@@ -86,6 +87,7 @@ export const storeState = (state, id, rate) => (dispatch, getState) => {
       credentials: "include",
       headers: {
         "Content-Type": "application/json; charset=utf-8",
+        "X-Instance": getState().app.instance,
       },
       body: JSON.stringify({save: state.userid, subject: state.subject, id: id, state: rate})
     })

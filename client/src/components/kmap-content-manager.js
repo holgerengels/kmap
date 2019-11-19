@@ -1,10 +1,13 @@
 import {LitElement, html, css} from 'lit-element';
 import {connect} from 'pwa-helpers/connect-mixin.js';
 import {store} from "../store";
-import {updateTitle} from "../actions/app";
+import {chooseInstance, updateTitle} from "../actions/app";
 
 import {colorStyles, fontStyles} from "./kmap-styles";
+import '@material/mwc-dialog';
 import '@material/mwc-icon-button';
+import '@material/mwc-button';
+import '@material/mwc-textfield';
 import '@material/mwc-top-app-bar';
 import './kmap-content-manager-instances';
 import './kmap-content-manager-modules';
@@ -53,6 +56,7 @@ mwc-icon {
       <mwc-top-app-bar id="bar" dense>
         <mwc-icon-button icon="menu" slot="navigationIcon" @click="${e => this._fire('toggleDrawer')}"></mwc-icon-button>
         <div slot="title">Content Manager</div>
+        <mwc-icon-button icon="polymer" slot="actionItems" @click="${this._switchInstance}"></mwc-icon-button>
         <kmap-login-button slot="actionItems" @lclick="${e => this._fire('login')}"></kmap-login-button>
       </mwc-top-app-bar>
       <div id="content" class="board">
@@ -60,6 +64,10 @@ mwc-icon {
         ${this._roles.includes('teacher') ? html`<kmap-content-manager-modules></kmap-content-manager-modules>` : ''}
         ${this._roles.includes('teacher') ? html`<kmap-content-manager-sets></kmap-content-manager-sets>` : ''}
       </div>
+    <mwc-dialog id="dialog" title="Instanz wechseln">
+      <mwc-textfield id="instance" name="instance" label="Instanz" type="text" required dialogInitialFocus></mwc-textfield>
+      <mwc-button slot="primaryAction" @click=${this._chooseInstance}>Auswählen</mwc-button>
+   </mwc-dialog>
 `;}
 
   static get properties() {
@@ -89,6 +97,17 @@ mwc-icon {
 
   _fire(name) {
     this.dispatchEvent(new CustomEvent(name, {bubbles: true, composed: true}));
+  }
+
+  _switchInstance() {
+    this.shadowRoot.getElementById('dialog').open = true;
+  }
+
+  _chooseInstance() {
+    let textfield =  this.shadowRoot.getElementById('instance');
+    this.shadowRoot.getElementById('dialog').open = false;
+    document.cookie = "instance=" + textfield.value;
+    location.reload();
   }
 }
 customElements.define('kmap-content-manager', KMapContentManager);

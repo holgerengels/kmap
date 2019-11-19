@@ -19,6 +19,7 @@ export const loadInstances = () => (dispatch, getState) => {
       credentials: "include",
       headers: {
         "Content-Type": "application/json; charset=utf-8",
+        "X-Instance": state.app.instance,
       }
     })
       .then(handleErrors)
@@ -67,6 +68,7 @@ export const createInstance = (name) => (dispatch, getState) => {
       credentials: "include",
       headers: {
         "Content-Type": "application/json; charset=utf-8",
+        "X-Instance": state.app.instance,
       },
     })
       .then(handleErrors)
@@ -109,6 +111,7 @@ export const dropInstance = (name) => (dispatch, getState) => {
       credentials: "include",
       headers: {
         "Content-Type": "application/json; charset=utf-8",
+        "X-Instance": state.app.instance,
       },
     })
       .then(handleErrors)

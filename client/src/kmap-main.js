@@ -12,8 +12,6 @@ import {store} from './store.js';
 import {
     navigate,
     updateOffline,
-    login,
-    showMessage,
     addLayer, removeLayer
 } from './actions/app.js';
 
@@ -21,6 +19,8 @@ import '@material/mwc-button';
 import '@material/mwc-drawer';
 import '@material/mwc-icon-button';
 import '@material/mwc-snackbar';
+import 'pwa-helper-components/pwa-install-button';
+import 'pwa-helper-components/pwa-update-available';
 
 import './components/kmap-login-popup';
 import './components/kmap-subjects';
@@ -35,6 +35,7 @@ import './components/kmap-editor-add-fabs';
 import './components/kmap-test-editor-add-fabs';
 import './components/kmap-test-editor-edit-dialog';
 import './components/kmap-test-editor-delete-dialog';
+import {chooseInstance} from "./actions/app";
 
 class KmapMain extends connect(store)(LitElement) {
 
@@ -45,17 +46,10 @@ class KmapMain extends connect(store)(LitElement) {
       colorStyles,
       css`
       :host {
-          display: contents;
+        display: contents;
         --app-drawer-background-color: var(--app-secondary-color);
         --app-drawer-text-color: var(--app-light-text-color);
         --app-drawer-selected-color: #c67100;
-      }
-
-      kmap-login-popup {
-        position: absolute;
-        top: 16px;
-        right: 16px;
-        z-index: 1000;
       }
       .drawer-content {
         padding: 0px 16px 0 16px;
@@ -77,6 +71,9 @@ class KmapMain extends connect(store)(LitElement) {
       .main-content {
           width: 100% !important;
       }
+        [hidden] {
+            display: none !important;
+        }
       `,
     ];
   }
@@ -95,6 +92,9 @@ class KmapMain extends connect(store)(LitElement) {
         <a ?selected="${this._page === 'courses'}" ?disabled="${!this._roles.includes("teacher")}" href="#courses">Kurse</a>
         <a ?selected="${this._page === 'content-mananer'}" ?disabled="${!this._roles.includes("teacher")}" href="#content-manager">Content Manager</a>
         <a href="#browser/Hilfe/Hilfe">Hilfe</a>
+
+        <pwa-install-button><mwc-button>App installieren</mwc-button></pwa-install-button>
+        <pwa-update-available><mwc-button>App aktualisieren</mwc-button></pwa-update-available>
       </nav>
       <hr/>
       <nav class="drawer-list">
@@ -110,29 +110,37 @@ class KmapMain extends connect(store)(LitElement) {
         ` : ''}
       </nav>
     </div>
-    <div slot="appContent" class="main-content" role="main" @toggleDrawer="${e => this._drawerOpen = !this._drawerOpen}" @lclick="${this._showLogin}">
-    ${this._renderPage()}
     
-    ${this._page === 'home' || this._page === 'browser' ? html`
-        ${this._layers.includes('editor') ? html`<kmap-editor-edit-dialog></kmap-editor-edit-dialog>` : ''}
-        ${this._layers.includes('editor') ? html`<kmap-editor-rename-dialog></kmap-editor-rename-dialog>` : ''}
-        ${this._layers.includes('editor') ? html`<kmap-editor-delete-dialog></kmap-editor-delete-dialog>` : ''}
-        ${this._layers.includes('editor') ? html`<kmap-editor-add-fabs></kmap-editor-add-fabs>` : ''}
-      ` : ''}
+    <div slot="appContent" class="main-content" role="main" @toggleDrawer="${e => this._drawerOpen = !this._drawerOpen}" @lclick="${this._showLogin}">
+    ${this._instance ? html`
+      ${this._renderPage()}
+      
+      ${this._page === 'home' || this._page === 'browser' ? html`
+          ${this._layers.includes('editor') ? html`<kmap-editor-edit-dialog></kmap-editor-edit-dialog>` : ''}
+          ${this._layers.includes('editor') ? html`<kmap-editor-rename-dialog></kmap-editor-rename-dialog>` : ''}
+          ${this._layers.includes('editor') ? html`<kmap-editor-delete-dialog></kmap-editor-delete-dialog>` : ''}
+          ${this._layers.includes('editor') ? html`<kmap-editor-add-fabs></kmap-editor-add-fabs>` : ''}
+        ` : ''}
       ${this._page === 'test' ? html`
         ${this._layers.includes('editor') ? html`<kmap-test-editor-edit-dialog></kmap-test-editor-edit-dialog>` : ''}
         ${this._layers.includes('editor') ? html`<kmap-test-editor-delete-dialog></kmap-test-editor-delete-dialog>` : ''}
         ${this._layers.includes('editor') ? html`<kmap-test-editor-add-fabs></kmap-test-editor-add-fabs>` : ''}
       ` : ''}
+    ` : ''}
     </div>
   </mwc-drawer>
-  <kmap-login-popup id="login-popup"></kmap-login-popup>
+    <mwc-dialog id="instanceDialog" title="Instanz wählen">
+      <mwc-textfield id="instance" name="instance" label="Instanz" type="text" required dialogInitialFocus></mwc-textfield>
+      <mwc-button slot="primaryAction" @click=${this._chooseInstance}>Auswählen</mwc-button>
+   </mwc-dialog>
+     <kmap-login-popup id="login-popup"></kmap-login-popup>
   <mwc-snackbar id="snackbar" labeltext="${this._renderMessages()}"></mwc-snackbar>
 `;
   }
 
   static get properties() {
     return {
+      _instance: {type: String},
       _userid: {type: String},
       _roles: {type: Array},
       _page: {type: String},
@@ -145,6 +153,7 @@ class KmapMain extends connect(store)(LitElement) {
 
   constructor() {
     super();
+    this._instance = null;
     this._roles = [];
     this._page = "home";
     this._title = 'KMap';
@@ -153,10 +162,15 @@ class KmapMain extends connect(store)(LitElement) {
   }
 
   firstUpdated(changedProperties) {
+    let instance = getCookie("instance");
+    if (instance) {
+      console.log("instance from cookie: " + instance);
+      store.dispatch(chooseInstance(instance));
+    }
+
     installRouter((location) => store.dispatch(navigate(decodeURIComponent(location.hash))));
     installOfflineWatcher((offline) => store.dispatch(updateOffline(offline)));
     installMediaQueryWatcher(`(min-width: 460px)`, () => {});
-    this._drawer = this.shadowRoot.getElementById('drawer');
     this._snackbar = this.shadowRoot.getElementById('snackbar');
     this._loginPopup = this.shadowRoot.getElementById('login-popup');
   }
@@ -179,11 +193,17 @@ class KmapMain extends connect(store)(LitElement) {
         console.log(this._messages);
       }
     }
+
+    if (changedProps.has('_instance')) {
+      if (!this._instance)
+        this.shadowRoot.getElementById('instanceDialog').open = true;
+    }
   }
 
   stateChanged(state) {
     console.log(state);
 
+    this._instance = state.app.instance;
     this._userid = state.app.userid;
     this._roles = state.app.roles;
     this._page = state.app.page;
@@ -232,6 +252,17 @@ class KmapMain extends connect(store)(LitElement) {
   _showLogin() {
     this._loginPopup.show();
   }
+
+  _chooseInstance() {
+    let textfield =  this.shadowRoot.getElementById('instance');
+    store.dispatch(chooseInstance(textfield.value));
+    this.shadowRoot.getElementById('instanceDialog').open = false;
+  }
+}
+
+function getCookie(n) {
+  let a = `; ${document.cookie}`.match(`;\\s*${n}=([^;]+)`);
+  return a ? a[1] : null;
 }
 
 customElements.define('kmap-main', KmapMain);

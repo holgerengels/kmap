@@ -61,6 +61,7 @@ box img {
 
   static get properties() {
     return {
+      instance: {type: String},
       subject: {type: String},
       chapter: {type: String},
       topic: {type: String},
@@ -71,6 +72,7 @@ box img {
 
   constructor() {
     super();
+    this.instance = null;
     this.subject = '';
     this.chapter = '';
     this.topic = '';
@@ -82,7 +84,7 @@ box img {
     if (changedProperties.has("description")) {
       if (this.description) {
         let description = this.description.replace(/inline:/g, config.server + "data/" + this.subject + "/" + this.chapter + "/" + this.topic + "/");
-        description = description.replace(/link:/g, config.client + config.instance + "/#browser/");
+        description = description.replace(/link:/g, config.client + this.instance + "/#browser/");
 
         let buffer = "";
         let t = false;

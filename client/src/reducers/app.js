@@ -1,4 +1,5 @@
 import {
+  CHOOSE_INSTANCE,
   UPDATE_PAGE,
   UPDATE_OFFLINE,
   OPEN_DRAWER,
@@ -19,6 +20,7 @@ import {
 } from '../actions/app.js';
 
 const INITIAL_STATE = {
+  instance: null,
   page: '',
   offline: false,
   messages: [],
@@ -43,6 +45,11 @@ const INITIAL_STATE = {
 
 const app = (state = INITIAL_STATE, action) => {
   switch (action.type) {
+    case CHOOSE_INSTANCE:
+      return {
+        ...state,
+        instance: action.instance
+      };
     case UPDATE_PAGE:
       return {
         ...state,

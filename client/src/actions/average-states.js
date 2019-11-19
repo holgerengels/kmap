@@ -17,6 +17,7 @@ export const fetchAverageStateIfNeeded = (subject, course) => (dispatch, getStat
       credentials: "include",
       headers: {
         "Content-Type": "application/json; charset=utf-8",
+        "X-Instance": state.app.instance,
       }
     })
       .then(handleErrors)

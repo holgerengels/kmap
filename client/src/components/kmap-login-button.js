@@ -15,6 +15,7 @@ class KMapLoginButton extends connect(store)(LitElement) {
 :host {
     display: inline-block;
     outline: none;
+    width: 48px;
 }        
 [hidden] {
   display: none !important;
@@ -23,12 +24,13 @@ class KMapLoginButton extends connect(store)(LitElement) {
   cursor: pointer;
   position: absolute;
   display: flex;
-  right: 4px;
-  top: 4px;
-  height: 40px; 
-  width: 40px;
+  right: 6px;
+  top: 6px;
+  height: 36px; 
+  width: 36px;
   border-radius: 50%; 
   color: black;
+  font-size: 0.95rem;
   background-color: var(--color-secondary);
   box-shadow: var(--elevation-06);
 }

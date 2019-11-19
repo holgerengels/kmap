@@ -88,6 +88,7 @@ class KMapKnowledgeCard extends connect(store)(LitElement) {
   </kmap-knowledge-card-progress>
     ` : ''}
   <kmap-knowledge-card-description
+      .instance="${this._instance}"
       .subject="${this.subject}"
       .chapter="${this.chapter}"
       .topic="${this.card.topic}"
@@ -103,7 +104,7 @@ class KMapKnowledgeCard extends connect(store)(LitElement) {
           ? html`<div>
               <b>Erklärungen</b>
               ${this._explanations.map((attachment, i) => html`
-                  <kmap-card-attachment .attachment="${attachment}"></kmap-card-attachment>
+                  <kmap-card-attachment .instance="${this._instance}" .attachment="${attachment}"></kmap-card-attachment>
               `)}
               </div>
           `
@@ -113,7 +114,7 @@ class KMapKnowledgeCard extends connect(store)(LitElement) {
           ? html`<div>
               <b>Beispiele</b>
               ${this._examples.map((attachment, i) => html`
-                  <kmap-card-attachment .attachment="${attachment}"></kmap-card-attachment>
+                  <kmap-card-attachment .instance="${this._instance}" .attachment="${attachment}"></kmap-card-attachment>
               `)}
               </div>
           `
@@ -123,7 +124,7 @@ class KMapKnowledgeCard extends connect(store)(LitElement) {
           ? html`<div>
               <b>Vorstellung</b>
               ${this._ideas.map((attachment, i) => html`
-                  <kmap-card-attachment .attachment="${attachment}"></kmap-card-attachment>
+                  <kmap-card-attachment .instance="${this._instance}" .attachment="${attachment}"></kmap-card-attachment>
               `)}
               </div>
           `
@@ -133,7 +134,7 @@ class KMapKnowledgeCard extends connect(store)(LitElement) {
           ? html`<div>
               <b>Anwendungen</b>
               ${this._usages.map((attachment, i) => html`
-                  <kmap-card-attachment .attachment="${attachment}"></kmap-card-attachment>
+                  <kmap-card-attachment .instance="${this._instance}" .attachment="${attachment}"></kmap-card-attachment>
               `)}
               </div>
           `
@@ -143,7 +144,7 @@ class KMapKnowledgeCard extends connect(store)(LitElement) {
           ? html`<div>
               <b>Übungen</b>
               ${this._exercises.map((attachment, i) => html`
-                  <kmap-card-attachment .attachment="${attachment}"></kmap-card-attachment>
+                  <kmap-card-attachment .instance="${this._instance}" .attachment="${attachment}"></kmap-card-attachment>
               `)}
               </div>
           `
@@ -163,6 +164,7 @@ class KMapKnowledgeCard extends connect(store)(LitElement) {
 
   static get properties() {
     return {
+      _instance: {type: String},
       subject: {type: String},
       chapter: {type: String},
       card: {type: Object},
@@ -184,6 +186,7 @@ class KMapKnowledgeCard extends connect(store)(LitElement) {
 
   constructor() {
     super();
+    this._instance = null;
     this._colorStyles = { "--color-rated":  "--color-darkgray", "--color-unrated": "--color-lightgray" };
     this._colorize("0");
   }
@@ -196,6 +199,7 @@ class KMapKnowledgeCard extends connect(store)(LitElement) {
   }
 
   stateChanged(state) {
+    this._instance = state.app.instance;
     this._rating(state);
   }
 

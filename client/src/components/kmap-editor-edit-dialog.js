@@ -102,7 +102,7 @@ kmap-knowledge-card-description {
     return html`
 <mwc-dialog id="editDialog" title="Editor">
 ${this._card ? html`
-  <form @focus="${this._focus}">
+  <form @focus="${this._focus}" @keydown="${this._captureEnter}">
     <mwc-textfield id="topic" name="topic" disabled label="Thema" dense type="text" .value="${this._card.topic !== '_' ? this._card.topic : "Allgemeines zu " + this._card.chapter}"></mwc-textfield>
     <br/>
     <mwc-textfield ?hidden="${this._card.topic === '_'}" id="links" name="links" label="Verweist auf ..." dense type="text" .value="${this._card.links}" @change="${e => this._card.links = e.target.value}"></mwc-textfield>
@@ -151,6 +151,7 @@ ${this._card ? html`
 
   static get properties() {
     return {
+      _instance: {type: String},
       _userid: {type: String},
       _subject: {type: String},
       _chapter: {type: String},
@@ -169,6 +170,7 @@ ${this._card ? html`
 
   constructor() {
     super();
+    this._instance = null;
     this._userid = '';
     this._subject = '';
     this._chapter = '';
@@ -206,6 +208,7 @@ ${this._card ? html`
   }
 
   stateChanged(state) {
+    this._instance = state.app.instance;
     this._userid = state.app.userid;
     this._card = state.app.cardForEdit;
 
@@ -330,6 +333,7 @@ ${this._card ? html`
       credentials: "include",
       headers: {
         "Content-Type": "application/json; charset=utf-8",
+        "X-Instance": this._instance,
       }
     })
       .then(handleErrors)
@@ -374,6 +378,7 @@ ${this._card ? html`
       credentials: "include",
       headers: {
         "Content-Type": "application/json; charset=utf-8",
+        "X-Instance": this._instance,
       }
     })
       .then(handleErrors)
@@ -387,6 +392,11 @@ ${this._card ? html`
         if (error.message === "invalid session")
           store.dispatch(logout({userid: this._userid}));
       });
+  }
+
+  _captureEnter(e) {
+    if (!e.metaKey && e.key === "Enter")
+      e.cancelBubble = true;
   }
 }
 

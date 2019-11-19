@@ -7,7 +7,8 @@ export const RENAME_TOPIC = 'RENAME_TOPIC';
 export const DELETE_TOPIC = 'DELETE_TOPIC';
 
 export const saveTopic = (subject, module, card) => (dispatch, getState) => {
-  let userid = getState().app.userid;
+  let state = getState();
+  let userid = state.app.userid;
 
   if (userid && subject && module && card) {
     dispatch(requestSaveTopic(subject, module, card));
@@ -18,6 +19,7 @@ export const saveTopic = (subject, module, card) => (dispatch, getState) => {
       credentials: "include",
       headers: {
         "Content-Type": "application/json; charset=utf-8",
+        "X-Instance": state.app.instance,
       },
       body: JSON.stringify(card.added ? {changed: card} : {old: card, changed: card})
     })
@@ -49,7 +51,8 @@ const failSaveTopic = (subject, module, card, response) => {
 };
 
 export const renameTopic = (subject, module, card, name) => (dispatch, getState) => {
-  let userid = getState().app.userid;
+  let state = getState();
+  let userid = state.app.userid;
 
   if (userid && subject && module && card && name) {
     dispatch(requestRenameTopic(subject, module, card));
@@ -60,6 +63,7 @@ export const renameTopic = (subject, module, card, name) => (dispatch, getState)
       credentials: "include",
       headers: {
         "Content-Type": "application/json; charset=utf-8",
+        "X-Instance": state.app.instance,
       },
       body: JSON.stringify({rename: card, name})
     })
@@ -91,7 +95,8 @@ const failRenameTopic = (subject, module, card, name, response) => {
 };
 
 export const deleteTopic = (subject, module, card) => (dispatch, getState) => {
-  let userid = getState().app.userid;
+  let state = getState();
+  let userid = state.app.userid;
 
   if (userid && subject && module && card) {
     dispatch(requestDeleteTopic(subject, module, card));
@@ -102,6 +107,7 @@ export const deleteTopic = (subject, module, card) => (dispatch, getState) => {
       credentials: "include",
       headers: {
         "Content-Type": "application/json; charset=utf-8",
+        "X-Instance": state.app.instance,
       },
       body: JSON.stringify({delete: card})
     })

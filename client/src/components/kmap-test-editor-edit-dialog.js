@@ -63,6 +63,12 @@ kmap-test-card {
       0 1px 5px 0 rgba(0, 0, 0, 0.12),
       0 3px 1px -2px rgba(0, 0, 0, 0.2);
 }
+select {
+  border: none;
+  border-bottom: 1px solid var(--color-mediumgray);
+  padding: 12px;
+  background-color: var(--color-lightgray);
+}
     `];
   }
 
@@ -71,21 +77,21 @@ kmap-test-card {
     return html`
 <mwc-dialog id="editDialog" title="Editor">
 ${this._test ? html`
-  <form @focus="${this._focus}">
+  <form @focus="${this._focus}" @keydown="${this._captureEnter}" @input="${this._checkValidity}">
     <mwc-formfield alignend="" label="Kapitel">
       <select required @change="${e => this._chapter = e.target.value}">
-        <option>- - -</option>
-        ${this._chapters.map((chapter, i) => html`<option ?selected="${chapter === this._chapter}">${chapter}</option>`)}
+        <option value="">- - -</option>
+        ${this._chapters.map((chapter, i) => html`<option value="${chapter}" ?selected="${chapter === this._chapter}">${chapter}</option>`)}
       </select>
       </mwc-formfield>
       <mwc-formfield alignend="" label="Thema">
       <select required @change="${e => this._topic = e.target.value}">
-        <option>- - -</option>
-        ${this._topics.map((topic, i) => html`<option ?selected="${topic === this._topic}">${topic}</option>`)}
+        <option value="">- - -</option>
+        ${this._topics.map((topic, i) => html`<option value="${topic}" ?selected="${topic === this._topic}">${topic}</option>`)}
       </select>
     </mwc-formfield>
-    <br/>
-    <mwc-textfield id="key" name="key" label="Titel" dense type="text" .value="${this._key}" @change="${e => this._key = e.target.value}"></mwc-textfield>
+    <br/><br/>
+    <mwc-textfield id="key" name="key" label="Titel" dense type="text" required .value="${this._key}" @change="${e => this._key = e.target.value}"></mwc-textfield>
     <mwc-textfield id="level" name="level" label="Level" dense type="number" inputmode="numeric" min="1" max="3" step="1" .value="${this._level}" @change="${e => this._level = e.target.value}"></mwc-textfield>
     <br/>
     <mwc-formfield alignend="" label="Layout Verhältnis Frage zu Antwort: ${this._balance} zu ${6 - this._balance}   ">
@@ -114,13 +120,14 @@ ${this._test ? html`
 
   <mwc-icon-button slot="secondaryAction" icon="folder_open" title="Cloud Verzeichnis öffnen" @click=${this._createDirectory}></mwc-icon-button>
   <mwc-button slot="secondaryAction" @click=${this._cancel}>Abbrechen</mwc-button>
-  <mwc-button slot="primaryAction" @click=${this._save}>Speichern</mwc-button>
+  <mwc-button slot="primaryAction" @click=${this._save} ?disabled="${!this._valid}">Speichern</mwc-button>
 </mwc-dialog>
     `;
     }
 
   static get properties() {
     return {
+      _instance: {type: String},
       _userid: {type: String},
       _test: {type: Object},
       _subject: {type: String},
@@ -137,11 +144,14 @@ ${this._test ? html`
 
       _chapters: {type: Array},
       _topics: {type: Array},
+
+      _valid: {type: Boolean},
     };
   }
 
   constructor() {
     super();
+    this._instance = null;
     this._userid = '';
     this._test = null;
     this._subject = '';
@@ -168,7 +178,7 @@ ${this._test ? html`
 
   updated(changedProperties) {
     if (changedProperties.has('_test') && this._test) {
-      this._editDialog.open = true
+      this._editDialog.open = true;
 
       this._subject  = this._test.subject;
       this._chapter  = this._test.chapter;
@@ -181,6 +191,7 @@ ${this._test ? html`
       this._oldValues = [...this._values];
 
       this._editDialog.forceLayout();
+      this._checkValidity();
     }
 
     if (changedProperties.has('_subject'))
@@ -207,6 +218,7 @@ ${this._test ? html`
   }
 
   stateChanged(state) {
+    this._instance = state.app.instance;
     this._userid = state.app.userid;
     this._test = state.app.testForEdit;
 
@@ -228,6 +240,8 @@ ${this._test ? html`
       if (!this._test.values)
         this._test.values = [];
 
+      this._oldTest = { ...this._test };
+
       this._newSet = !state.contentSets.sets.includes({subject: this._test.subject, set: this._test.set});
     }
   }
@@ -241,6 +255,7 @@ ${this._test ? html`
         credentials: "include",
         headers: {
           "Content-Type": "application/json; charset=utf-8",
+          "X-Instance": this._instance,
         }
       })
         .then(handleErrors)
@@ -265,6 +280,7 @@ ${this._test ? html`
         credentials: "include",
         headers: {
           "Content-Type": "application/json; charset=utf-8",
+          "X-Instance": this._instance,
         }
       })
         .then(handleErrors)
@@ -305,7 +321,7 @@ ${this._test ? html`
     let test = this._test;
     console.log(test);
 
-    store.dispatch(saveTest(test.subject, test.set, test))
+    store.dispatch(saveTest(test.subject, test.set, this._oldTest, test))
       .then(store.dispatch(unsetTestForEdit()))
       .then(lala => window.setTimeout(function(test, newSet) {
         if (newSet) {
@@ -353,6 +369,7 @@ ${this._test ? html`
       credentials: "include",
       headers: {
         "Content-Type": "application/json; charset=utf-8",
+        "X-Instance": this._instance,
       }
     })
       .then(handleErrors)
@@ -366,6 +383,19 @@ ${this._test ? html`
         if (error.message === "invalid session")
           store.dispatch(logout({userid: this._userid}));
       });
+  }
+
+  _checkValidity() {
+    let valid = true;
+    for (const element of this.shadowRoot.querySelectorAll('[required]')) {
+      valid = valid && element.checkValidity();
+    }
+    this._valid = valid;
+  }
+
+  _captureEnter(e) {
+    if (!e.metaKey && e.key === "Enter")
+      e.cancelBubble = true;
   }
 }
 

@@ -55,28 +55,29 @@ class KMapCardAttachment extends LitElement {
       else if (this._handler)
         return html `
             <a href="${this._handler}${this.attachment.href}" target="_blank">${this.attachment.name}&nbsp;<mwc-icon>open_in_new</mwc-icon></a>
-            <a href="${config.server}${this.attachment.href}?instance=${config.instance}" download="${this._isDownload}" target="${this._isTarget}"><mwc-icon>cloud_download</mwc-icon></a>
+            <a href="${config.server}${this.attachment.href}?instance=${this.instance}" download="${this._isDownload}" target="${this._isTarget}"><mwc-icon>cloud_download</mwc-icon></a>
         `;
       else if (this._isDownload && this._isTarget)
         return html `
-            <a href="${config.server}${this.attachment.href}?instance=${config.instance}" download="${this._isDownload}" target="${this._isTarget}">${this.attachment.name}</a>
+            <a href="${config.server}${this.attachment.href}?instance=${this.instance}" download="${this._isDownload}" target="${this._isTarget}">${this.attachment.name}</a>
         `;
       else if (this._isDownload)
         return html `
-            <a href="${config.server}${this.attachment.href}?instance=${config.instance}" download="${this._isDownload}">${this.attachment.name}</a>
+            <a href="${config.server}${this.attachment.href}?instance=${this.instance}" download="${this._isDownload}">${this.attachment.name}</a>
         `;
       else if (this._isTarget)
         return html `
-            <a href="${config.server}${this.attachment.href}?instance=${config.instance}" target="${this._isTarget}">${this.attachment.name}</a>
+            <a href="${config.server}${this.attachment.href}?instance=${this.instance}" target="${this._isTarget}">${this.attachment.name}</a>
         `;
       else
         return html `
-            <a href="${config.server}${this.attachment.href}?instance=${config.instance}">${this.attachment.name}</a>
+            <a href="${config.server}${this.attachment.href}?instance=${this.instance}">${this.attachment.name}</a>
         `;
     }
 
     static get properties() {
         return {
+          instance: {type: String},
             attachment: {type: Object},
             _fileServer: {type: String},
             _supportsDownload: {type: Boolean},
@@ -86,6 +87,11 @@ class KMapCardAttachment extends LitElement {
             _isTarget: {type: String},
         }
     }
+
+  constructor() {
+    super();
+    this.instance = null;
+  }
 
     firstUpdated() {
         this._supportsDownload = !(/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream);

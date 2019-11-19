@@ -22,7 +22,7 @@ class KMapTestEditorScroller extends connect(store)(LitElement) {
                   bottom: 0;
                   left: 0;
                   right: 0;
-                  margin: 16px;
+                  margin: 8px;
                   padding: 16px;
                   box-shadow: var(--elevation);
                   background-color: whitesmoke;

@@ -93,6 +93,18 @@ input[correction=correct] {
 input[correction=incorrect] {
   outline-color: var(--color-red);
 }
+.blink {
+    animation: blinker .2s ease-in-out 2;
+}
+@keyframes blinker {
+    70% {
+        text-shadow: 1px 1px 4px var(--color-darkgray);
+    }
+}
+mwc-icon {
+  vertical-align: middle;
+  --mdc-icon-size: 1.2em;
+}
       `];
   }
 
@@ -101,7 +113,7 @@ input[correction=incorrect] {
   <div class="card-header" ?hidden="${this.hideHeader}">
       <span>Aufgabe ${this.num + 1} von ${this.of} (${this._levelText()})</span>
       <div style="flex: 1 0 auto"></div>
-      <a href="#browser/${this.subject}/${this.chapter}/${this.topic}" target="_blank">Wissenskarte ansehen <iron-icon icon="icons:open-in-new"></iron-icon></a>
+      <a href="#browser/${this.subject}/${this.chapter}/${this.topic}" target="_blank" id="blinky">Wissenskarte ansehen <mwc-icon>open_in_new</mwc-icon></a>
   </div>
   <div class="card-content">
       <div id="question" style="${this.questionFlex}"></div>
@@ -262,6 +274,13 @@ input[correction=incorrect] {
     this.correct = everythingCorrect;
     this.sent = this.sent || this.correct;
     this.attempts++;
+    if (!everythingCorrect) {
+      let blinky = this.shadowRoot.getElementById('blinky');
+      blinky.addEventListener("animationend", e => {
+        blinky.className = undefined;
+      });
+      blinky.className = "blink";
+    }
   }
 
   showAnswer() {

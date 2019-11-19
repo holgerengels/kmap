@@ -19,6 +19,7 @@ export const loadSet = (subject, set) => (dispatch, getState) => {
       credentials: "include",
       headers: {
         "Content-Type": "application/json; charset=utf-8",
+        "X-Instance": state.app.instance,
       }
     })
       .then(handleErrors)
@@ -56,10 +57,13 @@ export const forgetSet = () => {
 };
 
 
-export const saveTest = (subject, set, test) => (dispatch, getState) => {
-  let userid = getState().app.userid;
+export const saveTest = (subject, set, old, test) => (dispatch, getState) => {
+  let state = getState();
+  let userid = state.app.userid;
 
   if (userid && subject && set && test) {
+    if (!old)
+      old = test;
     dispatch(requestSaveTest(subject, set, test.title));
     return fetch(`${config.server}tests?userid=${userid}&subject=${subject}&save=${set}`, {
       method: "POST",
@@ -68,8 +72,9 @@ export const saveTest = (subject, set, test) => (dispatch, getState) => {
       credentials: "include",
       headers: {
         "Content-Type": "application/json; charset=utf-8",
+        "X-Instance": state.app.instance,
       },
-      body: JSON.stringify(test.added ? {changed: test} : {old: test, changed: test})
+      body: JSON.stringify(test.added ? {changed: test} : {old: old, changed: test})
     })
       .then(handleErrors)
       .then(res => res.json())
@@ -99,7 +104,8 @@ const failSaveTest = (subject, set, test, response) => {
 };
 
 export const deleteTest = (subject, set, test) => (dispatch, getState) => {
-  let userid = getState().app.userid;
+  let state = getState();
+  let userid = state.app.userid;
 
   if (userid && subject && set && test) {
     test.delete = true;
@@ -111,6 +117,7 @@ export const deleteTest = (subject, set, test) => (dispatch, getState) => {
       credentials: "include",
       headers: {
         "Content-Type": "application/json; charset=utf-8",
+        "X-Instance": state.app.instance,
       },
       body: JSON.stringify({delete: test})
     })

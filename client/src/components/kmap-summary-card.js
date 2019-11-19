@@ -7,11 +7,11 @@ import {fontStyles, colorStyles} from "./kmap-styles";
 
 import '@material/mwc-icon';
 import '@material/mwc-ripple';
-import './star-rating';
 import './kmap-summary-card-summary';
 import './kmap-summary-card-averages';
 import './kmap-summary-card-editor';
 import './kmap-summary-card-rating';
+import './kmap-summary-card-ratecolors';
 
 class KMapSummaryCard extends connect(store)(LitElement) {
 
@@ -104,12 +104,15 @@ div.card[highlighted] {
       <kmap-summary-card-editor id="editor" .key="${this._key}" .card="${this.card}" @statecolor="${this._colorizeEvent}"></kmap-summary-card-editor>
     ` : ''
       }
+  ${!this._layers.includes('averages') ? html`
+      <kmap-summary-card-ratecolors id="rating" .key="${this._key}" @statecolor="${this._colorizeEvent}"></kmap-summary-card-ratecolors>
+  ` : ''}
   <div class="card-footer font-body">
       ${this.card.links
       ? html`<a slot="footer" href="#browser/${this.subject}/${this.card.links}"><mwc-ripple></mwc-ripple><mwc-icon>open_in_new</mwc-icon></a>`
       : html`
         ${!this._layers.includes('averages') ? html`
-          <kmap-summary-card-rating id="rating" .key="${this._key}" .lightest="${this._lightest}" .opaque="${this._opaque}" @statecolor="${this._colorizeEvent}"></kmap-summary-card-rating>
+          <kmap-summary-card-rating .key="${this._key}" .lightest="${this._lightest}" .opaque="${this._opaque}"></kmap-summary-card-rating>
         ` : '' }
       `}
                       

@@ -80,7 +80,10 @@
                 <configuration>
                     <path>/kmap</path>
                     <uriEncoding>utf-8</uriEncoding>
+                    <server>gollum</server>
                     <port>8081</port>
+                    <httpsPort>8443</httpsPort>
+                    <keystorePass>changeit</keystorePass>
                 </configuration>
             </plugin>
 

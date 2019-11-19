@@ -7,6 +7,8 @@ import {colorStyles, fontStyles} from "./kmap-styles";
 import '@material/mwc-button';
 import '@material/mwc-dialog';
 import '@material/mwc-textfield';
+import 'pwa-helper-components/pwa-install-button';
+import 'pwa-helper-components/pwa-update-available';
 
 class KMapLoginPopup extends connect(store)(LitElement) {
   static get styles() {
@@ -17,18 +19,10 @@ class KMapLoginPopup extends connect(store)(LitElement) {
       css`
 form {
   width: 300px;
+  display: block;
 }
 [hidden] {
   display: none !important;
-}
-
-.form, .button, #message {
-  display: block;
-}
-.field {
-    display: flex;
-    justify-content: space-between;
-    margin: .5rem;
 }
 mwc-textfield {
   width: 300px;
@@ -50,10 +44,12 @@ mwc-textfield {
       Angemeldet als ${this._userid} ..
     </form>
     <div class="layout horizontal">
-      <div id="message" style="height: 32px">${this._message}</div>
+      <div id="message" style="height: 32px; padding-top: 10px">${this._message}</div>
     </div>
     <mwc-button slot="primaryAction" ?hidden="${this._userid}" @click=${this._login}>Anmelden</mwc-button>
     <mwc-button slot="secondaryAction" ?hidden="${!this._userid}" @click=${this._logout}>Abmelden</mwc-button>
+    <pwa-install-button slot="secondaryAction"><mwc-button>App installieren</mwc-button></pwa-install-button>
+    <pwa-update-available slot="secondaryAction"><mwc-button>App aktualisieren</mwc-button></pwa-update-available>
   </mwc-dialog>
     `;
   }

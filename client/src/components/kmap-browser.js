@@ -14,6 +14,8 @@ import './kmap-summary-card';
 import './kmap-knowledge-card';
 import './kmap-browser-chapter-editor';
 
+const _standalone = (window.matchMedia('(display-mode: standalone)').matches) || (window.navigator.standalone) || document.referrer.includes('android-app://');
+
 class KMapBrowser extends connect(store)(LitElement) {
   static get styles() {
     // language=CSS
@@ -55,6 +57,9 @@ class KMapBrowser extends connect(store)(LitElement) {
 .page[active] {
   display: block;
 }
+[hidden] {
+  display: none !important;
+}
       `];
   }
 
@@ -63,6 +68,7 @@ class KMapBrowser extends connect(store)(LitElement) {
     return html`
       <mwc-top-app-bar id="bar" dense>
         <mwc-icon-button icon="menu" slot="navigationIcon" @click="${e => this._fire('toggleDrawer')}"></mwc-icon-button>
+        <mwc-icon-button icon="arrow_back" slot="navigationIcon" @click="${e => history.back()}" ?hidden="${!_standalone}"></mwc-icon-button>
         <div slot="title">${this._chapter}</div>
         <kmap-login-button slot="actionItems" @lclick="${e => this._fire('login')}"></kmap-login-button>
       </mwc-top-app-bar>
