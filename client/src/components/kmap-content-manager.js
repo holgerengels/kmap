@@ -106,9 +106,10 @@ mwc-icon {
 
   _chooseInstance() {
     let textfield =  this.shadowRoot.getElementById('instance');
-    this.shadowRoot.getElementById('dialog').open = false;
+    let instance = textfield.value;
     set("instance", instance)
       .then(() => location.reload());
+    this.shadowRoot.getElementById('dialog').open = false;
   }
 }
 customElements.define('kmap-content-manager', KMapContentManager);

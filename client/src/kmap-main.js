@@ -260,8 +260,8 @@ class KmapMain extends connect(store)(LitElement) {
   _chooseInstance() {
     let textfield =  this.shadowRoot.getElementById('instance');
     let instance = textfield.value;
-    set("instance", instance);
-    store.dispatch(chooseInstance(instance));
+    set("instance", instance)
+      .then(() => store.dispatch(chooseInstance(instance)));
     this.shadowRoot.getElementById('instanceDialog').open = false;
   }
 }
