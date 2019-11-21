@@ -12,6 +12,7 @@ import '@material/mwc-top-app-bar';
 import './kmap-content-manager-instances';
 import './kmap-content-manager-modules';
 import './kmap-content-manager-sets';
+import {set} from "idb-keyval";
 
 class KMapContentManager extends connect(store)(LitElement) {
   static get styles() {
@@ -106,8 +107,8 @@ mwc-icon {
   _chooseInstance() {
     let textfield =  this.shadowRoot.getElementById('instance');
     this.shadowRoot.getElementById('dialog').open = false;
-    document.cookie = "instance=" + textfield.value;
-    location.reload();
+    set("instance", instance)
+      .then(() => location.reload());
   }
 }
 customElements.define('kmap-content-manager', KMapContentManager);

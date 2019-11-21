@@ -1,4 +1,5 @@
 import { LitElement, html, css } from 'lit-element';
+import { get, set } from 'idb-keyval';
 import {connect} from 'pwa-helpers/connect-mixin.js';
 import {installMediaQueryWatcher} from 'pwa-helpers/media-query.js';
 import {installOfflineWatcher} from 'pwa-helpers/network.js';
@@ -162,11 +163,19 @@ class KmapMain extends connect(store)(LitElement) {
   }
 
   firstUpdated(changedProperties) {
-    let instance = getCookie("instance");
-    if (instance) {
-      console.log("instance from cookie: " + instance);
-      store.dispatch(chooseInstance(instance));
-    }
+    get('instance').then(instance => {
+      if (instance) {
+        console.log("instance from idb: " + instance);
+        store.dispatch(chooseInstance(instance));
+      }
+      else if((instance = getCookie("instance"))) {
+        console.log("instance from cookie: " + instance);
+        set("instance", instance);
+        store.dispatch(chooseInstance(instance));
+      }
+      else
+        this.shadowRoot.getElementById('instanceDialog').open = true;
+    });
 
     installRouter((location) => store.dispatch(navigate(decodeURIComponent(location.hash))));
     installOfflineWatcher((offline) => store.dispatch(updateOffline(offline)));
@@ -192,11 +201,6 @@ class KmapMain extends connect(store)(LitElement) {
         this._snackbar.open();
         console.log(this._messages);
       }
-    }
-
-    if (changedProps.has('_instance')) {
-      if (!this._instance)
-        this.shadowRoot.getElementById('instanceDialog').open = true;
     }
   }
 
@@ -255,7 +259,9 @@ class KmapMain extends connect(store)(LitElement) {
 
   _chooseInstance() {
     let textfield =  this.shadowRoot.getElementById('instance');
-    store.dispatch(chooseInstance(textfield.value));
+    let instance = textfield.value;
+    set("instance", instance);
+    store.dispatch(chooseInstance(instance));
     this.shadowRoot.getElementById('instanceDialog').open = false;
   }
 }
