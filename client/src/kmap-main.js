@@ -8,6 +8,16 @@ import {updateMetadata} from 'pwa-helpers/metadata.js';
 import {fontStyles, colorStyles} from "./components/kmap-styles";
 import "web-animations-js/web-animations.min";
 
+if (!window.location.host.includes("localhost")) {
+  let pathComponent = window.location.pathname.split('/')[1];
+  console.log(pathComponent);
+  if (pathComponent !== "app") {
+    console.log("redirect ..");
+    set("instance", pathComponent)
+      .then(() => window.location.pathname = window.location.pathname.replace(pathComponent, "app"));
+  }
+}
+
 import {store} from './store.js';
 
 import {
@@ -168,11 +178,6 @@ class KmapMain extends connect(store)(LitElement) {
         console.log("instance from idb: " + instance);
         store.dispatch(chooseInstance(instance));
       }
-      else if((instance = getCookie("instance"))) {
-        console.log("instance from cookie: " + instance);
-        set("instance", instance);
-        store.dispatch(chooseInstance(instance));
-      }
       else
         this.shadowRoot.getElementById('instanceDialog').open = true;
     });
@@ -264,11 +269,6 @@ class KmapMain extends connect(store)(LitElement) {
       .then(() => store.dispatch(chooseInstance(instance)));
     this.shadowRoot.getElementById('instanceDialog').open = false;
   }
-}
-
-function getCookie(n) {
-  let a = `; ${document.cookie}`.match(`;\\s*${n}=([^;]+)`);
-  return a ? a[1] : null;
 }
 
 customElements.define('kmap-main', KmapMain);
