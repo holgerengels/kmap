@@ -10,15 +10,15 @@ import "web-animations-js/web-animations.min";
 
 if (!window.location.host.includes("localhost")) {
   let pathComponent = window.location.pathname.split('/')[1];
-  let fromCookie = getCookie("instance");
+  let instance = getCookie("instance");
   if (pathComponent !== "app") {
     console.log("choose instance .. " + pathComponent);
     document.cookie = "instance=" + pathComponent + "; path=/";
     window.location.pathname = window.location.pathname.replace(pathComponent, "app");
   }
-  else if (fromCookie) {
-    console.log("instance from cookie .. " + fromCookie);
-    document.cookie = "instance=" + fromCookie + "; path=/; expires=0";
+  else if (instance) {
+    console.log("instance from cookie .. " + instance);
+    document.cookie = "instance=" + instance + "; path=/; expires=0";
     set("instance", instance)
       .then(() => store.dispatch(chooseInstance(instance)));
   }
