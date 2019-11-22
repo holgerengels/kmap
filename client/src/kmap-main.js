@@ -10,17 +10,27 @@ import "web-animations-js/web-animations.min";
 
 if (!window.location.host.includes("localhost")) {
   let pathComponent = window.location.pathname.split('/')[1];
-  let instance = getCookie("instance");
+  let cookie = getCookie("instance");
   if (pathComponent !== "app") {
     console.log("choose instance .. " + pathComponent);
     document.cookie = "instance=" + pathComponent + "; path=/";
     window.location.pathname = window.location.pathname.replace(pathComponent, "app");
   }
-  else if (instance) {
-    console.log("instance from cookie .. " + instance);
-    document.cookie = "instance=" + instance + "; path=/; expires=0";
-    set("instance", instance)
-      .then(() => store.dispatch(chooseInstance(instance)));
+  else if (cookie) {
+    console.log("instance from cookie .. " + cookie);
+    document.cookie = "instance=" + cookie + "; path=/; expires=0";
+    set("instance", cookie)
+      .then(() => store.dispatch(chooseInstance(cookie)));
+  }
+  else {
+    get('instance').then(instance => {
+      if (instance) {
+        console.log("instance from idb .. " + instance);
+        store.dispatch(chooseInstance(instance));
+      }
+      else
+        this.shadowRoot.getElementById('instanceDialog').open = true;
+    });
   }
 }
 
@@ -184,15 +194,6 @@ class KmapMain extends connect(store)(LitElement) {
   }
 
   firstUpdated(changedProperties) {
-    get('instance').then(instance => {
-      if (instance) {
-        console.log("instance from idb: " + instance);
-        store.dispatch(chooseInstance(instance));
-      }
-      else
-        this.shadowRoot.getElementById('instanceDialog').open = true;
-    });
-
     installRouter((location) => store.dispatch(navigate(decodeURIComponent(location.hash))));
     installOfflineWatcher((offline) => store.dispatch(updateOffline(offline)));
     installMediaQueryWatcher(`(min-width: 460px)`, () => {});
