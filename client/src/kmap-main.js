@@ -10,11 +10,18 @@ import "web-animations-js/web-animations.min";
 
 if (!window.location.host.includes("localhost")) {
   let pathComponent = window.location.pathname.split('/')[1];
-  console.log(pathComponent);
+  let search = window.location.search;
   if (pathComponent !== "app") {
-    console.log("redirect ..");
-    set("instance", pathComponent)
-      .then(() => window.location.pathname = window.location.pathname.replace(pathComponent, "app"));
+    console.log("choose instance .. " + pathComponent);
+    window.location.pathname = window.location.pathname.replace(pathComponent, "app") + "?instance=" + pathComponent;
+  }
+  else if (search) {
+    let params = new URLSearchParams(search);
+    let instance = params.get("instance");
+    if (instance) {
+      console.log("instance from query .. " + instance);
+      set("instance", instance);
+    }
   }
 }
 
