@@ -10,19 +10,22 @@ import "web-animations-js/web-animations.min";
 
 if (!window.location.host.includes("localhost")) {
   let pathComponent = window.location.pathname.split('/')[1];
-  let search = window.location.search;
+  let fromCookie = getCookie("instance");
   if (pathComponent !== "app") {
     console.log("choose instance .. " + pathComponent);
-    window.location.pathname = window.location.pathname.replace(pathComponent, "app") + "?instance=" + pathComponent;
+    document.cookie = "instance=" + pathComponent + "; path=/";
+    window.location.pathname = window.location.pathname.replace(pathComponent, "app");
   }
-  else if (search) {
-    let params = new URLSearchParams(search);
-    let instance = params.get("instance");
-    if (instance) {
-      console.log("instance from query .. " + instance);
-      set("instance", instance);
-    }
+  else if (fromCookie) {
+    console.log("instance from cookie .. " + fromCookie);
+    document.cookie = "instance=" + fromCookie + "; path=/; expires=0";
+    set("instance", instance);
   }
+}
+
+function getCookie(n) {
+  let a = `; ${document.cookie}`.match(`;\\s*${n}=([^;]+)`);
+  return a ? a[1] : null;
 }
 
 import {store} from './store.js';
