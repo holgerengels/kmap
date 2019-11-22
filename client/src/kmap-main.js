@@ -19,7 +19,8 @@ if (!window.location.host.includes("localhost")) {
   else if (fromCookie) {
     console.log("instance from cookie .. " + fromCookie);
     document.cookie = "instance=" + fromCookie + "; path=/; expires=0";
-    set("instance", instance);
+    set("instance", instance)
+      .then(() => store.dispatch(chooseInstance(instance)));
   }
 }
 
