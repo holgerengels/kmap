@@ -8,11 +8,6 @@ import {updateMetadata} from 'pwa-helpers/metadata.js';
 import {fontStyles, colorStyles} from "./components/kmap-styles";
 import "web-animations-js/web-animations.min";
 
-function getCookie(n) {
-  let a = `; ${document.cookie}`.match(`;\\s*${n}=([^;]+)`);
-  return a ? a[1] : null;
-}
-
 import {store} from './store.js';
 
 import {
@@ -88,7 +83,7 @@ class KmapMain extends connect(store)(LitElement) {
     // language=HTML
     return html`
   <mwc-drawer id="drawer" hasheader type="dismissible" ?open="${this._drawerOpen}">
-    <span slot="title">KMap</span>
+    <span slot="title">KMap <span class="secondary" style="vertical-align: middle">[${this._instance}]</span></span>
     <span slot="subtitle">Knowledge Map</span>
     <div class="drawer-content">
       <nav class="drawer-list">
@@ -170,7 +165,7 @@ class KmapMain extends connect(store)(LitElement) {
   firstUpdated(changedProperties) {
     if (!window.location.host.includes("localhost")) {
       let pathComponent = window.location.pathname.split('/')[1];
-      let cookie = getCookie("instance");
+      let cookie = this._getCookie("instance");
       if (pathComponent !== "app") {
         console.log("choose instance .. " + pathComponent);
         document.cookie = "instance=" + pathComponent + "; path=/";
@@ -193,6 +188,8 @@ class KmapMain extends connect(store)(LitElement) {
         });
       }
     }
+    else
+      store.dispatch(chooseInstance("lala"));
 
     installRouter((location) => store.dispatch(navigate(decodeURIComponent(location.hash))));
     installOfflineWatcher((offline) => store.dispatch(updateOffline(offline)));
@@ -280,6 +277,11 @@ class KmapMain extends connect(store)(LitElement) {
     set("instance", instance)
       .then(() => store.dispatch(chooseInstance(instance)));
     this.shadowRoot.getElementById('instanceDialog').open = false;
+  }
+
+  _getCookie(n) {
+    let a = `; ${document.cookie}`.match(`;\\s*${n}=([^;]+)`);
+    return a ? a[1] : null;
   }
 }
 

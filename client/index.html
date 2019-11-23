@@ -12,7 +12,7 @@
   <link href="https://fonts.googleapis.com/css?family=Material+Icons&display=block" rel="stylesheet">
 
   <script>
-      if ('serviceWorker' in navigator) {
+      if (!window.location.host.includes("localhost") && 'serviceWorker' in navigator) {
           window.addEventListener('load', () => {
               navigator.serviceWorker.register('./sw.js');
           });
