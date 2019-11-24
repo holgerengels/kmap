@@ -1,5 +1,6 @@
 import {
   CHOOSE_INSTANCE,
+  UPDATE_NARROW_LAYOUT,
   UPDATE_PAGE,
   UPDATE_OFFLINE,
   OPEN_DRAWER,
@@ -21,6 +22,7 @@ import {
 
 const INITIAL_STATE = {
   instance: null,
+  narrow: false,
   page: '',
   offline: false,
   messages: [],
@@ -49,6 +51,11 @@ const app = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         instance: action.instance
+      };
+    case UPDATE_NARROW_LAYOUT:
+      return {
+        ...state,
+        narrow: action.narrow
       };
     case UPDATE_PAGE:
       return {

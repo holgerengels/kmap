@@ -70,6 +70,9 @@ class KMapTestCard extends connect(store)(LitElement) {
   border-bottom-left-radius: 4px;
   border-bottom-right-radius: 4px;
 }
+.card-footer[stacked] {
+    flex-wrap: wrap;
+}
 .card-footer a {
     color: black;
 }
@@ -120,7 +123,7 @@ mwc-icon {
       <div id="answer" style="${this.answerFlex}"></div>
   </div>
   ${this.showActions ? html`
-    <div class="card-footer">
+    <div class="card-footer" ?stacked="${this._narrow}">
         <mwc-button @click="${this.showAnswer}">Richtige Antwort zeigen</mwc-button>
         <div style="flex: 1 0 auto"></div>
         <mwc-button @click="${this.sendAnswer}" ?hidden="${this.sent}">Antwort abschicken</mwc-button>
@@ -150,6 +153,7 @@ mwc-icon {
       questionFlex: {type: String},
       answerFlex: {type: String},
       balance: {type: Number},
+      _narrow: {type: Boolean},
     };
   }
 
@@ -161,6 +165,7 @@ mwc-icon {
     this.attempts = 0;
     this.balance = 4;
     this._colorize("0");
+    this._narrow = false;
   }
 
   _colorize(rate) {
@@ -184,6 +189,11 @@ mwc-icon {
       this._mathAnswer(this.answer);
     if (changedProperties.has("balance"))
       this._flexes(this.balance);
+  }
+
+  stateChanged(state) {
+    this._narrow = state.app.narrow;
+    console.log("narrow " + this._narrow);
   }
 
   _flexes(balance) {

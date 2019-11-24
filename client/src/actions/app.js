@@ -11,6 +11,7 @@ import {handleErrors} from "./fetchy";
 import {config} from "../config";
 
 export const CHOOSE_INSTANCE = 'CHOOSE_INSTANCE';
+export const UPDATE_NARROW_LAYOUT = 'UPDATE_NARROW_LAYOUT';
 export const UPDATE_PAGE = 'UPDATE_PAGE';
 export const UPDATE_OFFLINE = 'UPDATE_OFFLINE';
 export const UPDATE_DATA_PATH = 'UPDATE_DATA_PATH';
@@ -292,6 +293,13 @@ export const chooseInstance = (instance) => {
   return {
     type: CHOOSE_INSTANCE,
     instance
+  };
+};
+
+export const updateNarrowLayout = (narrow) => {
+  return {
+    type: UPDATE_NARROW_LAYOUT,
+    narrow
   };
 };
 

@@ -5,6 +5,7 @@ import {installMediaQueryWatcher} from 'pwa-helpers/media-query.js';
 import {installOfflineWatcher} from 'pwa-helpers/network.js';
 import {installRouter} from 'pwa-helpers/router.js';
 import {updateMetadata} from 'pwa-helpers/metadata.js';
+import {chooseInstance, updateNarrowLayout} from "./actions/app";
 import {fontStyles, colorStyles} from "./components/kmap-styles";
 import "web-animations-js/web-animations.min";
 
@@ -36,7 +37,6 @@ import './components/kmap-editor-add-fabs';
 import './components/kmap-test-editor-add-fabs';
 import './components/kmap-test-editor-edit-dialog';
 import './components/kmap-test-editor-delete-dialog';
-import {chooseInstance} from "./actions/app";
 
 class KmapMain extends connect(store)(LitElement) {
 
@@ -193,7 +193,7 @@ class KmapMain extends connect(store)(LitElement) {
 
     installRouter((location) => store.dispatch(navigate(decodeURIComponent(location.hash))));
     installOfflineWatcher((offline) => store.dispatch(updateOffline(offline)));
-    installMediaQueryWatcher(`(min-width: 460px)`, () => {});
+    installMediaQueryWatcher(`(max-width: 500px)`, (matches) => store.dispatch(updateNarrowLayout(matches)));
     this._snackbar = this.shadowRoot.getElementById('snackbar');
     this._loginPopup = this.shadowRoot.getElementById('login-popup');
   }
