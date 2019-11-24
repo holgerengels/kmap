@@ -16,19 +16,6 @@ const config = createDefaultConfig({
 
 export default deepmerge(config, {
   plugins: [
-    generateSW({
-      swDest: 'dist/sw.js',
-      globDirectory: 'dist/',
-      globPatterns: ['**/*.{html,js,css,png}'],
-      navigateFallback: '/',
-    }),
-    /*
-    injectManifest({
-      swSrc: 'dist/sw.js',
-      swDest: 'dist/sw.js',
-      globDirectory: 'dist/',
-    }),
-     */
     cpy([
       { files: 'favicon.ico', dest: 'dist' },
       { files: '*.png', dest: 'dist' },
@@ -36,5 +23,12 @@ export default deepmerge(config, {
       { files: 'browserconfig.xml', dest: 'dist' },
       { files: 'geogebra.html', dest: 'dist' },
     ]),
+    generateSW({
+      swDest: 'dist/sw.js',
+      globDirectory: 'dist/',
+      globPatterns: ['**/*.{html,js,css,png}'],
+      navigateFallback: '/',
+      navigateFallbackBlacklist: [/geogebra.html/],
+    }),
   ],
 });
