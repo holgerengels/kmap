@@ -196,7 +196,6 @@ mwc-icon {
   stateChanged(state) {
     this._instance = state.app.instance;
     this._narrow = state.app.narrow;
-    console.log("narrow " + this._narrow);
   }
 
   _flexes(balance) {

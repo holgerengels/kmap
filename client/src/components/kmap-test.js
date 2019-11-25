@@ -49,7 +49,6 @@ mega-surface {
   box-shadow: var(--elevation);
   background-color: whitesmoke;
 }
-}
 .result-cards {
   display: flex;
   flex-wrap: wrap;
@@ -61,7 +60,21 @@ mwc-icon {
   vertical-align: middle;
   --mdc-icon-size: 1.2em;
 }
-        `
+select {
+  border: none;
+  border-bottom: 2px solid var(--color-mediumgray);
+  padding: 12px;
+  background-color: var(--color-lightgray);
+  outline: none;
+}
+select:focus {
+  border-bottom-color: var(--color-primary);
+}
+option {
+  font-size:16px;
+  background-color:#ffffff;
+}
+      `
     ];
   }
 
@@ -79,17 +92,17 @@ mwc-icon {
     <label section>Thema auswählen</label>
     <br/><br/>
     <div class="mdc-elevation--z1">
-      <mwc-formfield alignend="" label="Fach">
-        <select @change="${e => this.subject = e.target.value}">
-          <option>- - -</option>
-          ${this.subjects.map((subject, j) => html`<option>${subject}</option>`)}
+      <mwc-formfield alignend>
+        <select required @change="${e => this.subject = e.target.value}">
+          <option value="">Fach</option>
+          ${this.subjects.map((subject, j) => html`<option value="${subject}">${subject}</option>`)}
         </select>
       </mwc-formfield>
       ${this.arrangedChapters ? html`
-        <mwc-formfield alignend="" label="Kapitel">
-          <select @change="${e => this.chapter = e.target.value.split(" - ").pop()}">
-            <option>- - -</option>
-            ${this.arrangedChapters.map((chapter, j) => html`<option>${chapter.replace(".", " - ")}</option>`)}
+        <mwc-formfield alignend>
+          <select required @change="${e => this.chapter = e.target.value.split(".").pop()}">
+            <option value="">Kapitel</option>
+            ${this.arrangedChapters.map((chapter, j) => html`<option value="${chapter}">${chapter.replace(".", " - ")}</option>`)}
           </select>
         </mwc-formfield>
       `
@@ -171,8 +184,8 @@ mwc-icon {
       subject: {type: String},
       chapters: {type: Array},
       tree: {type: Object},
-      arrangedChapters: {type: Object},
-      chapter: {type: String, observer: 'chapterChanged'},
+      arrangedChapters: {type: Array},
+      chapter: {type: String },
       _tests: {type: Array},
       _allTests: {type: Array},
       topics: {type: Array},
@@ -223,6 +236,10 @@ mwc-icon {
     if (changedProperties.has("subject")) {
       store.dispatch(fetchChaptersIfNeeded(this.subject));
       store.dispatch(fetchTreeIfNeeded(this.subject));
+      this.chapter = undefined;
+      this.chapters = [];
+      this.arrangedChapters = [];
+      this._allTests = undefined;
     }
 
     if ((changedProperties.has("chapters") || changedProperties.has("tree")) && this.chapters.length > 0 && this.tree.length > 0) {
@@ -230,7 +247,10 @@ mwc-icon {
     }
 
     if (changedProperties.has("chapter")) {
-      store.dispatch(fetchTestsIfNeeded(this.subject, this.chapter));
+      if (this.chapter)
+        store.dispatch(fetchTestsIfNeeded(this.subject, this.chapter));
+      else
+        this._allTests = undefined;
     }
   }
 

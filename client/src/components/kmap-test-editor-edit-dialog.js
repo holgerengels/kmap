@@ -65,11 +65,18 @@ kmap-test-card {
 }
 select {
   border: none;
-  border-bottom: 1px solid var(--color-mediumgray);
+  border-bottom: 2px solid var(--color-mediumgray);
   padding: 12px;
   background-color: var(--color-lightgray);
 }
-    `];
+select:focus {
+  border-bottom-color: var(--color-primary);
+}
+option {
+  font-size:16px;
+  background-color:#ffffff;
+}
+      `];
   }
 
   render() {
