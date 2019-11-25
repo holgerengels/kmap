@@ -135,6 +135,7 @@ mwc-icon {
 
   static get properties() {
     return {
+      _instance: {type: String},
       hideHeader: {type: Boolean},
       subject: {type: String},
       chapter: {type: String},
@@ -159,6 +160,7 @@ mwc-icon {
 
   constructor() {
     super();
+    this._instance = null;
     this.hideHeader = false;
     this.sent = false;
     this.correct = false;
@@ -192,6 +194,7 @@ mwc-icon {
   }
 
   stateChanged(state) {
+    this._instance = state.app.instance;
     this._narrow = state.app.narrow;
     console.log("narrow " + this._narrow);
   }
@@ -216,7 +219,7 @@ mwc-icon {
 
   math(text, element) {
     if (text) {
-      let replace = text.replace(/inline:/g, config.server + "data/" + this.subject + "/" + this.chapter + "/" + this.topic + "/tests/");
+      let replace = text.replace(/inline:([^"]*)/g, config.server + "data/" + this.subject + "/" + this.chapter + "/" + this.topic + "/tests/$1?instance=" + this._instance);
       replace = replace.replace(/<check\/>/g, "<input type='checkbox'/>");
       replace = replace.replace(/<text\/>/g, "<input type='text' inputmode='text'/>");
       replace = replace.replace(/<text ([0-9]+)\/>/g, "<input type='text' inputmode='text' maxlength='$1' style='width: $1em'/>");
