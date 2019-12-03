@@ -82,7 +82,7 @@ class KmapMain extends connect(store)(LitElement) {
   render() {
     // language=HTML
     return html`
-  <mwc-drawer id="drawer" hasheader type="dismissible" ?open="${this._drawerOpen}">
+  <mwc-drawer id="drawer" hasheader type="${this._narrow ? 'modal' : 'dismissible'}" ?open="${this._drawerOpen}">
     <span slot="title">KMap <span class="secondary" style="vertical-align: middle">[${this._instance}]</span></span>
     <span slot="subtitle">Knowledge Map</span>
     <div class="drawer-content">
@@ -149,6 +149,7 @@ class KmapMain extends connect(store)(LitElement) {
       _messages: {type: Array},
       _layers: {type: Array},
       _drawerOpen: {type: Boolean},
+      _narrow: {type: Boolean},
     };
   }
 
@@ -160,6 +161,7 @@ class KmapMain extends connect(store)(LitElement) {
     this._title = 'KMap';
     this._layers = [];
     this._drawerOpen = false;
+    this._narrow = false;
   }
 
   firstUpdated(changedProperties) {
@@ -222,6 +224,7 @@ class KmapMain extends connect(store)(LitElement) {
     console.log(state);
 
     this._instance = state.app.instance;
+    this._narrow = state.app.narrow;
     this._userid = state.app.userid;
     this._roles = state.app.roles;
     this._page = state.app.page;

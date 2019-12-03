@@ -63,7 +63,7 @@ mwc-icon {
 select {
   border: none;
   border-bottom: 2px solid var(--color-mediumgray);
-  padding: 12px;
+  padding: 12px 6px;
   background-color: var(--color-lightgray);
   outline: none;
 }
@@ -90,33 +90,37 @@ option {
 <div id="start" class="page" ?active="${this._page === 'start'}">
   <mega-surface style="--elevation: var(--elevation-01)">
     <label section>Thema auswählen</label>
-    <br/><br/>
+    <br/>
     <div class="mdc-elevation--z1">
-      <mwc-formfield alignend>
+      <mwc-formfield>
         <select required @change="${e => this.subject = e.target.value}">
-          <option value="">Fach</option>
+          <option value="" style="color:var(--color-mediumgray)">Fach</option>
           ${this.subjects.map((subject, j) => html`<option value="${subject}">${subject}</option>`)}
         </select>
       </mwc-formfield>
-      ${this.arrangedChapters ? html`
-        <mwc-formfield alignend>
-          <select required @change="${e => this.chapter = e.target.value.split(".").pop()}">
-            <option value="">Kapitel</option>
-            ${this.arrangedChapters.map((chapter, j) => html`<option value="${chapter}">${chapter.replace(".", " - ")}</option>`)}
-          </select>
-        </mwc-formfield>
-      `
-      : html`
-        <label class="secondary" style="vertical-align: sub; padding-left: 16px">Zu diesem Fach gibt es noch keine Aufgaben</label>
-      `}
+      ${!this._chaptersLoading ? html`
+        ${this.arrangedChapters && this.arrangedChapters.length > 0 ? html`
+          <mwc-formfield>
+            <select required @change="${e => this.chapter = e.target.value.split(".").pop()}">
+              <option value="" style="color:var(--color-mediumgray)">Kapitel</option>
+              ${this.arrangedChapters.map((chapter, j) => html`<option value="${chapter}">${chapter.replace(".", " - ")}</option>`)}
+            </select>
+          </mwc-formfield>
+        ` : html`
+          ${this.subject ? html`
+            <label class="secondary" style="vertical-align: sub; padding-left: 16px">Zu diesem Fach gibt es noch keine Aufgaben</label>
+          ` : ''}
+        `}
+      ` : '' }
     </div>
     <br/><br/>
     <label>Anzahl Aufgaben</label>
-    <br/><br/>
-    <div>
-      <span style="vertical-align: top; display: inline-block; width: 36px">${this._number}</span>
-      <mwc-slider id="slider" ?disabled="${!this._allTests || this._allTests.length === 0}" style="display: inline-block" class="form" value="${this._number}" discrete="" markers="" step="3" min="3" max="${this._maxNumber}" @MDCSlider:change=${e => this._number = e.target.value}></mwc-slider>
-    </div>
+    <br/>
+    <mwc-formfield>
+      <span style="vertical-align: middle; display: inline-block; width: 36px">${this._number}</span>
+      <mwc-slider id="slider" ?disabled="${!this._allTests || this._allTests.length === 0}" style="display: inline-block;vertical-align: middle" class="form" value="${this._number}" discrete="" markers="" step="3" min="3" max="${this._maxNumber}" @MDCSlider:change=${e => this._number = e.target.value}></mwc-slider>
+    </mwc-formfield>
+    <br/>
     <mwc-button @click="${this._start}" ?disabled="${!this._allTests || this._allTests.length === 0}">Starten</mwc-button>
   </mega-surface>
 </div>
@@ -183,9 +187,10 @@ option {
       subjects: {type: Array},
       subject: {type: String},
       chapters: {type: Array},
-      tree: {type: Object},
+      tree: {type: Array},
       arrangedChapters: {type: Array},
       chapter: {type: String },
+      _chaptersLoading: { Boolean },
       _tests: {type: Array},
       _allTests: {type: Array},
       topics: {type: Array},
@@ -205,7 +210,9 @@ option {
     this._page = "start";
     this._number = 3;
     this._maxNumber = 3;
+    this.tree = [];
     this._tests = [];
+    this._chaptersLoading = false;
     store.dispatch(fetchSubjectsIfNeeded());
   }
 
@@ -238,11 +245,11 @@ option {
       store.dispatch(fetchTreeIfNeeded(this.subject));
       this.chapter = undefined;
       this.chapters = [];
-      this.arrangedChapters = [];
+      this.arrangedChapters = undefined;
       this._allTests = undefined;
     }
 
-    if ((changedProperties.has("chapters") || changedProperties.has("tree")) && this.chapters.length > 0 && this.tree.length > 0) {
+    if ((changedProperties.has("chapters") || changedProperties.has("tree")) && this.subject) {
       this.arrange(this.chapters, this.tree);
     }
 
@@ -274,7 +281,7 @@ option {
       this.tree = state.tests.tree;
     }
     if (!this.tree)
-      this.tree = {};
+      this.tree = [];
 
     if (this._allTests !== state.tests.tests) {
       this._allTests = state.tests.tests;
@@ -287,11 +294,10 @@ option {
       this.topics = topics;
       this._maxNumber = this._allTests.length - this._allTests.length % 3;
     }
+    this._chaptersLoading = state.tests.fetchingChapters || state.tests.fetchingTree;
   }
 
   arrange(chapters, tree) {
-    if (!chapters || !tree)
-      return;
     var arrangedChapters = [];
     for (var path of tree) {
       var parts = path.split(".");

@@ -102,7 +102,7 @@ kmap-subject-card {
   }
 
 
-    _fire(name) {
+  _fire(name) {
     this.dispatchEvent(new CustomEvent(name, {bubbles: true, composed: true}));
   }
 }
