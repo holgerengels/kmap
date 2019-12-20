@@ -60,10 +60,10 @@ class KmapMain extends connect(store)(LitElement) {
       }
       .drawer-list > * {
           display: block;
-          margin: 8px 0px;
+          margin: 4px 0px;
       }
       .drawer-list > a {
-        line-height: 32px; 
+        line-height: 32px;
         color: var(--app-drawer-text-color);
       }
       .drawer-list > a[selected] {
@@ -72,9 +72,9 @@ class KmapMain extends connect(store)(LitElement) {
       .main-content {
           width: 100% !important;
       }
-        [hidden] {
-            display: none !important;
-        }
+      [hidden] {
+        display: none !important;
+      }
       `,
     ];
   }
@@ -111,11 +111,11 @@ class KmapMain extends connect(store)(LitElement) {
         ` : ''}
       </nav>
     </div>
-    
+
     <div slot="appContent" class="main-content" role="main" @toggleDrawer="${e => this._drawerOpen = !this._drawerOpen}" @lclick="${this._showLogin}">
     ${this._instance ? html`
       ${this._renderPage()}
-      
+
       ${this._page === 'home' || this._page === 'browser' ? html`
           ${this._layers.includes('editor') ? html`<kmap-editor-edit-dialog></kmap-editor-edit-dialog>` : ''}
           ${this._layers.includes('editor') ? html`<kmap-editor-rename-dialog></kmap-editor-rename-dialog>` : ''}

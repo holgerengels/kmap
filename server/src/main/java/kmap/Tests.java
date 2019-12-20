@@ -7,10 +7,9 @@ import org.lightcouch.CouchDbClient;
 import org.lightcouch.Response;
 import org.lightcouch.View;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.*;
 
 import static kmap.JSON.*;
 
@@ -58,6 +57,16 @@ public class Tests {
         return array;
     }
 
+    public JsonArray loadTopics(String subject) {
+        View view = getClient().view("test/topics")
+            .key(subject)
+            .reduce(false);
+        List<JsonObject> objects = view.query(JsonObject.class);
+        JsonArray array = new JsonArray();
+        objects.stream().map(o -> o.getAsJsonPrimitive("value").getAsString()).distinct().forEach(array::add);
+        return array;
+    }
+
     public synchronized JsonArray loadSet(String subject, String set) {
         List<JsonObject> objects = loadSetAsList(subject, set);
         JsonArray array = new JsonArray();
@@ -93,7 +102,18 @@ public class Tests {
             .includeDocs(true);
         List<JsonObject> objects = view.query(JsonObject.class);
         JsonArray array = new JsonArray();
-        objects.stream().forEach(array::add);
+        objects.forEach(array::add);
+        return array;
+    }
+
+    public JsonArray loadTopic(String subject, String chapter, String topic) {
+        View view = getClient().view("test/byChapterTopic")
+            .key(subject, chapter, topic)
+            .reduce(false)
+            .includeDocs(true);
+        List<JsonObject> objects = view.query(JsonObject.class);
+        JsonArray array = new JsonArray();
+        objects.forEach(array::add);
         return array;
     }
 
@@ -244,5 +264,18 @@ public class Tests {
         object.addProperty("set", set);
         object.addProperty("count", oldTests.size());
         return object;
+    }
+
+    public static void main(String[] args) throws IOException {
+        Server.CLIENT.set("lala");
+        Tests tests = new Tests(new Couch(readProperties(args[0])));
+        JsonArray topics = tests.loadTopics("Mathematik");
+        System.out.println("topics = " + topics);
+    }
+
+    private static Properties readProperties(String fileName) throws IOException {
+        Properties properties = new Properties();
+        properties.load(new FileInputStream(fileName));
+        return properties;
     }
 }

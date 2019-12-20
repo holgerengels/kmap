@@ -79,8 +79,10 @@ public class TestsServlet
             String sets = req.getParameter("sets");
             String subject = req.getParameter("subject");
             String set = req.getParameter("set");
-            String load = req.getParameter("load");
+            String chapter = req.getParameter("chapter");
+            String topic = req.getParameter("topic");
             String chapters = req.getParameter("chapters");
+            String topics = req.getParameter("topics");
             String directory = req.getParameter("directory");
             String attachments = req.getParameter("attachments");
             if (sets != null) {
@@ -95,15 +97,27 @@ public class TestsServlet
                 if (array != null)
                     writeResponse(req, resp, "data", array);
             }
-            else if (load != null) {
-                log("load chapter = " + load);
-                JsonArray array = tests.loadChapter(subject, load);
+            else if (topic != null) { // uses chapter and topic !!!
+                log("load topic = " + chapter + " " + topic);
+                JsonArray array = tests.loadTopic(subject, chapter, topic);
+                if (array != null)
+                    writeResponse(req, resp, "data", array);
+            }
+            else if (chapter != null) {
+                log("load chapter = " + chapter);
+                JsonArray array = tests.loadChapter(subject, chapter);
                 if (array != null)
                     writeResponse(req, resp, "data", array);
             }
             else if (chapters != null) {
                 log("available chapters = " + subject);
                 JsonArray array = tests.loadChapters(subject);
+                if (array != null)
+                    writeObject(req, resp, array.toString());
+            }
+            else if (topics != null) {
+                log("available topics = " + subject);
+                JsonArray array = tests.loadTopics(subject);
                 if (array != null)
                     writeObject(req, resp, array.toString());
             }

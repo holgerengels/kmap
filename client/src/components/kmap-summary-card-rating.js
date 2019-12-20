@@ -14,6 +14,9 @@ class KMapSummaryCardRating extends connect(store)(LitElement) {
       fontStyles,
       colorStyles,
       css`
+        :host {
+          display: contents;
+        }
       `
     ];
   }

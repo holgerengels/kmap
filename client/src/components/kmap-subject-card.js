@@ -1,19 +1,11 @@
-/**
- @license
- Copyright (c) 2018 The Polymer Project Authors. All rights reserved.
- This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
- The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
- The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
- Code distributed by Google as part of the polymer project is also
- subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
- */
-
 import {LitElement, html, css} from 'lit-element';
 import {connect} from "pwa-helpers/connect-mixin";
 import {store} from "../store";
-import '@material/mwc-icon';
 import {STATE_COLORS} from "./state-colors";
 import {colorStyles, fontStyles} from "./kmap-styles";
+
+import '@material/mwc-icon';
+import '@material/mwc-ripple';
 
 class KMapSubjectCard extends connect(store)(LitElement) {
   static get styles() {
@@ -23,21 +15,32 @@ class KMapSubjectCard extends connect(store)(LitElement) {
       colorStyles,
       css`
 :host {
+  display: block;
   --color-opaque: #f5f5f5;
-  --color-light: #e0e0e0;
-  --color-lightest: #9e9e9e;
-
+  --color-light: var(--color-mediumgray);
+  --color-lightest: #e0e0e0;
+}
+div.card {
+  vertical-align: top;
+  margin: 6px;
+  margin-top: 0px;
   display: inline-block;
   box-sizing: border-box;
   width: 300px;
   border-radius: 4px;
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
       0 1px 5px 0 rgba(0, 0, 0, 0.12),
-      0 3px 1px -2px rgba(0, 0, 0, 0.2);
+      0 4px 1px -2px rgba(0, 0, 0, 0.2);
   color: var(--color-darkgray);
 }
+.card-header, .card-footer {
+  transition: background-color .5s ease-in-out;
+  padding: 4px 8px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
 .card-header {
-  padding: 8px;
   color: black;
   background-color: var(--color-opaque);
   border-top-left-radius: 4px;
@@ -46,29 +49,26 @@ class KMapSubjectCard extends connect(store)(LitElement) {
 .card-footer {
   color: var(--color-darkgray);
   background-color: var(--color-light);
-  transition: background-color .5s ease-in-out;
-  padding: 4px 8px;
-  font-size: 0px;
-  line-height: 0px;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
   border-bottom-left-radius: 4px;
   border-bottom-right-radius: 4px;
 }
-.card-footer a {
-  color: var(--color-darkgray);
-}
+.card-header span, .card-footer span { align-self: center; }
+.card-header a, .card-footer a { height: 24px; color: black; display: block }
+.card-footer a { color: var(--color-darkgray); }
       `];
   }
 
     render() {
       return html`
+<div class="card">
   <div class="card-header font-body">
     <span>${this.subject}</span>
+    <div style="flex: 1 0 auto"></div>
+    <a href="#browser/${this.subject}/${this.subject}" title="Wissenslandkarte"><mwc-ripple></mwc-ripple><mwc-icon style="--mdc-icon-size: 20px; margin:2px 0px">open_in_new</mwc-icon></a>
   </div>
   <div class="card-footer font-body">
-    <a slot="footer" href="#browser/${this.subject}/${this.subject}"><mwc-icon>open_in_new</mwc-icon></a>
+      <div style="flex: 1 0 auto; height: 24px"></div>
+  </div>
   </div>
     `;
     }

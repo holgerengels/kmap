@@ -13,6 +13,7 @@ import './kmap-login-button';
 import './kmap-summary-card';
 import './kmap-knowledge-card';
 import './kmap-browser-chapter-editor';
+import {fetchTopicsIfNeeded} from "../actions/tests";
 
 const _standalone = (window.matchMedia('(display-mode: standalone)').matches) || (window.navigator.standalone) || document.referrer.includes('android-app://');
 
@@ -126,7 +127,6 @@ class KMapBrowser extends connect(store)(LitElement) {
       topicCard: {type: Object},
       board: {type: Object},
       _map: {type: Object},
-      _chapterLine: {type: Array},
       _lines: {type: Array},
       _page: {type: String},
       mapHeight: {type: Number},
@@ -141,7 +141,6 @@ class KMapBrowser extends connect(store)(LitElement) {
 
   constructor() {
     super();
-    this._chapterLine = null;
     this._lines = [];
     this.topicCard = {};
     this._layers = [];
@@ -162,6 +161,7 @@ class KMapBrowser extends connect(store)(LitElement) {
     }
     if (changedProperties.has('routeSubject') || changedProperties.has('routeChapter')) {
       store.dispatch(fetchMapIfNeeded(this.routeSubject, this.routeChapter));
+      store.dispatch(fetchTopicsIfNeeded(this.routeSubject));
     }
     if (changedProperties.has('routeTopic') || changedProperties.has('_chapterCard') || changedProperties.has('_lines')) {
       if (this.routeTopic === "_") {
@@ -225,14 +225,7 @@ class KMapBrowser extends connect(store)(LitElement) {
         this._chapter = this._map.chapter;
 
         let lines = this._map.lines;
-        if (lines[0].cards[0].row === -1) {
-          this._chapterLine = lines[0];
-          this._lines = lines.slice(1);
-        }
-        else {
-          this._chapterLine = null;
-          this._lines = lines;
-        }
+        this._lines = lines[0].cards[0].row === -1 ? lines.slice(1) : lines;
       }
       else {
         this._subject = "";
@@ -311,8 +304,10 @@ class KMapBrowser extends connect(store)(LitElement) {
   }
 
   activeChanged(active) {
-    if (active && this.routeSubject && this.routeChapter)
+    if (active && this.routeSubject && this.routeChapter) {
       store.dispatch(fetchMapIfNeeded(this.routeSubject, this.routeChapter));
+      store.dispatch(fetchTopicsIfNeeded(this.routeSubject));
+    }
   }
 
   _fire(name) {

@@ -3,7 +3,7 @@ import {connect} from "pwa-helpers/connect-mixin";
 import {store} from "../store";
 import {loadSet, forgetSet} from "../actions/test-editor";
 import {setTestForDelete, setTestForEdit} from "../actions/app";
-import {fontStyles, colorStyles} from "./kmap-styles";
+import {fontStyles, colorStyles, elevationStyles} from "./kmap-styles";
 import 'mega-material/surface';
 import './kmap-test-card';
 
@@ -14,49 +14,43 @@ class KMapTestEditorScroller extends connect(store)(LitElement) {
         return [
           fontStyles,
           colorStyles,
+          elevationStyles,
           css`
-              mega-surface {
-                  position: absolute;
-                  overflow: auto;
-                  top: 0;
-                  bottom: 0;
-                  left: 0;
-                  right: 0;
-                  margin: 8px;
-                  padding: 16px;
-                  box-shadow: var(--elevation);
-                  background-color: whitesmoke;
-              }
+            .box {
+              overflow: auto;
+              margin: 8px;
+              padding: 16px;
+              background-color: whitesmoke;
+            }
             kmap-test-card {
-                
             }
             .scroller {
-                height: 102px;
-                overflow-y: auto;
+              height: 102px;
+              overflow-y: auto;
             }
             .item {
-                padding: 8px;
+              padding: 8px;
             }
             .item[activated] {
-                color: var(--color-primary-dark);
-                background-color: var(--color-primary-lighter);
+              color: var(--color-primary-dark);
+              background-color: var(--color-primary-lighter);
             }
             .item mwc-icon {
-                pointer-events: all;
-                cursor: pointer;
-                vertical-align: middle;
-                float: right;
+              pointer-events: all;
+              cursor: pointer;
+              vertical-align: middle;
+              float: right;
             }
           `];
     }
 
   render() {
     return html`
-  <mega-surface style="--elevation: var(--elevation-01)">
+  <div class="box elevation-01">
     <div class="scroller">
           ${this._tests.map((test, i) => html`
             <div class="item" ?activated="${this._selectedIndex === i}" @click="${e => this._select(i)}">${test.key}
-                <span class="secondary">${test.chapter} - ${test.topic}</span> 
+                <span class="secondary">${test.chapter} - ${test.topic}</span>
                 <mwc-icon @click="${e => { e.stopPropagation(); this._deleteTest(test)}}">delete</mwc-icon>
                 <mwc-icon @click="${e => { e.stopPropagation(); this._editTest(test)}}">edit</mwc-icon>
             </div>
@@ -73,7 +67,7 @@ class KMapTestEditorScroller extends connect(store)(LitElement) {
                                 .answer="${this._selected.answer}"
                                 .num="1" .of="1"></kmap-test-card>` : ''}
     </div>
-  </mega-surface>
+  </div>
     `;
     }
 

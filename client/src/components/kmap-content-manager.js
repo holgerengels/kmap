@@ -1,7 +1,7 @@
-import {LitElement, html, css} from 'lit-element';
+import {css, html, LitElement} from 'lit-element';
 import {connect} from 'pwa-helpers/connect-mixin.js';
 import {store} from "../store";
-import {chooseInstance, updateTitle} from "../actions/app";
+import {updateTitle} from "../actions/app";
 
 import {colorStyles, fontStyles} from "./kmap-styles";
 import '@material/mwc-dialog';
@@ -84,8 +84,7 @@ mwc-icon {
 
   firstUpdated(changedProperties) {
     let bar = this.shadowRoot.getElementById('bar');
-    let content = this.shadowRoot.getElementById('content');
-    bar.scrollTarget = content;
+    bar.scrollTarget = this.shadowRoot.getElementById('content');
     store.dispatch(updateTitle("Content Manager"));
   }
 

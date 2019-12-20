@@ -7,6 +7,8 @@ class StarRating extends LitElement {
         return [
             css`
 :host {
+  display: block;
+  height: 24px;
   unicode-bidi: bidi-override;
   direction: rtl;
   text-align: center;
@@ -30,10 +32,10 @@ class StarRating extends LitElement {
 }
 mwc-icon.cross {
     opacity: 0.1;
-} 
+}
 :host(:hover) > mwc-icon.cross {
     opacity: 1;
-} 
+}
 mwc-icon {
   pointer-events: all;
 }

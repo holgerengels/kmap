@@ -18,7 +18,7 @@
       "map": "function(doc) {\n    if (!doc.links)\n        emit(doc.subject, doc.chapter);\n}"
     },
     "topics": {
-      "map": "function(doc) {\n    if (!doc.links)\n        emit(doc.subject, doc.subject + \".\" + doc.chapter + \".\" + doc.topic);\n}"
+      "map": "function(doc) {\n    if (!doc.links)\n        emit(doc.subject, doc.chapter + \".\" + doc.topic);\n}"
     }
   }
 }

@@ -15,18 +15,6 @@ class KMapSummaryCardAverages extends connect(store)(LitElement) {
   padding: 8px;
   background-color: var(--color-lightest);
   transition: background-color .5s ease-in-out;
-    font-family: Roboto,sans-serif;
-    -webkit-font-smoothing: antialiased;
-    font-size: 0.95rem;
-    font-weight: 500;
-}
-span {
-  white-space: normal;
-  hyphens: auto;
-  overflow : hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
 }
       `
     ];
