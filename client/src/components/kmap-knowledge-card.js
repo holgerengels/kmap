@@ -13,7 +13,6 @@ import './kmap-knowledge-card-description';
 import './kmap-card-attachment';
 
 class KMapKnowledgeCard extends connect(store)(LitElement) {
-
   static get styles() {
     // language=CSS
     return [
@@ -34,8 +33,14 @@ class KMapKnowledgeCard extends connect(store)(LitElement) {
       0 3px 1px -2px rgba(0, 0, 0, 0.2);
   color: var(--color-darkgray);
 }
+.card-header, .card-footer {
+  transition: background-color .5s ease-in-out;
+  padding: 4px 8px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
 .card-header {
-  padding: 8px 12px;
   color: black;
   background-color: var(--color-opaque);
   border-top-left-radius: 4px;
@@ -44,20 +49,12 @@ class KMapKnowledgeCard extends connect(store)(LitElement) {
 .card-footer {
   color: var(--color-darkgray);
   background-color: var(--color-light);
-  transition: background-color .5s ease-in-out;
-  padding: 4px 8px;
-  font-size: 0px;
-  line-height: 0px;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
   border-bottom-left-radius: 4px;
   border-bottom-right-radius: 4px;
 }
-.card-footer a {
-  color: var(--color-darkgray);
-}
-.attachments {
+.card-header span, .card-footer span { align-self: center; }
+.card-header a, .card-footer a { height: 24px; color: black; display: block }
+.card-footer a { color: var(--color-darkgray); }.attachments {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
@@ -68,6 +65,9 @@ class KMapKnowledgeCard extends connect(store)(LitElement) {
   align-content: start;
   margin: 12px;
 }
+        [hidden] {
+          display: none;
+        }
       `];
   }
 
@@ -75,11 +75,14 @@ class KMapKnowledgeCard extends connect(store)(LitElement) {
     return html`
   <div class="card-header font-body">
       <span>${this.card.topic !== "_" ? this.card.topic : this.chapter}</span>
+      <div style="flex: 1 0 auto"></div>
+      <a href="#browser/${this.subject}/${this.chapter}"><mwc-ripple></mwc-ripple><mwc-icon>fullscreen_exit</mwc-icon></a>
   </div>
   <kmap-knowledge-card-depends ?chapterDepends="${this.card.topic === '_'}"
       .subject="${this.subject}"
       .chapter="${this.chapter}"
-      .depends="${this.card.depends}">
+      .depends="${this.card.depends}"
+      ?hidden="${this.card.depends.length === 0}">
   </kmap-knowledge-card-depends>
     ${this.links ? html`
   <kmap-knowledge-card-progress
@@ -156,8 +159,10 @@ class KMapKnowledgeCard extends connect(store)(LitElement) {
       ? html`<a slot="footer" href="#browser/${this.subject}/${this.card.links}"><mwc-icon>open_in_new</mwc-icon></a>`
       : html`<star-rating .rate="${this.state}" @clicked="${this._rated}" style=${styleMap(this._colorStyles)}></star-rating>`
     }
-    <div slot="footer" style="flex: 1 0 auto"></div>
-    <a slot="footer" href="#browser/${this.subject}/${this.chapter}"><mwc-ripple></mwc-ripple><mwc-icon>fullscreen_exit</mwc-icon></a>
+      <div style="flex: 1 0 auto; height: 24px"></div>
+      ${this._hasTests ? html`
+        <a href="#test/${this.subject}/${this.chapter}/${this.card.topic}"><mwc-ripple></mwc-ripple><mwc-icon>help_outline</mwc-icon></a>
+      ` : ''}
   </div>
     `;
     }
@@ -181,12 +186,16 @@ class KMapKnowledgeCard extends connect(store)(LitElement) {
       _light: {type: String},
       _lightest: {type: String},
       _colorStyles: {type: Object},
+      _hasTests: {type: Boolean},
+      _topics: {type: Array}
     };
   }
 
   constructor() {
     super();
     this._instance = null;
+    this._hasTests = false;
+    this._topics = [];
     this._colorStyles = { "--color-rated":  "--color-darkgray", "--color-unrated": "--color-lightgray" };
     this._colorize("0");
   }
@@ -194,13 +203,17 @@ class KMapKnowledgeCard extends connect(store)(LitElement) {
   updated(changedProperties) {
     if (changedProperties.has("subject") || changedProperties.has("chapter") || changedProperties.has("card"))
       this._rating(store.getState());
-    if (changedProperties.has("card") && this.card && this.card.attachments)
+    if (changedProperties.has("card") && this.card && this.card.attachments) {
       this.divideAttachments(this.card.attachments);
+      this._hasTests = this._topics.includes(this.chapter + "." + this.card.topic);
+    }
   }
 
   stateChanged(state) {
     this._instance = state.app.instance;
     this._rating(state);
+    this._topics = state.tests.topics;
+    this._hasTests = this._topics && this._topics.includes(this.chapter + "." + this.card.topic);
   }
 
   _colorize(rate) {

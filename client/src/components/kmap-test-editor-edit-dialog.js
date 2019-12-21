@@ -66,8 +66,9 @@ kmap-test-card {
 select {
   border: none;
   border-bottom: 2px solid var(--color-mediumgray);
-  padding: 12px;
+  padding: 12px 6px;
   background-color: var(--color-lightgray);
+  outline: none;
 }
 select:focus {
   border-bottom-color: var(--color-primary);

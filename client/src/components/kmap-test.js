@@ -29,7 +29,7 @@ class KmapTest extends connect(store)(LitElement) {
 }
 div.modules {
   display: flex;
-  flex-flow: row wrap;
+  flex-flow: column;
 }
 div.buttons {
   padding: 8px 16px;
@@ -71,7 +71,7 @@ kmap-test-editor-scroller {
         <kmap-test-editor-scroller id="editor" ?hidden="${!this._layers.includes('editor')}"></kmap-test-editor-scroller>
       </div>
       <div class="buttons">
-        <mwc-button ?hidden="${this._page === 'chooser'}" @click="${this._goChoose}">Zurück zum Start</mwc-button>
+        <mwc-button ?hidden="${this._page === 'chooser'}" @click="${this._goChoose}">Aufgabenauswahl</mwc-button>
         <div style="flex: 1 0 auto"></div>
         <mwc-button ?hidden="${this._page === 'results' || this._results.length === 0}" @click="${this._goResults}">Auswertung</mwc-button>
       </div>
@@ -124,11 +124,8 @@ kmap-test-editor-scroller {
         case 'exercise':
           this._title = "Test - Aufgaben bearbeiten";
           break;
-        case 'result':
+        case 'results':
           this._title = "Test - Auswertung";
-          break;
-        case 'editor':
-          this._title = "Test - Editor";
           break;
       }
     }

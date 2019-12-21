@@ -133,13 +133,13 @@ div.card[highlighted] {
       chapter: {type: String},
       card: {type: Object},
       _key: {type: String},
-      _hasTests: {type: Boolean},
       selected: {type: Boolean, reflect: true},
       highlighted: {type: Boolean, reflect: true},
       _opaque: {type: String},
       _light: {type: String},
       _lightest: {type: String},
       _layers: {type: Array},
+      _hasTests: {type: Boolean},
       _topics: {type: Array}
     };
   }
@@ -150,6 +150,7 @@ div.card[highlighted] {
     this.chapter = '';
     this.card = {};
     this._hasTests = false;
+    this._topics = [];
     this._layers = [];
     this._colorize(0);
   }
@@ -182,15 +183,6 @@ div.card[highlighted] {
     store.dispatch(selectSummaryCard(this.card));
   }
 
-  stateChanged(state) {
-    this._userid = state.app.userid;
-    this.highlighted = state.maps.selectedCardDependencies && state.maps.selectedCardDependencies.includes(this.card.topic);
-    this.selected = state.maps.selectedCardName === this.card.topic;
-    this._layers = state.app.layers;
-    this._topics = state.tests.topics;
-    this._hasTests = state.tests.topics.includes(this.chapter + "." + this.card.topic);
-  }
-
   updated(changedProperties) {
     if (changedProperties.has("card")) {
       this._key = this.card.links ? this.card.links : this.chapter + "." + this.card.topic;
@@ -198,6 +190,15 @@ div.card[highlighted] {
     }
     if (changedProperties.has("_userid") || changedProperties.has("_layers") || changedProperties.has("_key"))
       this._colorizeEvent({ lala: "lala"} );
+  }
+
+  stateChanged(state) {
+    this._userid = state.app.userid;
+    this.highlighted = state.maps.selectedCardDependencies && state.maps.selectedCardDependencies.includes(this.card.topic);
+    this.selected = state.maps.selectedCardName === this.card.topic;
+    this._layers = state.app.layers;
+    this._topics = state.tests.topics;
+    this._hasTests = state.tests.topics.includes(this.chapter + "." + this.card.topic);
   }
 }
 

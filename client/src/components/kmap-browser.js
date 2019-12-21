@@ -46,7 +46,7 @@ class KMapBrowser extends connect(store)(LitElement) {
   border-radius: 10px;
 }
 .chapter-line {
-    margin: 8px 6px;
+    margin: 0px 0px 8px 6px;
     padding: 4px 0px;
     line-height: 24px;
     color: var(--color-darkgray);
