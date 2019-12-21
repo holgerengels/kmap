@@ -19,9 +19,6 @@ class KmapTestExercise extends connect(store)(LitElement) {
 :host {
   display: contents;
 }
-kmap-test-card {
-  margin: auto;
-}
       `
     ];
   }

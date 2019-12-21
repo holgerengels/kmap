@@ -36,6 +36,7 @@ div.buttons {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  max-width: 800px;
 }
 .page {
   display: block;
