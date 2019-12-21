@@ -38,12 +38,9 @@ div.buttons {
   justify-content: space-between;
 }
 .page {
-  display: none;
+  display: block;
   padding: 8px;
   flex: 1 1 auto;
-}
-.page[active] {
-  display: block;
 }
 kmap-test-editor-scroller {
   flex: 1 1 auto;
@@ -65,9 +62,9 @@ kmap-test-editor-scroller {
       </mwc-top-app-bar>
 
       <div class="modules">
-        <kmap-test-chooser id="chooser" class="page" ?active="${this._page === 'chooser'}"></kmap-test-chooser>
-        <kmap-test-exercise id="exercise" class="page" ?active="${this._page === 'exercise'}"></kmap-test-exercise>
-        <kmap-test-results id="results" class="page" ?active="${this._page === 'results'}"></kmap-test-results>
+        ${this._page === 'chooser' ? html`<kmap-test-chooser id="chooser" class="page"></kmap-test-chooser>` : ''}
+        ${this._page === 'exercise' ? html`<kmap-test-exercise id="exercise" class="page"></kmap-test-exercise>` : ''}
+        ${this._page === 'results' ? html`<kmap-test-results id="results" class="page"></kmap-test-results>` : ''}
         <kmap-test-editor-scroller id="editor" ?hidden="${!this._layers.includes('editor')}"></kmap-test-editor-scroller>
       </div>
       <div class="buttons">
@@ -135,12 +132,14 @@ kmap-test-editor-scroller {
     this._layers = state.app.layers;
     this._results = state.tests.results;
 
-    if (state.app.dataPath.length === 0)
-      this._noRoute = 'chooser';
-    else if (state.app.dataPath.length === 1 && state.app.dataPath[0] === 'results')
-      this._noRoute = 'results';
-    else
-      this._noRoute = null;
+    if (state.app.page === 'test') {
+      if (state.app.dataPath.length === 0)
+        this._noRoute = 'chooser';
+      else if (state.app.dataPath.length === 1 && state.app.dataPath[0] === 'results')
+        this._noRoute = 'results';
+      else
+        this._noRoute = null;
+    }
   }
 
   _goChoose(e) {

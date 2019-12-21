@@ -72,8 +72,8 @@ kmap-test-card {
         store.dispatch(fetchTopicIfNeeded(this.subject, this.chapter, this.topic));
       else if (this.subject && this.chapter)
         store.dispatch(fetchChapterIfNeeded(this.subject, this.chapter));
-      else
-        this._allTests = undefined;
+      //else
+      //  this._allTests = undefined;
     }
     if (changedProperties.has("_allTests") && this._allTests) {
         this._start();
@@ -83,9 +83,11 @@ kmap-test-card {
   stateChanged(state) {
     this._allTests = state.tests.tests;
 
-    this.subject  = state.app.dataPath.length > 0 ? state.app.dataPath[0] : null;
-    this.chapter = state.app.dataPath.length > 1 ? state.app.dataPath[1] : null;
-    this.topic = state.app.dataPath.length > 2 ? state.app.dataPath[2] : null;
+    if (state.app.page === 'test') {
+      this.subject = state.app.dataPath.length > 0 ? state.app.dataPath[0] : null;
+      this.chapter = state.app.dataPath.length > 1 ? state.app.dataPath[1] : null;
+      this.topic = state.app.dataPath.length > 2 ? state.app.dataPath[2] : null;
+    }
   }
 
   _start() {

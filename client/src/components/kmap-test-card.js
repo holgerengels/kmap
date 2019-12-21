@@ -127,7 +127,7 @@ mwc-icon {
         <mwc-button @click="${this.showAnswer}">Richtige Antwort zeigen</mwc-button>
         <div style="flex: 1 0 auto"></div>
         <mwc-button @click="${this.sendAnswer}" ?hidden="${this.sent}">Antwort abschicken</mwc-button>
-        <mwc-button @click="${this.next}" ?hidden="${!this.correct}">Weiter</mwc-button>
+        <mwc-button @click="${this.next}" ?hidden="${!this.correct || this.num + 1 == this.of}">Weiter</mwc-button>
     </div>`
       : ''}
     `;
@@ -318,6 +318,7 @@ mwc-icon {
   next(e) {
     this.dispatchEvent(new CustomEvent('next', {
       bubbles: true, composed: true, detail: {
+        "subject": this.subject,
         "chapter": this.chapter,
         "topic": this.topic,
         "key": this.key,

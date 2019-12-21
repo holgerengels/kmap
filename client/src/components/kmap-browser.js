@@ -246,17 +246,19 @@ class KMapBrowser extends connect(store)(LitElement) {
   stateChanged(state) {
     this._userid = state.app.userid;
 
-    if (state.app.dataPath.length > 0)
-      this.routeSubject = state.app.dataPath[0];
-    else
-      console.log("ERROR: malformed datapath - no subject");
+    if (state.app.page === 'browser') {
+      if (state.app.dataPath.length > 0)
+        this.routeSubject = state.app.dataPath[0];
+      else
+        console.log("ERROR: malformed datapath - no subject");
 
-    if (state.app.dataPath.length > 1)
-      this.routeChapter = state.app.dataPath[1];
-    else
-      console.log("ERROR: malformed datapath - no chapter");
+      if (state.app.dataPath.length > 1)
+        this.routeChapter = state.app.dataPath[1];
+      else
+        console.log("ERROR: malformed datapath - no chapter");
 
-    this.routeTopic = state.app.dataPath.length > 2 ? state.app.dataPath[2] : null;
+      this.routeTopic = state.app.dataPath.length > 2 ? state.app.dataPath[2] : null;
+    }
 
     this._map = state.maps.map;
     this._layers = state.app.layers;

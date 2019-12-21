@@ -112,7 +112,7 @@ mwc-icon {
         points += Math.pow(2, -result.attempts + 1);
       if (result.attempts !== 1)
         cards.push({
-          subject: this.subject,
+          subject: result.subject,
           chapter: result.chapter,
           topic: result.topic,
         });

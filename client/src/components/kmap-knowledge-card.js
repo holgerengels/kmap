@@ -82,7 +82,7 @@ class KMapKnowledgeCard extends connect(store)(LitElement) {
       .subject="${this.subject}"
       .chapter="${this.chapter}"
       .depends="${this.card.depends}"
-      ?hidden="${this.card.depends.length === 0}">
+      ?hidden="${!this.card.depends || this.card.depends.length === 0}">
   </kmap-knowledge-card-depends>
     ${this.links ? html`
   <kmap-knowledge-card-progress
