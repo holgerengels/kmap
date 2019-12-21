@@ -186,7 +186,7 @@ ${this._test ? html`
 
   updated(changedProperties) {
     if (changedProperties.has('_test') && this._test) {
-      this._editDialog.open = true;
+      this._editDialog.show();
 
       this._subject  = this._test.subject;
       this._chapter  = this._test.chapter;
@@ -315,7 +315,7 @@ ${this._test ? html`
   }
 
   _save() {
-    this._editDialog.open = false;
+    this._editDialog.close();
 
     this._test.subject  = this._subject;
     this._test.chapter  = this._chapter;
@@ -342,7 +342,7 @@ ${this._test ? html`
   }
 
   _cancel() {
-    this._editDialog.open = false;
+    this._editDialog.close();
     store.dispatch(unsetTestForEdit());
   }
 

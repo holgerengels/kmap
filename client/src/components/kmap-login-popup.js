@@ -73,11 +73,11 @@ mwc-textfield {
   updated(changedProps) {
     if (changedProps.has('_userid')) {
       if (this._userid && !changedProps.get("_userid")) {
-        this._loginDialog.open = false;
+        this._loginDialog.close();
         store.dispatch(showMessage("Du bist jetzt angemeldet!"))
       }
       else if (!this._userid && changedProps.get("_userid")) {
-        this._loginDialog.open = false;
+        this._loginDialog.close();
         store.dispatch(showMessage("Du bist jetzt abgemeldet!"))
       }
     }
@@ -92,7 +92,7 @@ mwc-textfield {
   }
 
   show() {
-    this._loginDialog.open = true;
+    this._loginDialog.show();
   }
 
   _login(e) {

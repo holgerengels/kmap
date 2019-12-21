@@ -66,7 +66,7 @@ ${this._card ? html`
   updated(changedProperties) {
     if (changedProperties.has('_card') && this._card) {
       this._newName = '';
-      this._renameDialog.open = true;
+      this._renameDialog.show();
     }
   }
 
@@ -82,7 +82,7 @@ ${this._card ? html`
   }
 
   _rename() {
-    this._renameDialog.open = false;
+    this._renameDialog.close();
     this._card.subject = this._subject;
     this._card.chapter = this._chapter;
     this._card.topic = this._card.topic;
@@ -94,7 +94,7 @@ ${this._card ? html`
   }
 
   _cancel() {
-    this._renameDialog.open = false;
+    this._renameDialog.close();
     store.dispatch(unsetCardForRename());
   }
 

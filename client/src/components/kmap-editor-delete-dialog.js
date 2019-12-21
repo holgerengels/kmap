@@ -61,7 +61,7 @@ form {
 
   updated(changedProperties) {
     if (changedProperties.has('_card') && this._card) {
-      this._deleteDialog.open = true;
+      this._deleteDialog.show();
     }
   }
 
@@ -77,7 +77,7 @@ form {
   }
 
   _delete() {
-    this._deleteDialog.open = false;
+    this._deleteDialog.close();
 
     this._card.subject = this._subject;
     this._card.chapter = this._chapter;
@@ -90,7 +90,7 @@ form {
   }
 
   _cancel() {
-    this._deleteDialog.open = false;
+    this._deleteDialog.close();
     store.dispatch(unsetCardForDelete());
   }
 

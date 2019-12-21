@@ -93,7 +93,7 @@ kmap-knowledge-card-description {
   font-size: small;
   letter-spacing: 0px;
   vertical-align: middle;
-}        
+}
     `];
   }
 
@@ -133,7 +133,7 @@ ${this._card ? html`
   </form>` : ''}
   <div class="preview">
   ${this._showSummaryPreview ? html`<kmap-summary-card-summary .summary="${this._summary}"></kmap-summary-card-summary>` : ''}
-  ${this._showDescriptionPreview ? html`<div class="preview-scroller"><kmap-knowledge-card-description 
+  ${this._showDescriptionPreview ? html`<div class="preview-scroller"><kmap-knowledge-card-description
     .subject="${this._subject}"
     .chapter="${this._chapter}"
     .topic="${this._card.topic}"
@@ -197,7 +197,7 @@ ${this._card ? html`
       this._attachmentTag = '';
       this._attachmentName = '';
       this._attachmentHref = '';
-      this._editDialog.open = true;
+      this._editDialog.show();
 
       this._summary = this._card.summary;
       this._description = this._card.description;
@@ -250,7 +250,7 @@ ${this._card ? html`
   }
 
   _save() {
-    this._editDialog.open = false;
+    this._editDialog.close();
 
     this._card.subject = this._subject;
     this._card.chapter = this._chapter;
@@ -273,7 +273,7 @@ ${this._card ? html`
   }
 
   _cancel() {
-    this._editDialog.open = false;
+    this._editDialog.close();
     store.dispatch(unsetCardForEdit());
   }
 

@@ -66,7 +66,7 @@ mwc-fab {
       <mwc-fab icon="add" label="Modul"   extended mini class="secondary two"   ?exited="${!this._opened || !this._currentSubject}" @click="${this._addModule}"></mwc-fab>
       <mwc-fab icon="add" label="Kapitel" extended mini class="secondary three" ?exited="${!this._opened || !this._currentModule}" @click="${this._addChapter}"></mwc-fab>
       <mwc-fab icon="add" label="Thema"   extended mini class="secondary four"  ?exited="${!this._opened || !this._currentModule || !this._currentChapter}" @click="${this._addTopic}"></mwc-fab>
-      
+
       <mwc-dialog id="addDialog" title="${this._title()}">
         <form id="addForm" @keyup="${this._maybeEnter}">
           <label>${this._explanation()}</label>
@@ -178,7 +178,7 @@ mwc-fab {
     this._module = this._currentModule;
     this._chapter = this._currentChapter;
     this._topic = '';
-    this.shadowRoot.getElementById('addDialog').open = true;
+    this.shadowRoot.getElementById('addDialog').show();
   }
 
   _addChapter() {
@@ -188,7 +188,7 @@ mwc-fab {
     this._module = this._currentModule;
     this._chapter = '';
     this._topic = '';
-    this.shadowRoot.getElementById('addDialog').open = true;
+    this.shadowRoot.getElementById('addDialog').show();
   }
 
   _addModule() {
@@ -198,7 +198,7 @@ mwc-fab {
     this._module = '';
     this._chapter = '';
     this._topic = '';
-    this.shadowRoot.getElementById('addDialog').open = true;
+    this.shadowRoot.getElementById('addDialog').show();
   }
 
   _addSubject() {
@@ -208,7 +208,7 @@ mwc-fab {
     this._module = '';
     this._chapter = '';
     this._topic = '';
-    this.shadowRoot.getElementById('addDialog').open = true;
+    this.shadowRoot.getElementById('addDialog').show();
   }
 
   _ok() {

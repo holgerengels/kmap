@@ -100,7 +100,7 @@ mwc-icon {
   }
 
   _switchInstance() {
-    this.shadowRoot.getElementById('dialog').open = true;
+    this.shadowRoot.getElementById('dialog').show();
   }
 
   _chooseInstance() {
@@ -108,7 +108,7 @@ mwc-icon {
     let instance = textfield.value;
     set("instance", instance)
       .then(() => location.reload());
-    this.shadowRoot.getElementById('dialog').open = false;
+    this.shadowRoot.getElementById('dialog').close();
   }
 }
 customElements.define('kmap-content-manager', KMapContentManager);

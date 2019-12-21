@@ -64,7 +64,7 @@ mwc-fab {
       <mwc-fab icon="${this._opened ? 'clear' : 'add'}" class="primary" ?exited="${!this._fabs}" @click="${this._open}"></mwc-fab>
       <mwc-fab icon="add" label="Set"    extended mini class="secondary one"  ?exited="${!this._opened}" @click="${this._addSet}"></mwc-fab>
       <mwc-fab icon="add" label="Test"   extended mini class="secondary two"  ?exited="${!this._opened || !this._currentSet}" @click="${this._addTest}"></mwc-fab>
-      
+
       <mwc-dialog id="addDialog" title="${this._header()}">
         <form id="addForm" @keyup="${this._maybeEnter}">
           <label>${this._explanation()}</label>
@@ -156,7 +156,7 @@ mwc-fab {
     this._subject = this._currentSubject;
     this._set = this._currentSet;
     this._key = '';
-    this.shadowRoot.getElementById('addDialog').open = true;
+    this.shadowRoot.getElementById('addDialog').show();
   }
 
   _addSet() {
@@ -165,7 +165,7 @@ mwc-fab {
     this._subject = this._currentSubject;
     this._set = '';
     this._key = '';
-    this.shadowRoot.getElementById('addDialog').open = true;
+    this.shadowRoot.getElementById('addDialog').show();
   }
 
   _ok() {
@@ -177,7 +177,7 @@ mwc-fab {
     };
     console.log(test);
     store.dispatch(setTestForEdit(test));
-    this.shadowRoot.getElementById('addDialog').open = false;
+    this.shadowRoot.getElementById('addDialog').close();
   }
 }
 

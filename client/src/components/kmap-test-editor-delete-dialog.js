@@ -56,7 +56,7 @@ form {
 
   updated(changedProperties) {
     if (changedProperties.has('_test') && this._test) {
-      this._deleteDialog.open = true;
+      this._deleteDialog.show();
     }
   }
 
@@ -65,7 +65,7 @@ form {
   }
 
   _delete() {
-    this._deleteDialog.open = false;
+    this._deleteDialog.close();
     console.log(this._test);
 
     let test = this._test;
@@ -77,7 +77,7 @@ form {
   }
 
   _cancel() {
-    this._deleteDialog.open = false;
+    this._deleteDialog.close();
     store.dispatch(unsetTestForDelete());
   }
 
