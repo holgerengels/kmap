@@ -107,7 +107,7 @@ ${this._card ? html`
     <br/>
     <mwc-textfield ?hidden="${this._card.topic === '_'}" id="links" name="links" label="Verweist auf ..." dense type="text" .value="${this._card.links}" @change="${e => this._card.links = e.target.value}"></mwc-textfield>
     <mwc-textfield ?hidden="${this._card.topic === '_'}" id="priority" name="priority" label="Priorität" dense type="number" inputmode="numeric" min="0" step="1" .value="${this._card.priority}" @change="${e => this._card.priority = e.target.value}"></mwc-textfield>
-    <mwc-textarea ?hidden="${this._card.topic === '_'}" id="depends" placeholder="Basiert auf ..." dense fullwidth rows="2" .value=${this._depends}></mwc-textarea>
+    <mwc-textarea ?hidden="${this._card.topic === '_'}" id="depends" placeholder="Basiert auf ..." dense fullwidth rows="2" .value=${this._depends} @change="${e => this._depends = e.target.value}"></mwc-textarea>
     <mwc-textarea id="summary" placeholder="Kurztext" dense fullwidth rows="2" .value=${this._card.summary} @keyup="${this._setSummary}" @focus="${this._focus}" @blur="${this._focus}"></mwc-textarea>
     <mwc-textarea id="description" placeholder="Langtext" dense fullwidth rows="7" .value=${this._card.description} @keyup="${this._setDescription}" @focus="${this._focus}" @blur="${this._focus}"></mwc-textarea>
 
