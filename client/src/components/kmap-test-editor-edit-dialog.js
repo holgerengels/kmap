@@ -103,7 +103,7 @@ ${this._test ? html`
     <mwc-textfield id="level" name="level" label="Level" dense type="number" inputmode="numeric" min="1" max="3" step="1" .value="${this._level}" @change="${e => this._level = e.target.value}"></mwc-textfield>
     <br/>
     <mwc-formfield alignend="" label="Layout Verhältnis Frage zu Antwort: ${this._balance} zu ${6 - this._balance}   ">
-      <mwc-slider id="balance" style="vertical-align:middle" .value="${this._balance}" discrete="" markers="" min="0" max="5" @MDCSlider:change=${e => this._balance = e.target.value}></mwc-slider>
+      <mwc-slider id="balance" style="vertical-align:middle" .value="${this._balance}" pin markers step="1" min="0" max="5" @change=${e => this._balance = e.target.value}></mwc-slider>
     </mwc-formfield>
     <br/>
     <mwc-textarea id="question" placeholder="Frage" fullwidth rows="4" .value=${this._question} @keyup="${this._setQuestion}" @focus="${this._focus}" @blur="${this._focus}"></mwc-textarea>
@@ -306,7 +306,7 @@ ${this._test ? html`
 
   _focus(e) {
     if (e.type === "blur") {
-      this._showPreview = true;
+      this._showPreview = false;
     }
     else if (e.type === "focus") {
       if (e.srcElement.id === "question" || e.srcElement.id === "answer" || e.srcElement.id === "balance")
