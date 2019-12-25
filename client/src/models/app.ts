@@ -1,8 +1,7 @@
-import { createModel, RoutingState } from '@captaincodeman/rdx-model';
-import { State, Dispatch } from '../rdxstore';
+import { createModel } from '@captaincodeman/rdx-model';
+import { State, Dispatch } from '../store';
 import {endpoint} from "../endpoint";
 import {config} from "../config";
-import {Path} from "./types";
 
 interface Login {
   userid: string,

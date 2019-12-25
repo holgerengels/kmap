@@ -1,13 +1,13 @@
 import { LitElement, html, css } from 'lit-element';
 import {styleMap} from 'lit-html/directives/style-map.js';
 import { fontStyles, colorStyles } from "./kmap-styles";
-import {connect} from "pwa-helpers/connect-mixin";
+import { connect } from '@captaincodeman/rdx';
 import {store} from "../store";
 
 import './star-rating';
 
 
-class KMapSummaryCardRating extends connect(store)(LitElement) {
+class KMapSummaryCardRating extends connect(store, LitElement) {
   static get styles() {
     // language=CSS
     return [

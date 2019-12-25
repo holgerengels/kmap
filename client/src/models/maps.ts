@@ -1,5 +1,5 @@
-import { createModel, RoutingState } from '@captaincodeman/rdx-model';
-import { State, Dispatch } from '../rdxstore';
+import {createModel, RoutingState} from '@captaincodeman/rdx-model';
+import { State, Dispatch } from '../store';
 import {endpoint} from "../endpoint";
 import {config} from "../config";
 import {Path} from "./types";
@@ -16,6 +16,8 @@ export interface Card {
   topic: string,
   row: number,
   col: number,
+  summary: string,
+  description: string,
   links: string,
   depends: string[],
   attachments: Attachment[];
@@ -55,15 +57,12 @@ export default createModel({
 
     request(state) {
       return { ...state, loading: true,
-        lines: [],
         timestamp: Date.now(),
         error: "",
-        selected: "",
-        selectedDependencies: []
       };
     },
 
-    receivedList(state, payload: MapState) {
+    received(state, payload: MapState) {
       return { ...state,
         subject: payload.subject,
         chapter: payload.chapter,
@@ -84,13 +83,13 @@ export default createModel({
     async load(payload: Path) {
       const state: State = getState();
       // @ts-ignore
-      if (Date.now() - state.maps.timestamp > 3000 || state.maps.subject !== payload.subject || state.maps.chapter != payload.chapter) {
+      if (state.maps.subject !== payload.subject || state.maps.chapter != payload.chapter) {
         dispatch.maps.request();
         const resp = await fetch(`${config.server}data?subject=${payload.subject}&load=${payload.chapter}`, endpoint.get(state));
         if (resp.ok) {
           const json = await resp.json();
           // @ts-ignore
-          dispatch.maps.receivedList(json);
+          dispatch.maps.received(json);
         }
         else {
           const message = await resp.text();
@@ -99,15 +98,13 @@ export default createModel({
         }
       }
     },
-/*
     'routing/change': async function(payload: RoutingState) {
       switch (payload.page) {
         case 'browser':
           // @ts-ignore
-          dispatch.maps.load(payload.page["subject"], payload.page["chapter"]);
+          dispatch.maps.load({ subject: payload.params["subject"], chapter: payload.params["chapter"]});
           break;
       }
     }
- */
   })
 })

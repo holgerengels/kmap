@@ -1,5 +1,5 @@
 import {LitElement, html, css} from 'lit-element';
-import {connect} from "pwa-helpers/connect-mixin";
+import { connect } from '@captaincodeman/rdx';
 import {store} from "../store";
 import {config} from '../config';
 import {STATE_COLORS} from './state-colors';
@@ -8,7 +8,7 @@ import './star-rating';
 import '@material/mwc-icon';
 import '@material/mwc-button';
 
-class KMapTestCard extends connect(store)(LitElement) {
+class KMapTestCard extends connect(store, LitElement) {
 
   static get styles() {
     // language=CSS
@@ -116,7 +116,7 @@ mwc-icon {
   <div class="card-header" ?hidden="${this.hideHeader}">
       <span>Aufgabe ${this.num + 1} von ${this.of} (${this._levelText()})</span>
       <div style="flex: 1 0 auto"></div>
-      <a href="#browser/${this.subject}/${this.chapter}/${this.topic}" target="_blank" id="blinky">Wissenskarte ansehen <mwc-icon>open_in_new</mwc-icon></a>
+      <a href="/:app/browser/${this.subject}/${this.chapter}/${this.topic}" target="_blank" id="blinky">Wissenskarte ansehen <mwc-icon>open_in_new</mwc-icon></a>
   </div>
   <div class="card-content">
       <div id="question" style="${this.questionFlex}"></div>

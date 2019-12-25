@@ -1,7 +1,7 @@
 import {LitElement, html, css} from 'lit-element';
 import {updateTitle, showMessage} from "../actions/app";
 import {store} from "../store";
-import {connect} from "pwa-helpers/connect-mixin";
+import { connect } from '@captaincodeman/rdx';
 import {storeState} from "../actions/states";
 
 import {colorStyles, elevationStyles, fontStyles} from "./kmap-styles";
@@ -10,7 +10,7 @@ import '@material/mwc-icon';
 import '@material/mwc-icon-button';
 import './kmap-test-result-card';
 
-class KmapTestResults extends connect(store)(LitElement) {
+class KmapTestResults extends connect(store, LitElement) {
   static get styles() {
     // language=CSS
     return [
@@ -55,7 +55,7 @@ mwc-icon {
         <br/>
         ${this.summary.cards.map((card, i) => html`
           <kmap-test-result-card .subject="${card.subject}" .chapter="${card.chapter}" .card="${card}" .state="${card.state}">
-            <a slot="actions-fullscreen" href="#browser/${card.subject}/${card.chapter}/${card.topic}"><mwc-icon>open-in-new"></mwc-icon></a>
+            <a slot="actions-fullscreen" href="/:app/browser/${card.subject}/${card.chapter}/${card.topic}"><mwc-icon>open-in-new"></mwc-icon></a>
           </kmap-test-result-card>
         `)}
       </div>

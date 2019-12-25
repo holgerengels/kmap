@@ -1,5 +1,5 @@
 import {LitElement, html, css} from 'lit-element';
-import {connect} from "pwa-helpers/connect-mixin";
+import { connect } from '@captaincodeman/rdx';
 import {store} from "../store";
 import {loadSet, forgetSet} from "../actions/test-editor";
 import {setTestForDelete, setTestForEdit} from "../actions/app";
@@ -7,7 +7,7 @@ import {fontStyles, colorStyles, elevationStyles} from "./kmap-styles";
 import 'mega-material/surface';
 import './kmap-test-card';
 
-class KMapTestEditorScroller extends connect(store)(LitElement) {
+class KMapTestEditorScroller extends connect(store, LitElement) {
 
     static get styles() {
       // language=CSS

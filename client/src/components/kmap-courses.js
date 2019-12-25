@@ -1,5 +1,5 @@
 import {LitElement, html, css} from 'lit-element';
-import {connect} from 'pwa-helpers/connect-mixin.js';
+import { connect } from '@captaincodeman/rdx';
 import {store} from "../store";
 import {loadCourses, storeCourses, forgetCourses, storeCourse} from "../actions/courses";
 import {logout, showMessage, updateTitle} from "../actions/app";
@@ -15,7 +15,7 @@ import '@material/mwc-textfield';
 import '@material/mwc-top-app-bar';
 import 'mega-material/list';
 
-class KCourses extends connect(store)(LitElement) {
+class KCourses extends connect(store, LitElement) {
   static get styles() {
     // language=CSS
     return [

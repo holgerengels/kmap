@@ -1,8 +1,7 @@
-import { createModel, RoutingState } from '@captaincodeman/rdx-model';
-import { State, Dispatch } from '../rdxstore';
+import {createModel, RoutingState} from '@captaincodeman/rdx-model';
+import { State, Dispatch } from '../store';
 import {endpoint} from "../endpoint";
 import {config} from "../config";
-import {Path} from "./types";
 
 export interface SubjectsState {
   subjects: string[],
@@ -61,17 +60,13 @@ export default createModel({
       }
     },
 
-/*
     'routing/change': async function(payload: RoutingState) {
       switch (payload.page) {
-        case 'browser':
+        case 'home':
           // @ts-ignore
-          dispatch.subjects.load(payload.page["subject"], payload.page["chapter"]);
+          dispatch.subjects.load();
           break;
       }
     }
- */
   })
 })
-
-// TODO: forgetSubjects on logout

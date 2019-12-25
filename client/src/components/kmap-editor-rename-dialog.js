@@ -1,5 +1,5 @@
 import {css, html, LitElement} from 'lit-element';
-import {connect} from "pwa-helpers/connect-mixin";
+import { connect } from '@captaincodeman/rdx';
 import {store} from "../store";
 import {unsetCardForRename} from "../actions/app";
 import {renameTopic} from "../actions/editor";
@@ -10,7 +10,7 @@ import '@material/mwc-button';
 import '@material/mwc-dialog';
 import '@material/mwc-textfield';
 
-class KMapEditorRenameDialog extends connect(store)(LitElement) {
+class KMapEditorRenameDialog extends connect(store, LitElement) {
   static get styles() {
     // language=CSS
     return [

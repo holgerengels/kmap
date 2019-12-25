@@ -1,5 +1,5 @@
 import {css, html, LitElement} from 'lit-element';
-import {connect} from "pwa-helpers/connect-mixin";
+import { connect } from '@captaincodeman/rdx';
 import {store} from "../store";
 import {unsetCardForDelete} from "../actions/app";
 import {deleteTopic} from "../actions/editor";
@@ -9,7 +9,7 @@ import {colorStyles, fontStyles} from "./kmap-styles";
 import '@material/mwc-button';
 import '@material/mwc-dialog';
 
-class KMapEditorDeleteDialog extends connect(store)(LitElement) {
+class KMapEditorDeleteDialog extends connect(store, LitElement) {
   static get styles() {
     // language=CSS
     return [

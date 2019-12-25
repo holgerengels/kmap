@@ -1,9 +1,9 @@
 import { LitElement, html, css } from 'lit-element';
-import {connect} from "pwa-helpers/connect-mixin";
+import { connect } from '@captaincodeman/rdx';
 import { colorStyles, fontStyles } from "./kmap-styles";
 import {store} from "../store";
 
-class KMapSummaryCardSummary extends connect(store)(LitElement) {
+class KMapSummaryCardSummary extends connect(store, LitElement) {
   static get styles() {
     // language=CSS
     return [

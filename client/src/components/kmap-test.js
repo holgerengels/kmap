@@ -2,7 +2,7 @@ import {LitElement, html, css} from 'lit-element';
 import {updateTitle, showMessage, updateLocation} from "../actions/app";
 import {store} from "../store";
 import {fetchSubjectsIfNeeded, fetchChaptersIfNeeded, fetchTreeIfNeeded, fetchChapterIfNeeded} from "../actions/tests";
-import {connect} from "pwa-helpers/connect-mixin";
+import { connect } from '@captaincodeman/rdx';
 import {storeState} from "../actions/states";
 
 import {colorStyles, fontStyles} from "./kmap-styles";
@@ -17,7 +17,7 @@ import './kmap-test-exercise';
 import './kmap-test-results';
 import './kmap-test-editor-scroller';
 
-class KmapTest extends connect(store)(LitElement) {
+class KmapTest extends connect(store, LitElement) {
   static get styles() {
     // language=CSS
     return [

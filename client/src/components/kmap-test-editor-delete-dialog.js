@@ -1,5 +1,5 @@
 import {css, html, LitElement} from 'lit-element';
-import {connect} from "pwa-helpers/connect-mixin";
+import { connect } from '@captaincodeman/rdx';
 import {store} from "../store";
 import {unsetTestForDelete} from "../actions/app";
 import {deleteTest, loadSet} from "../actions/test-editor";
@@ -9,7 +9,7 @@ import '@material/mwc-button';
 import '@material/mwc-dialog';
 import '@material/mwc-textfield';
 
-class KMapTestEditorDeleteDialog extends connect(store)(LitElement) {
+class KMapTestEditorDeleteDialog extends connect(store, LitElement) {
   static get styles() {
     // language=CSS
     return [

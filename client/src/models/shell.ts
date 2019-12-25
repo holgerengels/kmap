@@ -1,8 +1,5 @@
-import { createModel, RoutingState } from '@captaincodeman/rdx-model';
-import { State, Dispatch } from '../rdxstore';
-import {endpoint} from "../endpoint";
-import {config} from "../config";
-import {Path} from "./types";
+import { createModel } from '@captaincodeman/rdx-model';
+import { Dispatch } from '../store';
 
 export interface ShellState {
   title: string,
@@ -14,13 +11,12 @@ export interface ShellState {
   cardForRename: string,
   cardForDelete: string,
   testForEdit: string,
-  testForRename: string,
   testForDelete: string,
 }
 
 export default createModel({
   state: <ShellState>{
-    title: "",
+    title: "KMap",
     narrow: false,
     drawerOpen: false,
     messages: [],

@@ -2,14 +2,14 @@ import {LitElement, html, css} from 'lit-element';
 import {addResult, clearResults} from "../actions/tests";
 import {store} from "../store";
 import {fetchChapterIfNeeded, fetchTopicIfNeeded} from "../actions/tests";
-import {connect} from "pwa-helpers/connect-mixin";
+import { connect } from '@captaincodeman/rdx';
 
 import {colorStyles, fontStyles} from "./kmap-styles";
 import '@material/mwc-button';
 import '@material/mwc-icon-button';
 import './kmap-test-card';
 
-class KmapTestExercise extends connect(store)(LitElement) {
+class KmapTestExercise extends connect(store, LitElement) {
   static get styles() {
     // language=CSS
     return [

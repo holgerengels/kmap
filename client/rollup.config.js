@@ -1,4 +1,4 @@
-import createDefaultConfig from '@open-wc/building-rollup/modern-config';
+import createDefaultConfig from '@open-wc/building-rollup';
 import cpy from 'rollup-plugin-cpy';
 import deepmerge from 'deepmerge';
 const { injectManifest, generateSW } = require('rollup-plugin-workbox');
@@ -9,6 +9,7 @@ const { injectManifest, generateSW } = require('rollup-plugin-workbox');
 
 const config = createDefaultConfig({
   input: './index.html',
+  extensions: ['.js', '.mjs', '.ts'],
   plugins: {
     workbox: false,
   },

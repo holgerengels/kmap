@@ -1,12 +1,12 @@
 import { LitElement, html, css } from 'lit-element';
-import {connect} from "pwa-helpers/connect-mixin";
+import { connect } from '@captaincodeman/rdx';
 import {store} from "../store";
 import {setCardForEdit, setCardForRename, setCardForDelete} from "../actions/app";
 import {colorStyles, fontStyles} from "./kmap-styles";
 import '@material/mwc-button';
 import './modal-dialog';
 
-class KMapSummaryCardEditor extends connect(store)(LitElement) {
+class KMapSummaryCardEditor extends connect(store, LitElement) {
   static get styles() {
     // language=CSS
     return [

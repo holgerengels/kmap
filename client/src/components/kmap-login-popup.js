@@ -1,5 +1,5 @@
 import {LitElement, html, css} from 'lit-element';
-import {connect} from 'pwa-helpers/connect-mixin.js';
+import { connect } from '@captaincodeman/rdx';
 import {store} from "../store.js";
 import {login, logout, showMessage} from "../actions/app";
 import {colorStyles, fontStyles} from "./kmap-styles";
@@ -10,7 +10,7 @@ import '@material/mwc-textfield';
 import 'pwa-helper-components/pwa-install-button';
 import 'pwa-helper-components/pwa-update-available';
 
-class KMapLoginPopup extends connect(store)(LitElement) {
+class KMapLoginPopup extends connect(store, LitElement) {
   static get styles() {
     // language=CSS
     return [

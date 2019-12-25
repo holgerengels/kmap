@@ -1,8 +1,7 @@
-import { createModel, RoutingState } from '@captaincodeman/rdx-model';
-import { State, Dispatch } from '../rdxstore';
+import { createModel } from '@captaincodeman/rdx-model';
+import { State, Dispatch } from '../store';
 import {endpoint} from "../endpoint";
 import {config} from "../config";
-import {Path} from "./types";
 
 export interface Course {
   name: string,
@@ -120,6 +119,7 @@ export default createModel({
       dispatch.courses.requestStoreChange();
       const resp = await fetch(`${config.server}state?userid=${state.app.userid}&storeCourse=${payload.name}`, {... endpoint.post, body: JSON.stringify(payload.students)});
       if (resp.ok) {
+        // @ts-ignore
         const json = await resp.json();
         dispatch.courses.receivedStoreChange();
       }

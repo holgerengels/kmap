@@ -2,14 +2,14 @@ import { LitElement, html, css } from 'lit-element';
 import {styleMap} from 'lit-html/directives/style-map.js';
 import { fontStyles, colorStyles } from "./kmap-styles";
 import { STATE_COLORS } from './state-colors';
-import {connect} from "pwa-helpers/connect-mixin";
+import { connect } from '@captaincodeman/rdx';
 import {store} from "../store";
 import {selectSummaryCard} from '../actions/maps.js';
 import '@material/mwc-icon';
 import 'mega-material/list';
 import './star-rating';
 
-class KMapTestResultCard extends connect(store)(LitElement) {
+class KMapTestResultCard extends connect(store, LitElement) {
 
   static get styles() {
     // language=CSS
@@ -85,7 +85,7 @@ class KMapTestResultCard extends connect(store)(LitElement) {
         <div class="card-footer">
             <star-rating .rate="${this._state}" @clicked="${this._rated}" style=${styleMap(this._colorStyles)}></star-rating>
             <div slot="footer" style="flex: 1 0 auto"></div>
-            <a slot="footer" href="#browser/${this.card.subject}/${this.card.chapter}/${this.card.topic}"><mwc-icon>open_in_new</mwc-icon></a>
+            <a slot="footer" href="/:app/browser/${this.card.subject}/${this.card.chapter}/${this.card.topic}"><mwc-icon>open_in_new</mwc-icon></a>
         </div>
     `;
   }

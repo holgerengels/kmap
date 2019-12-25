@@ -34,9 +34,9 @@ a:hover {
       ? html`
           <b>Voraussetzungen:</b> ${this.depends.map((depend, i) => html`
             ${this.chapterDepends ? html`
-              &nbsp;<a href="#browser/${this.subject}/${depend}">${depend}</a>
+              &nbsp;<a href="/:app/browser/${this.subject}/${depend}">${depend}</a>
             ` : html`
-              &nbsp;<a href="#browser/${this.subject}/${this.chapter}/${depend}">${depend}</a>
+              &nbsp;<a href="/:app/browser/${this.subject}/${this.chapter}/${depend}">${depend}</a>
             `}
           `)}
         `

@@ -1,5 +1,5 @@
 import {LitElement, html, css} from 'lit-element';
-import {connect} from "pwa-helpers/connect-mixin";
+import { connect } from '@captaincodeman/rdx';
 import {store} from "../store";
 import {setCardForEdit} from "../actions/app";
 import {fontStyles, colorStyles} from "./kmap-styles";
@@ -9,7 +9,7 @@ import '@material/mwc-dialog';
 import '@material/mwc-fab';
 import '@material/mwc-textfield';
 
-class KMapEditorAddFabs extends connect(store)(LitElement) {
+class KMapEditorAddFabs extends connect(store, LitElement) {
   static get styles() {
     // language=CSS
     return [

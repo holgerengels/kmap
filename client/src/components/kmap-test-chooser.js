@@ -2,7 +2,7 @@ import {LitElement, html, css} from 'lit-element';
 import {updateTitle, updateLocation} from "../actions/app";
 import {store} from "../store";
 import {fetchSubjectsIfNeeded, fetchChaptersIfNeeded, fetchTreeIfNeeded, fetchChapterIfNeeded} from "../actions/tests";
-import {connect} from "pwa-helpers/connect-mixin";
+import { connect } from '@captaincodeman/rdx';
 
 import {colorStyles, elevationStyles, fontStyles} from "./kmap-styles";
 import '@material/mwc-button';
@@ -14,7 +14,7 @@ import '@material/mwc-top-app-bar';
 import '@material/mwc-top-app-bar';
 import 'mega-material/surface';
 
-class KmapTestChooser extends connect(store)(LitElement) {
+class KmapTestChooser extends connect(store, LitElement) {
   static get styles() {
     // language=CSS
     return [

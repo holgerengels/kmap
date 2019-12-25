@@ -5,7 +5,7 @@ import * as models from './models'
 
 const routingPlugin = routingPluginFactory(routeMatcher)
 
-let rdxstore = createStore({ models, plugins: [routingPlugin] })
+let store = createStore({ models, plugins: [routingPlugin] })
 
 // These could be commented out if the extra functionality
 // wasn't required, to create a production bundle without
@@ -13,13 +13,13 @@ let rdxstore = createStore({ models, plugins: [routingPlugin] })
 // controlled using rollup with the replace plugin, e.g.
 //
 // if (process.env.NODE_ENV !== 'production') {
-//   rdxstore = devtools(rdxstore)
+//   store = devtools(store)
 
-rdxstore = devtools(rdxstore)
-rdxstore = persist(rdxstore)
+store = devtools(store)
+store = persist(store)
 
-export { rdxstore }
+export { store }
 
-export type Store = typeof rdxstore
+export type Store = typeof store
 export type State = ModelsState<typeof models> // & { routing: RoutingState }
 export type Dispatch = ModelsDispatch<typeof models> // { routing: RoutingDispatch }

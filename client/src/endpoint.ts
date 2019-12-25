@@ -1,4 +1,4 @@
-import {State} from "./rdxstore";
+import {State} from "./store";
 
 export const endpoint = {
   get(state: State): RequestInit {
@@ -9,7 +9,7 @@ export const endpoint = {
       credentials: "include",
       headers: new Headers({
         "Content-Type": "application/json; charset=utf-8",
-        "X-Instance": "lala", // state.app.instance,
+        "X-Instance": state.app.instance,
       })
     };
   },
@@ -21,7 +21,7 @@ export const endpoint = {
       credentials: "include",
       headers: new Headers({
         "Content-Type": "application/json; charset=utf-8",
-        "X-Instance": "lala", // state.app.instance,
+        "X-Instance": state.app.instance,
       })
     };
   },

@@ -1,5 +1,5 @@
 import {css, html, LitElement} from 'lit-element';
-import {connect} from "pwa-helpers/connect-mixin";
+import { connect } from '@captaincodeman/rdx';
 import {store} from "../store";
 import {navigate, logout, unsetCardForEdit, showMessage} from "../actions/app";
 import {saveTopic} from "../actions/editor";
@@ -18,7 +18,7 @@ import '@material/mwc-textfield';
 import './kmap-summary-card-summary';
 import './kmap-knowledge-card-description';
 
-class KMapEditorEditDialog extends connect(store)(LitElement) {
+class KMapEditorEditDialog extends connect(store, LitElement) {
   static get styles() {
     // language=CSS
     return [
@@ -218,7 +218,7 @@ ${this._card ? html`
         this._chapter = this._card.chapter ? this._card.chapter : state.maps.map.chapter;
 
         this._navigateAfterSafe = state.maps.map.subject !== this._subject || state.maps.map.chapter !== this._chapter
-          ? "#browser/" + this._subject + "/" + this._chapter
+          ? "/:app/browser/" + this._subject + "/" + this._chapter
           : null;
 
         if (!this._card.summary)

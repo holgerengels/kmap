@@ -1,11 +1,11 @@
 import {LitElement, html, css} from 'lit-element';
-import {connect} from "pwa-helpers/connect-mixin";
+import { connect } from '@captaincodeman/rdx';
 import {store} from "../store";
 import 'mega-material/list';
 import {loadSets, forgetSets, selectSet} from "../actions/content-sets";
 import {fontStyles, colorStyles} from "./kmap-styles";
 
-class KMapSetSelector extends connect(store)(LitElement) {
+class KMapSetSelector extends connect(store, LitElement) {
 
     static get styles() {
       // language=CSS

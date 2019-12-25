@@ -1,10 +1,10 @@
 import {css, html, LitElement} from 'lit-element';
-import {connect} from "pwa-helpers/connect-mixin";
+import { connect } from '@captaincodeman/rdx';
 import {store} from "../store";
 import {colorStyles, fontStyles} from "./kmap-styles";
 import './kmap-set-selector';
 
-class KMapTestEditor extends connect(store)(LitElement) {
+class KMapTestEditor extends connect(store, LitElement) {
 
   static get styles() {
     // language=CSS

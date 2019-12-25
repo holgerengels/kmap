@@ -1,5 +1,5 @@
 import {LitElement, html, css} from 'lit-element';
-import {connect} from 'pwa-helpers/connect-mixin.js';
+import { connect } from '@captaincodeman/rdx';
 import {loadInstances, forgetInstances, createInstance, dropInstance} from "../actions/instances";
 import {store} from "../store";
 import {colorStyles, fontStyles} from "./kmap-styles";
@@ -8,7 +8,7 @@ import 'mega-material/list';
 import '@material/mwc-icon-button';
 import '@material/mwc-textfield';
 
-class KMapContentManagerInstances extends connect(store)(LitElement) {
+class KMapContentManagerInstances extends connect(store, LitElement) {
   static get styles() {
     // language=CSS
     return [

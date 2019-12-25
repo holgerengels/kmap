@@ -1,5 +1,5 @@
 import {css, html, LitElement} from 'lit-element';
-import {connect} from "pwa-helpers/connect-mixin";
+import { connect } from '@captaincodeman/rdx';
 import {store} from "../store";
 import {logout, unsetTestForEdit, showMessage} from "../actions/app";
 import {handleErrors} from "../actions/fetchy";
@@ -18,7 +18,7 @@ import '@material/mwc-textfield';
 import './kmap-summary-card-summary';
 import './kmap-knowledge-card-description';
 
-class KMapTestEditorEditDialog extends connect(store)(LitElement) {
+class KMapTestEditorEditDialog extends connect(store, LitElement) {
   static get styles() {
     // language=CSS
     return [

@@ -1,5 +1,5 @@
 import {css, html, LitElement} from 'lit-element';
-import {connect} from 'pwa-helpers/connect-mixin.js';
+import { connect } from '@captaincodeman/rdx';
 import {store} from "../store";
 import {updateTitle} from "../actions/app";
 
@@ -14,7 +14,7 @@ import './kmap-content-manager-modules';
 import './kmap-content-manager-sets';
 import {set} from "idb-keyval";
 
-class KMapContentManager extends connect(store)(LitElement) {
+class KMapContentManager extends connect(store, LitElement) {
   static get styles() {
     // language=CSS
     return [

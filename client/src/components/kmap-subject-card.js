@@ -1,5 +1,5 @@
 import {LitElement, html, css} from 'lit-element';
-import {connect} from "pwa-helpers/connect-mixin";
+import { connect } from '@captaincodeman/rdx';
 import {store} from "../store";
 import {STATE_COLORS} from "./state-colors";
 import {colorStyles, fontStyles} from "./kmap-styles";
@@ -7,7 +7,7 @@ import {colorStyles, fontStyles} from "./kmap-styles";
 import '@material/mwc-icon';
 import '@material/mwc-ripple';
 
-class KMapSubjectCard extends connect(store)(LitElement) {
+class KMapSubjectCard extends connect(store, LitElement) {
   static get styles() {
     // language=CSS
     return [
@@ -64,7 +64,7 @@ div.card {
   <div class="card-header font-body">
     <span>${this.subject}</span>
     <div style="flex: 1 0 auto"></div>
-    <a href="#browser/${this.subject}/${this.subject}" title="Wissenslandkarte"><mwc-ripple></mwc-ripple><mwc-icon style="--mdc-icon-size: 20px; margin:2px 0px">open_in_new</mwc-icon></a>
+    <a href="/:app/browser/${this.subject}/${this.subject}" title="Wissenslandkarte"><mwc-ripple></mwc-ripple><mwc-icon style="--mdc-icon-size: 20px; margin:2px 0px">open_in_new</mwc-icon></a>
   </div>
   <div class="card-footer font-body">
       <div style="flex: 1 0 auto; height: 24px"></div>

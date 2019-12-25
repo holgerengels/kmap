@@ -1,5 +1,5 @@
 import {LitElement, html, css} from 'lit-element';
-import {connect} from "pwa-helpers/connect-mixin";
+import { connect } from '@captaincodeman/rdx';
 import {store} from "../store";
 import {selectSummaryCard} from '../actions/maps.js';
 import {STATE_COLORS} from './state-colors';
@@ -13,7 +13,7 @@ import './kmap-summary-card-editor';
 import './kmap-summary-card-rating';
 import './kmap-summary-card-ratecolors';
 
-class KMapSummaryCard extends connect(store)(LitElement) {
+class KMapSummaryCard extends connect(store, LitElement) {
   static get styles() {
     // language=CSS
     return [
@@ -88,9 +88,9 @@ div.card[highlighted] {
     <span>${this.card.topic}</span>
     <div style="flex: 1 0 auto"></div>
     ${this.card.links ? html`
-        <a href="#browser/${this.subject}/${this.card.links}" title="Wissenslandkarte"><mwc-ripple></mwc-ripple><mwc-icon style="--mdc-icon-size: 20px; margin:2px 0px">open_in_new</mwc-icon></a>
+        <a href="/:app/browser/${this.subject}/${this.card.links}" title="Wissenslandkarte"><mwc-ripple></mwc-ripple><mwc-icon style="--mdc-icon-size: 20px; margin:2px 0px">open_in_new</mwc-icon></a>
     ` : html`
-        <a href="#browser/${this.subject}/${this.chapter}/${this.card.topic}" title="Wissenskarte"><mwc-ripple></mwc-ripple><mwc-icon>fullscreen</mwc-icon></a>
+        <a href="/:app/browser/${this.subject}/${this.chapter}/${this.card.topic}" title="Wissenskarte"><mwc-ripple></mwc-ripple><mwc-icon>fullscreen</mwc-icon></a>
     `}
   </div>
   ${this._layers.includes('summaries')

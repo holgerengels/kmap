@@ -1,11 +1,11 @@
 import {LitElement, html, css} from 'lit-element';
-import {connect} from 'pwa-helpers/connect-mixin.js';
+import { connect } from '@captaincodeman/rdx';
 import {store} from "../store.js";
 
 import {fontStyles, colorStyles} from "./kmap-styles";
 import '@material/mwc-icon';
 
-class KMapLoginButton extends connect(store)(LitElement) {
+class KMapLoginButton extends connect(store, LitElement) {
   static get styles() {
     // language=CSS
     return [
@@ -16,7 +16,7 @@ class KMapLoginButton extends connect(store)(LitElement) {
     display: inline-block;
     outline: none;
     width: 48px;
-}        
+}
 [hidden] {
   display: none !important;
 }
@@ -26,9 +26,9 @@ class KMapLoginButton extends connect(store)(LitElement) {
   display: flex;
   right: 6px;
   top: 6px;
-  height: 36px; 
+  height: 36px;
   width: 36px;
-  border-radius: 50%; 
+  border-radius: 50%;
   color: black;
   font-size: 0.95rem;
   background-color: var(--color-secondary);

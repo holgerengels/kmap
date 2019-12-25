@@ -1,5 +1,5 @@
-import { createModel, RoutingState } from '@captaincodeman/rdx-model';
-import { State, Dispatch } from '../rdxstore';
+import {createModel, RoutingState} from '@captaincodeman/rdx-model';
+import { State, Dispatch } from '../store';
 import {endpoint} from "../endpoint";
 import {config} from "../config";
 import {Path} from "./types";
@@ -74,6 +74,9 @@ export default createModel({
   effects: (dispatch: Dispatch, getState) => ({
     async load(payload: Path) {
       const state: State = getState();
+      if (!state.app.userid)
+        return;
+
       // @ts-ignore
       if (Date.now() - state.rates.timestamp > 3000 || state.rates.subject !== payload.subject) {
         dispatch.rates.requestLoad();
@@ -106,16 +109,14 @@ export default createModel({
       }
     },
 
-/*
     'routing/change': async function(payload: RoutingState) {
       switch (payload.page) {
         case 'browser':
           // @ts-ignore
-          dispatch.rates.load(payload.page["subject"], payload.page["chapter"]);
+          dispatch.rates.load({ subject: payload.params["subject"] });
           break;
       }
     }
- */
   })
 })
 
