@@ -4,14 +4,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Enumeration;
 import java.util.Properties;
 
 public class JsonServlet extends HttpServlet {
@@ -34,8 +30,7 @@ public class JsonServlet extends HttpServlet {
     }
 
     @Override
-    protected void doOptions(HttpServletRequest request, HttpServletResponse resp)
-        throws ServletException, IOException {
+    protected void doOptions(HttpServletRequest request, HttpServletResponse resp) {
         corsHeaders(request, resp);
     }
 
@@ -50,30 +45,46 @@ public class JsonServlet extends HttpServlet {
         JsonObject object = new JsonObject();
         object.addProperty("response", response);
         object.add("data", element);
-        writeObject(request, resp, object);
+        writeResponse(request, resp, object);
     }
 
     protected void writeResponse(HttpServletRequest request, HttpServletResponse resp, String response, String message) throws IOException {
         JsonObject object = new JsonObject();
         object.addProperty("response", response);
         object.addProperty("message", message);
-        writeObject(request, resp, object);
+        writeResponse(request, resp, object);
     }
 
-    private void writeObject(HttpServletRequest request, HttpServletResponse resp, JsonElement object) throws IOException {
+    static protected void writeResponse(HttpServletRequest request, HttpServletResponse resp, JsonElement object) throws IOException {
         resp.setContentType("application/json");
         resp.setCharacterEncoding("utf-8");
         corsHeaders(request, resp);
         resp.getWriter().print(object.toString());
     }
 
-    protected void sendError(HttpServletRequest request, HttpServletResponse resp, int code, String message) {
-        corsHeaders(request, resp);
+    static void sendError(HttpServletRequest req, HttpServletResponse resp, Exception e) {
+        corsHeaders(req, resp);
+        resp.setStatus(500);
+        resp.setContentType("text/plain");
+        resp.setCharacterEncoding("utf-8");
         try {
-            resp.sendError(code, message);
+            resp.getWriter().print(e.getMessage());
         }
-        catch (IOException e) {
-            throw new RuntimeException(e);
+        catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    static void sendError(HttpServletRequest req, HttpServletResponse resp, int status, String message) {
+        corsHeaders(req, resp);
+        resp.setStatus(status);
+        resp.setContentType("text/plain");
+        resp.setCharacterEncoding("utf-8");
+        try {
+            resp.getWriter().print(message);
+        }
+        catch (IOException ex) {
+            ex.printStackTrace();
         }
     }
 

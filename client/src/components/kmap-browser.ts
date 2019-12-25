@@ -164,11 +164,11 @@ class KMapBrowser extends connect(store, LitElement) {
     var detail = e.detail;
     if (this._userid) {
       console.log("save " + detail.key + " := " + detail.rate);
-      store.dispatch(storeState({userid: this._userid, subject: this.routeSubject}, detail.key, detail.rate));
+      store.dispatch.rates.store({subject: this._subject, id: detail.key, rate: detail.rate});
     }
     else {
       console.log("cannot save " + detail.key + " := " + detail.rate);
-      store.dispatch(showMessage("Achtung! Deine Eingaben können nur gespeichert werden, wenn Du angemeldet bist!"));
+      store.dispatch.shell.showMessage("Achtung! Deine Eingaben können nur gespeichert werden, wenn Du angemeldet bist!");
     }
   }
 

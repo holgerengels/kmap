@@ -94,6 +94,7 @@ export default createModel({
         else {
           const message = await resp.text();
           // @ts-ignore
+          dispatch.app.handleError({ code: resp.status, message: message });
           dispatch.maps.error(message);
         }
       }

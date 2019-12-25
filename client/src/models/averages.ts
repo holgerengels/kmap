@@ -59,11 +59,12 @@ export default createModel({
         if (resp.ok) {
           const json = await resp.json();
           // @ts-ignore
-          dispatch.averages.receivedLoad({subject: payload.subject, course: payload.course, rates: json.data});
+          dispatch.averages.receivedLoad({subject: payload.subject, course: payload.course, rates: json});
         }
         else {
           const message = await resp.text();
           // @ts-ignore
+          dispatch.app.handleError({ code: resp.status, message: message });
           dispatch.averages.error(message);
         }
       }

@@ -90,14 +90,14 @@ public class Authentication {
                         request.getSession().setAttribute("roles", roles);
                         writeRoles(request, response, roles);
                     } else
-                        writeResponse(request, response, "error", "invalid credentials");
+                        JsonServlet.writeResponse(request, response, new JsonPrimitive("invalid credentials"));
                 }
                 catch (Exception e) {
-                    sendError(request, response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+                    JsonServlet.sendError(request, response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
                 }
             }
             else
-                writeResponse(request, response, "error", "invalid login request");
+                JsonServlet.writeResponse(request, response, new JsonPrimitive("invalid login request"));
 
             return false;
         }
@@ -106,7 +106,7 @@ public class Authentication {
             System.out.println("logout = " + logout);
             request.getSession().removeAttribute("user");
             request.getSession().invalidate();
-            writeResponse(request, response, "info", "logged out");
+            JsonServlet.writeResponse(request, response, new JsonPrimitive("logged out"));
             return false;
         }
         else if (request.getSession().getAttribute("user") != null) {
@@ -114,42 +114,20 @@ public class Authentication {
         }
         else if (request.getSession().isNew()) {
             System.out.println("session new");
-            sendError(request, response, HttpServletResponse.SC_UNAUTHORIZED, "session timeout");
+            JsonServlet.sendError(request, response, HttpServletResponse.SC_UNAUTHORIZED, "session timeout");
             return false;
         }
         else {
             System.out.println("session not authenticated");
-            sendError(request, response, HttpServletResponse.SC_FORBIDDEN, "session not authenticated");
+            JsonServlet.sendError(request, response, HttpServletResponse.SC_UNAUTHORIZED, "session not authenticated");
             return false;
         }
-    }
-
-    private void sendError(HttpServletRequest request, HttpServletResponse response, int code, String message) throws IOException {
-        JsonServlet.corsHeaders(request, response);
-        response.sendError(code, message);
-    }
-
-    private void writeResponse(HttpServletRequest request, HttpServletResponse resp, String response, String message) throws IOException {
-        JsonObject object = new JsonObject();
-        object.addProperty("response", response);
-        object.addProperty("message", message);
-        writeObject(request, resp, object);
     }
 
     private void writeRoles(HttpServletRequest request, HttpServletResponse resp, Collection<String> roles) throws IOException {
         JsonArray array = new JsonArray();
         roles.forEach(array::add);
-        JsonObject object = new JsonObject();
-        object.addProperty("response", "data");
-        object.add("data", array);
-        writeObject(request, resp, object);
-    }
-
-    private void writeObject(HttpServletRequest request, HttpServletResponse resp, JsonObject object) throws IOException {
-        resp.setContentType("application/json");
-        resp.setCharacterEncoding("utf-8");
-        JsonServlet.corsHeaders(request, resp);
-        resp.getWriter().print(object.toString());
+        JsonServlet.writeResponse(request, resp, array);
     }
 
     private Set<String> authenticate(String user, String password) {

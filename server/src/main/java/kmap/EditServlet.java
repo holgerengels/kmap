@@ -69,7 +69,7 @@ public class EditServlet
         }
         catch (Exception e) {
             e.printStackTrace();
-            sendError(req, resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+            sendError(req, resp, e);
         }
         finally {
             Server.CLIENT.remove();
@@ -123,7 +123,7 @@ public class EditServlet
         }
         catch (Exception e) {
             e.printStackTrace();
-            sendError(req, resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+            sendError(req, resp, e);
         }
         finally {
             Server.CLIENT.remove();

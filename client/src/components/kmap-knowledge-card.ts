@@ -2,7 +2,7 @@ import {LitElement, html, css, customElement, property} from 'lit-element';
 import { connect } from '@captaincodeman/rdx';
 import {State, store} from "../store";
 import {Attachment, Card} from "../models/maps";
-import { STATE_COLORS } from './state-colors';
+import {STATE_COLORS} from './state-colors';
 
 import {styleMap} from 'lit-html/directives/style-map.js';
 import '@material/mwc-icon';
@@ -12,14 +12,13 @@ import './kmap-knowledge-card-depends';
 import './kmap-knowledge-card-progress';
 import './kmap-knowledge-card-description';
 import './kmap-card-attachment';
-import { fontStyles, colorStyles } from "./kmap-styles";
+import {fontStyles, colorStyles} from "./kmap-styles";
 
 @customElement('kmap-knowledge-card')
 class KMapKnowledgeCard extends connect(store, LitElement) {
 
   @property()
   private _instance: string = '';
-
   @property()
   private subject: string = '';
   @property()
@@ -74,7 +73,6 @@ class KMapKnowledgeCard extends connect(store, LitElement) {
     if (changedProperties.has("card") || changedProperties.has("_topics"))
       this._hasTests = this._topics.includes(this.chapter + "." + this.card.topic);
   }
-
 
   _colorize(rate) {
     let _opaque = STATE_COLORS[rate][0];
@@ -146,11 +144,11 @@ class KMapKnowledgeCard extends connect(store, LitElement) {
       colorStyles,
       css`
         :host {
+          display: block;
           --color-opaque: #f5f5f5;
           --color-light: #e0e0e0;
           --color-lightest: #9e9e9e;
 
-          display: block;
           box-sizing: border-box;
           width: 100%;
           border-radius: 4px;
@@ -180,13 +178,14 @@ class KMapKnowledgeCard extends connect(store, LitElement) {
         }
         .card-header span, .card-footer span { align-self: center; }
         .card-header a, .card-footer a { height: 24px; color: black; display: block }
-        .card-footer a { color: var(--color-darkgray); }.attachments {
-                                                          display: flex;
-                                                          flex-direction: row;
-                                                          flex-wrap: wrap;
-                                                          margin-top: 12px;
-                                                          margin-bottom: 12px;
-                                                        }
+        .card-footer a { color: var(--color-darkgray); }
+        .attachments {
+          display: flex;
+          flex-direction: row;
+          flex-wrap: wrap;
+          margin-top: 12px;
+          margin-bottom: 12px;
+        }
         .attachments > div {
           align-content: start;
           margin: 12px;

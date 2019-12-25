@@ -205,7 +205,7 @@ public class States {
             JsonElement value = entry.getValue();
             return !"_id".equals(key) && !"_rev".equals(key) && !topics.contains(key) || (value.getAsJsonPrimitive().isNumber() && value.getAsInt() == 0);
         });
-        states.add(object.get("id").getAsString(), object.get("state"));
+        states.add(object.get("id").getAsString(), object.get("rate"));
         client.update(states);
         return statesAndProgress(user, subject);
     }

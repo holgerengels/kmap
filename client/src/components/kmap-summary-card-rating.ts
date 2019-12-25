@@ -1,49 +1,36 @@
-import { LitElement, html, css } from 'lit-element';
-import {styleMap} from 'lit-html/directives/style-map.js';
-import { fontStyles, colorStyles } from "./kmap-styles";
+import {LitElement, html, css, customElement, property} from 'lit-element';
 import { connect } from '@captaincodeman/rdx';
-import {store} from "../store";
+import {State, store} from "../store";
+import {styleMap} from 'lit-html/directives/style-map.js';
 
 import './star-rating';
+import { fontStyles, colorStyles } from "./kmap-styles";
 
 
+@customElement('kmap-summary-card-rating')
 class KMapSummaryCardRating extends connect(store, LitElement) {
-  static get styles() {
-    // language=CSS
-    return [
-      fontStyles,
-      colorStyles,
-      css`
-        :host {
-          display: contents;
-        }
-      `
-    ];
-  }
 
-  render() {
-    return html`
-      <star-rating .rate="${this._state}" @clicked="${this._rated}" style=${styleMap(this._colorStyles)}></star-rating>
-    `;
+  @property()
+  private key: string = '';
+  @property()
+  private _states: object = {};
+  @property()
+  private _state: number = 0;
+  @property()
+  private _colorStyles: object = { "--color-rated":  "--color-darkgray", "--color-unrated": "--color-lightgray" };
+
+  mapState(state: State) {
+    return {
+      _states: state.rates.rates,
+    };
   }
 
   static get properties() {
     return {
-      key: {type: String},
-      _states: {type: Array},
-      _state: {type: String},
       lightest: {type: String},
       opaque: {type: String},
       _colorStyles: {type: Object},
     };
-  }
-
-  constructor() {
-    super();
-    this.key = '';
-    this._states = [];
-    this._state = 0;
-    this._colorStyles = { "--color-rated":  "--color-darkgray", "--color-unrated": "--color-lightgray" };
   }
 
   updated(changedProperties) {
@@ -74,6 +61,23 @@ class KMapSummaryCardRating extends connect(store, LitElement) {
     let value = this._states.state[key];
     return value !== undefined ? value : 0;
   }
-}
 
-window.customElements.define('kmap-summary-card-rating', KMapSummaryCardRating);
+  static get styles() {
+    // language=CSS
+    return [
+      fontStyles,
+      colorStyles,
+      css`
+        :host {
+          display: contents;
+        }
+      `
+    ];
+  }
+
+  render() {
+    return html`
+      <star-rating .rate="${this._state}" @clicked="${this._rated}" style=${styleMap(this._colorStyles)}></star-rating>
+    `;
+  }
+}

@@ -3,12 +3,12 @@ import { State, Dispatch } from '../store';
 import {endpoint} from "../endpoint";
 import {config} from "../config";
 import {Path} from "./types";
+import {Login} from "./app";
 
 export interface Rate {
-  save: string,
   subject: string,
   id: string
-  state: number,
+  rate: number,
 }
 
 export interface RateState {
@@ -37,12 +37,18 @@ export default createModel({
         error: "",
       };
     },
-
     receivedLoad(state, payload: RateState) {
       return { ...state,
         subject: payload.subject,
         rates: payload.rates,
         loading: false,
+      };
+    },
+    forget(state) {
+      return { ...state,
+        rates: {},
+        timestamp: Date.now(),
+        error: "",
       };
     },
 
@@ -78,17 +84,18 @@ export default createModel({
         return;
 
       // @ts-ignore
-      if (Date.now() - state.rates.timestamp > 3000 || state.rates.subject !== payload.subject) {
+      if (state.rates.subject !== payload.subject || !state.rates.rates) {
         dispatch.rates.requestLoad();
         const resp = await fetch(`${config.server}state?load=${state.app.userid}&subject=${payload.subject}`, endpoint.get(state));
         if (resp.ok) {
           const json = await resp.json();
           // @ts-ignore
-          dispatch.rates.receivedLoad({subject: payload.subject, rates: json.data});
+          dispatch.rates.receivedLoad({subject: payload.subject, rates: json});
         }
         else {
           const message = await resp.text();
           // @ts-ignore
+          dispatch.app.handleError({ code: resp.status, message: message });
           dispatch.rates.error(message);
         }
       }
@@ -97,14 +104,15 @@ export default createModel({
       const state: State = getState();
       dispatch.rates.requestStore();
       let body = {... payload, save: state.app.userid};
-      const resp = await fetch(`${config.server}state?save=${state.app.userid}&subject=${payload.subject}`, {... endpoint.post, body: JSON.stringify(body)});
+      const resp = await fetch(`${config.server}state?save=${state.app.userid}&subject=${payload.subject}`, {... endpoint.post(state), body: JSON.stringify(body)});
       if (resp.ok) {
         const json = await resp.json();
-        dispatch.rates.receivedStore(json);
+        dispatch.rates.receivedStore({subject: payload.subject, rates: json});
       }
       else {
         const message = await resp.text();
         // @ts-ignore
+        dispatch.app.handleError({ code: resp.status, message: message });
         dispatch.rates.error(message);
       }
     },
@@ -116,8 +124,15 @@ export default createModel({
           dispatch.rates.load({ subject: payload.params["subject"] });
           break;
       }
-    }
+    },
+    'app/receivedLogin': async function(payload: Login) {
+      const state: State = getState();
+      const routing: RoutingState = state.routing;
+      if (routing.page === 'browser')
+        dispatch.rates.load({ subject: routing.params.subject });
+    },
+    'app/receivedLogout': async function() {
+      dispatch.rates.forget();
+    },
   })
 })
-
-// TODO: forgetState on logout

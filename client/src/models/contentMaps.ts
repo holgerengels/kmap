@@ -3,16 +3,22 @@ import { State, Dispatch } from '../store';
 import {endpoint} from "../endpoint";
 import {config} from "../config";
 
-export interface SubjectsState {
-  subjects: string[],
+export interface Module {
+  subject: string,
+  module: string,
+}
+export interface ContentMapsState {
+  modules: Module[],
+  selected?: Module,
   timestamp: number,
   loading: boolean,
   error: string,
 }
 
 export default createModel({
-  state: <SubjectsState>{
-    subjects: [],
+  state: <ContentMapsState>{
+    modules: [],
+    selected: undefined,
     timestamp: -1,
     loading: false,
     error: "",
@@ -26,9 +32,16 @@ export default createModel({
     },
     receivedLoad(state, payload: string[]) {
       return { ...state,
-        subjects: payload,
+        modules: payload,
         loading: false,
       };
+    },
+
+    selectModule(state, module: Module) {
+      return { ...state, selected: module }
+    },
+    unselectModule(state) {
+      return { ...state, selected: undefined }
     },
 
     error(state, message) {
@@ -44,30 +57,21 @@ export default createModel({
     async load() {
       const state: State = getState();
       // @ts-ignore
-      if (Date.now() - state.subjects.timestamp > 3000) {
-        dispatch.subjects.requestLoad();
-        const resp = await fetch(`${config.server}data?subjects=all`, endpoint.get(state));
+      if (Date.now() - state.modules.timestamp > 3000) {
+        dispatch.modules.requestLoad();
+        const resp = await fetch(`${config.server}edit?modules=all`, endpoint.get(state));
         if (resp.ok) {
           const json = await resp.json();
           // @ts-ignore
-          dispatch.subjects.receivedLoad(json);
+          dispatch.modules.receivedLoad(json);
         }
         else {
           const message = await resp.text();
           // @ts-ignore
           dispatch.app.handleError({ code: resp.status, message: message });
-          dispatch.subjects.error(message);
+          dispatch.modules.error(message);
         }
       }
     },
-
-    'routing/change': async function(payload: RoutingState) {
-      switch (payload.page) {
-        case 'home':
-          // @ts-ignore
-          dispatch.subjects.load();
-          break;
-      }
-    }
   })
 })

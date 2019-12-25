@@ -3,7 +3,12 @@ import { State, Dispatch } from '../store';
 import {endpoint} from "../endpoint";
 import {config} from "../config";
 
-interface Login {
+export interface Error {
+  code: number,
+  message: string,
+}
+
+export interface Login {
   userid: string,
   roles: string[],
 }
@@ -48,6 +53,16 @@ export default createModel({
         authenticating: false,
       };
     },
+    requestLogout(state) {
+      return { ...state, authenticating: true };
+    },
+    receivedLogout(state) {
+      return { ...state,
+        userid: '',
+        roles: [],
+        authenticating: false,
+      };
+    },
     logout(state) {
       return { ...state, userid: "", roles: [] };
     },
@@ -69,23 +84,53 @@ export default createModel({
       if (resp.ok) {
         const json = await resp.json();
         // @ts-ignore
-        dispatch.app.receivedLogin(json);
+        dispatch.app.receivedLogin({ userid: payload.userid, roles: json});
       }
       else {
         const message = await resp.text();
         // @ts-ignore
+        dispatch.app.handleError({ code: resp.status, message: message });
         dispatch.app.error(message);
       }
     },
-/*
-    'routing/change': async function(payload: RoutingState) {
-      switch (payload.page) {
-        case 'browser':
-          // @ts-ignore
-          dispatch.maps.load(payload.page["subject"], payload.page["chapter"]);
+    async logout() {
+      const state: State = getState();
+      // @ts-ignore
+      dispatch.app.requestLogout();
+      const resp = await fetch(`${config.server}state?logout=${state.app.userid}`, {... endpoint.post(state), body: JSON.stringify({userid: state.app.userid})});
+      if (resp.ok) {
+        // @ts-ignore
+        const json = await resp.json();
+        dispatch.app.receivedLogout();
+      }
+      else {
+        const message = await resp.text();
+        // @ts-ignore
+        dispatch.app.handleError({ code: resp.status, message: message });
+        dispatch.app.error(message);
+      }
+    },
+    handleError(error: Error) {
+      switch (error.code) {
+        case 401:
+          dispatch.shell.showMessage(error.message);
+          dispatch.app.logout();
+          break;
+        case 500:
+          dispatch.shell.showMessage(error.message);
           break;
       }
-    }
- */
+    },
+
+    /*
+        'routing/change': async function(payload: RoutingState) {
+          switch (payload.page) {
+            case 'browser':
+              // @ts-ignore
+              dispatch.maps.load(payload.page["subject"], payload.page["chapter"]);
+              break;
+          }
+        }
+     */
   })
 })

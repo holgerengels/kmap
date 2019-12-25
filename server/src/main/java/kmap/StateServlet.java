@@ -1,11 +1,11 @@
 package kmap;
 
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -26,8 +26,7 @@ public class StateServlet
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-        throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
         try {
             Server.CLIENT.set(extractClient(req));
 
@@ -38,21 +37,21 @@ public class StateServlet
                 String storeCourses = req.getParameter("storeCourses");
                 String storeCourse = req.getParameter("storeCourse");
                 if (save != null) {
-                    String json = IOUtils.toString(new InputStreamReader(req.getInputStream(), "UTF-8"));
+                    String json = IOUtils.toString(new InputStreamReader(req.getInputStream(), StandardCharsets.UTF_8));
                     JsonObject states = this.states.store(save, subject, json);
-                    writeResponse(req, resp, "data", states);
+                    writeResponse(req, resp, states);
                 }
                 else if (storeCourses != null) {
                     log("store courses = " + storeCourses);
-                    String json = IOUtils.toString(new InputStreamReader(req.getInputStream(), "UTF-8"));
+                    String json = IOUtils.toString(new InputStreamReader(req.getInputStream(), StandardCharsets.UTF_8));
                     states.storeCourses(userid, json);
-                    writeResponse(req, resp, "success", new JsonPrimitive(storeCourses));
+                    writeResponse(req, resp, new JsonPrimitive(storeCourses));
                 }
                 else if (storeCourse != null) {
                     log("store course = " + storeCourse);
-                    String json = IOUtils.toString(new InputStreamReader(req.getInputStream(), "UTF-8"));
+                    String json = IOUtils.toString(new InputStreamReader(req.getInputStream(), StandardCharsets.UTF_8));
                     states.storeCourse(userid, storeCourse, json);
-                    writeResponse(req, resp, "success", new JsonPrimitive(storeCourse));
+                    writeResponse(req, resp, new JsonPrimitive(storeCourse));
                 }
                 else
                     log("unknown request " + req.getParameterMap());
@@ -60,15 +59,14 @@ public class StateServlet
         }
         catch (Exception e) {
             e.printStackTrace();
-            sendError(req, resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+            sendError(req, resp, e);
         }
         finally {
             Server.CLIENT.remove();
         }
     }
 
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-        throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
         try {
             Server.CLIENT.set(extractClient(req));
 
@@ -82,19 +80,19 @@ public class StateServlet
                     log("load state = " + load);
                     JsonObject state = course != null ? states.courseStates(load, course, subject) : states.statesAndProgress(load, subject);
                     if (state != null)
-                        writeResponse(req, resp, "data", state);
+                        writeResponse(req, resp, state);
                 }
                 else if (courses != null) {
                     log("load courses = " + courses);
                     JsonArray array = states.courses(courses);
                     if (array != null)
-                        writeResponse(req, resp, "data", array);
+                        writeResponse(req, resp, array);
                 }
                 else if (course != null) {
                     log("load course = " + course);
                     JsonArray object = states.course(userid, course);
                     if (object != null)
-                        writeResponse(req, resp, "data", object);
+                        writeResponse(req, resp, object);
                 }
                 else
                     log("unknown request " + req.getParameterMap());
@@ -102,7 +100,7 @@ public class StateServlet
         }
         catch (Exception e) {
             e.printStackTrace();
-            sendError(req, resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+            sendError(req, resp, e);
         }
         finally {
             Server.CLIENT.remove();

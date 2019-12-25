@@ -20,7 +20,7 @@ export default createModel({
     narrow: false,
     drawerOpen: false,
     messages: [],
-    layers: [],
+    layers: ["summaries"],
     cardForEdit: "",
     cardForRename: "",
     cardForDelete: "",

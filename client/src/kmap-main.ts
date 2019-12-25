@@ -18,6 +18,7 @@ import 'pwa-helper-components/pwa-update-available';
 import './components/kmap-browser';
 import './components/kmap-login-popup';
 import './components/kmap-subjects';
+import './components/kmap-test';
 import './components/kmap-editor';
 import './components/kmap-test-editor';
 import './components/kmap-summaries';
@@ -59,9 +60,9 @@ class KmapMain extends connect(store, LitElement) {
 
   @query('#snackbar')
   private _snackbar: Snackbar;
-  @query('#login-popup')
-  private _instanceDialog: Dialog;
   @query('#instanceDialog')
+  private _instanceDialog: Dialog;
+  @query('#login-popup')
   private _loginPopup: Element;
 
   @property()

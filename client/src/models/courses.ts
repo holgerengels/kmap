@@ -91,11 +91,12 @@ export default createModel({
         if (resp.ok) {
           const json = await resp.json();
           // @ts-ignore
-          dispatch.courses.receivedLoad(json.data);
+          dispatch.courses.receivedLoad(json);
         }
         else {
           const message = await resp.text();
           // @ts-ignore
+          dispatch.app.handleError({ code: resp.status, message: message });
           dispatch.courses.error(message);
         }
       }
@@ -103,21 +104,22 @@ export default createModel({
     async store(payload: string[]) {
       const state: State = getState();
       dispatch.courses.requestStore();
-      const resp = await fetch(`${config.server}state?userid=${state.app.userid}&storeCourses=${state.app.userid}`, {... endpoint.post, body: JSON.stringify(payload)});
+      const resp = await fetch(`${config.server}state?userid=${state.app.userid}&storeCourses=${state.app.userid}`, {... endpoint.post(state), body: JSON.stringify(payload)});
       if (resp.ok) {
         const json = await resp.json();
-        dispatch.courses.receivedStore(json.data);
+        dispatch.courses.receivedStore(json);
       }
       else {
         const message = await resp.text();
         // @ts-ignore
+        dispatch.app.handleError({ code: resp.status, message: message });
         dispatch.courses.error(message);
       }
     },
     async storeChange(payload: Course) {
       const state: State = getState();
       dispatch.courses.requestStoreChange();
-      const resp = await fetch(`${config.server}state?userid=${state.app.userid}&storeCourse=${payload.name}`, {... endpoint.post, body: JSON.stringify(payload.students)});
+      const resp = await fetch(`${config.server}state?userid=${state.app.userid}&storeCourse=${payload.name}`, {... endpoint.post(state), body: JSON.stringify(payload.students)});
       if (resp.ok) {
         // @ts-ignore
         const json = await resp.json();
@@ -126,6 +128,7 @@ export default createModel({
       else {
         const message = await resp.text();
         // @ts-ignore
+        dispatch.app.handleError({ code: resp.status, message: message });
         dispatch.courses.error(message);
       }
     },
