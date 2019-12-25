@@ -15,6 +15,9 @@ import './kmap-knowledge-card';
 import './kmap-browser-chapter-editor';
 import {fetchTopicsIfNeeded} from "../actions/tests";
 
+import { rdxstore } from '../rdxstore';
+//import { Path } from '../models/maps';
+
 const _standalone = (window.matchMedia('(display-mode: standalone)').matches) || (window.navigator.standalone) || document.referrer.includes('android-app://');
 
 class KMapBrowser extends connect(store)(LitElement) {
@@ -149,6 +152,15 @@ class KMapBrowser extends connect(store)(LitElement) {
   }
 
   updated(changedProperties) {
+    if (changedProperties.has('routeSubject') || changedProperties.has('routeChapter')) {
+      rdxstore.dispatch.maps.load({subject: this.routeSubject, chapter: this.routeChapter});
+    }
+
+    if (changedProperties.has('_userid') || changedProperties.has('routeSubject') || changedProperties.has('routeChapter')) {
+      if (this._userid)
+        rdxstore.dispatch.rates.load({subject: this.routeSubject});
+    }
+
     if (changedProperties.has('_page')) {
       let bar = this.shadowRoot.getElementById('bar');
       let page = this.shadowRoot.getElementById(this._page);

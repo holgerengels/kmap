@@ -71,7 +71,7 @@ mwc-textarea, mwc-textfield {
   width: 300px;
   --mdc-text-field-filled-border-radius: 4px 16px 0 0;
   margin: 4px 0;
-}        
+}
       `];
   }
 

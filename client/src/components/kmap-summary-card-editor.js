@@ -29,7 +29,7 @@ mwc-button[disabled] {
 }
 .warn {
   color: darkred;
-  margin: 16px;  
+  margin: 16px;
 }
       `
     ];

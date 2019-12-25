@@ -13,12 +13,15 @@
     "test:legacy": "karma start --legacy --coverage",
     "test:legacy:watch": "karma start --legacy --auto-watch=true --single-run=false",
     "test:bs": "karma start karma.bs.config.js --legacy --coverage",
+    "tsc": "tsc -w -p tsconfig.build.json",
     "build": "rimraf dist && rollup -c rollup.config.js",
     "start:build": "cd dist && es-dev-server --open",
     "watch:build": "rimraf dist && rollup --watch -c rollup.config.js & http-server dist -o -c-1",
     "start": "es-dev-server --app-index index.html --node-resolve --watch --open"
   },
   "devDependencies": {
+    "tslib": "^1.10.0",
+    "typescript": "^3.7.4",
     "@commitlint/cli": "^7.0.0",
     "@commitlint/config-conventional": "^7.0.0",
     "@open-wc/building-rollup": "^0.9.0",
@@ -47,6 +50,9 @@
   "name": "kmap-main",
   "license": "MIT",
   "dependencies": {
+    "@captaincodeman/rdx": "^1.0.0-beta.2",
+    "@captaincodeman/rdx-model": "^1.0.0-beta.6",
+    "@captaincodeman/router": "^1.0.1",
     "@material/mwc-button": "^0.12.0",
     "@material/mwc-dialog": "^0.12.0",
     "@material/mwc-drawer": "^0.12.0",
@@ -67,7 +73,6 @@
     "pwa-helpers": "^0.9.1",
     "redux": "^4.0.0",
     "redux-thunk": "^2.3.0",
-    "reselect": "^3.0.1",
     "web-animations-js": "^2.3.2"
   }
 }
