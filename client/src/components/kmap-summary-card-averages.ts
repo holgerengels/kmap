@@ -30,7 +30,6 @@ class KMapSummaryCardAverages extends connect(store, LitElement) {
 
   updated(changedProperties) {
     if (changedProperties.has("_states") || changedProperties.has("key")) {
-      this._rating(store.getState().states);
       this._hasStates = this._states && Object.keys(this._states).length !== 0;
 
       if (this._hasStates) {
@@ -40,7 +39,8 @@ class KMapSummaryCardAverages extends connect(store, LitElement) {
         let of = this._getStateValue(this.key + "#");
         this._averageOf = (of !== 0 ? of : 1) * (count !== 0 ? count : 1);
         this._averagePercent = Math.round(100 * this._averageNum / this._averageOf);
-      } else {
+      }
+      else {
         this._averageState = 0;
         this._averageNum = 0;
         this._averageOf = 0;
@@ -52,7 +52,7 @@ class KMapSummaryCardAverages extends connect(store, LitElement) {
   }
 
   _getStateValue(key) {
-    let value = this._states.state[key];
+    let value = this._states[key];
     return value !== undefined ? value : 0;
   }
 

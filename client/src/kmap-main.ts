@@ -21,8 +21,7 @@ import './components/kmap-subjects';
 import './components/kmap-test';
 import './components/kmap-editor';
 import './components/kmap-test-editor';
-import './components/kmap-summaries';
-import './components/kmap-averages';
+import './components/kmap-course-selector';
 import './components/kmap-editor-edit-dialog';
 import './components/kmap-editor-rename-dialog';
 import './components/kmap-editor-delete-dialog';
@@ -263,9 +262,8 @@ class KmapMain extends connect(store, LitElement) {
       <nav class="drawer-list">
         <label section>Layer ein-/ausblenden</label>
         <mwc-button @click="${() => this._toggleLayer('summaries')}" icon="short_text" outlined ?raised="${this._layers.includes('summaries')}">Kurztexte</mwc-button>
-        ${this._layers.includes('summaries') ? html`<kmap-summaries></kmap-summaries>` : ''}
         <mwc-button @click="${() => this._toggleLayer('averages')}" icon="group_work" outlined ?raised="${this._layers.includes('averages')}" ?disabled="${!this._roles.includes("teacher")}" title="Erfordert die Rolle 'Lehrer'">Mittelwerte</mwc-button>
-        ${this._layers.includes('averages') ? html`<kmap-averages></kmap-averages>` : ''}
+        ${this._layers.includes('averages') ? html`<kmap-course-selector></kmap-course-selector>` : ''}
         <mwc-button @click="${() => this._toggleLayer('editor')}" icon="edit" outlined ?raised="${this._layers.includes('editor')}" ?disabled="${!this._roles.includes("teacher")}" title="Erfordert die Rolle 'Lehrer'">editor</mwc-button>
         ${this._layers.includes('editor') ? html`
           ${this._page === 'home' || this._page === 'browser' ? html`<kmap-editor></kmap-editor>` : ''}

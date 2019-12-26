@@ -1,4 +1,4 @@
-import { createModel } from '@captaincodeman/rdx-model';
+import {createModel, RoutingState} from '@captaincodeman/rdx-model';
 import { State, Dispatch } from '../store';
 import {endpoint} from "../endpoint";
 import {config} from "../config";
@@ -30,13 +30,19 @@ export default createModel({
         error: "",
       };
     },
-
     receivedLoad(state, payload: AverageRateState) {
       return { ...state,
         subject: payload.subject,
         course: payload.course,
         rates: payload.rates,
         loading: false,
+      };
+    },
+    forget(state) {
+      return { ...state,
+        rates: {},
+        timestamp: Date.now(),
+        error: "",
       };
     },
 
@@ -50,16 +56,22 @@ export default createModel({
 
   // @ts-ignore
   effects: (dispatch: Dispatch, getState) => ({
-    async load(payload: Path) {
+    async load() {
       const state: State = getState();
+      const userid = state.app.userid;
+      const subject = state.maps.subject;
+      const course = state.courses.selectedCourse;
+      if (!userid || !subject || !course)
+        return;
+
       // @ts-ignore
-      if (Date.now() - state.averages.timestamp > 3000 || state.averages.subject !== payload.subject || state.averages.course !== state.courses.selectedCourse) {
+      if (Date.now() - state.averages.timestamp > 3000 || state.averages.subject !== subject || state.averages.course !== course) {
         dispatch.averages.requestLoad();
-        const resp = await fetch(`${config.server}state?load=${state.app.userid}&subject=${payload.subject}&course=${state.courses.selectedCourse}`, endpoint.get(state));
+        const resp = await fetch(`${config.server}state?load=${userid}&subject=${subject}&course=${course}`, endpoint.get(state));
         if (resp.ok) {
           const json = await resp.json();
           // @ts-ignore
-          dispatch.averages.receivedLoad({subject: payload.subject, course: payload.course, rates: json});
+          dispatch.averages.receivedLoad({subject: subject, course: course, rates: json});
         }
         else {
           const message = await resp.text();
@@ -70,17 +82,20 @@ export default createModel({
       }
     },
 
-    /*
-    'routing/change': async function(payload: RoutingState) {
-      switch (payload.page) {
-        case 'browser':
-          // @ts-ignore
-          dispatch.averages.load(payload.page["subject"], payload.page["chapter"]);
-          break;
-      }
-    }
- */
+    'maps/received': async function() {
+      dispatch.rates.load();
+    },
+    'courses/selectCourse': async function() {
+      dispatch.averages.load();
+    },
+    'courses/unselectCourse': async function() {
+      dispatch.averages.forget();
+    },
+    'app/receivedLogin': async function() {
+      dispatch.rates.load();
+    },
+    'app/receivedLogout': async function() {
+      dispatch.rates.forget();
+    },
   })
 })
-
-// TODO: forgetAverages on logout

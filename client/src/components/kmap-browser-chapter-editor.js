@@ -4,7 +4,6 @@ import {store} from "../store";
 import {setCardForEdit, setCardForRename, setCardForDelete} from "../actions/app";
 import {colorStyles, fontStyles} from "./kmap-styles";
 import '@material/mwc-button';
-import './modal-dialog';
 
 class KMapBrowserChapterEditor extends connect(store, LitElement) {
   static get styles() {

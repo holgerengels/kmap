@@ -1,8 +1,8 @@
 import {LitElement, html, css, customElement, property} from 'lit-element';
 import { connect } from '@captaincodeman/rdx';
 import {State, store} from "../store";
-import {STATE_COLORS} from './state-colors';
 
+import {styleMap} from "lit-html/directives/style-map";
 import '@material/mwc-icon';
 import '@material/mwc-ripple';
 import './kmap-summary-card-summary';
@@ -10,9 +10,9 @@ import './kmap-summary-card-averages';
 import './kmap-summary-card-editor';
 import './kmap-summary-card-rating';
 import './kmap-summary-card-ratecolors';
-import {fontStyles, colorStyles} from "./kmap-styles";
 import {Card} from "../models/maps";
-import {styleMap} from "lit-html/directives/style-map";
+import {STATE_COLORS} from './state-colors';
+import {fontStyles, colorStyles} from "./kmap-styles";
 
 @customElement('kmap-summary-card')
 class KMapSummaryCard extends connect(store, LitElement) {

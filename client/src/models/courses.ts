@@ -10,7 +10,7 @@ export interface Course {
 
 export interface CoursesState {
   courses: string[],
-  selectedCourse: "",
+  selectedCourse: string,
   timestamp: number,
   loading: boolean,
   storing: boolean,
@@ -31,7 +31,7 @@ export default createModel({
   reducers: {
     requestLoad(state) {
       return { ...state, loading: true,
-        rates: {},
+        courses: [],
         timestamp: Date.now(),
         error: "",
       };
@@ -41,6 +41,13 @@ export default createModel({
         courses: payload,
         selectedCourse: payload.includes(state.selectedCourse) ? state.selectedCourse : "",
         loading: false,
+      };
+    },
+    forget(state) {
+      return { ...state,
+        courses: [],
+        timestamp: Date.now(),
+        error: "",
       };
     },
 
@@ -70,6 +77,13 @@ export default createModel({
       };
     },
 
+    selectCourse(state, course: string) {
+      return { ...state, selectedCourse: course }
+    },
+    unselectCourse(state) {
+      return { ...state, selectedCourse: "" }
+    },
+
     error(state, message) {
       return { ...state,
         loading: false,
@@ -84,10 +98,14 @@ export default createModel({
   effects: (dispatch: Dispatch, getState) => ({
     async load() {
       const state: State = getState();
+      const userid = state.app.userid;
+      if (!userid)
+        return;
+
       // @ts-ignore
       if (Date.now() - state.courses.timestamp > 3000) {
         dispatch.courses.requestLoad();
-        const resp = await fetch(`${config.server}state?courses=${state.app.userid}`, endpoint.get(state));
+        const resp = await fetch(`${config.server}state?courses=${userid}`, endpoint.get(state));
         if (resp.ok) {
           const json = await resp.json();
           // @ts-ignore
@@ -133,17 +151,11 @@ export default createModel({
       }
     },
 
-/*
-    'routing/change': async function(payload: RoutingState) {
-      switch (payload.page) {
-        case 'browser':
-          // @ts-ignore
-          dispatch.courses.load(payload.page["subject"], payload.page["chapter"]);
-          break;
-      }
-    }
- */
+    'app/receivedLogin': async function() {
+      dispatch.courses.load();
+    },
+    'app/receivedLogout': async function() {
+      dispatch.courses.forget();
+    },
   })
 })
-
-// TODO: forgetCourses on logout

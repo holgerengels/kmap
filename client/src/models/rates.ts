@@ -2,8 +2,6 @@ import {createModel, RoutingState} from '@captaincodeman/rdx-model';
 import { State, Dispatch } from '../store';
 import {endpoint} from "../endpoint";
 import {config} from "../config";
-import {Path} from "./types";
-import {Login} from "./app";
 
 export interface Rate {
   subject: string,
@@ -78,19 +76,21 @@ export default createModel({
 
   // @ts-ignore
   effects: (dispatch: Dispatch, getState) => ({
-    async load(payload: Path) {
+    async load() {
       const state: State = getState();
-      if (!state.app.userid)
+      const userid = state.app.userid;
+      const subject = state.maps.subject;
+      if (!userid || !subject)
         return;
 
       // @ts-ignore
-      if (state.rates.subject !== payload.subject || !state.rates.rates) {
+      if (state.rates.subject !== subject || !state.rates.rates) {
         dispatch.rates.requestLoad();
-        const resp = await fetch(`${config.server}state?load=${state.app.userid}&subject=${payload.subject}`, endpoint.get(state));
+        const resp = await fetch(`${config.server}state?load=${userid}&subject=${subject}`, endpoint.get(state));
         if (resp.ok) {
           const json = await resp.json();
           // @ts-ignore
-          dispatch.rates.receivedLoad({subject: payload.subject, rates: json});
+          dispatch.rates.receivedLoad({subject: subject, rates: json});
         }
         else {
           const message = await resp.text();
@@ -117,19 +117,11 @@ export default createModel({
       }
     },
 
-    'routing/change': async function(payload: RoutingState) {
-      switch (payload.page) {
-        case 'browser':
-          // @ts-ignore
-          dispatch.rates.load({ subject: payload.params["subject"] });
-          break;
-      }
+    'maps/received': async function() {
+        dispatch.rates.load();
     },
-    'app/receivedLogin': async function(payload: Login) {
-      const state: State = getState();
-      const routing: RoutingState = state.routing;
-      if (routing.page === 'browser')
-        dispatch.rates.load({ subject: routing.params.subject });
+    'app/receivedLogin': async function() {
+        dispatch.rates.load();
     },
     'app/receivedLogout': async function() {
       dispatch.rates.forget();
