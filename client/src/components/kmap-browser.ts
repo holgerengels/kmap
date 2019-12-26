@@ -172,13 +172,6 @@ class KMapBrowser extends connect(store, LitElement) {
     }
   }
 
-  activeChanged(active) {
-    if (active && this.routeSubject && this.routeChapter) {
-      store.dispatch(fetchMapIfNeeded(this.routeSubject, this.routeChapter));
-      store.dispatch(fetchTopicsIfNeeded(this.routeSubject));
-    }
-  }
-
   _fire(name) {
     this.dispatchEvent(new CustomEvent(name, {bubbles: true, composed: true}));
   }

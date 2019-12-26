@@ -48,7 +48,7 @@ class KMapSummaryCard extends connect(store, LitElement) {
   mapState(state: State) {
     return {
       _userid: state.app.userid,
-      _topics: [], // TODO: tests.topics
+      _topics: state.tests.topics ? state.tests.topics.topics : [],
       _layers: state.shell.layers,
       selected: state.maps.selected == this.card.topic,
       highlighted: state.maps.selectedDependencies && state.maps.selectedDependencies.includes(this.card.topic),
@@ -56,10 +56,12 @@ class KMapSummaryCard extends connect(store, LitElement) {
   }
 
   updated(changedProperties) {
-    if (changedProperties.has("card")) {
+    if (changedProperties.has("card"))
       this._key = this.card.links ? this.card.links : this.chapter + "." + this.card.topic;
+
+    if (changedProperties.has("card") || changedProperties.has("_topics"))
       this._hasTests = this._topics.includes(this.chapter + "." + this.card.topic);
-    }
+
     if (changedProperties.has("_userid") || changedProperties.has("_layers") || changedProperties.has("_key"))
       this._colorizeEvent( );
   }
@@ -197,7 +199,7 @@ class KMapSummaryCard extends connect(store, LitElement) {
 
       <div style="flex: 1 0 auto; height: 24px"></div>
       ${this._hasTests ? html`
-        <a href="#test/${this.subject}/${this.chapter}/${this.card.topic}"><mwc-ripple></mwc-ripple><mwc-icon>help_outline</mwc-icon></a>
+        <a href="/:app/tests/${this.subject}/${this.chapter}/${this.card.topic}"><mwc-ripple></mwc-ripple><mwc-icon>help_outline</mwc-icon></a>
       ` : ''}
   </div>
     <mwc-ripple id="ripple"></mwc-ripple>

@@ -21,10 +21,6 @@ class KMapSubjects extends connect(store, LitElement) {
 
   firstUpdated(changedProperties) {
     this._bar.scrollTarget = this._content;
-    //store.dispatch.shell.setTitle("Fächer");
-  }
-
-  updated(changedProperties) {
   }
 
   mapState(state: State) {

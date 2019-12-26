@@ -64,6 +64,7 @@ export default createModel({
     'routing/change': async function(payload: RoutingState) {
       switch (payload.page) {
         case 'home':
+        case 'test':
           // @ts-ignore
           dispatch.subjects.load();
           break;

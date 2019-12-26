@@ -7,9 +7,8 @@ const routes = {
   '/:app/browser/:subject/:chapter':        'browser',
   '/:app/browser/:subject/:chapter/:topic': 'browser',
   '/:app/test':                             'test',
-  '/:app/test/results':                     'test',
-  '/:app/test/:subject/:chapter':           'test',
-  '/:app/test/:subject/:chapter/:topic':    'test',
+  '/:app/test/:results':                    'test',
+  '/:app/test/:subject/:chapter(/:topic)':  'test',
   '/:app/courses':                          'courses',
   '/:app/content-manager':                  'content-manager',
 }                                                 ;

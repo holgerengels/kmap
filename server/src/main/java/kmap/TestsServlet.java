@@ -1,6 +1,5 @@
 package kmap;
 
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
@@ -31,8 +30,7 @@ public class TestsServlet
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-        throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
         try {
             Server.CLIENT.set(extractClient(req));
             if (authentication.handle(req, resp)) {
@@ -71,8 +69,7 @@ public class TestsServlet
         }
     }
 
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-        throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
         try {
             Server.CLIENT.set(extractClient(req));
             req.setCharacterEncoding("UTF-8");
@@ -89,37 +86,37 @@ public class TestsServlet
                 log("sets = " + sets);
                 JsonArray array = tests.loadSets();
                 if (array != null)
-                    writeObject(req, resp, array.toString());
+                    writeResponse(req, resp, array);
             }
             else if (set != null) {
                 log("load set = " + set);
                 JsonArray array = tests.loadSet(subject, set);
                 if (array != null)
-                    writeResponse(req, resp, "data", array);
+                    writeResponse(req, resp, array);
             }
             else if (topic != null) { // uses chapter and topic !!!
                 log("load topic = " + chapter + " " + topic);
                 JsonArray array = tests.loadTopic(subject, chapter, topic);
                 if (array != null)
-                    writeResponse(req, resp, "data", array);
+                    writeResponse(req, resp, array);
             }
             else if (chapter != null) {
                 log("load chapter = " + chapter);
                 JsonArray array = tests.loadChapter(subject, chapter);
                 if (array != null)
-                    writeResponse(req, resp, "data", array);
+                    writeResponse(req, resp, array);
             }
             else if (chapters != null) {
                 log("available chapters = " + subject);
                 JsonArray array = tests.loadChapters(subject);
                 if (array != null)
-                    writeObject(req, resp, array.toString());
+                    writeResponse(req, resp, array);
             }
             else if (topics != null) {
                 log("available topics = " + subject);
                 JsonArray array = tests.loadTopics(subject);
                 if (array != null)
-                    writeObject(req, resp, array.toString());
+                    writeResponse(req, resp, array);
             }
             else if (directory != null) {
                 log("directory for = " + directory);
@@ -151,13 +148,5 @@ public class TestsServlet
         finally {
             Server.CLIENT.remove();
         }
-    }
-
-    @Deprecated
-    protected void writeObject(HttpServletRequest request, HttpServletResponse resp, String node) throws IOException {
-        resp.setContentType("application/json");
-        resp.setCharacterEncoding("utf-8");
-        corsHeaders(request, resp);
-        resp.getWriter().print(node);
     }
 }

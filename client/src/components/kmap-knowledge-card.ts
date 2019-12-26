@@ -58,7 +58,7 @@ class KMapKnowledgeCard extends connect(store, LitElement) {
   mapState(state: State) {
     return {
       _instance: state.app.instance,
-      _topics: [], // TODO: tests.topics
+      _topics: state.tests.topics ? state.tests.topics.topics : [],
       _rates: state.rates.rates,
     };
   }
@@ -286,7 +286,7 @@ class KMapKnowledgeCard extends connect(store, LitElement) {
     }
       <div style="flex: 1 0 auto; height: 24px"></div>
       ${this._hasTests ? html`
-        <a href="#test/${this.subject}/${this.chapter}/${this.card.topic}"><mwc-ripple></mwc-ripple><mwc-icon>help_outline</mwc-icon></a>
+        <a href="/:app/tests/${this.subject}/${this.chapter}/${this.card.topic}"><mwc-ripple></mwc-ripple><mwc-icon>help_outline</mwc-icon></a>
       ` : ''}
   </div>
     `;
