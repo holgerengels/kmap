@@ -1,9 +1,14 @@
-import {createStore, ModelsState, ModelsDispatch, routingPluginFactory} from '@captaincodeman/rdx-model'
+import {
+  createStore,
+  ModelsState,
+  ModelsDispatch,
+  fullRoutingPluginFactory
+} from '@captaincodeman/rdx-model'
 import { devtools, persist} from '@captaincodeman/rdx'
 import { routeMatcher } from './routes'
 import * as models from './models'
 
-const routingPlugin = routingPluginFactory(routeMatcher)
+const routingPlugin = fullRoutingPluginFactory(routeMatcher)
 
 let store = createStore({ models, plugins: [routingPlugin] })
 

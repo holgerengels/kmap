@@ -4,14 +4,14 @@ import {State, store} from "../store";
 import {Attachment, Card} from "../models/maps";
 import {STATE_COLORS} from './state-colors';
 
-import {styleMap} from 'lit-html/directives/style-map.js';
+import {StyleInfo, styleMap} from 'lit-html/directives/style-map.js';
 import '@material/mwc-icon';
 import '@material/mwc-ripple';
 import './star-rating';
 import './kmap-knowledge-card-depends';
 import './kmap-knowledge-card-progress';
 import './kmap-knowledge-card-description';
-import './kmap-card-attachment';
+import './kmap-knowledge-card-attachment';
 import {fontStyles, colorStyles} from "./kmap-styles";
 
 @customElement('kmap-knowledge-card')
@@ -42,7 +42,7 @@ class KMapKnowledgeCard extends connect(store, LitElement) {
   @property()
   private _exercises: Attachment[] = [];
   @property()
-  private _colorStyles: object = { "--color-rated":  "--color-darkgray", "--color-unrated": "--color-lightgray" };
+  private _colorStyles: StyleInfo = { "--color-rated":  "--color-darkgray", "--color-unrated": "--color-lightgray" };
   @property()
   private _hasTests: boolean = false;
   @property()
@@ -231,8 +231,8 @@ class KMapKnowledgeCard extends connect(store, LitElement) {
       ${this._explanations && this._explanations.length > 0
       ? html`<div>
               <b>Erklärungen</b>
-              ${this._explanations.map((attachment, i) => html`
-                  <kmap-card-attachment .instance="${this._instance}" .attachment="${attachment}"></kmap-card-attachment>
+              ${this._explanations.map((attachment) => html`
+                  <kmap-knowledge-card-attachment .instance="${this._instance}" .attachment="${attachment}"></kmap-knowledge-card-attachment>
               `)}
               </div>
           `
@@ -241,8 +241,8 @@ class KMapKnowledgeCard extends connect(store, LitElement) {
       ${this._examples && this._examples.length > 0
       ? html`<div>
               <b>Beispiele</b>
-              ${this._examples.map((attachment, i) => html`
-                  <kmap-card-attachment .instance="${this._instance}" .attachment="${attachment}"></kmap-card-attachment>
+              ${this._examples.map((attachment) => html`
+                  <kmap-knowledge-card-attachment .instance="${this._instance}" .attachment="${attachment}"></kmap-knowledge-card-attachment>
               `)}
               </div>
           `
@@ -251,8 +251,8 @@ class KMapKnowledgeCard extends connect(store, LitElement) {
       ${this._ideas && this._ideas.length > 0
       ? html`<div>
               <b>Vorstellung</b>
-              ${this._ideas.map((attachment, i) => html`
-                  <kmap-card-attachment .instance="${this._instance}" .attachment="${attachment}"></kmap-card-attachment>
+              ${this._ideas.map((attachment) => html`
+                  <kmap-knowledge-card-attachment .instance="${this._instance}" .attachment="${attachment}"></kmap-knowledge-card-attachment>
               `)}
               </div>
           `
@@ -261,8 +261,8 @@ class KMapKnowledgeCard extends connect(store, LitElement) {
       ${this._usages && this._usages.length > 0
       ? html`<div>
               <b>Anwendungen</b>
-              ${this._usages.map((attachment, i) => html`
-                  <kmap-card-attachment .instance="${this._instance}" .attachment="${attachment}"></kmap-card-attachment>
+              ${this._usages.map((attachment) => html`
+                  <kmap-knowledge-card-attachment .instance="${this._instance}" .attachment="${attachment}"></kmap-knowledge-card-attachment>
               `)}
               </div>
           `
@@ -271,8 +271,8 @@ class KMapKnowledgeCard extends connect(store, LitElement) {
       ${this._exercises && this._exercises.length > 0
       ? html`<div>
               <b>Übungen</b>
-              ${this._exercises.map((attachment, i) => html`
-                  <kmap-card-attachment .instance="${this._instance}" .attachment="${attachment}"></kmap-card-attachment>
+              ${this._exercises.map((attachment) => html`
+                  <kmap-knowledge-card-attachment .instance="${this._instance}" .attachment="${attachment}"></kmap-knowledge-card-attachment>
               `)}
               </div>
           `
