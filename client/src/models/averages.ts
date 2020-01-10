@@ -1,8 +1,7 @@
-import {createModel, RoutingState} from '@captaincodeman/rdx-model';
+import {createModel} from '@captaincodeman/rdx-model';
 import { State, Dispatch } from '../store';
 import {endpoint} from "../endpoint";
 import {config} from "../config";
-import {Path} from "./types";
 
 export interface AverageRateState {
   subject: string,
@@ -77,6 +76,7 @@ export default createModel({
           const message = await resp.text();
           // @ts-ignore
           dispatch.app.handleError({ code: resp.status, message: message });
+          // @ts-ignore
           dispatch.averages.error(message);
         }
       }

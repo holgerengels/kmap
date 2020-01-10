@@ -15,12 +15,13 @@ import '@material/mwc-snackbar';
 import 'pwa-helper-components/pwa-install-button';
 import 'pwa-helper-components/pwa-update-available';
 
-import './components/kmap-browser';
-import './components/kmap-login-popup';
 import './components/kmap-subjects';
+import './components/kmap-browser';
 import './components/kmap-test';
-import './components/kmap-editor';
-import './components/kmap-test-editor';
+import './components/kmap-courses';
+import './components/kmap-login-popup';
+import './components/kmap-module-selector';
+import './components/kmap-set-selector';
 import './components/kmap-course-selector';
 import './components/kmap-editor-edit-dialog';
 import './components/kmap-editor-rename-dialog';
@@ -35,7 +36,7 @@ import {Snackbar} from "@material/mwc-snackbar/mwc-snackbar";
 import {Dialog} from "@material/mwc-dialog/mwc-dialog";
 
 @customElement('kmap-main')
-class KmapMain extends connect(store, LitElement) {
+export class KmapMain extends connect(store, LitElement) {
 
   @property()
   private _page: string = '';
@@ -44,6 +45,7 @@ class KmapMain extends connect(store, LitElement) {
   @property()
   private _instance: string = '';
   @property()
+  // @ts-ignore
   private _userid: string = '';
   @property()
   private _roles: string[] = [];
@@ -58,11 +60,14 @@ class KmapMain extends connect(store, LitElement) {
   private _messages: string[] = [];
 
   @query('#snackbar')
+  // @ts-ignore
   private _snackbar: Snackbar;
   @query('#instanceDialog')
+  // @ts-ignore
   private _instanceDialog: Dialog;
   @query('#login-popup')
-  private _loginPopup: Element;
+  // @ts-ignore
+  private _loginPopup: KMapLoginPopup;
 
   @property()
   private _path: string = '';
@@ -97,7 +102,7 @@ class KmapMain extends connect(store, LitElement) {
   firstUpdated(changedProperties) {
     if (!window.location.host.includes("localhost")) {
       let pathComponent = window.location.pathname.split('/')[1];
-      let cookie:string = this._getCookie("instance");
+      let cookie: string | null = this._getCookie("instance");
       if (pathComponent !== "app") {
         console.log("choose instance .. " + pathComponent);
         document.cookie = "instance=" + pathComponent + "; path=/";
@@ -249,10 +254,10 @@ class KmapMain extends connect(store, LitElement) {
     <div class="drawer-content">
       <nav class="drawer-list">
         <a ?selected="${this._page === 'home'}" href="/:app">Home</a>
-        <a ?selected="${this._page === 'browser'}" href="/:app/browser/${this._path}" ?disabled="${!this._path}">Browser</a>
-        <a ?selected="${this._page === 'test'}" href="/:app/test">Test</a>
-        <a ?selected="${this._page === 'courses'}" ?disabled="${!this._roles.includes("teacher")}" href="/:app/courses">Kurse</a>
-        <a ?selected="${this._page === 'content-mananer'}" ?disabled="${!this._roles.includes("teacher")}" href="/:app/content-manager">Content Manager</a>
+        <a ?selected="${this._page === 'browser'}" href="/app/browser/${this._path}" ?disabled="${!this._path}">Browser</a>
+        <a ?selected="${this._page === 'test'}" href="/app/test">Test</a>
+        <a ?selected="${this._page === 'courses'}" ?disabled="${!this._roles.includes("teacher")}" href="/app/courses">Kurse</a>
+        <a ?selected="${this._page === 'content-mananer'}" ?disabled="${!this._roles.includes("teacher")}" href="/app/content-manager">Content Manager</a>
         <a href="#browser/Hilfe/Hilfe">Hilfe</a>
 
         <pwa-install-button><mwc-button>App installieren</mwc-button></pwa-install-button>
@@ -266,8 +271,8 @@ class KmapMain extends connect(store, LitElement) {
         ${this._layers.includes('averages') ? html`<kmap-course-selector></kmap-course-selector>` : ''}
         <mwc-button @click="${() => this._toggleLayer('editor')}" icon="edit" outlined ?raised="${this._layers.includes('editor')}" ?disabled="${!this._roles.includes("teacher")}" title="Erfordert die Rolle 'Lehrer'">editor</mwc-button>
         ${this._layers.includes('editor') ? html`
-          ${this._page === 'home' || this._page === 'browser' ? html`<kmap-editor></kmap-editor>` : ''}
-          ${this._page === 'test' ? html`<kmap-test-editor></kmap-test-editor>` : ''}
+          ${this._page === 'home' || this._page === 'browser' ? html`<kmap-module-selector></kmap-module-selector>` : ''}
+          ${this._page === 'test' ? html`<kmap-set-selector></kmap-set-selector>` : ''}
         ` : ''}
       </nav>
     </div>

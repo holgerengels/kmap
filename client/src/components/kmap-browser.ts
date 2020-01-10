@@ -12,16 +12,16 @@ import './kmap-knowledge-card';
 import './kmap-browser-chapter-editor';
 import {Card} from "../models/maps";
 import {RoutingState} from "@captaincodeman/rdx-model";
+import {TopAppBar} from "@material/mwc-top-app-bar/mwc-top-app-bar";
 
+// @ts-ignore
 const _standalone = (window.matchMedia('(display-mode: standalone)').matches) || (window.navigator.standalone) || document.referrer.includes('android-app://');
 
 @customElement('kmap-browser')
-class KMapBrowser extends connect(store, LitElement) {
+export class KMapBrowser extends connect(store, LitElement) {
 
   @property()
   private _userid: string = '';
-  @property()
-  private active: boolean = false;
   @property()
   private _layers: string[] = [];
   @property()
@@ -29,11 +29,11 @@ class KMapBrowser extends connect(store, LitElement) {
   @property()
   private _chapter: string = '';
   @property()
-  private _chapterCard: Card = undefined;
+  private _chapterCard?: Card = undefined;
   @property()
   private _topic: string = '';
   @property()
-  private _topicCard: Card = undefined;
+  private _topicCard?: Card = undefined;
   @property()
   private _lines: Card[][] = [];
   @property()
@@ -45,12 +45,13 @@ class KMapBrowser extends connect(store, LitElement) {
   private _faded: boolean = false;
 
   @property()
-  private _animFrom: DOMRect = {};
+  private _animFrom?: DOMRect = undefined;
   @property()
-  private _animTo: DOMRect = {};
+  private _animTo?: DOMRect = undefined;
 
   @query('#bar')
-  private _bar: Element;
+  // @ts-ignore
+  private _bar: TopAppBar;
 
   set route(val: RoutingState) {
     if (val.page === "browser") {
@@ -77,8 +78,9 @@ class KMapBrowser extends connect(store, LitElement) {
 
   updated(changedProperties) {
     if (changedProperties.has('_page')) {
+      // @ts-ignore
       let page = this.shadowRoot.getElementById(this._page);
-      this._bar.scrollTarget = page;
+      this._bar.scrollTarget = page ? page : window;
     }
 
     if (changedProperties.has('_topic')) {
@@ -102,6 +104,7 @@ class KMapBrowser extends connect(store, LitElement) {
 
       if (this._topicCard) {
         console.log('kmap-summary-card[key="' + this._topic + '"]');
+        // @ts-ignore
         let nodes = this.shadowRoot.querySelectorAll('kmap-summary-card[key="' + this._topic + '"]');
         console.log(nodes);
         if (nodes.length !== 0) {
@@ -121,10 +124,14 @@ class KMapBrowser extends connect(store, LitElement) {
     if (changedProperties.has("_page") && this._page === 'topic' && this._animFrom) {
       let that = this;
       setTimeout(function () {
+        // @ts-ignore
         let kcard: Element = that.shadowRoot.querySelectorAll('kmap-knowledge-card')[0];
         that._animTo = kcard.getBoundingClientRect();
         console.log("to");
         console.log(that._animTo);
+
+        if (!that._animFrom)
+          return;
 
         var invertTop = that._animFrom.top - that._animTo.top;
         var invertLeft = that._animFrom.left - that._animTo.left;
@@ -142,8 +149,8 @@ class KMapBrowser extends connect(store, LitElement) {
           fill: 'both'
         });
         player.addEventListener('finish', function () {
-          that._animFrom = {};
-          that._animTo = {};
+          that._animFrom = undefined;
+          that._animTo = undefined;
         });
       });
     }
@@ -226,19 +233,19 @@ class KMapBrowser extends connect(store, LitElement) {
     // language=HTML
     return html`
       <mwc-top-app-bar id="bar" dense>
-        <mwc-icon-button icon="menu" slot="navigationIcon" @click="${e => this._fire('toggleDrawer')}"></mwc-icon-button>
-        <mwc-icon-button icon="arrow_back" slot="navigationIcon" @click="${e => history.back()}" ?hidden="${!_standalone}"></mwc-icon-button>
+        <mwc-icon-button icon="menu" slot="navigationIcon" @click="${() => this._fire('toggleDrawer')}"></mwc-icon-button>
+        <mwc-icon-button icon="arrow_back" slot="navigationIcon" @click="${() => history.back()}" ?hidden="${!_standalone}"></mwc-icon-button>
         <div slot="title">${this._chapter}</div>
-        <kmap-login-button slot="actionItems" @lclick="${e => this._fire('login')}"></kmap-login-button>
+        <kmap-login-button slot="actionItems" @lclick="${() => this._fire('login')}"></kmap-login-button>
       </mwc-top-app-bar>
         <div id="map" class="page map" ?active="${this._page === 'map'}" @rated="${this._rated}">
           ${this._chapterCard ? html`
             <div class="chapter-line">
-              <a href="/:app/browser/${this._subject}/${this._chapter}/_"><mwc-icon style="float: right">fullscreen</mwc-icon></a>
+              <a href="/app/browser/${this._subject}/${this._chapter}/_"><mwc-icon style="float: right">fullscreen</mwc-icon></a>
               ${this._chapterCard.depends ? html`
                 <div>
-                  <b>Voraussetzung für das Kapitel ${this._chapter}:</b> ${this._chapterCard.depends.map((depend, j) => html`
-                    <a href="/:app/browser/${this._subject}/${depend}">${depend}</a>&nbsp;
+                  <b>Voraussetzung für das Kapitel ${this._chapter}:</b> ${this._chapterCard.depends.map((depend) => html`
+                    <a href="/app/browser/${this._subject}/${depend}">${depend}</a>&nbsp;
                   `)}
                 </div>
               ` : ''}
@@ -253,9 +260,9 @@ class KMapBrowser extends connect(store, LitElement) {
              <kmap-browser-chapter-editor .subject="${this._subject}" .chapter="${this._chapter}" .chapterCard="${this._chapterCard}"></kmap-browser-chapter-editor>
            ` : ''
     }
-          ${this._lines.map((line, i) => html`
+          ${this._lines.map((line) => html`
             <div class="scrollpane">
-              ${line.cards.map((card, j) => html`
+              ${line.cards.map((card) => html`
                 <kmap-summary-card .subject="${this._subject}" .chapter="${this._chapter}" .card="${card}" ?faded="${this._faded}" key="${card.topic}"></kmap-summary-card>
               `)}
             </div>

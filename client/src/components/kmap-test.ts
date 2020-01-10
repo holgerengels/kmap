@@ -14,6 +14,7 @@ import './kmap-test-exercise';
 import './kmap-test-results';
 import './kmap-test-editor-scroller';
 import {colorStyles, fontStyles} from "./kmap-styles";
+import {TopAppBar} from "@material/mwc-top-app-bar/mwc-top-app-bar";
 
 @customElement('kmap-test')
 class KmapTest extends connect(store, LitElement) {
@@ -35,7 +36,7 @@ class KmapTest extends connect(store, LitElement) {
   private _results: string[] = [];
 
   @query('#bar')
-  private _bar: Element;
+  private _bar: TopAppBar;
 
   set route(val: RoutingState) {
     if (val.page === "test") {
@@ -87,11 +88,11 @@ class KmapTest extends connect(store, LitElement) {
   }
 
   _goChoose() {
-    store.dispatch.routing.replace('/:app/test');
+    store.dispatch.routing.replace('/app/test');
   }
 
   _goResults() {
-    store.dispatch.routing.replace('/:app/test/results');
+    store.dispatch.routing.replace('/app/test/results');
   }
 
   _fire(name) {

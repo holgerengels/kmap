@@ -1,4 +1,4 @@
-import {createModel, RoutingState} from '@captaincodeman/rdx-model';
+import {createModel} from '@captaincodeman/rdx-model';
 import { State, Dispatch } from '../store';
 import {endpoint} from "../endpoint";
 import {config} from "../config";
@@ -96,6 +96,7 @@ export default createModel({
           const message = await resp.text();
           // @ts-ignore
           dispatch.app.handleError({ code: resp.status, message: message });
+          // @ts-ignore
           dispatch.rates.error(message);
         }
       }
@@ -107,12 +108,14 @@ export default createModel({
       const resp = await fetch(`${config.server}state?save=${state.app.userid}&subject=${payload.subject}`, {... endpoint.post(state), body: JSON.stringify(body)});
       if (resp.ok) {
         const json = await resp.json();
+        // @ts-ignore
         dispatch.rates.receivedStore({subject: payload.subject, rates: json});
       }
       else {
         const message = await resp.text();
         // @ts-ignore
         dispatch.app.handleError({ code: resp.status, message: message });
+        // @ts-ignore
         dispatch.rates.error(message);
       }
     },

@@ -4,6 +4,19 @@ import {endpoint} from "../endpoint";
 import {config} from "../config";
 import {Path} from "./types";
 
+export interface Test {
+  subject: string,
+  chapter: string,
+  topic: string,
+  set: string,
+  key: string,
+  level: number;
+  balance: number,
+  values: string[],
+  question: string,
+  answer: string,
+}
+
 export interface Topics {
   subject: string,
   topics: string[],
@@ -32,6 +45,8 @@ export interface TestsState {
   loadingTopics: boolean,
   loadingChapters: boolean,
   loadingTree: boolean,
+  deleting: boolean;
+  saving: boolean,
   error: string,
 }
 
@@ -46,6 +61,8 @@ export default createModel({
     loadingTopics: false,
     loadingChapters: false,
     loadingTree: false,
+    deleting: false,
+    saving: false,
     error: "",
   },
   reducers: {
@@ -104,6 +121,19 @@ export default createModel({
       };
     },
 
+    requestDeleteTest(state) {
+      return { ...state, deleting: true };
+    },
+    receivedDeleteTest(state) {
+      return { ...state, deleting: false };
+    },
+    requestSaveTest(state) {
+      return { ...state, deleting: true };
+    },
+    receivedSaveTest(state) {
+      return { ...state, deleting: false };
+    },
+
     clearResults(state) {
       return { ...state, results: [] };
     },
@@ -143,6 +173,7 @@ export default createModel({
           const message = await resp.text();
           // @ts-ignore
           dispatch.app.handleError({ code: resp.status, message: message });
+          // @ts-ignore
           dispatch.tests.error(message);
         }
       }
@@ -163,6 +194,7 @@ export default createModel({
           const message = await resp.text();
           // @ts-ignore
           dispatch.app.handleError({ code: resp.status, message: message });
+          // @ts-ignore
           dispatch.tests.error(message);
         }
       }
@@ -183,6 +215,7 @@ export default createModel({
           const message = await resp.text();
           // @ts-ignore
           dispatch.app.handleError({ code: resp.status, message: message });
+          // @ts-ignore
           dispatch.tests.error(message);
         }
       }
@@ -208,8 +241,51 @@ export default createModel({
           const message = await resp.text();
           // @ts-ignore
           dispatch.app.handleError({ code: resp.status, message: message });
+          // @ts-ignore
           dispatch.tests.error(message);
         }
+      }
+    },
+
+    async deleteTest(test: Test) {
+      const state: State = getState();
+      const userid = state.app.userid;
+
+      dispatch.tests.requestDeleteTest();
+      const resp = await fetch(`${config.server}edit?userid=${userid}&subject=${test.subject}&save=${test.set}`,
+        {... endpoint.post(state), body: JSON.stringify({delete: test})});
+
+      if (resp.ok) {
+        await resp.json();
+        dispatch.tests.receivedDeleteTest();
+      }
+      else {
+        const message = await resp.text();
+        // @ts-ignore
+        dispatch.app.handleError({ code: resp.status, message: message });
+        // @ts-ignore
+        dispatch.tests.error(message);
+      }
+    },
+    async saveTest(test: Test) {
+      const state: State = getState();
+      const userid = state.app.userid;
+
+      dispatch.tests.requestSaveTest();
+      const resp = await fetch(`${config.server}tests?userid=${userid}&subject=${test.subject}&save=${test.set}`,
+        // @ts-ignore
+        {... endpoint.post(state), body: JSON.stringify(test.added ? {changed: test} : {old: test, changed: test})});
+
+      if (resp.ok) {
+        await resp.json();
+        dispatch.tests.receivedSaveTest();
+      }
+      else {
+        const message = await resp.text();
+        // @ts-ignore
+        dispatch.app.handleError({ code: resp.status, message: message });
+        // @ts-ignore
+        dispatch.tests.error(message);
       }
     },
 

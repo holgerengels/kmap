@@ -2,7 +2,7 @@ import {LitElement, html, css, customElement, property} from 'lit-element';
 import '@material/mwc-icon';
 
 @customElement('star-rating')
-class StarRating extends LitElement {
+export class StarRating extends LitElement {
 
   @property()
   private rate: number = 0;

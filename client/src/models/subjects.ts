@@ -56,6 +56,7 @@ export default createModel({
           const message = await resp.text();
           // @ts-ignore
           dispatch.app.handleError({ code: resp.status, message: message });
+          // @ts-ignore
           dispatch.subjects.error(message);
         }
       }

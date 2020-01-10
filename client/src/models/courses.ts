@@ -1,5 +1,5 @@
-import { createModel } from '@captaincodeman/rdx-model';
-import { State, Dispatch } from '../store';
+import {createModel} from '@captaincodeman/rdx-model';
+import {Dispatch, State} from '../store';
 import {endpoint} from "../endpoint";
 import {config} from "../config";
 
@@ -11,8 +11,10 @@ export interface Course {
 export interface CoursesState {
   courses: string[],
   selectedCourse: string,
+  students?: string[],
   timestamp: number,
   loading: boolean,
+  loadingCourse: boolean,
   storing: boolean,
   storingChange: boolean,
   error: string,
@@ -24,6 +26,7 @@ export default createModel({
     selectedCourse: "",
     timestamp: -1,
     loading: false,
+    loadingCourse: false,
     storing: false,
     storingChange: false,
     error: "",
@@ -31,7 +34,6 @@ export default createModel({
   reducers: {
     requestLoad(state) {
       return { ...state, loading: true,
-        courses: [],
         timestamp: Date.now(),
         error: "",
       };
@@ -40,14 +42,29 @@ export default createModel({
       return { ...state,
         courses: payload,
         selectedCourse: payload.includes(state.selectedCourse) ? state.selectedCourse : "",
+        students: undefined,
         loading: false,
       };
     },
     forget(state) {
       return { ...state,
         courses: [],
+        selectedCourse: "",
+        students: undefined,
         timestamp: Date.now(),
         error: "",
+      };
+    },
+
+    requestLoadCourse(state) {
+      return { ...state, loadingCourse: true,
+        error: "",
+      };
+    },
+    receivedLoadCourse(state, payload: string[]) {
+      return { ...state,
+        students: payload,
+        loadingCourse: false,
       };
     },
 
@@ -62,6 +79,7 @@ export default createModel({
       return { ...state,
         courses: payload,
         selectedCourse: payload.includes(state.selectedCourse) ? state.selectedCourse : "",
+        students: payload.includes(state.selectedCourse) ? state.students : undefined,
         storing: false,
       };
     },
@@ -71,8 +89,9 @@ export default createModel({
         error: "",
       };
     },
-    receivedStoreChange(state) {
+    receivedStoreChange(state, payload: string[]) {
       return { ...state,
+        students: payload,
         storingChange: false,
       };
     },
@@ -103,26 +122,34 @@ export default createModel({
         return;
 
       // @ts-ignore
-      if (Date.now() - state.courses.timestamp > 3000) {
-        dispatch.courses.requestLoad();
-        const resp = await fetch(`${config.server}state?courses=${userid}`, endpoint.get(state));
-        if (resp.ok) {
-          const json = await resp.json();
-          // @ts-ignore
-          dispatch.courses.receivedLoad(json);
-        }
-        else {
-          const message = await resp.text();
-          // @ts-ignore
-          dispatch.app.handleError({ code: resp.status, message: message });
-          dispatch.courses.error(message);
-        }
+      if (Date.now() - state.courses.timestamp < 3000) {
+        console.warn("reloading after " + (state.courses.timestamp - Date.now()) + " ms");
+      }
+
+      dispatch.courses.requestLoad();
+      const resp = await fetch(`${config.server}state?courses=${userid}`, endpoint.get(state));
+      if (resp.ok) {
+        const json = await resp.json();
+        // @ts-ignore
+        dispatch.courses.receivedLoad(json);
+      }
+      else {
+        const message = await resp.text();
+        // @ts-ignore
+        dispatch.app.handleError({ code: resp.status, message: message });
+        // @ts-ignore
+        dispatch.courses.error(message);
       }
     },
+
     async store(payload: string[]) {
       const state: State = getState();
+      const userid = state.app.userid;
+      if (!userid)
+        return;
+
       dispatch.courses.requestStore();
-      const resp = await fetch(`${config.server}state?userid=${state.app.userid}&storeCourses=${state.app.userid}`, {... endpoint.post(state), body: JSON.stringify(payload)});
+      const resp = await fetch(`${config.server}state?userid=${userid}&storeCourses=${userid}`, {... endpoint.post(state), body: JSON.stringify(payload)});
       if (resp.ok) {
         const json = await resp.json();
         dispatch.courses.receivedStore(json);
@@ -131,22 +158,52 @@ export default createModel({
         const message = await resp.text();
         // @ts-ignore
         dispatch.app.handleError({ code: resp.status, message: message });
+        // @ts-ignore
         dispatch.courses.error(message);
       }
     },
-    async storeChange(payload: Course) {
+    async loadCourse(course: string) {
       const state: State = getState();
-      dispatch.courses.requestStoreChange();
-      const resp = await fetch(`${config.server}state?userid=${state.app.userid}&storeCourse=${payload.name}`, {... endpoint.post(state), body: JSON.stringify(payload.students)});
+      const userid = state.app.userid;
+      if (!userid || !course)
+        return;
+
+      dispatch.courses.requestLoadCourse();
+      const resp = await fetch(`${config.server}state?userid=${userid}&course=${course}`, endpoint.get(state));
       if (resp.ok) {
-        // @ts-ignore
         const json = await resp.json();
-        dispatch.courses.receivedStoreChange();
+        // @ts-ignore
+        dispatch.courses.receivedLoadCourse(json);
       }
       else {
         const message = await resp.text();
         // @ts-ignore
         dispatch.app.handleError({ code: resp.status, message: message });
+        // @ts-ignore
+        dispatch.courses.error(message);
+      }
+    },
+    async storeChange(payload: Course) {
+      const state: State = getState();
+      const userid = state.app.userid;
+      if (!userid)
+        return;
+
+      dispatch.courses.requestStoreChange();
+      const resp = await fetch(`${config.server}state?userid=${userid}&storeCourse=${payload.name}`, {... endpoint.post(state), body: JSON.stringify(payload.students)});
+      if (resp.ok) {
+        // @ts-ignore
+        await resp.json();
+        dispatch.courses.receivedStoreChange(payload.students);
+
+        if (!state.courses.courses.includes(payload.name))
+          dispatch.courses.receivedLoad([... state.courses.courses, payload.name].sort());
+      }
+      else {
+        const message = await resp.text();
+        // @ts-ignore
+        dispatch.app.handleError({ code: resp.status, message: message });
+        // @ts-ignore
         dispatch.courses.error(message);
       }
     },

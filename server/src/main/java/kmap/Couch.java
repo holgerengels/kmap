@@ -533,14 +533,19 @@ public class Couch extends Server {
         return array;
     }
 
-    public Set<String> topics(String subject) {
+    public JsonArray topics(String subject) {
+        JsonArray array = new JsonArray();
+        topicsAsList(subject).forEach(array::add);
+        return array;
+    }
+    public List<String> topicsAsList(String subject) {
         View view = createClient("map")
             .view("net/topics")
             .startKey(subject, "\u0000")
             .endKey(subject, "\uffff")
             .reduce(false);
         List<JsonObject> objects = view.query(JsonObject.class);
-        return objects.stream().map(object -> string(object, "value")).collect(Collectors.toSet());
+        return objects.stream().map(object -> string(object, "value")).collect(Collectors.toList());
     }
 
     Map<String, Integer> counts(String subject) {

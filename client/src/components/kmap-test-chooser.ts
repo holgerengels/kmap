@@ -13,7 +13,7 @@ import 'mega-material/surface';
 import {colorStyles, elevationStyles, fontStyles} from "./kmap-styles";
 
 @customElement('kmap-test-chooser')
-class KmapTestChooser extends connect(store, LitElement) {
+export class KmapTestChooser extends connect(store, LitElement) {
   @property()
   private _subjects: string[] = [];
   @property()
@@ -94,7 +94,7 @@ class KmapTestChooser extends connect(store, LitElement) {
   }
 
   _start() {
-    store.dispatch.routing.replace(`/:app/test/${[this._subject, ...this._chapter.split('.')].join('/')}`);
+    store.dispatch.routing.replace(`/app/test/${[this._subject, ...this._chapter.split('.')].join('/')}`);
   }
 
   static get styles() {

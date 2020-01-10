@@ -37,8 +37,8 @@ export default createModel({
     error: "",
   },
   reducers: {
-    chooseInstance(state, instance: string) {
-      return { ...state, instance: instance }
+    chooseInstance(state, instance: string | null) {
+      return { ...state, instance: instance ? instance : "" }
     },
     updateOffline(state, offline: boolean) {
       return { ...state, offline: offline }
@@ -90,6 +90,7 @@ export default createModel({
         const message = await resp.text();
         // @ts-ignore
         dispatch.app.handleError({ code: resp.status, message: message });
+        // @ts-ignore
         dispatch.app.error(message);
       }
     },
@@ -100,13 +101,14 @@ export default createModel({
       const resp = await fetch(`${config.server}state?logout=${state.app.userid}`, {... endpoint.post(state), body: JSON.stringify({userid: state.app.userid})});
       if (resp.ok) {
         // @ts-ignore
-        const json = await resp.json();
+        await resp.json();
         dispatch.app.receivedLogout();
       }
       else {
         const message = await resp.text();
         // @ts-ignore
         dispatch.app.handleError({ code: resp.status, message: message });
+        // @ts-ignore
         dispatch.app.error(message);
       }
     },

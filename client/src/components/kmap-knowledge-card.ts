@@ -201,7 +201,7 @@ class KMapKnowledgeCard extends connect(store, LitElement) {
   <div class="card-header font-body">
       <span>${this.card.topic !== "_" ? this.card.topic : this.chapter}</span>
       <div style="flex: 1 0 auto"></div>
-      <a href="/:app/browser/${this.subject}/${this.chapter}"><mwc-ripple></mwc-ripple><mwc-icon>fullscreen_exit</mwc-icon></a>
+      <a href="/app/browser/${this.subject}/${this.chapter}"><mwc-ripple></mwc-ripple><mwc-icon>fullscreen_exit</mwc-icon></a>
   </div>
   <kmap-knowledge-card-depends ?chapterDepends="${this.card.topic === '_'}"
       .subject="${this.subject}"
@@ -281,12 +281,12 @@ class KMapKnowledgeCard extends connect(store, LitElement) {
   </div>
   <div class="card-footer">
     ${this.card.links
-      ? html`<a slot="footer" href="/:app/browser/${this.subject}/${this.card.links}"><mwc-icon>open_in_new</mwc-icon></a>`
+      ? html`<a slot="footer" href="/app/browser/${this.subject}/${this.card.links}"><mwc-icon>open_in_new</mwc-icon></a>`
       : html`<star-rating .rate="${this.state}" @clicked="${this._rated}" style=${styleMap(this._colorStyles)}></star-rating>`
     }
       <div style="flex: 1 0 auto; height: 24px"></div>
       ${this._hasTests ? html`
-        <a href="/:app/tests/${this.subject}/${this.chapter}/${this.card.topic}"><mwc-ripple></mwc-ripple><mwc-icon>help_outline</mwc-icon></a>
+        <a href="/app/tests/${this.subject}/${this.chapter}/${this.card.topic}"><mwc-ripple></mwc-ripple><mwc-icon>help_outline</mwc-icon></a>
       ` : ''}
   </div>
     `;

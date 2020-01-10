@@ -12,7 +12,7 @@ import {TextField} from "@material/mwc-textfield/mwc-textfield";
 import {colorStyles, fontStyles} from "./kmap-styles";
 
 @customElement('kmap-login-popup')
-class KMapLoginPopup extends connect(store, LitElement) {
+export class KMapLoginPopup extends connect(store, LitElement) {
 
   @property()
   private _userid: string = '';
@@ -20,10 +20,13 @@ class KMapLoginPopup extends connect(store, LitElement) {
   private _message: string = '';
 
   @query('#loginDialog')
+  // @ts-ignore
   private _loginDialog: Dialog;
   @query('#loginId')
+  // @ts-ignore
   private _loginId: TextField;
   @query('#loginPassword')
+  // @ts-ignore
   private _loginPassword: TextField;
 
   mapState(state: State) {
@@ -51,6 +54,7 @@ class KMapLoginPopup extends connect(store, LitElement) {
   }
 
   _login() {
+    // @ts-ignore
     store.dispatch.app.login({ userid: this._loginId.value, password: this._loginPassword.value });
   }
 

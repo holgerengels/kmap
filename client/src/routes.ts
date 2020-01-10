@@ -4,13 +4,13 @@ import createMatcher from '@captaincodeman/router';
 
 const routes = {
   '/:app':                                  'home',
-  '/:app/browser/:subject/:chapter':        'browser',
-  '/:app/browser/:subject/:chapter/:topic': 'browser',
-  '/:app/test':                             'test',
-  '/:app/test/:results':                    'test',
-  '/:app/test/:subject/:chapter(/:topic)':  'test',
-  '/:app/courses':                          'courses',
-  '/:app/content-manager':                  'content-manager',
+  '/app/browser/:subject/:chapter':        'browser',
+  '/app/browser/:subject/:chapter/:topic': 'browser',
+  '/app/test':                             'test',
+  '/app/test/:results':                    'test',
+  '/app/test/:subject/:chapter(/:topic)':  'test',
+  '/app/courses':                          'courses',
+  '/app/content-manager':                  'content-manager',
 }                                                 ;
 
 export const routeMatcher = createMatcher(routes);

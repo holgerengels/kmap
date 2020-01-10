@@ -5,7 +5,7 @@ import {State, store} from "../store";
 import { colorStyles, fontStyles } from "./kmap-styles";
 
 @customElement('kmap-summary-card-averages')
-class KMapSummaryCardAverages extends connect(store, LitElement) {
+export class KMapSummaryCardAverages extends connect(store, LitElement) {
 
   @property()
   private key: string = '';

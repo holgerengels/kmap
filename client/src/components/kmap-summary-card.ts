@@ -169,9 +169,9 @@ class KMapSummaryCard extends connect(store, LitElement) {
     <span>${this.card.topic}</span>
     <div style="flex: 1 0 auto"></div>
     ${this.card.links ? html`
-        <a href="/:app/browser/${this.subject}/${this.card.links}" title="Wissenslandkarte"><mwc-ripple></mwc-ripple><mwc-icon style="--mdc-icon-size: 20px; margin:2px 0px">open_in_new</mwc-icon></a>
+        <a href="/app/browser/${this.subject}/${this.card.links}" title="Wissenslandkarte"><mwc-ripple></mwc-ripple><mwc-icon style="--mdc-icon-size: 20px; margin:2px 0px">open_in_new</mwc-icon></a>
     ` : html`
-        <a href="/:app/browser/${this.subject}/${this.chapter}/${this.card.topic}" title="Wissenskarte"><mwc-ripple></mwc-ripple><mwc-icon>fullscreen</mwc-icon></a>
+        <a href="/app/browser/${this.subject}/${this.chapter}/${this.card.topic}" title="Wissenskarte"><mwc-ripple></mwc-ripple><mwc-icon>fullscreen</mwc-icon></a>
     `}
   </div>
   ${this._layers.includes('summaries')
@@ -199,7 +199,7 @@ class KMapSummaryCard extends connect(store, LitElement) {
 
       <div style="flex: 1 0 auto; height: 24px"></div>
       ${this._hasTests ? html`
-        <a href="/:app/tests/${this.subject}/${this.chapter}/${this.card.topic}"><mwc-ripple></mwc-ripple><mwc-icon>help_outline</mwc-icon></a>
+        <a href="/app/tests/${this.subject}/${this.chapter}/${this.card.topic}"><mwc-ripple></mwc-ripple><mwc-icon>help_outline</mwc-icon></a>
       ` : ''}
   </div>
     <mwc-ripple id="ripple"></mwc-ripple>

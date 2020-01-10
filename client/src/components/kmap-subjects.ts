@@ -7,18 +7,22 @@ import '@material/mwc-icon-button';
 import '@material/mwc-top-app-bar';
 import './kmap-login-button';
 import './kmap-subject-card';
+import {TopAppBar} from "@material/mwc-top-app-bar/mwc-top-app-bar";
 
 
 @customElement('kmap-subjects')
-class KMapSubjects extends connect(store, LitElement) {
+export class KMapSubjects extends connect(store, LitElement) {
   @property()
   private _subjects: string[] = [];
 
   @query('#bar')
-  private _bar: Element;
+  // @ts-ignore
+  private _bar: TopAppBar;
   @query('#content')
-  private _content: Element;
+  // @ts-ignore
+  private _content: HTMLElement;
 
+  // @ts-ignore
   firstUpdated(changedProperties) {
     this._bar.scrollTarget = this._content;
   }
@@ -62,12 +66,12 @@ class KMapSubjects extends connect(store, LitElement) {
     // language=HTML
     return html`
       <mwc-top-app-bar id="bar" dense>
-        <mwc-icon-button icon="menu" slot="navigationIcon" @click="${e => this._fire('toggleDrawer')}"></mwc-icon-button>
+        <mwc-icon-button icon="menu" slot="navigationIcon" @click="${() => this._fire('toggleDrawer')}"></mwc-icon-button>
         <div slot="title">Fächer</div>
-        <kmap-login-button slot="actionItems" @lclick="${e => this._fire('login')}"></kmap-login-button>
+        <kmap-login-button slot="actionItems" @lclick="${() => this._fire('login')}"></kmap-login-button>
       </mwc-top-app-bar>
         <div id="content" class="board" tabindex="0">
-            ${this._subjects.map((subject, j) => html`
+            ${this._subjects.map((subject) => html`
                 <kmap-subject-card .subject="${subject}"></kmap-subject-card>
             `)}
         </div>

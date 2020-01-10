@@ -133,11 +133,10 @@ public class States {
 
     public void storeCourses(String user, String json) {
         CouchDbClient client = getClient();
-        JsonObject data = client.getGson().fromJson(json, JsonObject.class);
+        JsonArray data = client.getGson().fromJson(json, JsonArray.class);
         try {
             JsonObject object = client.find(JsonObject.class, user + ".courses");
-            JsonArray courses = data.getAsJsonArray("courses");
-            courses = JSON.sort(courses);
+            JsonArray courses = JSON.sort(data);
             object.add("courses", courses);
             for (Iterator<Map.Entry<String, JsonElement>> iterator = object.entrySet().iterator(); iterator.hasNext(); ) {
                 Map.Entry<String, JsonElement> entry = iterator.next();
@@ -156,10 +155,10 @@ public class States {
 
     public void storeCourse(String user, String name, String json) {
         CouchDbClient client = getClient();
-        JsonObject data = client.getGson().fromJson(json, JsonObject.class);
+        JsonArray data = client.getGson().fromJson(json, JsonArray.class);
         try {
             JsonObject object = client.find(JsonObject.class, user + ".courses");
-            object.add(name, data.getAsJsonArray("students"));
+            object.add(name, data);
             JsonArray courses = object.get("courses").getAsJsonArray();
             if (!courses.contains(new JsonPrimitive(name)))
                 courses.add(name);
@@ -199,7 +198,7 @@ public class States {
         CouchDbClient client = getClient();
         JsonObject object = client.getGson().fromJson(json, JsonObject.class);
         JsonObject states = states(user, subject);
-        Set<String> topics = couch.topics(subject);
+        List<String> topics = couch.topicsAsList(subject);
         states.entrySet().removeIf(entry -> {
             String key = entry.getKey();
             JsonElement value = entry.getValue();

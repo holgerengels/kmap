@@ -5,7 +5,7 @@ import '@material/mwc-icon';
 import {Attachment} from "../models/maps";
 
 @customElement('kmap-knowledge-card-attachment')
-class KMapKnowledgeCardAttachment extends LitElement {
+export class KMapKnowledgeCardAttachment extends LitElement {
   @property()
   private instance: string = '';
   @property()
@@ -23,7 +23,7 @@ class KMapKnowledgeCardAttachment extends LitElement {
 
   updated(changedProperties) {
     if (changedProperties.has("attachment")) {
-      let attachment = this.attachment;
+      let attachment: Attachment = this.attachment;
       this._handler = attachment.type === "application/vnd.geogebra.file" ? "/geogebra.html?path=" + config.server : "";
       this._mimeIcon = this.mimeIcon(attachment.type);
       this._isDownload = attachment.type !== "link" && attachment.type !== "text/html" && this._supportsDownload ? attachment.name : undefined;
@@ -89,6 +89,8 @@ class KMapKnowledgeCardAttachment extends LitElement {
         `;
   }
 
+  // TODO spread
+  // TODO rel
   _renderAttachment() {
     if (this.attachment.type === "link")
       return html `

@@ -9,14 +9,14 @@ import './kmap-test-result-card';
 import {colorStyles, elevationStyles, fontStyles} from "./kmap-styles";
 
 interface Summary {
-  achievedPoints: number,
+  achievedPoints: string,
   achievablePoints: number,
   cards: object[],
   hasCards: boolean,
 }
 
 @customElement('kmap-test-results')
-class KmapTestResults extends connect(store, LitElement) {
+export class KmapTestResults extends connect(store, LitElement) {
   @property()
   private _userid: string = '';
 
@@ -148,7 +148,7 @@ class KmapTestResults extends connect(store, LitElement) {
         <br/>
         ${this._summary.cards.map((card) => html`
           <kmap-test-result-card .card="${card}" .state="${card.state}">
-            <a slot="actions-fullscreen" href="/:app/browser/${card.subject}/${card.chapter}/${card.topic}"><mwc-icon>open-in-new"></mwc-icon></a>
+            <a slot="actions-fullscreen" href="/app/browser/${card.subject}/${card.chapter}/${card.topic}"><mwc-icon>open-in-new"></mwc-icon></a>
           </kmap-test-result-card>
         `)}
       </div>

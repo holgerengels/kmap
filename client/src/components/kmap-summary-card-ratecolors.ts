@@ -3,7 +3,7 @@ import { connect } from '@captaincodeman/rdx';
 import {State, store} from "../store";
 
 @customElement('kmap-summary-card-ratecolors')
-class KMapSummaryCardRateColors extends connect(store, LitElement) {
+export class KMapSummaryCardRateColors extends connect(store, LitElement) {
 
   @property()
   private key: string = '';

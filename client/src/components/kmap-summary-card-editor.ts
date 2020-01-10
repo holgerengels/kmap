@@ -8,16 +8,14 @@ import {colorStyles, fontStyles} from "./kmap-styles";
 import {Module} from "../models/contentMaps";
 
 @customElement('kmap-summary-card-editor')
-class KMapSummaryCardEditor extends connect(store, LitElement) {
+export class KMapSummaryCardEditor extends connect(store, LitElement) {
 
   @property()
   private _subject: string = '';
   @property()
   private _selectedModule?: Module = undefined;
   @property()
-  private key: string = '';
-  @property()
-  private card: Card = undefined;
+  private card?: Card = undefined;
 
   @property()
   private _enabled: boolean = false;

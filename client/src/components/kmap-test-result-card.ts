@@ -10,7 +10,7 @@ import './star-rating';
 import {colorStyles, fontStyles} from "./kmap-styles";
 
 @customElement('kmap-test-result-card')
-class KMapTestResultCard extends connect(store, LitElement) {
+export class KMapTestResultCard extends connect(store, LitElement) {
   @property()
   private _userid: string = '';
 
@@ -156,7 +156,7 @@ class KMapTestResultCard extends connect(store, LitElement) {
         <div class="card-footer">
             <star-rating .rate="${this._state}" @clicked="${this._rated}" style=${styleMap(this._colorStyles)}></star-rating>
             <div slot="footer" style="flex: 1 0 auto"></div>
-            <a slot="footer" href="/:app/browser/${this.card.subject}/${this.card.chapter}/${this.card.topic}"><mwc-icon>open_in_new</mwc-icon></a>
+            <a slot="footer" href="/app/browser/${this.card.subject}/${this.card.chapter}/${this.card.topic}"><mwc-icon>open_in_new</mwc-icon></a>
         </div>
     `;
   }

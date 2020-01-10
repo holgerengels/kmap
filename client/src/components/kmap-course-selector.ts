@@ -6,7 +6,7 @@ import 'mega-material/list';
 import {fontStyles, colorStyles} from "./kmap-styles";
 
 @customElement('kmap-course-selector')
-class KMapCourseSelector extends connect(store, LitElement) {
+export class KMapCourseSelector extends connect(store, LitElement) {
 
   @property()
   private _courses: string[] = [];

@@ -1,6 +1,7 @@
-import {LitElement, html, css} from 'lit-element';
-import { connect } from '@captaincodeman/rdx';
-import {store} from "../store";
+import {LitElement, html, css, customElement, property, query} from 'lit-element';
+import {connect} from '@captaincodeman/rdx';
+import {State, store} from "../store";
+
 import {config} from '../config';
 import {STATE_COLORS} from './state-colors';
 import {fontStyles, colorStyles} from "./kmap-styles";
@@ -8,6 +9,7 @@ import './star-rating';
 import '@material/mwc-icon';
 import '@material/mwc-button';
 
+@customElement('kmap-test-card')
 class KMapTestCard extends connect(store, LitElement) {
 
   static get styles() {
@@ -116,7 +118,7 @@ mwc-icon {
   <div class="card-header" ?hidden="${this.hideHeader}">
       <span>Aufgabe ${this.num + 1} von ${this.of} (${this._levelText()})</span>
       <div style="flex: 1 0 auto"></div>
-      <a href="/:app/browser/${this.subject}/${this.chapter}/${this.topic}" target="_blank" id="blinky">Wissenskarte ansehen <mwc-icon>open_in_new</mwc-icon></a>
+      <a href="/app/browser/${this.subject}/${this.chapter}/${this.topic}" target="_blank" id="blinky">Wissenskarte ansehen <mwc-icon>open_in_new</mwc-icon></a>
   </div>
   <div class="card-content">
       <div id="question" style="${this.questionFlex}"></div>
@@ -329,4 +331,3 @@ mwc-icon {
 
 }
 
-window.customElements.define('kmap-test-card', KMapTestCard);

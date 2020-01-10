@@ -78,7 +78,7 @@ public class DataServlet
             }
             else if (topics != null) {
                 log("topics = " + topics);
-                JsonArray result = couch.topics(subject, topics);
+                JsonArray result = "all".equals(topics) ? couch.topics(subject) : couch.topics(subject, topics);
                 if (result != null)
                     writeObject(req, resp, result.toString());
             }
