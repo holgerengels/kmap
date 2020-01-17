@@ -19,7 +19,7 @@ export class KMapEditorDeleteDialog extends connect(store, LitElement) {
 
   mapState(state: State) {
     return {
-      _card: state.shell.cardForDelete,
+      _card: state.maps.cardForDelete,
     };
   }
 
@@ -34,22 +34,22 @@ export class KMapEditorDeleteDialog extends connect(store, LitElement) {
     }
   }
 
-  async _delete() {
+  _delete() {
     this._deleteDialog.close();
-    console.log(this._card);
     if (!this._card)
       return;
 
-    await store.dispatch.maps.deleteTopic(this._card);
-    await store.dispatch.shell.unsetCardForDelete();
+    const card: Card = this._card;
+
+    store.dispatch.maps.deleteTopic(card);
     window.setTimeout(function(subject, chapter) {
       store.dispatch.maps.load({subject: subject, chapter: chapter});
-    }.bind(undefined, this._card.subject, this._card.chapter), 1000);
+    }.bind(undefined, card.subject, card.chapter), 1000);
   }
 
   _cancel() {
     this._deleteDialog.close();
-    store.dispatch.shell.unsetCardForDelete();
+    store.dispatch.maps.unsetCardForDelete();
   }
 
   static get styles() {

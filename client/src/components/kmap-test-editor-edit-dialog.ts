@@ -59,6 +59,9 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
   @property()
   private _valid: boolean = true;
 
+  @property()
+  private _cloudPath?: string = undefined;
+
   @query('#editDialog')
   // @ts-ignore
   private _editDialog: Dialog;
@@ -74,8 +77,9 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
 
   mapState(state: State) {
     return {
-      _test: state.shell.testForEdit,
+      _test: state.tests.testForEdit,
       _allTopics: state.maps.allTopics ? state.maps.allTopics.topics : undefined,
+      _cloudPath: state.cloud.path,
     };
   }
 
@@ -160,11 +164,13 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
         this._values = newValues;
       }
     }
-  }
-
-  // TODO make sure chapters are loaded
-  stateChanged(state) {
-    this._test = state.app.testForEdit;
+    if (changedProperties.has("_cloudPath")) {
+      if (this._cloudPath) {
+        store.dispatch.cloud.forgetPath();
+        console.log(this._cloudPath);
+        //window.open(this._cloudPath, '_blank');
+      }
+    }
   }
 
   _focus(e) {
@@ -177,7 +183,7 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
     }
   }
 
-  async _save() {
+  _save() {
     this._editDialog.close();
     if (!this._test)
       return;
@@ -194,11 +200,11 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
     let test = this._test;
     console.log(test);
 
-    await store.dispatch.tests.saveTest(this._test);
-    await store.dispatch.shell.unsetCardForEdit();
-    window.setTimeout(async function (test, newSet) {
+    store.dispatch.tests.saveTest(this._test);
+    window.setTimeout(function (test, newSet) {
         if (newSet) {
-          await store.dispatch.contentSets.load();
+          store.dispatch.contentSets.load();
+          // TODO reselect
           store.dispatch.contentSets.selectSet({subject: test.subject, set: test.set});
         }
     }.bind(undefined, test, this._newSet), 1000);
@@ -206,7 +212,7 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
 
   _cancel() {
     this._editDialog.close();
-    store.dispatch.shell.unsetTestForEdit();
+    store.dispatch.tests.unsetTestForEdit();
   }
 
   _setQuestion() {
@@ -233,16 +239,14 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
     }
   }
 
-  async _createDirectory() {
+  _createDirectory() {
     if (!this._test) return;
 
-    await store.dispatch.cloud.createDirectoryForTests({
+    store.dispatch.cloud.createDirectoryForTests({
       subject: this._test.subject,
       chapter: this._test.chapter,
       topic: this._test.topic
     });
-    console.log(store.state.cloud.path);
-    window.open(store.state.cloud.path, '_blank');
   }
 
   _checkValidity() {

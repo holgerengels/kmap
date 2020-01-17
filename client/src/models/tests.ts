@@ -1,5 +1,5 @@
 import {createModel, RoutingState} from '@captaincodeman/rdx-model';
-import { State, Dispatch } from '../store';
+import {State, Dispatch} from '../store';
 import {endpoint} from "../endpoint";
 import {config} from "../config";
 import {Path} from "./types";
@@ -48,6 +48,8 @@ export interface TestsState {
   deleting: boolean;
   saving: boolean,
   error: string,
+  testForEdit?: Test,
+  testForDelete?: Test,
 }
 
 export default createModel({
@@ -64,6 +66,8 @@ export default createModel({
     deleting: false,
     saving: false,
     error: "",
+    testForEdit: undefined,
+    testForDelete: undefined,
   },
   reducers: {
     requestTopics(state) {
@@ -141,6 +145,19 @@ export default createModel({
       return { ...state,
         results: [ ...state.results, result],
       };
+    },
+
+    setTestForEdit(state, testForEdit: Test) {
+      return { ...state, testForEdit: testForEdit }
+    },
+    unsetTestForEdit(state) {
+      return { ...state, testForEdit: undefined }
+    },
+    setTestForDelete(state, testForDelete: Test) {
+      return { ...state, testForDelete: testForDelete }
+    },
+    unsetTestForDelete(state) {
+      return { ...state, testForDelete: undefined }
     },
 
     error(state, message) {
@@ -258,6 +275,7 @@ export default createModel({
       if (resp.ok) {
         await resp.json();
         dispatch.tests.receivedDeleteTest();
+        dispatch.tests.unsetTestForDelete();
       }
       else {
         const message = await resp.text();
@@ -279,6 +297,7 @@ export default createModel({
       if (resp.ok) {
         await resp.json();
         dispatch.tests.receivedSaveTest();
+        dispatch.tests.unsetTestForEdit();
       }
       else {
         const message = await resp.text();
@@ -292,13 +311,19 @@ export default createModel({
     'maps/received': async function() {
         dispatch.tests.loadTopics();
     },
-    'routing/change': async function(payload: RoutingState) {
-      switch (payload.page) {
+    'routing/change': async function(routing: RoutingState) {
+      switch (routing.page) {
         case 'test':
           // @ts-ignore
-          dispatch.tests.loadTests({ subject: payload.params["subject"], chapter: payload.params["chapter"], topic: payload.params["topic"]});
+          dispatch.tests.loadTests({ subject: routing.params["subject"], chapter: routing.params["chapter"], topic: routing.params["topic"]});
           break;
       }
-    }
+    },
+    'app/chooseInstance': async function() {
+      const state: State = getState();
+      const routing: RoutingState = state.routing;
+      if (routing.page === 'test')
+        dispatch.tests.loadTests({ subject: routing.params["subject"], chapter: routing.params["chapter"], topic: routing.params["topic"]});
+    },
   })
 })

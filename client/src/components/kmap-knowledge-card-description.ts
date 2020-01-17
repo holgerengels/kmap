@@ -4,7 +4,7 @@ import {config} from "../config";
 import {colorStyles, fontStyles} from "./kmap-styles";
 
 @customElement('kmap-knowledge-card-description')
-class KMapKnowledgeCardDescription extends LitElement {
+export class KMapKnowledgeCardDescription extends LitElement {
   @property()
   private instance: string = '';
   @property()
@@ -28,6 +28,7 @@ class KMapKnowledgeCardDescription extends LitElement {
         let t = false;
         description.split("`").reverse().forEach(function (element) {
           if (t) {
+            // @ts-ignore
             buffer = " " + MathJax.asciimath2svg(element).getElementsByTagName("svg")[0].outerHTML + " " + buffer;
           }
           else

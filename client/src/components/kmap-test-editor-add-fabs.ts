@@ -105,7 +105,7 @@ export class KMapTestEditorAddFabs extends connect(store, LitElement) {
       key: this._key,
     };
     console.log(test);
-    store.dispatch.shell.setTestForEdit(test);
+    store.dispatch.tests.setTestForEdit(test);
     this._addDialog.close();
   }
 

@@ -44,6 +44,11 @@ export default createModel({
         creating: false,
       };
     },
+    forgetPath(state) {
+      return { ...state,
+        path: undefined,
+      };
+    },
 
     error(state, message) {
       return { ...state,
@@ -108,6 +113,10 @@ export default createModel({
         // @ts-ignore
         dispatch.cloud.error(message);
       }
+    },
+
+    'app/chooseInstance': async function() {
+      dispatch.cloud.forgetPath();
     },
   })
 })

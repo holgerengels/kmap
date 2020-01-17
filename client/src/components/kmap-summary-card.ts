@@ -15,7 +15,7 @@ import {STATE_COLORS} from './state-colors';
 import {fontStyles, colorStyles} from "./kmap-styles";
 
 @customElement('kmap-summary-card')
-class KMapSummaryCard extends connect(store, LitElement) {
+export class KMapSummaryCard extends connect(store, LitElement) {
 
   @property()
   private _userid: string = '';

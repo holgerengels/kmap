@@ -70,6 +70,9 @@ export default createModel({
           dispatch.subjects.load();
           break;
       }
-    }
+    },
+    'app/chooseInstance': async function() {
+      dispatch.subjects.load();
+    },
   })
 })

@@ -36,15 +36,15 @@ export class KMapSummaryCardEditor extends connect(store, LitElement) {
   }
 
   _showEdit() {
-    store.dispatch.shell.setCardForEdit(this.card);
+    store.dispatch.maps.setCardForEdit(this.card);
   }
 
   _showRename() {
-    store.dispatch.shell.setCardForRename(this.card);
+    store.dispatch.maps.setCardForRename(this.card);
   }
 
   _showDelete() {
-    store.dispatch.shell.setCardForDelete(this.card);
+    store.dispatch.maps.setCardForDelete(this.card);
   }
 
   getState() { return 0; }

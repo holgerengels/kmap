@@ -141,9 +141,14 @@ export class KMapEditorAddFabs extends connect(store, LitElement) {
       chapter: this._chapter,
       topic: this._topic,
       name: this._topic,
+      summary: '',
+      description: '',
+      links: '',
+      depends: [],
+      attachments: [],
     };
     console.log(card);
-    store.dispatch.shell.setCardForEdit(card);
+    store.dispatch.maps.setCardForEdit(card);
     this._addDialog.close();
   }
 

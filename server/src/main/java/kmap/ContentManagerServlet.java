@@ -2,6 +2,7 @@ package kmap;
 
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonPrimitive;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -45,7 +46,7 @@ public class ContentManagerServlet
 
                 if (importModule != null) {
                     authentication.checkRole(req, "teacher");
-                    List<String> modules = new ArrayList<>();
+                    JsonArray modules = new JsonArray();
                     log("import module " + importModule);
                     for (Part part : req.getParts()) {
                         String name = getFileName(part);
@@ -55,11 +56,11 @@ public class ContentManagerServlet
                         System.out.println("imported " + String.join(" - ", strings));
                         modules.add(String.join(" - ", strings));
                     }
-                    writeResponse(req, resp, "success", modules.toString());
+                    writeResponse(req, resp, modules);
                 }
                 else if (importSet != null) {
                     authentication.checkRole(req, "teacher");
-                    List<String> sets = new ArrayList<>();
+                    JsonArray sets = new JsonArray();
                     log("import set " + importSet);
                     for (Part part : req.getParts()) {
                         String name = getFileName(part);
@@ -69,17 +70,17 @@ public class ContentManagerServlet
                         System.out.println("imported " + String.join(" - ", strings));
                         sets.add(String.join(" - ", strings));
                     }
-                    writeResponse(req, resp, "success", sets.toString());
+                    writeResponse(req, resp, sets);
                 }
                 else if (create != null) {
                     authentication.checkRole(req, "admin");
                     contentManager.createInstance(create);
-                    writeResponse(req, resp, "success", create);
+                    writeResponse(req, resp, new JsonPrimitive(create));
                 }
                 else if (drop != null) {
                     authentication.checkRole(req, "admin");
                     contentManager.dropInstance(drop);
-                    writeResponse(req, resp, "success", drop);
+                    writeResponse(req, resp, new JsonPrimitive(drop));
                 }
             }
         }

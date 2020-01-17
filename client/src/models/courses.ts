@@ -214,5 +214,8 @@ export default createModel({
     'app/receivedLogout': async function() {
       dispatch.courses.forget();
     },
+    'app/chooseInstance': async function() {
+      dispatch.courses.forget();
+    },
   })
 })

@@ -50,12 +50,13 @@ export class KCourses extends connect(store, LitElement) {
   mapState(state: State) {
     return {
       _courses: state.courses.courses,
+      _selectedIndex: state.courses.courses.includes(this._selectedName) ? state.courses.courses.indexOf(this._selectedName) : -1,
       _selectedStudents: state.courses.students,
       _editStudents: state.courses.students,
     };
   }
 
-  // TODO leave courses on logout
+  // TODO forget courses on logout
   updated(changedProperties) {
     if (changedProperties.has('_selectedIndex')) {
       if (this._selectedIndex === -1) {
@@ -93,32 +94,36 @@ export class KCourses extends connect(store, LitElement) {
     for (let i = 0; i < students.length; i++)
       students[i] = students[i].trim();
 
+    this._selectedName = name;
+    this._selectedStudents = students.join(', ');
+
     await store.dispatch.courses.storeChange({ name: name, students: students });
 
-    this._selectedIndex = this._courses.indexOf(name);
     this._newName = '';
     this._newStudents = '';
     this._page = 'default';
   }
 
-  async _edit() {
+  _edit() {
     let name = this._editName;
     let students = this._editStudents.split(',');
     for (let i = 0; i < students.length; i++)
       students[i] = students[i].trim();
 
-    await store.dispatch.courses.storeChange({name: name, students: students});
-
+    this._selectedName = name;
     this._selectedStudents = students.join(', ');
+
+    store.dispatch.courses.storeChange({name: name, students: students});
+
     this._editName = '';
     this._editStudents = '';
     this._page = 'default';
   }
 
-  async _delete() {
+  _delete() {
     let courses = new Array(...this._courses);
     courses.splice(this._selectedIndex, 1);
-    await store.dispatch.courses.store(courses);
+    store.dispatch.courses.store(courses);
     this._courses = courses;
     this._page = '';
   }

@@ -1,5 +1,5 @@
 import {LitElement, html, css, customElement, property, query} from 'lit-element';
-import { get, set } from 'idb-keyval';
+//import { get, set } from 'idb-keyval';
 import {installMediaQueryWatcher} from 'pwa-helpers/media-query.js';
 import {installOfflineWatcher} from 'pwa-helpers/network.js';
 import {updateMetadata} from 'pwa-helpers/metadata.js';
@@ -19,6 +19,7 @@ import './components/kmap-subjects';
 import './components/kmap-browser';
 import './components/kmap-test';
 import './components/kmap-courses';
+import './components/kmap-content-manager';
 import './components/kmap-login-popup';
 import './components/kmap-module-selector';
 import './components/kmap-set-selector';
@@ -99,6 +100,7 @@ export class KmapMain extends connect(store, LitElement) {
     };
   }
 
+  // @ts-ignore
   firstUpdated(changedProperties) {
     if (!window.location.host.includes("localhost")) {
       let pathComponent = window.location.pathname.split('/')[1];
@@ -111,10 +113,14 @@ export class KmapMain extends connect(store, LitElement) {
       else if (cookie) {
         console.log("instance from cookie .. " + cookie);
         document.cookie = "instance=" + cookie + "; path=/; expires=0";
+        /*
         set("instance", cookie)
           .then(() => store.dispatch.app.chooseInstance(cookie));
+         */
+        store.dispatch.app.chooseInstance(cookie);
       }
       else {
+        /*
         get('instance').then((instance: string) => {
           if (instance) {
             console.log("instance from idb .. " + instance);
@@ -123,9 +129,12 @@ export class KmapMain extends connect(store, LitElement) {
           else
             this._instanceDialog.show();
         });
+         */
+        if (!store.state.app.instance)
+          this._instanceDialog.show();
       }
     }
-    else
+    else if (!store.state.app.instance)
       store.dispatch.app.chooseInstance("lala");
 
     installOfflineWatcher((offline) => store.dispatch.app.updateOffline(offline));
@@ -193,11 +202,21 @@ export class KmapMain extends connect(store, LitElement) {
     this._loginPopup.show();
   }
 
+  _showChooseInstance() {
+    this._instanceDialog.show();
+  }
   _chooseInstance() {
-    let textfield =  this.shadowRoot.getElementById('instance');
-    let instance = textfield.value;
+    // @ts-ignore
+    let textfield = this.shadowRoot.getElementById('instance');
+    // @ts-ignore
+    let instance: string = textfield.value;
+    /*
     set("instance", instance)
       .then(() => store.dispatch.app.chooseInstance(instance));
+    this._instanceDialog.close();
+     */
+    // @ts-ignore
+    store.dispatch.app.chooseInstance(instance);
     this._instanceDialog.close();
   }
 
@@ -241,6 +260,13 @@ export class KmapMain extends connect(store, LitElement) {
       [hidden] {
         display: none !important;
       }
+        span[slot=subtitle] {
+          display: flex;
+          align-content: center;
+        }
+        span[slot=subtitle] > * {
+          margin-right: 8px;
+        }
       `,
     ];
   }
@@ -249,11 +275,13 @@ export class KmapMain extends connect(store, LitElement) {
     // language=HTML
     return html`
   <mwc-drawer id="drawer" hasheader type="${this._narrow ? 'modal' : 'dismissible'}" ?open="${this._drawerOpen}">
-    <span slot="title">KMap <span class="secondary" style="vertical-align: middle">[${this._instance}]</span></span>
-    <span slot="subtitle">Knowledge Map</span>
+    <span slot="title">Knowledge Map</span>
+    <span slot="subtitle">[<span>&nbsp;<b>Instanz:</b> ${this._instance}</span>
+        <mwc-icon-button icon="polymer" class="secondary" style="--mdc-icon-size: 18px; --mdc-icon-button-size: 18px" @click="${this._showChooseInstance}"></mwc-icon-button>
+    ]</span>
     <div class="drawer-content">
       <nav class="drawer-list">
-        <a ?selected="${this._page === 'home'}" href="/:app">Home</a>
+        <a ?selected="${this._page === 'home'}" href="/app">Home</a>
         <a ?selected="${this._page === 'browser'}" href="/app/browser/${this._path}" ?disabled="${!this._path}">Browser</a>
         <a ?selected="${this._page === 'test'}" href="/app/test">Test</a>
         <a ?selected="${this._page === 'courses'}" ?disabled="${!this._roles.includes("teacher")}" href="/app/courses">Kurse</a>
@@ -295,11 +323,13 @@ export class KmapMain extends connect(store, LitElement) {
     ` : ''}
     </div>
   </mwc-drawer>
-    <mwc-dialog id="instanceDialog" title="Instanz wählen">
-      <mwc-textfield id="instance" name="instance" label="Instanz" type="text" required dialogInitialFocus></mwc-textfield>
-      <mwc-button slot="primaryAction" @click=${this._chooseInstance}>Auswählen</mwc-button>
-   </mwc-dialog>
-     <kmap-login-popup id="login-popup"></kmap-login-popup>
+
+  <mwc-dialog id="instanceDialog" title="Instanz wählen">
+    <mwc-textfield id="instance" name="instance" label="Instanz" type="text" required dialogInitialFocus></mwc-textfield>
+    <mwc-button slot="primaryAction" @click=${this._chooseInstance}>Auswählen</mwc-button>
+  </mwc-dialog>
+  <kmap-login-popup id="login-popup"></kmap-login-popup>
+
   <mwc-snackbar id="snackbar" labeltext="${this._renderMessages()}"></mwc-snackbar>
 `;
   }

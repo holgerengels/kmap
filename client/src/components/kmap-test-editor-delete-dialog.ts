@@ -21,7 +21,7 @@ export class KMapTestEditorDeleteDialog extends connect(store, LitElement) {
 
   mapState(state: State) {
     return {
-      _test: state.shell.testForDelete,
+      _test: state.tests.testForDelete,
     };
   }
 
@@ -31,14 +31,13 @@ export class KMapTestEditorDeleteDialog extends connect(store, LitElement) {
     }
   }
 
-  async _delete() {
+  _delete() {
     this._deleteDialog.close();
     console.log(this._test);
     if (!this._test)
       return;
 
-    await store.dispatch.tests.deleteTest(this._test);
-    await store.dispatch.shell.unsetTestForDelete();
+    store.dispatch.tests.deleteTest(this._test);
     window.setTimeout(function(test: Test) {
       store.dispatch.contentSets.loadSet({subject: test.subject, set: test.set});
     }.bind(undefined, this._test), 1000);
@@ -46,7 +45,7 @@ export class KMapTestEditorDeleteDialog extends connect(store, LitElement) {
 
   _cancel() {
     this._deleteDialog.close();
-    store.dispatch(unsetTestForDelete());
+    store.dispatch.tests.unsetTestForDelete();
   }
 
   static get styles() {

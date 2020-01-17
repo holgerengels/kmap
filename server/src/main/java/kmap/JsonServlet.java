@@ -41,20 +41,6 @@ public class JsonServlet extends HttpServlet {
         return value;
     }
 
-    protected void writeResponse(HttpServletRequest request, HttpServletResponse resp, String response, JsonElement element) throws IOException {
-        JsonObject object = new JsonObject();
-        object.addProperty("response", response);
-        object.add("data", element);
-        writeResponse(request, resp, object);
-    }
-
-    protected void writeResponse(HttpServletRequest request, HttpServletResponse resp, String response, String message) throws IOException {
-        JsonObject object = new JsonObject();
-        object.addProperty("response", response);
-        object.addProperty("message", message);
-        writeResponse(request, resp, object);
-    }
-
     static protected void writeResponse(HttpServletRequest request, HttpServletResponse resp, JsonElement object) throws IOException {
         resp.setContentType("application/json");
         resp.setCharacterEncoding("utf-8");

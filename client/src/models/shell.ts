@@ -1,7 +1,5 @@
 import { createModel } from '@captaincodeman/rdx-model';
 import { Dispatch } from '../store';
-import {Card} from "./maps";
-import {Test} from "./tests";
 
 export interface ShellState {
   title: string,
@@ -9,11 +7,6 @@ export interface ShellState {
   drawerOpen: boolean,
   messages: string[],
   layers: string[],
-  cardForEdit?: Card,
-  cardForRename?: Card,
-  cardForDelete?: Card,
-  testForEdit?: Test,
-  testForDelete?: Test,
 }
 
 export default createModel({
@@ -23,11 +16,6 @@ export default createModel({
     drawerOpen: false,
     messages: [],
     layers: ["summaries"],
-    cardForEdit: undefined,
-    cardForRename: undefined,
-    cardForDelete: undefined,
-    testForEdit: undefined,
-    testForDelete: undefined,
   },
   reducers: {
     setTitle(state, title: string) {
@@ -50,36 +38,6 @@ export default createModel({
     },
     removeLayer(state, layer: string) {
       return { ...state, layers: state.layers.filter(m => m !== layer) }
-    },
-    setCardForEdit(state, cardForEdit: Card) {
-      return { ...state, cardForEdit: cardForEdit }
-    },
-    unsetCardForEdit(state) {
-      return { ...state, cardForEdit: undefined }
-    },
-    setCardForRename(state, cardForRename: Card) {
-      return { ...state, cardForRename: cardForRename }
-    },
-    unsetCardForRename(state) {
-      return { ...state, cardForRename: undefined }
-    },
-    setCardForDelete(state, cardForDelete: Card) {
-      return { ...state, cardForDelete: cardForDelete }
-    },
-    unsetCardForDelete(state) {
-      return { ...state, cardForDelete: undefined }
-    },
-    setTestForEdit(state, testForEdit: Test) {
-      return { ...state, testForEdit: testForEdit }
-    },
-    unsetTestForEdit(state) {
-      return { ...state, testForEdit: undefined }
-    },
-    setTestForDelete(state, testForDelete: Test) {
-      return { ...state, testForDelete: testForDelete }
-    },
-    unsetTestForDelete(state) {
-      return { ...state, testForDelete: undefined }
     },
   },
 

@@ -3,7 +3,7 @@ import createMatcher from '@captaincodeman/router';
 // NOTE: the /:app prefix of the routes is to handle github pages
 
 const routes = {
-  '/:app':                                  'home',
+  '/app':                                  'home',
   '/app/browser/:subject/:chapter':        'browser',
   '/app/browser/:subject/:chapter/:topic': 'browser',
   '/app/test':                             'test',

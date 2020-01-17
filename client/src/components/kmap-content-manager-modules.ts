@@ -9,7 +9,7 @@ import '@material/mwc-icon-button';
 import {Module} from "../models/contentMaps";
 
 @customElement('kmap-content-manager-modules')
-class KMapContentManagerModules extends connect(store, LitElement) {
+export class KMapContentManagerModules extends connect(store, LitElement) {
   @property()
   private _modules: Module[] = [];
   @property()
@@ -19,18 +19,25 @@ class KMapContentManagerModules extends connect(store, LitElement) {
   @property()
   private _selected?: Module = undefined;
 
+  @property()
+  private _working: boolean = false;
+
   @query("#file")
-  private _file?: Element;
+  private _file?: HTMLElement;
 
   mapState(state: State) {
     return {
-      _modules: state.modules.modules,
+      _modules: state.contentMaps.modules,
+      _working: state.contentMaps.importing || state.contentMaps.exporting || state.contentMaps.deleting,
     };
   }
 
   updated(changedProperties) {
     if (changedProperties.has('_selectedIndex'))
       this._selected = this._modules[this._selectedIndex];
+
+    if (changedProperties.has("_working") && !this._working)
+      this._page = '';
   }
 
   _select(index) {
@@ -47,18 +54,18 @@ class KMapContentManagerModules extends connect(store, LitElement) {
   }
 
   _import() {
-    store.dispatch.contentMaps.import(this._file.files)
-      .then(() => this._page = '');
+    if (!this._file) return;
+    store.dispatch.contentMaps.import(this._file.files);
   }
 
   _export() {
-    store.dispatch.contentMaps.export(this._selected)
-      .then(() => this._page = '');
+    if (!this._selected) return;
+    store.dispatch.contentMaps.export(this._selected);
   }
 
   _delete() {
-    store.dispatch.contentMaps.delete(this._selected)
-      .then(() => this._page = '');
+    if (!this._selected) return;
+    store.dispatch.contentMaps.delete(this._selected);
   }
 
   static get styles() {

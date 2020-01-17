@@ -43,20 +43,20 @@ public class TestsServlet
                     String json = IOUtils.toString(new InputStreamReader(req.getInputStream(), StandardCharsets.UTF_8));
                     String command = tests.storeTest(subject, save, json);
                     if (command.startsWith("error:"))
-                        writeResponse(req, resp, "error", command.substring("error:".length()));
+                        sendError(req, resp, HttpServletResponse.SC_PRECONDITION_FAILED, command.substring("error:".length()));
                     else
-                        writeResponse(req, resp, "success", new JsonPrimitive(command));
+                        writeResponse(req, resp, new JsonPrimitive(command));
                 }
                 else if (imp != null) {
                     log("import set = " + imp);
                     String json = IOUtils.toString(new InputStreamReader(req.getInputStream(), StandardCharsets.UTF_8));
                     JsonObject set = tests.importSet(subject, imp, json);
-                    writeResponse(req, resp, "success", set);
+                    writeResponse(req, resp, set);
                 }
                 else if (delete != null) {
                     log("delete set = " + delete);
                     JsonObject set = tests.deleteSet(subject, delete);
-                    writeResponse(req, resp, "success", set);
+                    writeResponse(req, resp, set);
                 }
             }
         }
@@ -118,11 +118,11 @@ public class TestsServlet
                 if (array != null)
                     writeResponse(req, resp, array);
             }
-            else if (directory != null) {
+            else if (directory != null) { // TODO: move to POST
                 log("directory for = " + directory);
                 String[] split = directory.split("/");
                 String link = cloud.createDirectory(split[0], split[1], split[2], "tests");
-                writeResponse(req, resp, "success", new JsonPrimitive(link));
+                writeResponse(req, resp, new JsonPrimitive(link));
             }
             else if (attachments != null) {
                 log("attachments for = " + attachments);
@@ -137,7 +137,7 @@ public class TestsServlet
                         object.addProperty("type", attachment.type);
                         array.add(object);
                     }
-                    writeResponse(req, resp, "data", array);
+                    writeResponse(req, resp, array);
                 }
             }
         }

@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -42,12 +43,12 @@ public class EditServlet
                 if (save != null) {
                     authentication.checkRole(req, "teacher");
                     log("save topic = " + save);
-                    String json = IOUtils.toString(new InputStreamReader(req.getInputStream(), "UTF-8"));
+                    String json = IOUtils.toString(new InputStreamReader(req.getInputStream(), StandardCharsets.UTF_8));
                     String command = couch.storeTopic(subject, save, json);
                     if (command.startsWith("error:"))
-                        writeResponse(req, resp, "error", command.substring("error:".length()));
+                        sendError(req, resp, HttpServletResponse.SC_PRECONDITION_FAILED, command.substring("error:".length()));
                     else
-                        writeResponse(req, resp, "success", new JsonPrimitive(command));
+                        writeResponse(req, resp, new JsonPrimitive(command));
                 }
                 /*
                 else if (imp != null) {
@@ -90,19 +91,19 @@ public class EditServlet
                 log("modules = " + modules);
                 JsonArray array = couch.loadModules();
                 if (array != null)
-                    writeObject(req, resp, array.toString());
+                    writeResponse(req, resp, array);
             }
             else if (load != null) {
                 log("load chapter = " + load);
                 JsonArray array = couch.loadModule(subject, load);
                 if (array != null)
-                    writeResponse(req, resp, "data", array);
+                    writeResponse(req, resp, array);
             }
             else if (directory != null) { // TODO: move to POST
                 log("directory for = " + directory);
                 String[] split = directory.split("/");
                 String link = cloud.createDirectory(split[0], split[1], split[2]);
-                writeResponse(req, resp, "success", new JsonPrimitive(link));
+                writeResponse(req, resp, new JsonPrimitive(link));
             }
             else if (attachments != null) {
                 log("attachments for = " + attachments);
@@ -117,7 +118,7 @@ public class EditServlet
                         object.addProperty("type", attachment.type);
                         array.add(object);
                     }
-                    writeResponse(req, resp, "data", array);
+                    writeResponse(req, resp, array);
                 }
             }
         }
@@ -128,13 +129,5 @@ public class EditServlet
         finally {
             Server.CLIENT.remove();
         }
-    }
-
-    @Deprecated
-    protected void writeObject(HttpServletRequest request, HttpServletResponse resp, String node) throws IOException {
-        resp.setContentType("application/json");
-        resp.setCharacterEncoding("utf-8");
-        corsHeaders(request, resp);
-        resp.getWriter().print(node);
     }
 }

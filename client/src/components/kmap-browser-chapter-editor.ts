@@ -59,7 +59,7 @@ export class KMapBrowserChapterEditor extends connect(store, LitElement) {
       chapter: this.chapter,
       topic: '_',
     };
-    store.dispatch.shell.setCardForEdit(card);
+    store.dispatch.maps.setCardForEdit(card);
   }
 
   _showDelete() {
@@ -69,7 +69,7 @@ export class KMapBrowserChapterEditor extends connect(store, LitElement) {
       chapter: this.chapter,
       topic: '_',
     };
-    store.dispatch.shell.setCardForDelete(card);
+    store.dispatch.maps.setCardForDelete(card);
   }
 
   static get styles() {

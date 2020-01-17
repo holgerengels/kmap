@@ -1,4 +1,4 @@
-import {LitElement, html, css, customElement, property, query} from 'lit-element';
+import {LitElement, html, css, customElement, property} from 'lit-element';
 import {connect} from '@captaincodeman/rdx';
 import {State, store} from "../store";
 
@@ -9,7 +9,7 @@ import '@material/mwc-icon-button';
 import '@material/mwc-textfield';
 
 @customElement('kmap-content-manager-instances')
-class KMapContentManagerInstances extends connect(store, LitElement) {
+export class KMapContentManagerInstances extends connect(store, LitElement) {
   @property()
   private _instances: string[] = [];
   @property()
@@ -20,17 +20,24 @@ class KMapContentManagerInstances extends connect(store, LitElement) {
   private _selected: string = '';
 
   @property()
+  private _working: boolean = false;
+
+  @property()
   private _name: string = '';
 
   mapState(state: State) {
     return {
       _instances: state.instances.instances,
+      _working: state.instances.creating || state.instances.dropping,
     };
   }
 
   updated(changedProperties) {
     if (changedProperties.has('_selectedIndex'))
       this._selected = this._instances[this._selectedIndex];
+
+    if (changedProperties.has("_working") && !this._working)
+      this._page = '';
   }
 
   _select(index) {
@@ -48,14 +55,12 @@ class KMapContentManagerInstances extends connect(store, LitElement) {
 
   _create() {
     console.log("create new instance");
-    store.dispatch.instances.create(this._name)
-      .then(() => this._page = '');
+    store.dispatch.instances.create(this._name);
   }
 
   _drop() {
     console.log("drop instance");
-    store.dispatch.instances.drop(this._selected)
-      .then(() => this._page = '');
+    store.dispatch.instances.drop(this._selected);
   }
 
   static get styles() {
@@ -66,14 +71,6 @@ class KMapContentManagerInstances extends connect(store, LitElement) {
       css`
         :host {
           display: contents;
-        }
-        .board {
-          height: auto;
-          padding: 8px;
-          padding-bottom: 36px;
-          display: flex;
-          flex-flow: row wrap;
-          justify-content: flex-start;
         }
         .form {
           max-width: 300px;
@@ -122,7 +119,7 @@ class KMapContentManagerInstances extends connect(store, LitElement) {
           <div class="scroll">
           <mega-list>
             ${this._instances.map((instance, i) => html`
-              <mega-list-item icon="storage" ?activated="${this._selectedIndex === i}" @click="${e => this._select(i)}">${instance}</mega-list-item>
+              <mega-list-item icon="storage" ?activated="${this._selectedIndex === i}" @click="${() => this._select(i)}">${instance}</mega-list-item>
             `)}
           </mega-list>
           </div>

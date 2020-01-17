@@ -1,4 +1,4 @@
-import {createModel} from '@captaincodeman/rdx-model';
+import {createModel, RoutingState} from '@captaincodeman/rdx-model';
 import { State, Dispatch } from '../store';
 import {endpoint} from "../endpoint";
 import {config} from "../config";
@@ -43,6 +43,10 @@ export default createModel({
         loading: false,
       };
     },
+    forget(state) {
+      return { ...state, modules: [], selected: undefined}
+    },
+
     requestImport(state) {
       return { ...state, importing: true, error: "" };
     },
@@ -170,6 +174,18 @@ export default createModel({
         // @ts-ignore
         dispatch.contentMaps.error(message);
       }
+    },
+
+    'routing/change': async function(payload: RoutingState) {
+      switch (payload.page) {
+        case 'content-manager':
+          // @ts-ignore
+          dispatch.contentMaps.load();
+          break;
+      }
+    },
+    'app/chooseInstance': async function() {
+      dispatch.contentMaps.forget();
     },
   })
 })

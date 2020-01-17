@@ -97,5 +97,8 @@ export default createModel({
     'app/receivedLogout': async function() {
       dispatch.rates.forget();
     },
+    'app/chooseInstance': async function() {
+      dispatch.rates.forget();
+    },
   })
 })

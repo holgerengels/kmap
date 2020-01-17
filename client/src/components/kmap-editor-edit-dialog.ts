@@ -41,6 +41,11 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
   @property()
   private _navigateAfterSave?: string = '';
 
+  @property()
+  private _syncedAttachments: Attachment[] = [];
+  @property()
+  private _cloudPath?: string = undefined;
+
   @query('#editDialog')
   // @ts-ignore
   private _editDialog: Dialog;
@@ -54,7 +59,9 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
 
   mapState(state: State) {
     return {
-      _card: state.shell.cardForEdit,
+      _card: state.maps.cardForEdit,
+      _syncedAttachments: state.cloud.attachments,
+      _cloudPath: state.cloud.path,
     };
   }
 
@@ -96,6 +103,40 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
 
       this._editDialog.show();
     }
+    if (changedProperties.has("_syncedAttachments") && this._card) {
+      console.log(this._syncedAttachments);
+
+      var attachments: Attachment[] = [];
+      if (this._card.attachments)
+        attachments.push(...this._card.attachments);
+
+      var i = attachments.length;
+      while (i--) {
+        if (attachments[i].type !== "link") {
+          attachments.splice(i, 1);
+        }
+      }
+
+      if (this._syncedAttachments) {
+        for (let attachment of this._syncedAttachments) {
+          if (attachment.tag)
+            attachments.unshift(attachment);
+          else {
+            console.log(attachment.name + " ist nicht getaggt");
+          }
+        }
+      }
+
+      this._card.attachments = attachments;
+      this.requestUpdate();
+    }
+    if (changedProperties.has("_cloudPath")) {
+      if (this._cloudPath) {
+        store.dispatch.cloud.forgetPath();
+        console.log(this._cloudPath);
+        //window.open(this._cloudPath, '_blank');
+      }
+    }
   }
 
   _focus(e) {
@@ -111,30 +152,31 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
     }
   }
 
-  async _save() {
+  _save() {
     this._editDialog.close();
     if (!this._card)
       return;
 
-    this._card.summary = this._summary;
-    this._card.description = this._description;
-    this._card.depends = this._depends.split(",").map(d => d.trim()).filter(d => d.length > 0);
-    console.log(this._card);
+    const card: Card = this._card;
+    card.summary = this._summary;
+    card.description = this._description;
+    card.depends = this._depends.split(",").map(d => d.trim()).filter(d => d.length > 0);
+    console.log(card);
 
-    await store.dispatch.maps.saveTopic(this._card);
-    await store.dispatch.shell.unsetCardForEdit();
+    store.dispatch.maps.saveTopic(card);
     window.setTimeout(function (subject, chapter, navigateAfterSafe) {
       if (navigateAfterSafe) {
+        // @ts-ignore
         store.dispatch.routing.replace(navigateAfterSafe);
       }
       else
         store.dispatch.maps.load({subject: subject, chapter: chapter});
-    }.bind(undefined, this._card.subject, this._card.chapter, this._navigateAfterSave), 1000);
+    }.bind(undefined, card.subject, card.chapter, this._navigateAfterSave), 1000);
   }
 
   _cancel() {
     this._editDialog.close();
-    store.dispatch.shell.unsetCardForEdit();
+    store.dispatch.maps.unsetCardForEdit();
   }
 
   _setSummary() {
@@ -191,52 +233,24 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
     this.requestUpdate();
   }
 
-  async _syncAttachments() {
+  _syncAttachments() {
     if (!this._card) return;
 
-    await store.dispatch.cloud.fetchAttachments({
+    store.dispatch.cloud.fetchAttachments({
       subject: this._card.subject,
       chapter: this._card.chapter,
       topic: this._card.topic
     });
-
-    console.log(store.state.cloud.attachments);
-
-    var attachments: Attachment[] = [];
-    if (this._card.attachments)
-      attachments.push(...this._card.attachments);
-
-    var i = attachments.length;
-    while (i--) {
-      if (attachments[i].type !== "link") {
-        attachments.splice(i, 1);
-      }
-    }
-
-    if (store.state.cloud.attachments) {
-      for (let attachment of store.state.cloud.attachments) {
-        if (attachment.tag)
-          attachments.unshift(attachment);
-        else {
-          console.log(attachment.name + " ist nicht getaggt");
-        }
-      }
-    }
-
-    this._card.attachments = attachments;
-    this.requestUpdate();
   }
 
-  async _createDirectory() {
+  _createDirectory() {
     if (!this._card) return;
 
-    await store.dispatch.cloud.createDirectory({
+    store.dispatch.cloud.createDirectory({
       subject: this._card.subject,
       chapter: this._card.chapter,
       topic: this._card.topic
     });
-    console.log(store.state.cloud.path);
-    window.open(store.state.cloud.path, '_blank');
   }
 
   _captureEnter(e) {
@@ -332,8 +346,8 @@ ${this._card ? html`
     <br/>
     <mwc-textfield ?hidden="${this._card.topic === '_'}" id="links" name="links" label="Verweist auf ..." dense type="text" .value="${this._card.links}" @change="${e => this._card.links = e.target.value}"></mwc-textfield>
     <mwc-textfield ?hidden="${this._card.topic === '_'}" id="priority" name="priority" label="Priorität" dense type="number" inputmode="numeric" min="0" step="1" .value="${this._card.priority}" @change="${e => this._card.priority = e.target.value}"></mwc-textfield>
-    <mwc-textarea ?hidden="${this._card.topic === '_'}" id="depends" placeholder="Basiert auf ..." dense fullwidth rows="2" .value=${this._depends} @change="${e => this._depends = e.target.value}"></mwc-textarea>
-    <mwc-textarea id="summary" placeholder="Kurztext" dense fullwidth rows="2" .value=${this._card.summary} @keyup="${this._setSummary}" @focus="${this._focus}" @blur="${this._focus}"></mwc-textarea>
+    <mwc-textarea ?hidden="${this._card.topic === '_'}" ?dialogInitialFocus="${this._card.topic !== '_'}" id="depends" placeholder="Basiert auf ..." dense fullwidth rows="2" .value=${this._depends} @change="${e => this._depends = e.target.value}"></mwc-textarea>
+    <mwc-textarea id="summary" placeholder="Kurztext" ?dialogInitialFocus="${this._card.topic === '_'}" dense fullwidth rows="2" .value=${this._card.summary} @keyup="${this._setSummary}" @focus="${this._focus}" @blur="${this._focus}"></mwc-textarea>
     <mwc-textarea id="description" placeholder="Langtext" dense fullwidth rows="7" .value=${this._card.description} @keyup="${this._setDescription}" @focus="${this._focus}" @blur="${this._focus}"></mwc-textarea>
 
     <div class="field attachments">

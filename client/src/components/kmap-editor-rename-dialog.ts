@@ -22,7 +22,7 @@ export class KMapEditorRenameDialog extends connect(store, LitElement) {
 
   mapState(state: State) {
     return {
-      _card: state.shell.cardForRename,
+      _card: state.maps.cardForRename,
     };
   }
 
@@ -38,25 +38,25 @@ export class KMapEditorRenameDialog extends connect(store, LitElement) {
     }
   }
 
-  async _rename() {
+  _rename() {
     this._renameDialog.close();
-    console.log(this._card);
     if (!this._card)
       return;
 
-    // @ts-ignore
-    this._card.newName = this._newName;
+    const card: Card = this._card;
 
-    await store.dispatch.maps.renameTopic(this._card);
-    await store.dispatch.shell.unsetCardForRename();
+    // @ts-ignore
+    card.newName = this._newName;
+
+    store.dispatch.maps.renameTopic(card);
     window.setTimeout(function(subject, chapter) {
       store.dispatch.maps.load({subject: subject, chapter: chapter});
-    }.bind(undefined, this._card.subject, this._card.chapter), 1000);
+    }.bind(undefined, card.subject, card.chapter), 1000);
   }
 
   _cancel() {
     this._renameDialog.close();
-    store.dispatch.shell.unsetCardForRename();
+    store.dispatch.maps.unsetCardForRename();
   }
 
   static get styles() {

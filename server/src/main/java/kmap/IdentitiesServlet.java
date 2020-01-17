@@ -41,19 +41,19 @@ public class IdentitiesServlet
                 String expand = req.getParameter("expand");
                 if (students != null) {
                     log("load students = " + students);
-                    writeResponse(req, resp, "data", array(this.students.readStudents()));
+                    writeResponse(req, resp, array(this.students.readStudents()));
                 }
                 else if (classes != null) {
                     log("load classes = " + classes);
-                    writeResponse(req, resp, "data", array(this.students.readClasses()));
+                    writeResponse(req, resp, array(this.students.readClasses()));
                 }
                 else if (match != null) {
                     log("match identities = " + match);
-                    writeResponse(req, resp, "data", array(this.students.filterIdentities(match)));
+                    writeResponse(req, resp, array(this.students.filterIdentities(match)));
                 }
                 else if (expand != null) {
                     log("expand class = " + expand);
-                    writeResponse(req, resp, "data", array(this.students.expandClass(expand)));
+                    writeResponse(req, resp, array(this.students.expandClass(expand)));
                 }
                 else
                     log("unknown request " + req.getParameterMap());
@@ -61,7 +61,7 @@ public class IdentitiesServlet
         }
         catch (Exception e) {
             e.printStackTrace();
-            throw new ServletException(e);
+            sendError(req, resp, e);
         }
     }
 

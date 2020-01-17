@@ -9,7 +9,7 @@ import '@material/mwc-icon-button';
 import {Set} from "../models/contentSets";
 
 @customElement('kmap-content-manager-sets')
-class KMapContentManagerSets extends connect(store, LitElement) {
+export class KMapContentManagerSets extends connect(store, LitElement) {
   @property()
   private _sets: Set[] = [];
   @property()
@@ -19,18 +19,25 @@ class KMapContentManagerSets extends connect(store, LitElement) {
   @property()
   private _selected?: Set = undefined;
 
+  @property()
+  private _working: boolean = false;
+
   @query("#file")
   private _file?: Element;
 
   mapState(state: State) {
     return {
-      _sets: state.sets.sets,
+      _sets: state.contentSets.sets,
+      _working: state.contentSets.importing || state.contentSets.exporting || state.contentSets.deleting
     };
   }
 
   updated(changedProperties) {
     if (changedProperties.has('_selectedIndex'))
       this._selected = this._sets[this._selectedIndex];
+
+    if (changedProperties.has("_working") && !this._working)
+      this._page = '';
   }
 
   _select(index) {
@@ -47,18 +54,19 @@ class KMapContentManagerSets extends connect(store, LitElement) {
   }
 
   _import() {
-    store.dispatch.contentSets.import(this._file.files)
-      .then(() => this._page = '');
+    if (!this._file) return;
+    // @ts-ignore
+    store.dispatch.contentSets.import(this._file.files);
   }
 
   _export() {
-    store.dispatch.contentSets.export(this._selected)
-      .then(() => this._page = '');
+    if (!this._selected) return;
+    store.dispatch.contentSets.export(this._selected);
   }
 
   _delete() {
-    store.dispatch.contentSets.delete(this._selected)
-      .then(() => this._page = '');
+    if (!this._selected) return;
+    store.dispatch.contentSets.delete(this._selected);
   }
 
   static get styles() {

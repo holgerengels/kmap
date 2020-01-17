@@ -45,6 +45,9 @@ export interface MapState {
   saving: boolean,
   allTopics?: AllTopics,
   loadingAllTopics: boolean,
+  cardForEdit?: Card,
+  cardForRename?: Card,
+  cardForDelete?: Card,
 }
 
 export default createModel({
@@ -61,6 +64,9 @@ export default createModel({
     renaming: false,
     saving: false,
     loadingAllTopics: false,
+    cardForEdit: undefined,
+    cardForRename: undefined,
+    cardForDelete: undefined,
   },
   reducers: {
     selectCard(state, card: Card) {
@@ -90,19 +96,19 @@ export default createModel({
       return { ...state, deleting: true };
     },
     receivedDeleteTopic(state) {
-      return { ...state, deleting: false };
+      return { ...state, deleting: false, cardForDelete: undefined };
     },
     requestRenameTopic(state) {
       return { ...state, deleting: true };
     },
     receivedRenameTopic(state) {
-      return { ...state, deleting: false };
+      return { ...state, deleting: false, cardForRename: undefined };
     },
     requestSaveTopic(state) {
       return { ...state, deleting: true };
     },
     receivedSaveTopic(state) {
-      return { ...state, deleting: false };
+      return { ...state, deleting: false, cardForEdit: undefined };
     },
 
     requestAllTopics(state) {
@@ -113,6 +119,25 @@ export default createModel({
         allTopics: payload,
         loadingAllTopics: false,
       };
+    },
+
+    setCardForEdit(state, cardForEdit: Card) {
+      return { ...state, cardForEdit: cardForEdit }
+    },
+    unsetCardForEdit(state) {
+      return { ...state, cardForEdit: undefined }
+    },
+    setCardForRename(state, cardForRename: Card) {
+      return { ...state, cardForRename: cardForRename }
+    },
+    unsetCardForRename(state) {
+      return { ...state, cardForRename: undefined }
+    },
+    setCardForDelete(state, cardForDelete: Card) {
+      return { ...state, cardForDelete: cardForDelete }
+    },
+    unsetCardForDelete(state) {
+      return { ...state, cardForDelete: undefined }
     },
 
     error(state, message) {
@@ -158,6 +183,7 @@ export default createModel({
       if (resp.ok) {
         await resp.json();
         dispatch.maps.receivedDeleteTopic();
+        dispatch.maps.unsetCardForDelete();
       }
       else {
         const message = await resp.text();
@@ -179,6 +205,7 @@ export default createModel({
       if (resp.ok) {
         await resp.json();
         dispatch.maps.receivedRenameTopic();
+        dispatch.maps.unsetCardForRename();
       }
       else {
         const message = await resp.text();
@@ -200,6 +227,7 @@ export default createModel({
       if (resp.ok) {
         await resp.json();
         dispatch.maps.receivedSaveTopic();
+        dispatch.maps.unsetCardForEdit();
       }
       else {
         const message = await resp.text();
@@ -233,13 +261,19 @@ export default createModel({
       }
     },
 
-    'routing/change': async function(payload: RoutingState) {
-      switch (payload.page) {
+    'routing/change': async function(routing: RoutingState) {
+      switch (routing.page) {
         case 'browser':
           // @ts-ignore
-          dispatch.maps.load({ subject: payload.params["subject"], chapter: payload.params["chapter"]});
+          dispatch.maps.load({ subject: routing.params["subject"], chapter: routing.params["chapter"]});
           break;
       }
-    }
+    },
+    'app/chooseInstance': async function() {
+      const state: State = getState();
+      const routing: RoutingState = state.routing;
+      if (routing.page === 'browser')
+        dispatch.maps.load({ subject: routing.params["subject"], chapter: routing.params["chapter"]});
+    },
   })
 })

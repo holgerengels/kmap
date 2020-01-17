@@ -40,12 +40,12 @@ export class KMapTestEditorScroller extends connect(store, LitElement) {
 
   _deleteTest(test) {
     console.log("delete " + test.key);
-    store.dispatch.shell.setTestForDelete(test);
+    store.dispatch.tests.setTestForDelete(test);
   }
 
   _editTest(test) {
     console.log("edit " + test.key);
-    store.dispatch.shell.setTestForEdit(test);
+    store.dispatch.tests.setTestForEdit(test);
   }
 
   static get styles() {
