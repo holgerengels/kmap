@@ -1,14 +1,13 @@
 import {LitElement, html, css, customElement, property} from 'lit-element';
 import { connect } from '@captaincodeman/rdx';
 import {State, store} from "../store";
-import {styleMap} from 'lit-html/directives/style-map.js';
 
 import './star-rating';
 import { fontStyles, colorStyles } from "./kmap-styles";
 
 
 @customElement('kmap-summary-card-rating')
-class KMapSummaryCardRating extends connect(store, LitElement) {
+export class KMapSummaryCardRating extends connect(store, LitElement) {
 
   @property()
   private key: string = '';
@@ -16,8 +15,6 @@ class KMapSummaryCardRating extends connect(store, LitElement) {
   private _states: object = {};
   @property()
   private _state: number = 0;
-  @property()
-  private _colorStyles: object = { "--color-rated":  "--color-darkgray", "--color-unrated": "--color-lightgray" };
 
   mapState(state: State) {
     return {
@@ -25,27 +22,13 @@ class KMapSummaryCardRating extends connect(store, LitElement) {
     };
   }
 
-  static get properties() {
-    return {
-      lightest: {type: String},
-      opaque: {type: String},
-      _colorStyles: {type: Object},
-    };
-  }
-
   updated(changedProperties) {
     if (changedProperties.has("_states") || changedProperties.has("key"))
-      this._rating(this._states);
-    if (changedProperties.has("lightest") || changedProperties.has("opaque"))
-      this._colorStyles = { "--color-rated":  this.opaque, "--color-unrated": this.lightest };
-  }
-
-  stateChanged(state) {
-    this._states = state.states;
+      this._rating();
   }
 
   _rating() {
-    if (this._states && this._states.state && this._states.state.length !== 0) {
+    if (this._states && this._states.length !== 0) {
       this._state = this._getStateValue(this.key);
     }
     else {
@@ -58,7 +41,7 @@ class KMapSummaryCardRating extends connect(store, LitElement) {
   }
 
   _getStateValue(key) {
-    let value = this._states.state[key];
+    let value = this._states[key];
     return value !== undefined ? value : 0;
   }
 
@@ -77,7 +60,7 @@ class KMapSummaryCardRating extends connect(store, LitElement) {
 
   render() {
     return html`
-      <star-rating .rate="${this._state}" @clicked="${this._rated}" style=${styleMap(this._colorStyles)}></star-rating>
+      <star-rating .rate="${this._state}" @clicked="${this._rated}"></star-rating>
     `;
   }
 }

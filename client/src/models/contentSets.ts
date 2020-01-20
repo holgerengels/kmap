@@ -14,7 +14,7 @@ interface TestSet {
   set: string,
   tests: Test[],
 }
-export interface ContentMapsState {
+export interface ContentSetsState {
   sets: Set[],
   selected?: Set,
   timestamp: number,
@@ -29,7 +29,7 @@ export interface ContentMapsState {
 }
 
 export default createModel({
-  state: <ContentMapsState>{
+  state: <ContentSetsState>{
     sets: [],
     selected: undefined,
     timestamp: -1,
@@ -114,20 +114,20 @@ export default createModel({
     async load() {
       const state: State = getState();
       // @ts-ignore
-      if (Date.now() - state.contentMaps.timestamp > 3000) {
-        dispatch.contentMaps.requestLoad();
+      if (Date.now() - state.contentSets.timestamp > 3000) {
+        dispatch.contentSets.requestLoad();
         const resp = await fetch(`${config.server}tests?sets=all`, endpoint.get(state));
         if (resp.ok) {
           const json = await resp.json();
           // @ts-ignore
-          dispatch.contentMaps.receivedLoad(json);
+          dispatch.contentSets.receivedLoad(json);
         }
         else {
           const message = await resp.text();
           // @ts-ignore
           dispatch.app.handleError({ code: resp.status, message: message });
           // @ts-ignore
-          dispatch.contentMaps.error(message);
+          dispatch.contentSets.error(message);
         }
       }
     },
@@ -163,25 +163,25 @@ export default createModel({
         formData.append('files', file);
       }
 
-      dispatch.contentMaps.requestImport();
+      dispatch.contentSets.requestImport();
       const resp = await fetch(`${config.server}content?import-set=${names.join(",")}`, {... endpoint.post(state), body: formData});
       if (resp.ok) {
         await resp.json();
         // @ts-ignore
-        dispatch.contentMaps.receivedImport();
+        dispatch.contentSets.receivedImport();
       }
       else {
         const message = await resp.text();
         // @ts-ignore
         dispatch.app.handleError({ code: resp.status, message: message });
         // @ts-ignore
-        dispatch.contentMaps.error(message);
+        dispatch.contentSets.error(message);
       }
     },
     async export(payload: Set) {
       const state: State = getState();
 
-      dispatch.contentMaps.requestExport();
+      dispatch.contentSets.requestExport();
       const resp = await fetch(`${config.server}content?subject=${payload.subject}&export-set=${payload.set}`, endpoint.get(state));
       if (resp.ok) {
         const blob: Blob = await resp.blob();
@@ -195,32 +195,32 @@ export default createModel({
         a.remove();
         URL.revokeObjectURL(url);
         // @ts-ignore
-        dispatch.contentMaps.receivedExport();
+        dispatch.contentSets.receivedExport();
       }
       else {
         const message = await resp.text();
         // @ts-ignore
         dispatch.app.handleError({ code: resp.status, message: message });
         // @ts-ignore
-        dispatch.contentMaps.error(message);
+        dispatch.contentSets.error(message);
       }
     },
     async delete(payload: Set) {
       const state: State = getState();
 
-      dispatch.contentMaps.requestDelete();
+      dispatch.contentSets.requestDelete();
       const resp = await fetch(`${config.server}tests?subject=${payload.subject}&delete=${payload.set}`, endpoint.get(state));
       if (resp.ok) {
         await resp.json();
         // @ts-ignore
-        dispatch.contentMaps.receivedDelete();
+        dispatch.contentSets.receivedDelete();
       }
       else {
         const message = await resp.text();
         // @ts-ignore
         dispatch.app.handleError({ code: resp.status, message: message });
         // @ts-ignore
-        dispatch.contentMaps.error(message);
+        dispatch.contentSets.error(message);
       }
     },
 

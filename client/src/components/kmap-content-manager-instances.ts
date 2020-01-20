@@ -7,23 +7,27 @@ import {colorStyles, fontStyles} from "./kmap-styles";
 import 'mega-material/list';
 import '@material/mwc-icon-button';
 import '@material/mwc-textfield';
+import {Instance} from "../models/instances";
 
 @customElement('kmap-content-manager-instances')
 export class KMapContentManagerInstances extends connect(store, LitElement) {
   @property()
-  private _instances: string[] = [];
+  private _instances: Instance[] = [];
   @property()
   private _page: string = '';
   @property()
   private _selectedIndex: number = -1;
   @property()
-  private _selected: string = '';
+  private _selected?: Instance = undefined;
 
   @property()
   private _working: boolean = false;
 
   @property()
-  private _name: string = '';
+  private _newId: string = '';
+
+  @property()
+  private _newName: string = '';
 
   mapState(state: State) {
     return {
@@ -55,11 +59,12 @@ export class KMapContentManagerInstances extends connect(store, LitElement) {
 
   _create() {
     console.log("create new instance");
-    store.dispatch.instances.create(this._name);
+    store.dispatch.instances.create({ id: this._newId, name: this._newName});
   }
 
   _drop() {
     console.log("drop instance");
+    // @ts-ignore
     store.dispatch.instances.drop(this._selected);
   }
 
@@ -119,7 +124,7 @@ export class KMapContentManagerInstances extends connect(store, LitElement) {
           <div class="scroll">
           <mega-list>
             ${this._instances.map((instance, i) => html`
-              <mega-list-item icon="storage" ?activated="${this._selectedIndex === i}" @click="${() => this._select(i)}">${instance}</mega-list-item>
+              <mega-list-item icon="storage" ?activated="${this._selectedIndex === i}" @click="${() => this._select(i)}">${instance.id} <span class="secondary">${instance.name}</span></mega-list-item>
             `)}
           </mega-list>
           </div>
@@ -127,7 +132,8 @@ export class KMapContentManagerInstances extends connect(store, LitElement) {
         <div class="form">
           <div class="page" ?active="${this._page === 'create'}">
             <label section>Instanz anlegen</label>
-            <mwc-textfield label="Name" type="text" .value="${this._name}" @change="${e => this._name = e.target.value}"></mwc-textfield>
+            <mwc-textfield label="ID" type="text" .value="${this._newId}" @change="${e => this._newId = e.target.value}" required></mwc-textfield>
+            <mwc-textfield label="Name" type="text" .value="${this._newName}" @change="${e => this._newName = e.target.value}"></mwc-textfield>
             <mwc-button @click="${() => this._showPage('')}">Abbrechen</mwc-button>
             <mwc-button outlined @click="${this._create}">Anlegen</mwc-button>
           </div>

@@ -91,6 +91,16 @@ export default createModel({
         loading: false,
       };
     },
+    forget(state) {
+      return { ...state,
+        subject: '',
+        chapter: '',
+        lines: [],
+        cardForEdit: undefined,
+        cardForRename: undefined,
+        cardForDelete: undefined,
+      };
+    },
 
     requestDeleteTopic(state) {
       return { ...state, deleting: true };
@@ -274,6 +284,8 @@ export default createModel({
       const routing: RoutingState = state.routing;
       if (routing.page === 'browser')
         dispatch.maps.load({ subject: routing.params["subject"], chapter: routing.params["chapter"]});
+      else
+        dispatch.maps.forget();
     },
   })
 })

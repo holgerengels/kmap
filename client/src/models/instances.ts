@@ -3,8 +3,12 @@ import { State, Dispatch } from '../store';
 import {endpoint} from "../endpoint";
 import {config} from "../config";
 
+export interface Instance {
+  id: string,
+  name?: string,
+}
 export interface InstancesState {
-  instances: string[],
+  instances: Instance[],
   timestamp: number,
   loading: boolean,
   creating: boolean,
@@ -28,7 +32,7 @@ export default createModel({
         error: "",
       };
     },
-    receivedLoad(state, payload: string[]) {
+    receivedLoad(state, payload: Instance[]) {
       return { ...state,
         instances: payload,
         loading: false,
@@ -48,7 +52,7 @@ export default createModel({
         error: "",
       };
     },
-    receivedCreate(state, payload: string) {
+    receivedCreate(state, payload: Instance) {
       return { ...state,
         creating: false,
         instances: [...state.instances, payload].sort()
@@ -61,7 +65,7 @@ export default createModel({
         error: "",
       };
     },
-    receivedDrop(state, payload: string) {
+    receivedDrop(state, payload: Instance) {
       return { ...state,
         dropping: false,
         instances: state.instances.filter(i => i !== payload)
@@ -98,15 +102,16 @@ export default createModel({
         }
       }
     },
-    async create(name: string) {
+    async create(instance: Instance) {
       const state: State = getState();
       // @ts-ignore
       dispatch.instances.requestCreate();
-      const resp = await fetch(`${config.server}content?create=${name}`, endpoint.get(state));
+      const resp = await fetch(`${config.server}content?create=${instance.name}`,
+        {... endpoint.post(state), body: JSON.stringify({id: instance.id, name: instance.name})});
       if (resp.ok) {
         await resp.json();
         // @ts-ignore
-        dispatch.instances.receivedCreate(name);
+        dispatch.instances.receivedCreate(instance);
       }
       else {
         const message = await resp.text();
@@ -116,15 +121,16 @@ export default createModel({
         dispatch.instances.error(message);
       }
     },
-    async drop(name: string) {
+    async drop(instance: Instance) {
       const state: State = getState();
       // @ts-ignore
       dispatch.instances.requestDrop();
-      const resp = await fetch(`${config.server}content?drop=${name}`, endpoint.get(state));
+      const resp = await fetch(`${config.server}content?drop=${instance.name}`,
+        {... endpoint.post(state), body: JSON.stringify({id: instance.id, name: instance.name})});
       if (resp.ok) {
         await resp.json();
         // @ts-ignore
-        dispatch.instances.receivedDrop(name);
+        dispatch.instances.receivedDrop(instance);
       }
       else {
         const message = await resp.text();

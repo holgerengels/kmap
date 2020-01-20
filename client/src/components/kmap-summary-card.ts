@@ -194,7 +194,7 @@ export class KMapSummaryCard extends connect(store, LitElement) {
   ` : ''}
   <div class="card-footer font-body">
         ${!this.card.links && !this._layers.includes('averages') ? html`
-          <kmap-summary-card-rating .key="${this._key}" style=${styleMap(this._colorStyles)} .lightest="${this._lightest}" .opaque="${this._opaque}"></kmap-summary-card-rating>
+          <kmap-summary-card-rating .key="${this._key}" style=${styleMap(this._colorStyles)}></kmap-summary-card-rating>
         ` : '' }
 
       <div style="flex: 1 0 auto; height: 24px"></div>

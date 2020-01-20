@@ -124,6 +124,18 @@ export default createModel({
         loadingTests: false,
       };
     },
+    forget(state) {
+      return { ...state,
+        deleting: true,
+        subject: "",
+        chapters: undefined,
+        tree: undefined,
+        tests: undefined,
+        results: [],
+        testForDelete: undefined,
+        testForEdit: undefined,
+      };
+    },
 
     requestDeleteTest(state) {
       return { ...state, deleting: true };
@@ -324,6 +336,8 @@ export default createModel({
       const routing: RoutingState = state.routing;
       if (routing.page === 'test')
         dispatch.tests.loadTests({ subject: routing.params["subject"], chapter: routing.params["chapter"], topic: routing.params["topic"]});
+      else
+        dispatch.tests.forget();
     },
   })
 })

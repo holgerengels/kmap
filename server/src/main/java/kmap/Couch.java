@@ -623,7 +623,8 @@ public class Couch extends Server {
 
     public static void main(String[] args) throws IOException {
         Couch couch = new Couch(readProperties(args[0]));
-        couch.instances();
+        JsonArray instances = couch.instances();
+        System.out.println("instances = " + instances);
         //JsonObject object = couch.chapter("mathe", "Mathematik");
         //System.out.println("object = " + object);
         //JsonObject states = couch.statesAndProgress("h.engels", "Mathematik");
@@ -633,15 +634,23 @@ public class Couch extends Server {
     public JsonArray instances() {
         CouchDbClient client = createClient("lala");
         String uri = client.getBaseUri().toString();
-        JsonArray array = new JsonArray();
         JsonArray result = client.findAny(JsonArray.class, uri + "/_all_dbs");
+        List<String> list = new ArrayList<>();
         result.forEach(element -> {
             String name = element.getAsString();
             if (name.endsWith("-map"))
-                array.add(name.substring(0, name.length() - "-map".length()));
+                list.add(name.substring(0, name.length() - "-map".length()));
         });
-        System.out.println("result = " + result);
-        System.out.println("array = " + array);
+        JsonArray array = new JsonArray();
+        list.forEach(name -> {
+            JsonObject instance = new JsonObject();
+            instance.addProperty("id", name);
+            try {
+                JsonObject meta = client.findAny(JsonObject.class, uri + "/" + name + "-map/meta");
+                instance.addProperty("name", meta.get("name").getAsString());
+            } catch (NoDocumentException ignored) {}
+            array.add(instance);
+        });
         return array;
     }
 

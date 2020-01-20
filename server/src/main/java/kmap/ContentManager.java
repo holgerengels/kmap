@@ -18,6 +18,7 @@ import org.apache.http.impl.DefaultConnectionReuseStrategy;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.*;
 import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
+import org.lightcouch.CouchDbClient;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -251,32 +252,42 @@ curl -X PUT -u $1 http://localhost:5984/$2-state
 curl -X PUT -u $1 http://localhost:5984/$2-map/_design/net -d @design-map.json
 curl -X PUT -u $1 http://localhost:5984/$2-test/_design/test -d @design-test.json
      */
-    synchronized void createInstance(String name) {
+    synchronized void createInstance(String json) {
         try {
-            CloseableHttpClient client = client();
+            CloseableHttpClient httpClient = client();
             HttpClientContext context = clientContext();
+
+            CouchDbClient client = couch.createClient("map");
+            JsonObject object = client.getGson().fromJson(json, JsonObject.class);
+            String id = JSON.string(object, "id");
+            String name = JSON.string(object, "name");
 
             HttpPut put;
             InputStreamEntity entity;
 
-            put = new HttpPut(url() + name + "-map");
-            try (CloseableHttpResponse ignored = client.execute(put, context)){}
-            put = new HttpPut(url() + name + "-test");
-            try (CloseableHttpResponse ignored = client.execute(put, context)){}
-            put = new HttpPut(url() + name + "-state");
-            try (CloseableHttpResponse ignored = client.execute(put, context)){}
+            put = new HttpPut(url() + id + "-map");
+            try (CloseableHttpResponse ignored = httpClient.execute(put, context)){}
+            put = new HttpPut(url() + id + "-test");
+            try (CloseableHttpResponse ignored = httpClient.execute(put, context)){}
+            put = new HttpPut(url() + id + "-state");
+            try (CloseableHttpResponse ignored = httpClient.execute(put, context)){}
 
-            put = new HttpPut(url() + name + "-map/_design/net");
+            put = new HttpPut(url() + id + "-map/_design/net");
             entity = new InputStreamEntity(Files.newInputStream(Paths.get(getProperty("kmap.designDocs") + "design-map.json")));
             entity.setContentType("application/json");
             put.setEntity(entity);
-            try (CloseableHttpResponse ignored = client.execute(put, context)){}
+            try (CloseableHttpResponse ignored = httpClient.execute(put, context)){}
 
-            put = new HttpPut(url() + name + "-test/_design/test");
+            put = new HttpPut(url() + id + "-test/_design/test");
             entity = new InputStreamEntity(Files.newInputStream(Paths.get(getProperty("kmap.designDocs") + "design-test.json")));
             entity.setContentType("application/json");
             put.setEntity(entity);
-            try (CloseableHttpResponse ignored = client.execute(put, context)){}
+            try (CloseableHttpResponse ignored = httpClient.execute(put, context)){}
+
+            JsonObject meta = new JsonObject();
+            meta.addProperty("_id", "meta");
+            meta.addProperty("name", name);
+            client.save(meta);
         }
         catch (IOException e) {
             throw new RuntimeException(e);

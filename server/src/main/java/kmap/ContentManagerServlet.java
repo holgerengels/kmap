@@ -2,7 +2,9 @@ package kmap;
 
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import org.apache.commons.io.IOUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -10,6 +12,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -74,7 +78,8 @@ public class ContentManagerServlet
                 }
                 else if (create != null) {
                     authentication.checkRole(req, "admin");
-                    contentManager.createInstance(create);
+                    String json = IOUtils.toString(new InputStreamReader(req.getInputStream(), StandardCharsets.UTF_8));
+                    contentManager.createInstance(json);
                     writeResponse(req, resp, new JsonPrimitive(create));
                 }
                 else if (drop != null) {
