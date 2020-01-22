@@ -281,13 +281,14 @@ export default createModel({
       const userid = state.app.userid;
 
       dispatch.tests.requestDeleteTest();
-      const resp = await fetch(`${config.server}edit?userid=${userid}&subject=${test.subject}&save=${test.set}`,
+      const resp = await fetch(`${config.server}tests?userid=${userid}&subject=${test.subject}&save=${test.set}`,
         {... endpoint.post(state), body: JSON.stringify({delete: test})});
 
       if (resp.ok) {
         await resp.json();
         dispatch.tests.receivedDeleteTest();
         dispatch.tests.unsetTestForDelete();
+        dispatch.contentSets.maybeObsoleteSet({subject: test.subject, set: test.set});
       }
       else {
         const message = await resp.text();
@@ -310,6 +311,7 @@ export default createModel({
         await resp.json();
         dispatch.tests.receivedSaveTest();
         dispatch.tests.unsetTestForEdit();
+        dispatch.contentSets.maybeNewSet({subject: test.subject, set: test.set});
       }
       else {
         const message = await resp.text();
@@ -324,10 +326,19 @@ export default createModel({
         dispatch.tests.loadTopics();
     },
     'routing/change': async function(routing: RoutingState) {
+      console.log(routing.page);
+      console.log(routing.params);
       switch (routing.page) {
         case 'test':
           // @ts-ignore
           dispatch.tests.loadTests({ subject: routing.params["subject"], chapter: routing.params["chapter"], topic: routing.params["topic"]});
+
+          if (routing.params["chapter"])
+            document.title = "KMap - Aufgaben bearbeiten";
+          else if (routing.params["results"])
+            document.title = "KMap - Aufgaben auswerten";
+          else
+            document.title = "KMap - Aufgaben wählen";
           break;
       }
     },

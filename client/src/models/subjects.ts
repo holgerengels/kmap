@@ -62,9 +62,10 @@ export default createModel({
       }
     },
 
-    'routing/change': async function(payload: RoutingState) {
-      switch (payload.page) {
+    'routing/change': async function(routing: RoutingState) {
+      switch (routing.page) {
         case 'home':
+          document.title = "KMap - Knowledge Map";
         case 'test':
           // @ts-ignore
           dispatch.subjects.load();

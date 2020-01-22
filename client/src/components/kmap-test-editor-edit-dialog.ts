@@ -54,9 +54,6 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
   private _values: string[] = [];
 
   @property()
-  private _newSet: boolean = false;
-
-  @property()
   private _valid: boolean = true;
 
   @property()
@@ -71,7 +68,7 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
   @query('#answer')
   // @ts-ignore
   private _answerTextArea: TextArea;
-  @queryAll('[required]]')
+  @queryAll('[required]')
   // @ts-ignore
   private _requiredFields: HTMLElement[];
 
@@ -83,27 +80,6 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
     };
   }
 
-  static get properties() {
-    return {
-      _subject: {type: String},
-      _chapter: {type: String},
-      _topic: {type: String},
-      _key: {type: String},
-      _level: {type: Number},
-      _balance: {type: Number},
-      _question: {type: String},
-      _answer: {type: String},
-      _values: {type: Array},
-      _showPreview: {type: Boolean},
-      _newSet: {type: Boolean},
-
-      _chapters: {type: Array},
-      _topics: {type: Array},
-
-      _valid: {type: Boolean},
-    };
-  }
-
   constructor() {
     super();
     this._setQuestion = this._debounce(this._setQuestion.bind(this), 1000, false);
@@ -111,21 +87,15 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
   }
 
   updated(changedProperties) {
-    if (changedProperties.has("_subject")) {
-      if (this._subject)
-        store.dispatch.maps.loadAllTopics(this._subject);
-      else
-        this._allTopics = undefined
-    }
     if (changedProperties.has("_allTopics")) {
       if (this._allTopics)
-        this._chapters = [... new Set(this._allTopics.map(s => s.split(".")[0]))];
+        this._chapters = [... new Set(this._allTopics.map(s => s.split(".")[0]))].sort();
       else
         this._chapters = [];
     }
     if (changedProperties.has("_allTopics") || changedProperties.has("_chapter")) {
       if (this._allTopics)
-        this._topics = [... new Set(this._allTopics.filter(s => s.split(".")[0] === this._chapter).map(s => s.split(".")[1]))];
+        this._topics = [... new Set(this._allTopics.filter(s => s.split(".")[0] === this._chapter).map(s => s.split(".")[1]))].sort();
       else
         this._topics = [];
     }
@@ -143,7 +113,6 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
       this._answer   = this._test.answer || '';
       this._values   = this._test.values || [];
       this._oldValues = [...this._values];
-      this._newSet = !store.state.contentSets.sets.includes({subject: this._test.subject, set: this._test.set});
 
       this._editDialog.forceLayout();
       this._checkValidity();
@@ -199,15 +168,7 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
 
     let test = this._test;
     console.log(test);
-
     store.dispatch.tests.saveTest(this._test);
-    window.setTimeout(function (test, newSet) {
-        if (newSet) {
-          store.dispatch.contentSets.load();
-          // TODO reselect
-          store.dispatch.contentSets.selectSet({subject: test.subject, set: test.set});
-        }
-    }.bind(undefined, test, this._newSet), 1000);
   }
 
   _cancel() {

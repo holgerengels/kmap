@@ -20,7 +20,6 @@ export class KMapTestEditorScroller extends connect(store, LitElement) {
   @property()
   private _selected?: Test = undefined;
 
-  // TODO maybe load tests
   mapState(state: State) {
     return {
       _set: state.contentSets.selected,

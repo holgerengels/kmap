@@ -1,11 +1,11 @@
-import {createModel} from '@captaincodeman/rdx-model';
+import {createModel, RoutingState} from '@captaincodeman/rdx-model';
 import { State, Dispatch } from '../store';
 import {endpoint} from "../endpoint";
 import {config} from "../config";
 
 export interface Instance {
-  id: string,
-  name?: string,
+  name: string,
+  description?: string,
 }
 export interface InstancesState {
   instances: Instance[],
@@ -107,7 +107,7 @@ export default createModel({
       // @ts-ignore
       dispatch.instances.requestCreate();
       const resp = await fetch(`${config.server}content?create=${instance.name}`,
-        {... endpoint.post(state), body: JSON.stringify({id: instance.id, name: instance.name})});
+        {... endpoint.post(state), body: JSON.stringify({name: instance.name, description: instance.description})});
       if (resp.ok) {
         await resp.json();
         // @ts-ignore
@@ -126,7 +126,7 @@ export default createModel({
       // @ts-ignore
       dispatch.instances.requestDrop();
       const resp = await fetch(`${config.server}content?drop=${instance.name}`,
-        {... endpoint.post(state), body: JSON.stringify({id: instance.id, name: instance.name})});
+        {... endpoint.post(state), body: JSON.stringify({name: instance.name, description: instance.description})});
       if (resp.ok) {
         await resp.json();
         // @ts-ignore
@@ -140,6 +140,14 @@ export default createModel({
         dispatch.instances.error(message);
       }
     },
+
+    'routing/change': async function(routing: RoutingState) {
+      switch (routing.page) {
+        case 'content-manager':
+          document.title = "KMap - Content Manager";
+      }
+    },
+
     'app/receivedLogin': async function() {
       dispatch.instances.load();
     },

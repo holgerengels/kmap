@@ -78,14 +78,6 @@ export class KMapContentManagerSets extends connect(store, LitElement) {
         :host {
           display: contents;
         }
-        .board {
-          height: auto;
-          padding: 8px;
-          padding-bottom: 36px;
-          display: flex;
-          flex-flow: row wrap;
-          justify-content: flex-start;
-        }
         .form {
           max-width: 300px;
           margin: 12px;

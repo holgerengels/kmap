@@ -24,10 +24,10 @@ export class KMapContentManagerInstances extends connect(store, LitElement) {
   private _working: boolean = false;
 
   @property()
-  private _newId: string = '';
+  private _newName: string = '';
 
   @property()
-  private _newName: string = '';
+  private _newDescription: string = '';
 
   mapState(state: State) {
     return {
@@ -59,7 +59,7 @@ export class KMapContentManagerInstances extends connect(store, LitElement) {
 
   _create() {
     console.log("create new instance");
-    store.dispatch.instances.create({ id: this._newId, name: this._newName});
+    store.dispatch.instances.create({ name: this._newName, description: this._newDescription});
   }
 
   _drop() {
@@ -86,6 +86,14 @@ export class KMapContentManagerInstances extends connect(store, LitElement) {
         .space {
           margin: 12px;
           flex: 1 1 100%;
+        }
+        .field {
+          display: flex;
+          justify-content: space-between;
+          margin: 12px;
+        }
+        .field input {
+          width: 180px;
         }
         .scroll {
           height: 160px;
@@ -124,7 +132,7 @@ export class KMapContentManagerInstances extends connect(store, LitElement) {
           <div class="scroll">
           <mega-list>
             ${this._instances.map((instance, i) => html`
-              <mega-list-item icon="storage" ?activated="${this._selectedIndex === i}" @click="${() => this._select(i)}">${instance.id} <span class="secondary">${instance.name}</span></mega-list-item>
+              <mega-list-item icon="storage" ?activated="${this._selectedIndex === i}" @click="${() => this._select(i)}">${instance.name} <span class="secondary">${instance.description}</span></mega-list-item>
             `)}
           </mega-list>
           </div>
@@ -132,8 +140,8 @@ export class KMapContentManagerInstances extends connect(store, LitElement) {
         <div class="form">
           <div class="page" ?active="${this._page === 'create'}">
             <label section>Instanz anlegen</label>
-            <mwc-textfield label="ID" type="text" .value="${this._newId}" @change="${e => this._newId = e.target.value}" required></mwc-textfield>
-            <mwc-textfield label="Name" type="text" .value="${this._newName}" @change="${e => this._newName = e.target.value}"></mwc-textfield>
+            <mwc-textfield label="ID" type="text" .value="${this._newName}" @change="${e => this._newName = e.target.value}" required></mwc-textfield>
+            <mwc-textfield label="Name" type="text" .value="${this._newDescription}" @change="${e => this._newDescription = e.target.value}"></mwc-textfield>
             <mwc-button @click="${() => this._showPage('')}">Abbrechen</mwc-button>
             <mwc-button outlined @click="${this._create}">Anlegen</mwc-button>
           </div>
@@ -141,7 +149,7 @@ export class KMapContentManagerInstances extends connect(store, LitElement) {
             <label section>Instanz löschen</label>
             <div class="field">
               ${this._selected
-                ? html`<label>Soll die Instanz '${this._selected}' wirklich gelöscht werden?</label>`
+                ? html`<label>Soll die Instanz '${this._selected.name}' wirklich gelöscht werden?</label>`
                 : ''}
             </div>
             <mwc-button @click="${() => this._showPage('')}">Abbrechen</mwc-button>

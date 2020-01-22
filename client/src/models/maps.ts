@@ -256,7 +256,7 @@ export default createModel({
       }
 
       dispatch.maps.requestAllTopics();
-      const resp = await fetch(`${config.server}data?subject=$subject}&topics=all`, endpoint.get(state));
+      const resp = await fetch(`${config.server}data?subject=${subject}&topics=all`, endpoint.get(state));
       if (resp.ok) {
         const json = await resp.json();
         // @ts-ignore
@@ -276,6 +276,7 @@ export default createModel({
         case 'browser':
           // @ts-ignore
           dispatch.maps.load({ subject: routing.params["subject"], chapter: routing.params["chapter"]});
+          document.title = "KMap - " + (routing.params["topic"] ? decodeURIComponent(routing.params["topic"]) : decodeURIComponent(routing.params["chapter"]));
           break;
       }
     },

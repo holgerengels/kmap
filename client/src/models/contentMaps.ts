@@ -176,13 +176,20 @@ export default createModel({
       }
     },
 
-    'routing/change': async function(payload: RoutingState) {
-      switch (payload.page) {
-        case 'content-manager':
-          // @ts-ignore
-          dispatch.contentMaps.load();
-          break;
-      }
+    'routing/change': async function(routing: RoutingState) {
+      const state: State = getState();
+      if (state.app.roles.includes("teacher") && (routing.page === 'content-manager' || routing.page === 'test'))
+        dispatch.contentMaps.load();
+    },
+    'app/receivedLogin': async function() {
+      const state: State = getState();
+      const routing: RoutingState = state.routing;
+      if (state.app.roles.includes("teacher") && (routing.page === 'content-manager' || routing.page === 'test'))
+        dispatch.contentMaps.load();
+    },
+
+    'app/receivedLogout': async function() {
+      dispatch.contentMaps.forget();
     },
     'app/chooseInstance': async function() {
       dispatch.contentMaps.forget();

@@ -71,11 +71,6 @@ export class KMapBrowser extends connect(store, LitElement) {
     };
   }
 
-  /* TODO
-    store.dispatch(updateTitle(this.routeTopic ? this.routeTopic : this.routeChapter));
-    store.dispatch(fetchTopicsIfNeeded(this.routeSubject));
-   */
-
   updated(changedProperties) {
     if (changedProperties.has('_page')) {
       // @ts-ignore

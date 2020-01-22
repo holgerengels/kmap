@@ -134,6 +134,7 @@ public class Authentication {
         boolean authenticate = Boolean.parseBoolean(getProperty("ldap.authenticate"));
         if (!authenticate && "admin".equals(password)) {
             Set<String> roles = new HashSet<>();
+            roles.add("admin");
             for (List<String> list : groupConfig.values()) {
                 roles.addAll(list);
             }

@@ -12,12 +12,21 @@ export class KMapSetSelector extends connect(store, LitElement) {
   private _sets: Set[] = [];
   @property()
   private _selectedIndex: number = -1;
+  @property()
+  private _selectedSet?: Set = undefined;
 
-  // TODO load and forget modules on login and layer
   mapState(state: State) {
     return {
       _sets: state.contentSets.sets,
+      _selectedSet: state.contentSets.set,
     };
+  }
+
+  updated(changedProperties) {
+    if (changedProperties.has("_selectedSet")) {
+      if (this._selectedSet && (this._selectedIndex === -1 || this._selectedSet.set != this._sets[this._selectedIndex].set))
+        this._selectedIndex = this._sets.indexOf(this._selectedSet);
+    }
   }
 
   _select(index) {

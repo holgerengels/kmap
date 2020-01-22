@@ -38,9 +38,6 @@ export class KMapTestEditorDeleteDialog extends connect(store, LitElement) {
       return;
 
     store.dispatch.tests.deleteTest(this._test);
-    window.setTimeout(function(test: Test) {
-      store.dispatch.contentSets.loadSet({subject: test.subject, set: test.set});
-    }.bind(undefined, this._test), 1000);
   }
 
   _cancel() {

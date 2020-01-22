@@ -41,7 +41,6 @@ export class KCourses extends connect(store, LitElement) {
   // @ts-ignore
   private _content: HTMLElement;
 
-  // TODO load courses on login, layer activation or navigation
   // @ts-ignore
   firstUpdated(changedProperties) {
     this._bar.scrollTarget = this._content;
@@ -56,7 +55,6 @@ export class KCourses extends connect(store, LitElement) {
     };
   }
 
-  // TODO forget courses on logout
   updated(changedProperties) {
     if (changedProperties.has('_selectedIndex')) {
       if (this._selectedIndex === -1) {

@@ -13,7 +13,6 @@ export class KMapModuleSelector extends connect(store, LitElement) {
   @property()
   private _selectedIndex: number = -1;
 
-  // TODO load and forget modules on login and layer
   mapState(state: State) {
     return {
       _modules: state.contentMaps.modules,

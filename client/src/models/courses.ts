@@ -1,4 +1,4 @@
-import {createModel} from '@captaincodeman/rdx-model';
+import {createModel, RoutingState} from '@captaincodeman/rdx-model';
 import {Dispatch, State} from '../store';
 import {endpoint} from "../endpoint";
 import {config} from "../config";
@@ -208,8 +208,16 @@ export default createModel({
       }
     },
 
+    'routing/change': async function(routing: RoutingState) {
+      switch (routing.page) {
+        case 'courses':
+          document.title = "KMap - Kurse";
+      }
+    },
     'app/receivedLogin': async function() {
-      dispatch.courses.load();
+      const state: State = getState();
+      if (state.app.roles.includes("teacher"))
+        dispatch.courses.load();
     },
     'app/receivedLogout': async function() {
       dispatch.courses.forget();

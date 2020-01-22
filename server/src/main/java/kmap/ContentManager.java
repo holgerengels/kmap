@@ -259,26 +259,26 @@ curl -X PUT -u $1 http://localhost:5984/$2-test/_design/test -d @design-test.jso
 
             CouchDbClient client = couch.createClient("map");
             JsonObject object = client.getGson().fromJson(json, JsonObject.class);
-            String id = JSON.string(object, "id");
             String name = JSON.string(object, "name");
+            String description = JSON.string(object, "description");
 
             HttpPut put;
             InputStreamEntity entity;
 
-            put = new HttpPut(url() + id + "-map");
+            put = new HttpPut(url() + name + "-map");
             try (CloseableHttpResponse ignored = httpClient.execute(put, context)){}
-            put = new HttpPut(url() + id + "-test");
+            put = new HttpPut(url() + name + "-test");
             try (CloseableHttpResponse ignored = httpClient.execute(put, context)){}
-            put = new HttpPut(url() + id + "-state");
+            put = new HttpPut(url() + name + "-state");
             try (CloseableHttpResponse ignored = httpClient.execute(put, context)){}
 
-            put = new HttpPut(url() + id + "-map/_design/net");
+            put = new HttpPut(url() + name + "-map/_design/net");
             entity = new InputStreamEntity(Files.newInputStream(Paths.get(getProperty("kmap.designDocs") + "design-map.json")));
             entity.setContentType("application/json");
             put.setEntity(entity);
             try (CloseableHttpResponse ignored = httpClient.execute(put, context)){}
 
-            put = new HttpPut(url() + id + "-test/_design/test");
+            put = new HttpPut(url() + name + "-test/_design/test");
             entity = new InputStreamEntity(Files.newInputStream(Paths.get(getProperty("kmap.designDocs") + "design-test.json")));
             entity.setContentType("application/json");
             put.setEntity(entity);
@@ -286,7 +286,7 @@ curl -X PUT -u $1 http://localhost:5984/$2-test/_design/test -d @design-test.jso
 
             JsonObject meta = new JsonObject();
             meta.addProperty("_id", "meta");
-            meta.addProperty("name", name);
+            meta.addProperty("description", description);
             client.save(meta);
         }
         catch (IOException e) {

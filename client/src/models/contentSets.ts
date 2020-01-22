@@ -89,7 +89,7 @@ export default createModel({
     receivedSet(state, payload: TestSet) {
       return { ...state,
         loadingSet: false,
-        set: {subject: payload.subject, set: payload.set},
+        set: {subject: payload.subject, set: payload.set, count: payload.tests.length},
         tests: payload.tests,
       };
     },
@@ -98,7 +98,7 @@ export default createModel({
       return { ...state, selected: set }
     },
     unselectSet(state) {
-      return { ...state, selected: undefined }
+      return { ...state, selected: undefined, tests: undefined }
     },
 
     error(state, message) {
@@ -141,6 +141,12 @@ export default createModel({
       if (resp.ok) {
         const json = await resp.json();
         dispatch.contentSets.receivedSet({subject: set.subject, set: set.set, tests: json});
+        const sets: Set[] = [...state.contentSets.sets];
+        for (const s of sets) {
+          if (s.set === set.set)
+            s.count = json.length;
+        }
+        dispatch.contentSets.receivedLoad(sets);
       }
       else {
         const message = await resp.text();
@@ -149,6 +155,37 @@ export default createModel({
         // @ts-ignore
         dispatch.contentSets.error(message);
       }
+    },
+    selectSet(set: Set) {
+      if (!set.subject || !set.set)
+        return;
+
+      dispatch.contentSets.loadSet(set);
+      dispatch.maps.loadAllTopics(set.subject);
+    },
+    maybeNewSet(set: Set) {
+      const state: State = getState();
+      if (!state.contentSets.sets.includes(set)) {
+        // @ts-ignore
+        dispatch.contentSets.receivedLoad([...new Set(state.contentSets.sets).add(set)].sort((a, b) => a.set.localeCompare(b.set)));
+        dispatch.contentSets.selectSet(set);
+      }
+      else
+        window.setTimeout(function(set: Set) {
+          dispatch.contentSets.loadSet(set);
+        }.bind(undefined, set), 1000);
+    },
+    maybeObsoleteSet(set: Set) {
+      const state: State = getState();
+
+      if (state.contentSets.set.count === 1 ) {
+        dispatch.contentSets.receivedLoad(state.contentSets.sets.filter(s => s.set !== set.set));
+        dispatch.contentSets.unselectSet();
+      }
+      else
+        window.setTimeout(function(set: Set) {
+          dispatch.contentSets.loadSet(set);
+        }.bind(undefined, set), 1000);
     },
 
     async import(files: File[]) {
@@ -224,13 +261,20 @@ export default createModel({
       }
     },
 
-    'routing/change': async function(payload: RoutingState) {
-      switch (payload.page) {
-        case 'content-manager':
-          // @ts-ignore
-          dispatch.contentSets.load();
-          break;
-      }
+    'routing/change': async function(routing: RoutingState) {
+      const state: State = getState();
+      if (state.app.roles.includes("teacher") && (routing.page === 'content-manager' || routing.page === 'test'))
+        dispatch.contentSets.load();
+    },
+    'app/receivedLogin': async function() {
+      const state: State = getState();
+      const routing: RoutingState = state.routing;
+      if (state.app.roles.includes("teacher") && (routing.page === 'content-manager' || routing.page === 'test'))
+        dispatch.contentSets.load();
+    },
+
+    'app/receivedLogout': async function() {
+      dispatch.contentSets.forget();
     },
     'app/chooseInstance': async function() {
       dispatch.contentSets.forget();

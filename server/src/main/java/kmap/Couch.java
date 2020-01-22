@@ -644,10 +644,10 @@ public class Couch extends Server {
         JsonArray array = new JsonArray();
         list.forEach(name -> {
             JsonObject instance = new JsonObject();
-            instance.addProperty("id", name);
+            instance.addProperty("name", name);
             try {
                 JsonObject meta = client.findAny(JsonObject.class, uri + "/" + name + "-map/meta");
-                instance.addProperty("name", meta.get("name").getAsString());
+                instance.addProperty("description", meta.get("description").getAsString());
             } catch (NoDocumentException ignored) {}
             array.add(instance);
         });
