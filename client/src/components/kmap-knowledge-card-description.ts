@@ -24,18 +24,21 @@ export class KMapKnowledgeCardDescription extends LitElement {
         let description = this.description.replace(/inline:([^"]*)/g, config.server + "data/" + this.subject + "/" + this.chapter + "/" + this.topic + "/$1?instance=" + this.instance);
         description = description.replace(/link:/g, config.client + this.instance + "//app/browser/");
 
-        let buffer = "";
-        let t = false;
-        description.split("`").reverse().forEach(function (element) {
-          if (t) {
-            // @ts-ignore
-            buffer = " " + MathJax.asciimath2svg(element).getElementsByTagName("svg")[0].outerHTML + " " + buffer;
-          }
-          else
-            buffer = element + buffer;
-          t = !t;
+        // @ts-ignore
+        window.MathJaxLoader
+          .then(() => {
+          let buffer = "";
+          let t = false;
+          description.split("`").reverse().forEach(function (element) {
+            if (t) {
+              // @ts-ignore
+              buffer = " " + window.MathJax.asciimath2svg(element).getElementsByTagName("svg")[0].outerHTML + " " + buffer;
+            } else
+              buffer = element + buffer;
+            t = !t;
+          });
+          this._description = buffer;
         });
-        this._description = buffer;
       }
       else
         this._description = "";

@@ -155,7 +155,7 @@ export class KmapMain extends connect(store, LitElement) {
 
     if (changedProps.has('_messages')) {
       if (this._messages.length > 0) {
-        this._snackbar.open();
+        //this._snackbar.open();
         console.log(this._messages);
       }
     }
@@ -330,7 +330,9 @@ export class KmapMain extends connect(store, LitElement) {
   </mwc-dialog>
   <kmap-login-popup id="login-popup"></kmap-login-popup>
 
-  <mwc-snackbar id="snackbar" labeltext="${this._renderMessages()}"></mwc-snackbar>
+  ${this._messages.map((message, i) => html`
+      <mwc-snackbar id="snackbar" labeltext="${this._messages[i]}" ?isOpen="${i === 0}" style="bottom: 100px"></mwc-snackbar>
+`)}
 `;
   }
 }

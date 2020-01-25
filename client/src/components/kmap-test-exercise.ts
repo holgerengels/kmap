@@ -1,4 +1,4 @@
-import {LitElement, html, css, customElement, property} from 'lit-element';
+import {LitElement, html, css, customElement, property, query} from 'lit-element';
 import { connect } from '@captaincodeman/rdx';
 import {State, store} from "../store";
 
@@ -6,21 +6,26 @@ import '@material/mwc-button';
 import '@material/mwc-icon-button';
 import './kmap-test-card';
 import {colorStyles, fontStyles} from "./kmap-styles";
+import {Test} from "../models/tests";
+import {KMapTestCard} from "./kmap-test-card";
 
 @customElement('kmap-test-exercise')
-class KmapTestExercise extends connect(store, LitElement) {
+export class KmapTestExercise extends connect(store, LitElement) {
   @property()
   private _subject: string = '';
 
   @property()
-  private _allTests?: object[] = undefined;
+  private _allTests?: Test[] = undefined;
   @property()
-  private _tests?: object[] = undefined;
+  private _tests?: Test[] = undefined;
 
   @property()
   private _currentIndex: number = 0;
   @property()
-  private _currentTest?: object = undefined;
+  private _currentTest?: Test = undefined;
+
+  @query('#test-card')
+  private _testCard: KMapTestCard;
 
   mapState(state: State) {
     return {
@@ -36,7 +41,10 @@ class KmapTestExercise extends connect(store, LitElement) {
   }
 
   _start() {
-    var topics = [];
+    if (!this._allTests)
+      return;
+
+    var topics: string[] = [];
     for (var test of this._allTests) {
       if (!topics.includes(test.chapter + "." + test.topic))
         topics.push(test.chapter + "." + test.topic);
@@ -62,7 +70,7 @@ class KmapTestExercise extends connect(store, LitElement) {
       list.push(test);
     }
 
-    var tests = [];
+    var tests: Test[] = [];
     for (var i = 0; i < number / 3 && topics.length > 0; i++) {
       var r = Math.floor(Math.random() * Math.floor(map.size));
       var key = topics[r];
@@ -101,8 +109,7 @@ class KmapTestExercise extends connect(store, LitElement) {
     this._currentIndex++;
     if (this._currentIndex < this._tests.length) {
       this._currentTest = this._tests[this._currentIndex];
-      let testCard = this.shadowRoot.getElementById('test-card');
-      testCard.clear();
+      this._testCard.clear();
     }
   }
 
@@ -132,8 +139,7 @@ class KmapTestExercise extends connect(store, LitElement) {
         .question="${this._currentTest.question}"
         .answer="${this._currentTest.answer}"
         .values="${this._currentTest.values}"
-        .balance="${this._currentTest.balance}"
-        showActions></kmap-test-card>`
+        .balance="${this._currentTest.balance}"></kmap-test-card>`
       : ''}
   </div>
     `;

@@ -151,8 +151,8 @@ export default createModel({
       dispatch.courses.requestStore();
       const resp = await fetch(`${config.server}state?userid=${userid}&storeCourses=${userid}`, {... endpoint.post(state), body: JSON.stringify(payload)});
       if (resp.ok) {
-        const json = await resp.json();
-        dispatch.courses.receivedStore(json);
+        await resp.json();
+        dispatch.courses.receivedStore(payload);
       }
       else {
         const message = await resp.text();

@@ -207,7 +207,6 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
     if (!this._card) return;
 
     if (!this._attachmentTag || !this._attachmentName || !this._attachmentHref) {
-      // TODO: mwc-textfield with inline error message ??
       store.dispatch.shell.showMessage("unvollständig!");
     }
     else {
@@ -264,8 +263,8 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
       fontStyles,
       colorStyles,
       css`
-        form {
-          width: 510px;
+        mwc-dialog {
+          --mdc-dialog-max-width: 800px;
         }
         mwc-icon-button, mwc-button {
           vertical-align: middle
@@ -333,6 +332,26 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
           letter-spacing: 0px;
           vertical-align: middle;
         }
+        select {
+          font-size:16px;
+          border: none;
+          border-bottom: 1px solid var(--color-mediumgray);
+          padding: 18px 6px;
+          background-color: var(--color-lightgray);
+          outline: none;
+        }
+        select:focus {
+          border-bottom: 2px solid var(--color-primary);
+          padding-bottom: 17px;
+        }
+        option {
+          font-size:16px;
+          background-color:#ffffff;
+        }
+        mwc-icon.add {
+          margin-left: 4px;
+          margin-top: 16px;
+        }
     `];
   }
 
@@ -359,15 +378,15 @@ ${this._card ? html`
           ${attachment.type === 'link' ? html`<span slot="secondary">${attachment.href}</span>` : ''}
         </div>
       `)}
-      <select id="tag" placeholder="Tag" .value="${this._attachmentTag}" @change="${e => this._attachmentTag = e.target.value}">
+      <select id="tag" placeholder="Tag" .value="${this._attachmentTag}" @change="${e => this._attachmentTag = e.target.value}" required>
         <option value="">- - -</option>
         ${Array.from(_tags).map(([key, value]) => html`
           <option value="${key}">${value}</option>
         `)}
       </select>
-      <input id="name" type="text" placeholder="Name" .value="${this._attachmentName}" @change="${e => this._attachmentName = e.target.value}"/>
-      <input id="href" type="url" placeholder="Link" .value="${this._attachmentHref}" @change="${e => this._attachmentHref = e.target.value}"/>
-      <mwc-icon @click="${this._addAttachment}">add_circle</mwc-icon>
+      <mwc-textfield id="name" type="text" required placeholder="Name" .value="${this._attachmentName}" @change="${e => this._attachmentName = e.target.value}"></mwc-textfield>
+      <mwc-textfield id="href" type="url" required placeholder="Link" .value="${this._attachmentHref}" @change="${e => this._attachmentHref = e.target.value}"></mwc-textfield>
+      <mwc-icon class="add" @click="${this._addAttachment}">add_circle</mwc-icon>
     </div>
   </form>` : ''}
   <div class="preview">

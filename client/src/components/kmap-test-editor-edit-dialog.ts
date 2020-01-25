@@ -319,7 +319,7 @@ ${this._test ? html`
     </div>
   </form>` : ''}
   <div class="preview">
-    ${this._showPreview ? html`<kmap-test-card hideHeader
+    ${this._showPreview ? html`<kmap-test-card hideHeader hideActions
                                 .subject="${this._subject}"
                                 .chapter="${this._chapter}"
                                 .topic="${this._topic}"

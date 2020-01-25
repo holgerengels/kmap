@@ -50,8 +50,8 @@ export class KCourses extends connect(store, LitElement) {
     return {
       _courses: state.courses.courses,
       _selectedIndex: state.courses.courses.includes(this._selectedName) ? state.courses.courses.indexOf(this._selectedName) : -1,
-      _selectedStudents: state.courses.students,
-      _editStudents: state.courses.students,
+      _selectedStudents: state.courses.students || '',
+      _editStudents: state.courses.students || '',
     };
   }
 
@@ -239,7 +239,7 @@ export class KCourses extends connect(store, LitElement) {
           <div class="page" ?active="${this._page === 'default'}">
             <label section>Kurs</label>
             <mwc-textfield type="text" disabled .value=${this._selectedName}></mwc-textfield>
-            <mwc-textarea placeholder="Schüler" disabled rows="3" .value=${this._selectedStudents || ''}></mwc-textarea>
+            <mwc-textarea placeholder="Schüler" disabled rows="3" .value=${this._selectedStudents}></mwc-textarea>
           </div>
         </div>
         <div class="space"></div>

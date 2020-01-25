@@ -127,6 +127,8 @@ export class KMapBrowser extends connect(store, LitElement) {
 
         if (!that._animFrom)
           return;
+        if (that._animTo.width === 0)
+          return;
 
         var invertTop = that._animFrom.top - that._animTo.top;
         var invertLeft = that._animFrom.left - that._animTo.left;
