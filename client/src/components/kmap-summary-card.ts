@@ -19,17 +19,17 @@ export class KMapSummaryCard extends connect(store, LitElement) {
 
   @property()
   private _userid: string = '';
-  @property()
+  @property({type: String})
   private subject: string = '';
-  @property()
+  @property({type: String})
   private chapter: string = '';
-  @property()
+  @property({type: Object})
   private card: Card = {};
   @property()
   private _key: string = '';
-  @property()
+  @property({type: Boolean})
   private selected: boolean = false;
-  @property()
+  @property({type: Boolean})
   private highlighted: boolean = false;
   @property()
   private _layers: string[] = [];

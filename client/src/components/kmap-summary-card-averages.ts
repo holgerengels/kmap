@@ -7,7 +7,7 @@ import { colorStyles, fontStyles } from "./kmap-styles";
 @customElement('kmap-summary-card-averages')
 export class KMapSummaryCardAverages extends connect(store, LitElement) {
 
-  @property()
+  @property({type: String})
   private key: string = '';
   @property()
   private _states: object = {};

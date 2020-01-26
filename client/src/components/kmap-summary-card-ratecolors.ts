@@ -5,7 +5,7 @@ import {State, store} from "../store";
 @customElement('kmap-summary-card-ratecolors')
 export class KMapSummaryCardRateColors extends connect(store, LitElement) {
 
-  @property()
+  @property({type: String})
   private key: string = '';
   @property()
   private _states: object = {};

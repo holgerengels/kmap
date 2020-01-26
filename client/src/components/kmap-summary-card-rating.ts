@@ -9,7 +9,7 @@ import { fontStyles, colorStyles } from "./kmap-styles";
 @customElement('kmap-summary-card-rating')
 export class KMapSummaryCardRating extends connect(store, LitElement) {
 
-  @property()
+  @property({type: String})
   private key: string = '';
   @property()
   private _states: object = {};

@@ -5,15 +5,15 @@ import {colorStyles, fontStyles} from "./kmap-styles";
 
 @customElement('kmap-knowledge-card-description')
 export class KMapKnowledgeCardDescription extends LitElement {
-  @property()
+  @property({type: String})
   private instance: string = '';
-  @property()
+  @property({type: String})
   private subject: string = '';
-  @property()
+  @property({type: String})
   private chapter: string = '';
-  @property()
+  @property({type: String})
   private topic: string = '';
-  @property()
+  @property({type: String})
   private description: string = '';
   @property()
   private _description: string = '';

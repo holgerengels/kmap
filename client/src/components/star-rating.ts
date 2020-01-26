@@ -4,7 +4,7 @@ import '@material/mwc-icon';
 @customElement('star-rating')
 export class StarRating extends LitElement {
 
-  @property()
+  @property({type: Number})
   private rate: number = 0;
 
   _clicked(event) {

@@ -3,9 +3,9 @@ import {colorStyles, fontStyles} from "./kmap-styles";
 
 @customElement('kmap-knowledge-card-progress')
 class KMapKnowledgeCardProgress extends LitElement {
-  @property()
+  @property({type: Number})
   private progressNum: number = 0;
-  @property()
+  @property({type: Number})
   private progressOf: number = 0;
 
   static get styles() {

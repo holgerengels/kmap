@@ -19,17 +19,17 @@ class KMapKnowledgeCard extends connect(store, LitElement) {
 
   @property()
   private _instance: string = '';
-  @property()
+  @property({type: String})
   private subject: string = '';
-  @property()
+  @property({type: String})
   private chapter: string = '';
-  @property()
+  @property({type: Object})
   private card: Card = {};
-  @property()
+  @property({type: Number})
   private state: number = 0;
-  @property()
+  @property({type: Number})
   private progressNum: number = 0;
-  @property()
+  @property({type: Number})
   private progressOf: number = 0;
   @property()
   private _explanations: Attachment[] = [];

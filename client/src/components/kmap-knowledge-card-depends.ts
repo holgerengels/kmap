@@ -3,13 +3,13 @@ import {colorStyles, fontStyles} from "./kmap-styles";
 
 @customElement('kmap-knowledge-card-depends')
 class KMapKnowledgeCardDepends extends LitElement {
-  @property()
+  @property({type: String})
   private subject: string = '';
-  @property()
+  @property({type: String})
   private chapter: string = '';
-  @property()
+  @property({type: String})
   private depends: string[] = [];
-  @property()
+  @property({type: Boolean})
   private chapterDepends: boolean = false;
 
   static get styles() {

@@ -13,9 +13,9 @@ interface Module {
 
 @customElement('kmap-browser-chapter-editor')
 export class KMapBrowserChapterEditor extends connect(store, LitElement) {
-  @property()
+  @property({type: String})
   private subject: string = '';
-  @property()
+  @property({type: String})
   private chapter: string = '';
   @property()
   private chapterCard?: Card = undefined;

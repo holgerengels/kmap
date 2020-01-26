@@ -6,11 +6,11 @@ import {Attachment} from "../models/maps";
 
 @customElement('kmap-knowledge-card-attachment')
 export class KMapKnowledgeCardAttachment extends LitElement {
-  @property()
+  @property({type: String})
   private instance: string = '';
   @property()
   private _supportsDownload: boolean = !(/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream);
-  @property()
+  @property({type: Object})
   private attachment: Attachment = {};
   @property()
   private _handler: string = '';
@@ -94,16 +94,16 @@ export class KMapKnowledgeCardAttachment extends LitElement {
   _renderAttachment() {
     if (this.attachment.type === "link")
       return html `
-            <a href="${this.attachment.href}" target="_blank" rel="external">${this.attachment.name}</a>
+            <a href="${this.attachment.href}" target="_blank" rel="external noopener">${this.attachment.name}</a>
         `;
     else if (this._handler && this._isTarget)
       return html `
-            <a href="${this._handler}${this.attachment.href}" target="_blank" rel="external">${this.attachment.name}&nbsp;<mwc-icon>open_in_new</mwc-icon></a>
+            <a href="${this._handler}${this.attachment.href}" target="_blank" rel="external noopener">${this.attachment.name}&nbsp;<mwc-icon>open_in_new</mwc-icon></a>
             <a href="${config.server}${this.attachment.href}?instance=${this.instance}" download="${this._isDownload}" target="${this._isTarget}"><mwc-icon>cloud_download</mwc-icon></a>
         `;
     else if (this._handler)
       return html `
-            <a href="${this._handler}${this.attachment.href}" target="_blank" rel="external">${this.attachment.name}&nbsp;<mwc-icon>open_in_new</mwc-icon></a>
+            <a href="${this._handler}${this.attachment.href}" target="_blank" rel="external noopener">${this.attachment.name}&nbsp;<mwc-icon>open_in_new</mwc-icon></a>
             <a href="${config.server}${this.attachment.href}?instance=${this.instance}" download="${this._isDownload}"><mwc-icon>cloud_download</mwc-icon></a>
         `;
     else if (this._isDownload && this._isTarget)

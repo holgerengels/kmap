@@ -4,7 +4,7 @@ import { colorStyles, fontStyles } from "./kmap-styles";
 @customElement('kmap-summary-card-summary')
 class KMapSummaryCardSummary extends LitElement {
 
-  @property()
+  @property({type: String})
   private summary: string = '';
 
   static get styles() {

@@ -18,7 +18,7 @@ export class KMapTestResultCard extends connect(store, LitElement) {
   private card?: object = undefined;
   @property()
   private _states: object = {};
-  @property()
+  @property({type: Number})
   private state: number = 0;
   @property()
   private _state: number = 0;

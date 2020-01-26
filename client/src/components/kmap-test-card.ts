@@ -11,49 +11,49 @@ import '@material/mwc-button';
 
 @customElement('kmap-test-card')
 export class KMapTestCard extends connect(store, LitElement) {
-  @property()
+  @property({type: String})
   private _instance: string = '';
   @property()
   private _narrow: boolean = false;
 
-  @property()
+  @property({type: String})
   private key: string = '';
-  @property()
+  @property({type: String})
   private subject: string = '';
-  @property()
+  @property({type: String})
   private chapter: string = '';
-  @property()
+  @property({type: String})
   private topic: string = '';
-  @property()
+  @property({type: Number})
   private num: number = 0;
-  @property()
+  @property({type: Number})
   private of: number = 0;
-  @property()
+  @property({type: Number})
   private level: number = 0;
-  @property()
+  @property({type: String})
   private question: string = '';
-  @property()
+  @property({type: String})
   private answer: string = '';
-  @property()
+  @property({type: Number})
   private balance: number = 4;
 
-  @property()
+  @property({type: String})
   private values: string[] = [];
-  @property()
+  @property({type: Boolean})
   private sent: boolean = false;
-  @property()
+  @property({type: Boolean})
   private correct: boolean = false;
-  @property()
+  @property({type: Number})
   private attempts: number = 0;
 
-  @property()
+  @property({type: Boolean})
   private hideHeader: boolean = false;
-  @property()
+  @property({type: Boolean})
   private hideActions: boolean = false;
 
-  @property()
+  @property({type: String})
   private _questionFlex: string = '';
-  @property()
+  @property({type: String})
   private _answerFlex: string = '';
 
   @query('#question')

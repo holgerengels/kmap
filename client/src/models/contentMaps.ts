@@ -178,13 +178,13 @@ export default createModel({
 
     'routing/change': async function(routing: RoutingState) {
       const state: State = getState();
-      if (state.app.roles.includes("teacher") && (routing.page === 'content-manager' || routing.page === 'test'))
+      if (state.app.roles.includes("teacher") && (routing.page === 'content-manager' || routing.page === 'browser'))
         dispatch.contentMaps.load();
     },
     'app/receivedLogin': async function() {
       const state: State = getState();
       const routing: RoutingState = state.routing;
-      if (state.app.roles.includes("teacher") && (routing.page === 'content-manager' || routing.page === 'test'))
+      if (state.app.roles.includes("teacher") && (routing.page === 'content-manager' || routing.page === 'browser'))
         dispatch.contentMaps.load();
     },
 

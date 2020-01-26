@@ -10,7 +10,7 @@ import {fontStyles, colorStyles} from "./kmap-styles";
 @customElement('kmap-subject-card')
 class KMapSubjectCard extends connect(store, LitElement) {
 
-  @property()
+  @property({type: String})
   private subject: string = '';
   @property()
   private _states: object = {};
