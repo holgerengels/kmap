@@ -1,5 +1,4 @@
 import {LitElement, html, css, customElement, property, query} from 'lit-element';
-//import { get, set } from 'idb-keyval';
 import {installMediaQueryWatcher} from 'pwa-helpers/media-query.js';
 import {installOfflineWatcher} from 'pwa-helpers/network.js';
 import {updateMetadata} from 'pwa-helpers/metadata.js';
@@ -20,6 +19,7 @@ import './components/kmap-browser';
 import './components/kmap-test';
 import './components/kmap-courses';
 import './components/kmap-content-manager';
+import './components/kmap-instance-popup';
 import './components/kmap-login-popup';
 import './components/kmap-module-selector';
 import './components/kmap-set-selector';
@@ -34,7 +34,8 @@ import './components/kmap-test-editor-delete-dialog';
 
 import {fontStyles, colorStyles} from "./components/kmap-styles";
 import {Snackbar} from "@material/mwc-snackbar/mwc-snackbar";
-import {Dialog} from "@material/mwc-dialog/mwc-dialog";
+import {KMapLoginPopup} from "./components/kmap-login-popup";
+import {KMapInstancePopup} from "./components/kmap-instance-popup";
 
 @customElement('kmap-main')
 export class KmapMain extends connect(store, LitElement) {
@@ -42,7 +43,9 @@ export class KmapMain extends connect(store, LitElement) {
   @property()
   private _page: string = '';
   @property()
-  private _title: string = '';
+  private _metaTitle: string = '';
+  @property()
+  private _metaDescription: string = '';
   @property()
   private _instance: string = '';
   @property()
@@ -63,9 +66,9 @@ export class KmapMain extends connect(store, LitElement) {
   @query('#snackbar')
   // @ts-ignore
   private _snackbar: Snackbar;
-  @query('#instanceDialog')
+  @query('#instance-popup')
   // @ts-ignore
-  private _instanceDialog: Dialog;
+  private _instancePopup: KMapInstancePopup;
   @query('#login-popup')
   // @ts-ignore
   private _loginPopup: KMapLoginPopup;
@@ -93,7 +96,8 @@ export class KmapMain extends connect(store, LitElement) {
       _userid: state.app.userid,
       _roles: state.app.roles,
       _layers: state.shell.layers,
-      _title: state.shell.title,
+      _metaTitle: state.shell.title,
+      _metaDescription: state.shell.description,
       _drawerOpen: state.shell.drawerOpen,
       _narrow: state.shell.narrow,
       _messages: state.shell.messages,
@@ -127,11 +131,11 @@ export class KmapMain extends connect(store, LitElement) {
             store.dispatch.app.chooseInstance(instance);
           }
           else
-            this._instanceDialog.show();
+            this._instancePopup.show();
         });
          */
         if (!store.state.app.instance)
-          this._instanceDialog.show();
+          this._instancePopup.show();
       }
     }
     else if (!store.state.app.instance)
@@ -142,11 +146,10 @@ export class KmapMain extends connect(store, LitElement) {
   }
 
   updated(changedProps) {
-    if (changedProps.has('_title')) {
-      const pageTitle = 'KMap - ' + this._title;
+    if (changedProps.has('_metaTitle')) {
       updateMetadata({
-        title: pageTitle,
-        description: pageTitle
+        title: this._metaTitle,
+        description: this._metaDescription,
       });
     }
 
@@ -203,21 +206,7 @@ export class KmapMain extends connect(store, LitElement) {
   }
 
   _showChooseInstance() {
-    this._instanceDialog.show();
-  }
-  _chooseInstance() {
-    // @ts-ignore
-    let textfield = this.shadowRoot.getElementById('instance');
-    // @ts-ignore
-    let instance: string = textfield.value;
-    /*
-    set("instance", instance)
-      .then(() => store.dispatch.app.chooseInstance(instance));
-    this._instanceDialog.close();
-     */
-    // @ts-ignore
-    store.dispatch.app.chooseInstance(instance);
-    this._instanceDialog.close();
+    this._instancePopup.show();
   }
 
   _getCookie(n) {
@@ -267,6 +256,14 @@ export class KmapMain extends connect(store, LitElement) {
         span[slot=subtitle] > * {
           margin-right: 8px;
         }
+      mwc-icon-button[icon="polymer"] {
+        --mdc-icon-size: 18px;
+        --mdc-icon-button-size: 18px;
+        transition: filter ease-in-out .3s;
+      }
+      mwc-icon-button[icon="polymer"]:hover {
+        filter: brightness(120%);
+      }
       `,
     ];
   }
@@ -277,7 +274,7 @@ export class KmapMain extends connect(store, LitElement) {
   <mwc-drawer id="drawer" hasheader type="${this._narrow ? 'modal' : 'dismissible'}" ?open="${this._drawerOpen}">
     <span slot="title">Knowledge Map</span>
     <span slot="subtitle">[<span>&nbsp;<b>Instanz:</b> ${this._instance}</span>
-        <mwc-icon-button icon="polymer" class="secondary" style="--mdc-icon-size: 18px; --mdc-icon-button-size: 18px" @click="${this._showChooseInstance}"></mwc-icon-button>
+        <mwc-icon-button icon="polymer" class="secondary" @click="${this._showChooseInstance}" title="Instanz wechseln"></mwc-icon-button>
     ]</span>
     <div class="drawer-content">
       <nav class="drawer-list">
@@ -324,10 +321,7 @@ export class KmapMain extends connect(store, LitElement) {
     </div>
   </mwc-drawer>
 
-  <mwc-dialog id="instanceDialog" title="Instanz wählen">
-    <mwc-textfield id="instance" name="instance" label="Instanz" type="text" required dialogInitialFocus></mwc-textfield>
-    <mwc-button slot="primaryAction" @click=${this._chooseInstance}>Auswählen</mwc-button>
-  </mwc-dialog>
+  <kmap-instance-popup id="instance-popup"></kmap-instance-popup>
   <kmap-login-popup id="login-popup"></kmap-login-popup>
 
   ${this._messages.map((message, i) => html`

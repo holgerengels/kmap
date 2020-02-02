@@ -39,7 +39,7 @@ export class KmapTestChooser extends connect(store, LitElement) {
   mapState(state: State) {
     return {
       _subjects: state.subjects.subjects,
-      _chapters: state.tests.chapters,
+      _chapters: state.tests.chapters ? state.tests.chapters.chapters : [],
       _tree: state.tests.tree,
       _chaptersLoading: state.tests.loadingChapters || state.tests.loadingTree,
       _allTests: state.tests.tests,

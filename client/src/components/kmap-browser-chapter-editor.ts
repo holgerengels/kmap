@@ -58,6 +58,11 @@ export class KMapBrowserChapterEditor extends connect(store, LitElement) {
       subject: this._selectedModule.subject,
       chapter: this.chapter,
       topic: '_',
+      summary: '',
+      description: '',
+      links: '',
+      depends: [],
+      attachments: [],
     };
     store.dispatch.maps.setCardForEdit(card);
   }

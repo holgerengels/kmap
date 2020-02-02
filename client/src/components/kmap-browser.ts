@@ -37,6 +37,11 @@ export class KMapBrowser extends connect(store, LitElement) {
   @property()
   private _lines: Card[][] = [];
   @property()
+  private _hasTests: boolean = false;
+  @property()
+  private _topics: string[] = [];
+
+  @property()
   private _page: string = 'map';
 
   @property()
@@ -67,7 +72,9 @@ export class KMapBrowser extends connect(store, LitElement) {
       _subject: state.maps.subject,
       _chapter: state.maps.chapter,
       _lines: state.maps.lines,
+      _chapterCard: state.maps.chapterCard,
       _loading: state.maps.loading,
+      _topics: state.tests.topics ? state.tests.topics.topics : [],
     };
   }
 
@@ -112,9 +119,6 @@ export class KMapBrowser extends connect(store, LitElement) {
       }
     }
     this._page = this._topicCard ? "topic" : "map";
-
-    if (changedProperties.has("_topicCard")) {
-    }
 
     if (changedProperties.has("_page") && this._page === 'topic' && this._animFrom) {
       let that = this;
@@ -161,6 +165,16 @@ export class KMapBrowser extends connect(store, LitElement) {
     if (changedProperties.has("_loading")) {
       let that = this;
       setTimeout(function () { that._faded = that._loading; }, 100);
+    }
+
+    if (changedProperties.has("_chapter"))
+      this._hasTests = this._topics.filter(t => t.startsWith(this._chapter)).length > 1;
+
+    if (this._topicCard) {
+      store.dispatch.shell.updateMeta({title: this._topicCard.topic, description: this._topicCard.summary});
+    }
+    else {
+      store.dispatch.shell.updateMeta({title: this._chapter, description: this._chapterCard ? this._chapterCard.summary : "Wissenslandkarte zum Kapitel " + this._chapter});
     }
   }
 
@@ -220,6 +234,11 @@ export class KMapBrowser extends connect(store, LitElement) {
         .page[active] {
           display: block;
         }
+        a.tests {
+          position: relative;
+          --mdc-icon-size: 20px;
+          vertical-align: sub;
+        }
         [hidden] {
           display: none !important;
         }
@@ -249,6 +268,12 @@ export class KMapBrowser extends connect(store, LitElement) {
               ${this._layers.includes('summaries') && this._chapterCard.summary ? html`
                 <div>
                   ${this._chapterCard.summary}
+                </div>
+              ` : ''}
+              ${this._hasTests && this._page === "map" ? html`
+                <div>
+                  <b>Aufgaben zum Kapitel</b>
+                  <a href="/app/test/${this._subject}/${this._chapter}" class="tests"><mwc-ripple></mwc-ripple><mwc-icon>help_outline</mwc-icon></a>
                 </div>
               ` : ''}
             </div>

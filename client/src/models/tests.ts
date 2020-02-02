@@ -34,10 +34,10 @@ interface Tests {
 
 export interface TestsState {
   topics?: Topics,
+  chapters?: Chapters,
   subject: string,
   chapter?: string,
   topic?: string,
-  chapters?: string[],
   tree?: string[],
   tests?: object[],
   results: object[],
@@ -90,8 +90,7 @@ export default createModel({
     },
     receivedChapters(state, payload: Chapters) {
       return { ...state,
-        subject: payload.subject,
-        chapters: payload.chapters,
+        chapters: payload,
         loadingChapters: false,
       };
     },
@@ -322,7 +321,7 @@ export default createModel({
       }
     },
 
-    'maps/received': async function() {
+    'maps/subjectChanged': async function() {
         dispatch.tests.loadTopics();
     },
     'routing/change': async function(routing: RoutingState) {

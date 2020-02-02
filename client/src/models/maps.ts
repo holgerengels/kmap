@@ -35,6 +35,7 @@ export interface MapState {
   subject: string,
   chapter: string,
   lines: Card[][],
+  chapterCard?: Card,
   timestamp: number,
   loading: boolean,
   error: string,
@@ -55,6 +56,7 @@ export default createModel({
     subject: "",
     chapter: "",
     lines: [],
+    chapterCard: undefined,
     timestamp: -1,
     loading: false,
     error: "",
@@ -88,14 +90,19 @@ export default createModel({
         subject: payload.subject,
         chapter: payload.chapter,
         lines: payload.lines,
+        chapterCard: payload.chapterCard,
         loading: false,
       };
+    },
+    subjectChanged(state) {
+      return { ...state};
     },
     forget(state) {
       return { ...state,
         subject: '',
         chapter: '',
         lines: [],
+        chapterCard: undefined,
         cardForEdit: undefined,
         cardForRename: undefined,
         cardForDelete: undefined,
@@ -162,6 +169,7 @@ export default createModel({
   effects: (dispatch: Dispatch, getState) => ({
     async load(path: Path) {
       const state: State = getState();
+      const oldSubject: string = state.maps.subject;
 
       if (state.maps.subject === path.subject && state.maps.chapter === path.chapter) {
         console.warn("reloading map " + path.subject + " " + path.chapter);
@@ -173,6 +181,9 @@ export default createModel({
         const json = await resp.json();
         // @ts-ignore
         dispatch.maps.received(json);
+        if (path.subject !== oldSubject) {
+          dispatch.maps.subjectChanged();
+        }
       }
       else {
         const message = await resp.text();
@@ -278,6 +289,11 @@ export default createModel({
           dispatch.maps.load({ subject: routing.params["subject"], chapter: routing.params["chapter"]});
           document.title = "KMap - " + (routing.params["topic"] ? decodeURIComponent(routing.params["topic"]) : decodeURIComponent(routing.params["chapter"]));
           break;
+          /*
+        case 'home':
+          dispatch.maps.unsetSubject();
+          break;
+           */
       }
     },
     'app/chooseInstance': async function() {

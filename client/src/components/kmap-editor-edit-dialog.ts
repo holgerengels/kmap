@@ -352,6 +352,9 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
           margin-left: 4px;
           margin-top: 16px;
         }
+        [hidden] {
+          display: none;
+        }
     `];
   }
 

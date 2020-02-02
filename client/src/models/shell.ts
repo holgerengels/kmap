@@ -1,8 +1,13 @@
-import { createModel } from '@captaincodeman/rdx-model';
-import { Dispatch } from '../store';
+import {createModel, RoutingState} from '@captaincodeman/rdx-model';
+import {Dispatch, State} from '../store';
 
+export interface Meta {
+  title?: string,
+  description?: string,
+}
 export interface ShellState {
   title: string,
+  description: string,
   narrow: boolean,
   drawerOpen: boolean,
   messages: string[],
@@ -12,14 +17,15 @@ export interface ShellState {
 export default createModel({
   state: <ShellState>{
     title: "KMap",
+    description: "KMap kartographiert Wissen mit Zusammenhang",
     narrow: false,
     drawerOpen: false,
     messages: [],
     layers: ["summaries"],
   },
   reducers: {
-    setTitle(state, title: string) {
-      return { ...state, title: title }
+    updateMeta(state, meta: Meta) {
+      return { ...state, title: meta.title || "KMap", description: meta.description || "KMap kartographiert Wissen mit Zusammenhang"}
     },
     updateNarrow(state, narrow: boolean) {
       return { ...state, narrow: narrow }
@@ -47,15 +53,10 @@ export default createModel({
       window.setTimeout(() => dispatch.shell.removeMessage(payload), 3000);
       dispatch.shell.addMessage(payload);
     },
-/*
-    'routing/change': async function(payload: RoutingState) {
-      switch (payload.page) {
-        case 'browser':
-          // @ts-ignore
-          dispatch.maps.load(payload.page["subject"], payload.page["chapter"]);
-          break;
-      }
-    }
- */
+
+    'routing/change': async function(routing: RoutingState) {
+      if (routing.page !== 'browser')
+        dispatch.shell.updateMeta({});
+    },
   })
 })
