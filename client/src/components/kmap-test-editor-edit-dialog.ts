@@ -213,6 +213,7 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
   _checkValidity() {
     let valid = true;
     for (const element of this._requiredFields) {
+      // @ts-ignore
       valid = valid && element.checkValidity();
     }
     this._valid = valid;

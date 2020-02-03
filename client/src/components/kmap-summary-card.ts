@@ -79,12 +79,15 @@ export class KMapSummaryCard extends connect(store, LitElement) {
   _colorizeEvent() {
     let source;
     if (this._layers.includes("averages")) {
+      // @ts-ignore
       source = this.shadowRoot.getElementById('averages');
     }
     else if (this._layers.includes("editor")) {
+      // @ts-ignore
       source = this.shadowRoot.getElementById('editor');
     }
     else if (this._userid) {
+      // @ts-ignore
       source = this.shadowRoot.getElementById('rating');
     }
 

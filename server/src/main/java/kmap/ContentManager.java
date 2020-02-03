@@ -284,10 +284,18 @@ curl -X PUT -u $1 http://localhost:5984/$2-test/_design/test -d @design-test.jso
             put.setEntity(entity);
             try (CloseableHttpResponse ignored = httpClient.execute(put, context)){}
 
-            JsonObject meta = new JsonObject();
-            meta.addProperty("_id", "meta");
-            meta.addProperty("description", description);
-            client.save(meta);
+            String current = Server.CLIENT.get();
+            try {
+                Server.CLIENT.set(name);
+                CouchDbClient tempClient = couch.createClient("map");
+                JsonObject meta = new JsonObject();
+                meta.addProperty("_id", "meta");
+                meta.addProperty("description", description);
+                tempClient.save(meta);
+            }
+            finally {
+                Server.CLIENT.set(current);
+            }
         }
         catch (IOException e) {
             throw new RuntimeException(e);

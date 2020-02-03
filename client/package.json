@@ -69,6 +69,7 @@
     "@material/mwc-fab": "^0.12.0",
     "@material/mwc-formfield": "^0.12.0",
     "@material/mwc-icon-button": "^0.12.0",
+    "@material/mwc-radio": "^0.12.0",
     "@material/mwc-slider": "^0.12.0",
     "@material/mwc-snackbar": "^0.12.0",
     "@material/mwc-textarea": "^0.12.0",
