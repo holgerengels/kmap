@@ -3,13 +3,15 @@ import { connect } from '@captaincodeman/rdx';
 import {State, store} from "../store";
 
 import '@material/mwc-button';
+import '@material/mwc-formfield';
 import '@material/mwc-icon';
 import '@material/mwc-icon-button';
-import '@material/mwc-formfield';
+import '@material/mwc-list/mwc-list-item';
+import '@material/mwc-select';
 import '@material/mwc-slider';
 import '@material/mwc-top-app-bar';
 import '@material/mwc-top-app-bar';
-import 'mega-material/surface';
+import '@material/menu-surface';
 import {colorStyles, elevationStyles, fontStyles} from "./kmap-styles";
 
 @customElement('kmap-test-chooser')
@@ -115,20 +117,6 @@ export class KmapTestChooser extends connect(store, LitElement) {
         [hidden] {
           display: none;
         }
-        select {
-          border: none;
-          border-bottom: 2px solid var(--color-mediumgray);
-          padding: 12px 6px;
-          background-color: var(--color-lightgray);
-          outline: none;
-        }
-        select:focus {
-          border-bottom-color: var(--color-primary);
-        }
-        option {
-          font-size:16px;
-          background-color:#ffffff;
-        }
         mwc-button {
           vertical-align: middle;
         }
@@ -142,20 +130,18 @@ export class KmapTestChooser extends connect(store, LitElement) {
   <div class="box elevation-01">
     <label section>Thema auswählen</label>
     <br/>
-    <div class="mdc-elevation--z1">
+    <div>
       <mwc-formfield>
-        <select required @change="${e => this._subject = e.target.value}">
-          <option value="" style="color:var(--color-mediumgray)">Fach</option>
-          ${this._subjects.map((subject) => html`<option value="${subject}">${subject}</option>`)}
-        </select>
+        <mwc-select label="Fach" required @change="${e => this._subject = e.target.value}">
+          ${this._subjects.map((subject) => html`<mwc-list-item value="${subject}">${subject}</mwc-list-item>`)}
+        </mwc-select>
       </mwc-formfield>
       ${!this._chaptersLoading ? html`
         ${this._arrangedChapters ? html`
           <mwc-formfield>
-            <select required @change="${e => this._chapter = e.target.value.split(".").pop()}">
-              <option value="" style="color:var(--color-mediumgray)">Kapitel</option>
-              ${this._arrangedChapters.map((chapter) => html`<option value="${chapter}">${chapter.replace(".", " - ")}</option>`)}
-            </select>
+            <mwc-select label="Kapitel" required @change="${e => this._chapter = e.target.value.split(".").pop()}">
+              ${this._arrangedChapters.map((chapter) => html`<mwc-list-item value="${chapter}">${chapter.replace(".", " - ")}</mwc-list-item>`)}
+            </mwc-select>
           </mwc-formfield>
         ` : html`
           ${this._subject ? html`

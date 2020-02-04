@@ -6,10 +6,11 @@ import {colorStyles, fontStyles} from "./kmap-styles";
 import '@material/mwc-button';
 import '@material/mwc-icon';
 import '@material/mwc-icon-button';
+import '@material/mwc-list/mwc-list';
+import '@material/mwc-list/mwc-list-item';
 import '@material/mwc-textarea';
 import '@material/mwc-textfield';
 import '@material/mwc-top-app-bar';
-import 'mega-material/list';
 import {TopAppBar} from "@material/mwc-top-app-bar/mwc-top-app-bar";
 
 @customElement('kmap-courses')
@@ -165,9 +166,6 @@ export class KCourses extends connect(store, LitElement) {
           pointer-events: all;
           cursor: pointer;
         }
-        mega-list-item {
-          cursor: pointer;
-        }
         [disabled], [disabled] svg {
           color: gray;
           fill: gray;
@@ -207,11 +205,14 @@ export class KCourses extends connect(store, LitElement) {
           </span>
           <br style="clear: right"/>
           <div class="scroll">
-          <mega-list>
+          <mwc-list>
             ${this._courses.map((course, i) => html`
-              <mega-list-item icon="group" ?activated="${this._selectedIndex === i}" @click="${() => this._select(i)}">${course}</mega-list-item>
+              <mwc-list-item ?activated="${this._selectedIndex === i}" @click="${() => this._select(i)}" graphic="icon">
+                <span>${course}</span>
+                <mwc-icon slot="graphic">group</mwc-icon>
+              </mwc-list-item>
             `)}
-          </mega-list>
+          </mwc-list>
           </div>
         </div>
         <div class="form">

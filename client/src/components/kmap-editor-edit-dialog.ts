@@ -6,6 +6,8 @@ import '@material/mwc-button';
 import '@material/mwc-icon-button';
 import '@material/mwc-dialog';
 import '@material/mwc-formfield';
+import '@material/mwc-list/mwc-list-item';
+import '@material/mwc-select';
 import '@material/mwc-slider';
 import '@material/mwc-textarea';
 import '@material/mwc-textfield';
@@ -381,12 +383,11 @@ ${this._card ? html`
           ${attachment.type === 'link' ? html`<span slot="secondary">${attachment.href}</span>` : ''}
         </div>
       `)}
-      <select id="tag" placeholder="Tag" .value="${this._attachmentTag}" @change="${e => this._attachmentTag = e.target.value}" required>
-        <option value="">- - -</option>
+      <mwc-select id="tag" placeholder="Tag" .value="${this._attachmentTag}" @change="${e => this._attachmentTag = e.target.value}" required>
         ${Array.from(_tags).map(([key, value]) => html`
-          <option value="${key}">${value}</option>
+          <mwc-list-item value="${key}">${value}</mwc-list-item>
         `)}
-      </select>
+      </mwc-select>
       <mwc-textfield id="name" type="text" required placeholder="Name" .value="${this._attachmentName}" @change="${e => this._attachmentName = e.target.value}"></mwc-textfield>
       <mwc-textfield id="href" type="url" required placeholder="Link" .value="${this._attachmentHref}" @change="${e => this._attachmentHref = e.target.value}"></mwc-textfield>
       <mwc-icon class="add" @click="${this._addAttachment}">add_circle</mwc-icon>

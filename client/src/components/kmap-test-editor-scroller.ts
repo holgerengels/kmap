@@ -3,7 +3,6 @@ import {connect} from '@captaincodeman/rdx';
 import {State, store} from "../store";
 
 import {fontStyles, colorStyles, elevationStyles} from "./kmap-styles";
-import 'mega-material/surface';
 import './kmap-test-card';
 import {Set} from "../models/contentSets";
 import {Test} from "../models/tests";

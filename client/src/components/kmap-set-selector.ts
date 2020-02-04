@@ -2,7 +2,8 @@ import {LitElement, html, customElement, property} from 'lit-element';
 import {connect} from '@captaincodeman/rdx';
 import {State, store} from "../store";
 
-import 'mega-material/list';
+import '@material/mwc-list/mwc-list';
+import '@material/mwc-list/mwc-list-item';
 import {fontStyles, colorStyles} from "./kmap-styles";
 import {Set} from "../models/contentSets";
 
@@ -52,12 +53,13 @@ export class KMapSetSelector extends connect(store, LitElement) {
   render() {
     // language=HTML
     return html`
-        <mega-list dense>
+        <mwc-list>
           ${this._sets.map((set, i) => html`
-            <mega-list-item dense ?activated="${this._selectedIndex === i}" @click="${() => this._select(i)}">
-              ${set.subject} - ${set.set}</mega-list-item>
+            <mwc-list-item ?activated="${this._selectedIndex === i}" @click="${() => this._select(i)}">
+              <span>${set.subject} - ${set.set}</span>
+            </mwc-list-item>
           `)}
-        </mega-list>
+        </mwc-list>
     `;
   }
 }

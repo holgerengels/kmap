@@ -2,7 +2,9 @@ import {LitElement, html, customElement, property} from 'lit-element';
 import { connect } from '@captaincodeman/rdx';
 import {State, store} from "../store";
 
-import 'mega-material/list';
+import '@material/mwc-icon';
+import '@material/mwc-list/mwc-list';
+import '@material/mwc-list/mwc-list-item';
 import {fontStyles, colorStyles} from "./kmap-styles";
 
 @customElement('kmap-course-selector')
@@ -40,11 +42,14 @@ export class KMapCourseSelector extends connect(store, LitElement) {
   render() {
     // language=HTML
     return html`
-        <mega-list dense>
+        <mwc-list>
           ${this._courses.map((course, i) => html`
-            <mega-list-item dense icon="group" ?activated="${this._selectedIndex === i}" @click="${() => this._select(i)}">${course}</mega-list-item>
+            <mwc-list-item ?activated="${this._selectedIndex === i}" @click="${() => this._select(i)}" graphic="icon">
+              <span>${course}</span>
+              <mwc-icon slot="graphic">group</mwc-icon>
+            </mwc-list-item>
           `)}
-        </mega-list>
+        </mwc-list>
     `;
   }
 }

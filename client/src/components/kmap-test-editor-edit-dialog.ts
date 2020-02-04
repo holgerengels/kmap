@@ -8,6 +8,8 @@ import '@material/mwc-button';
 import '@material/mwc-icon-button';
 import '@material/mwc-dialog';
 import '@material/mwc-formfield';
+import '@material/mwc-list/mwc-list-item';
+import '@material/mwc-select';
 import '@material/mwc-slider';
 import '@material/mwc-textarea';
 import '@material/mwc-textfield';
@@ -292,16 +294,14 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
 ${this._test ? html`
   <form @focus="${this._focus}" @keydown="${this._captureEnter}" @input="${this._checkValidity}">
     <mwc-formfield alignend="" label="Kapitel">
-      <select required @change="${e => this._chapter = e.target.value}">
-        <option value="">- - -</option>
-        ${this._chapters.map((chapter) => html`<option value="${chapter}" ?selected="${chapter === this._chapter}">${chapter}</option>`)}
-      </select>
+      <mwc-select required @change="${e => this._chapter = e.target.value}">
+        ${this._chapters.map((chapter) => html`<mwc-list-item value="${chapter}" ?selected="${chapter === this._chapter}">${chapter}</mwc-list-item>`)}
+      </mwc-select>
       </mwc-formfield>
       <mwc-formfield alignend="" label="Thema">
-      <select required @change="${e => this._topic = e.target.value}">
-        <option value="">- - -</option>
-        ${this._topics.map((topic) => html`<option value="${topic}" ?selected="${topic === this._topic}">${topic}</option>`)}
-      </select>
+      <mwc-select required @change="${e => this._topic = e.target.value}">
+        ${this._topics.map((topic) => html`<mwc-list-item value="${topic}" ?selected="${topic === this._topic}">${topic}</mwc-list-item>`)}
+      </mwc-select>
     </mwc-formfield>
     <br/><br/>
     <mwc-textfield id="key" name="key" label="Titel" dense type="text" required .value="${this._key}" @change="${e => this._key = e.target.value}"></mwc-textfield>

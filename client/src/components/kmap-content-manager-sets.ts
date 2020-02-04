@@ -4,8 +4,10 @@ import {State, store} from "../store";
 
 import {colorStyles, fontStyles} from "./kmap-styles";
 
-import 'mega-material/list';
+import '@material/mwc-icon';
 import '@material/mwc-icon-button';
+import '@material/mwc-list/mwc-list';
+import '@material/mwc-list/mwc-list-item';
 import {Set} from "../models/contentSets";
 
 @customElement('kmap-content-manager-sets')
@@ -97,7 +99,7 @@ export class KMapContentManagerSets extends connect(store, LitElement) {
           width: 180px;
         }
         .scroll {
-          height: 160px;
+          height: 224px;
           overflow-y: auto;
         }
         mwc-icon {
@@ -132,13 +134,15 @@ export class KMapContentManagerSets extends connect(store, LitElement) {
           </span>
           <br style="clear: right"/>
           <div class="scroll">
-          <mega-list>
+          <mwc-list>
             ${this._sets.map((set, i) => html`
-              <mega-list-item icon="folder" ?activated="${this._selectedIndex === i}" @click="${() => this._select(i)}">${set.subject} - ${set.set}
-              <span slot="secondary">${set.count} Karten</span>
-              </mega-list-item>
+              <mwc-list-item icon="folder" ?activated="${this._selectedIndex === i}" @click="${() => this._select(i)}" graphic="icon" twoline>
+                <span>${set.subject} - ${set.set}</span>
+                <span slot="secondary">${set.count} Karten</span>
+                <mwc-icon slot="graphic">folder</mwc-icon>
+              </mwc-list-item>
             `)}
-          </mega-list>
+          </mwc-list>
           </div>
         </div>
         <div class="form">
