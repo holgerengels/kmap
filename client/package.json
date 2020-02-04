@@ -81,7 +81,6 @@
     "idb-keyval": "^3.2.0",
     "lit-element": "^2.2.1",
     "lit-html": "^1.1.2",
-    "mega-material": "1.0.0-alpha.2",
     "pwa-helper-components": "^0.2.1",
     "pwa-helpers": "^0.9.1",
     "redux": "^4.0.0",
