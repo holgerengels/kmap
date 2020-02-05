@@ -85,7 +85,7 @@ export class KMapBrowser extends connect(store, LitElement) {
       this._bar.scrollTarget = page ? page : window;
     }
 
-    if (changedProperties.has('_topic')) {
+    if (changedProperties.has('_topic') || changedProperties.has("_lines")) {
       if (!this._topic) {
         this._topicCard = undefined;
       }

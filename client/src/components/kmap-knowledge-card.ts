@@ -286,7 +286,7 @@ class KMapKnowledgeCard extends connect(store, LitElement) {
     }
       <div style="flex: 1 0 auto; height: 24px"></div>
       ${this._hasTests ? html`
-        <a href="/app/tests/${this.subject}/${this.chapter}/${this.card.topic}"><mwc-ripple></mwc-ripple><mwc-icon>help_outline</mwc-icon></a>
+        <a href="/app/test/${this.subject}/${this.chapter}/${this.card.topic}"><mwc-ripple></mwc-ripple><mwc-icon>help_outline</mwc-icon></a>
       ` : ''}
   </div>
     `;

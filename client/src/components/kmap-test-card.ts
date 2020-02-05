@@ -101,8 +101,8 @@ export class KMapTestCard extends connect(store, LitElement) {
     this._answerFlex = "flex: " + (6 - balance);
   }
 
-  _levelText() {
-    switch (this.level) {
+  _levelText(level: number) {
+    switch (level) {
       case 1:
         return "leicht";
       case 2:
@@ -332,7 +332,7 @@ export class KMapTestCard extends connect(store, LitElement) {
   render() {
     return html`
   <div class="card-header" ?hidden="${this.hideHeader}">
-      <span>Aufgabe ${this.num + 1} von ${this.of} (${this._levelText()})</span>
+      <span>Aufgabe ${this.num + 1} von ${this.of} (${this._levelText(this.level)})</span>
       <div style="flex: 1 0 auto"></div>
       <a href="/app/browser/${this.subject}/${this.chapter}/${this.topic}" target="_blank" id="blinky">Wissenskarte ansehen <mwc-icon>open_in_new</mwc-icon></a>
   </div>

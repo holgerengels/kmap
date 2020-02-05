@@ -46,7 +46,7 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
   @property()
   private _key: string = '';
   @property()
-  private _level: number = 1;
+  private _level: string = "1";
   @property()
   private _balance: number = 3;
 
@@ -109,7 +109,7 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
       this._chapter  = this._test.chapter || '';
       this._topic    = this._test.topic || '';
       this._key      = this._test.key || '';
-      this._level    = this._test.level || 1;
+      this._level    = "" + (this._test.level || 1);
       this._balance  = this._test.balance || 3;
       this._question = this._test.question || '';
       this._answer   = this._test.answer || '';
@@ -163,6 +163,7 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
     this._test.chapter = this._chapter;
     this._test.topic = this._topic;
     this._test.key = this._key;
+    this._test.level = this._level ? parseInt(this._level, 10) : undefined;
     this._test.balance = this._balance;
     this._test.question = this._question;
     this._test.answer = this._answer;
