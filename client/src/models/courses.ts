@@ -1,6 +1,6 @@
 import {createModel, RoutingState} from '@captaincodeman/rdx-model';
 import {Dispatch, State} from '../store';
-import {endpoint} from "../endpoint";
+import {endpoint, fetchjson} from "../endpoint";
 import {config} from "../config";
 
 export interface Course {
@@ -127,19 +127,12 @@ export default createModel({
       }
 
       dispatch.courses.requestLoad();
-      const resp = await fetch(`${config.server}state?courses=${userid}`, endpoint.get(state));
-      if (resp.ok) {
-        const json = await resp.json();
-        // @ts-ignore
-        dispatch.courses.receivedLoad(json);
-      }
-      else {
-        const message = await resp.text();
-        // @ts-ignore
-        dispatch.app.handleError({ code: resp.status, message: message });
-        // @ts-ignore
-        dispatch.courses.error(message);
-      }
+      fetchjson(`${config.server}state?courses=${userid}`, endpoint.get(state),
+        (json) => {
+          dispatch.courses.receivedLoad(json);
+        },
+        dispatch.app.handleError,
+        dispatch.courses.error);
     },
 
     async store(payload: string[]) {
@@ -149,18 +142,12 @@ export default createModel({
         return;
 
       dispatch.courses.requestStore();
-      const resp = await fetch(`${config.server}state?userid=${userid}&storeCourses=${userid}`, {... endpoint.post(state), body: JSON.stringify(payload)});
-      if (resp.ok) {
-        await resp.json();
-        dispatch.courses.receivedStore(payload);
-      }
-      else {
-        const message = await resp.text();
-        // @ts-ignore
-        dispatch.app.handleError({ code: resp.status, message: message });
-        // @ts-ignore
-        dispatch.courses.error(message);
-      }
+      fetchjson(`${config.server}state?userid=${userid}&storeCourses=${userid}`, {... endpoint.post(state), body: JSON.stringify(payload)},
+        () => {
+          dispatch.courses.receivedStore(payload);
+        },
+        dispatch.app.handleError,
+        dispatch.courses.error);
     },
     async loadCourse(course: string) {
       const state: State = getState();
@@ -169,19 +156,12 @@ export default createModel({
         return;
 
       dispatch.courses.requestLoadCourse();
-      const resp = await fetch(`${config.server}state?userid=${userid}&course=${course}`, endpoint.get(state));
-      if (resp.ok) {
-        const json = await resp.json();
-        // @ts-ignore
-        dispatch.courses.receivedLoadCourse(json);
-      }
-      else {
-        const message = await resp.text();
-        // @ts-ignore
-        dispatch.app.handleError({ code: resp.status, message: message });
-        // @ts-ignore
-        dispatch.courses.error(message);
-      }
+      fetchjson(`${config.server}state?userid=${userid}&course=${course}`, endpoint.get(state),
+        (json) => {
+          dispatch.courses.receivedLoadCourse(json);
+        },
+        dispatch.app.handleError,
+        dispatch.courses.error);
     },
     async storeChange(payload: Course) {
       const state: State = getState();
@@ -190,22 +170,15 @@ export default createModel({
         return;
 
       dispatch.courses.requestStoreChange();
-      const resp = await fetch(`${config.server}state?userid=${userid}&storeCourse=${payload.name}`, {... endpoint.post(state), body: JSON.stringify(payload.students)});
-      if (resp.ok) {
-        // @ts-ignore
-        await resp.json();
-        dispatch.courses.receivedStoreChange(payload.students);
+      fetchjson(`${config.server}state?userid=${userid}&storeCourse=${payload.name}`, {... endpoint.post(state), body: JSON.stringify(payload.students)},
+        () => {
+          dispatch.courses.receivedStoreChange(payload.students);
 
-        if (!state.courses.courses.includes(payload.name))
-          dispatch.courses.receivedLoad([... state.courses.courses, payload.name].sort());
-      }
-      else {
-        const message = await resp.text();
-        // @ts-ignore
-        dispatch.app.handleError({ code: resp.status, message: message });
-        // @ts-ignore
-        dispatch.courses.error(message);
-      }
+          if (!state.courses.courses.includes(payload.name))
+            dispatch.courses.receivedLoad([... state.courses.courses, payload.name].sort());
+        },
+        dispatch.app.handleError,
+        dispatch.courses.error);
     },
 
     'routing/change': async function(routing: RoutingState) {

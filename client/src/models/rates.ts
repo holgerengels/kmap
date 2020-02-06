@@ -1,6 +1,6 @@
 import {createModel} from '@captaincodeman/rdx-model';
 import { State, Dispatch } from '../store';
-import {endpoint} from "../endpoint";
+import {endpoint, fetchjson} from "../endpoint";
 import {config} from "../config";
 
 export interface Rate {
@@ -86,38 +86,26 @@ export default createModel({
       // @ts-ignore
       if (state.rates.subject !== subject || !state.rates.rates) {
         dispatch.rates.requestLoad();
-        const resp = await fetch(`${config.server}state?load=${userid}&subject=${subject}`, endpoint.get(state));
-        if (resp.ok) {
-          const json = await resp.json();
-          // @ts-ignore
-          dispatch.rates.receivedLoad({subject: subject, rates: json});
-        }
-        else {
-          const message = await resp.text();
-          // @ts-ignore
-          dispatch.app.handleError({ code: resp.status, message: message });
-          // @ts-ignore
-          dispatch.rates.error(message);
-        }
+        fetchjson(`${config.server}state?load=${userid}&subject=${subject}`, endpoint.get(state),
+          (json) => {
+            // @ts-ignore
+            dispatch.rates.receivedLoad({subject: subject, rates: json});
+          },
+          dispatch.app.handleError,
+          dispatch.rates.error);
       }
     },
     async store(payload: Rate) {
       const state: State = getState();
       dispatch.rates.requestStore();
       let body = {... payload, save: state.app.userid};
-      const resp = await fetch(`${config.server}state?save=${state.app.userid}&subject=${payload.subject}`, {... endpoint.post(state), body: JSON.stringify(body)});
-      if (resp.ok) {
-        const json = await resp.json();
-        // @ts-ignore
-        dispatch.rates.receivedStore({subject: payload.subject, rates: json});
-      }
-      else {
-        const message = await resp.text();
-        // @ts-ignore
-        dispatch.app.handleError({ code: resp.status, message: message });
-        // @ts-ignore
-        dispatch.rates.error(message);
-      }
+      fetchjson(`${config.server}state?save=${state.app.userid}&subject=${payload.subject}`, {... endpoint.post(state), body: JSON.stringify(body)},
+        (json) => {
+          // @ts-ignore
+          dispatch.rates.receivedStore({subject: payload.subject, rates: json});
+        },
+        dispatch.app.handleError,
+        dispatch.rates.error);
     },
 
     'maps/received': async function() {

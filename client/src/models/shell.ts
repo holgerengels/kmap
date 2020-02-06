@@ -1,5 +1,5 @@
 import {createModel, RoutingState} from '@captaincodeman/rdx-model';
-import {Dispatch, State} from '../store';
+import {Dispatch} from '../store';
 
 export interface Meta {
   title?: string,

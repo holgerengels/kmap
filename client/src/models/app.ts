@@ -1,6 +1,6 @@
 import { createModel } from '@captaincodeman/rdx-model';
 import { State, Dispatch } from '../store';
-import {endpoint} from "../endpoint";
+import {endpoint, fetchjson} from "../endpoint";
 import {config} from "../config";
 
 export interface Error {
@@ -80,37 +80,23 @@ export default createModel({
       const state: State = getState();
       // @ts-ignore
       dispatch.app.requestLogin();
-      const resp = await fetch(`${config.server}state?login=${payload.userid}`, {... endpoint.post(state), body: JSON.stringify(payload)});
-      if (resp.ok) {
-        const json = await resp.json();
-        // @ts-ignore
-        dispatch.app.receivedLogin({ userid: payload.userid, roles: json});
-      }
-      else {
-        const message = await resp.text();
-        // @ts-ignore
-        dispatch.app.handleError({ code: resp.status, message: message });
-        // @ts-ignore
-        dispatch.app.error(message);
-      }
+      fetchjson(`${config.server}state?login=${payload.userid}`, {... endpoint.post(state), body: JSON.stringify(payload)},
+        (json) => {
+          dispatch.app.receivedLogin({ userid: payload.userid, roles: json});
+        },
+        dispatch.app.handleError,
+        dispatch.app.error);
     },
     async logout() {
       const state: State = getState();
       // @ts-ignore
       dispatch.app.requestLogout();
-      const resp = await fetch(`${config.server}state?logout=${state.app.userid}`, {... endpoint.post(state), body: JSON.stringify({userid: state.app.userid})});
-      if (resp.ok) {
-        // @ts-ignore
-        await resp.json();
-        dispatch.app.receivedLogout();
-      }
-      else {
-        const message = await resp.text();
-        // @ts-ignore
-        dispatch.app.handleError({ code: resp.status, message: message });
-        // @ts-ignore
-        dispatch.app.error(message);
-      }
+      fetchjson(`${config.server}state?logout=${state.app.userid}`, {... endpoint.post(state), body: JSON.stringify({userid: state.app.userid})},
+        () => {
+          dispatch.app.receivedLogout();
+        },
+        dispatch.app.handleError,
+        dispatch.app.error);
     },
     handleError(error: Error) {
       switch (error.code) {

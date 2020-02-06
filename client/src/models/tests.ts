@@ -1,6 +1,6 @@
 import {createModel, RoutingState} from '@captaincodeman/rdx-model';
 import {State, Dispatch} from '../store';
-import {endpoint} from "../endpoint";
+import {endpoint, fetchjson} from "../endpoint";
 import {config} from "../config";
 import {Path} from "./types";
 
@@ -191,19 +191,12 @@ export default createModel({
       // @ts-ignore
       if (state.tests.subject !== subject || !state.tests.tests) {
         dispatch.tests.requestTopics();
-        const resp = await fetch(`${config.server}tests?topics=all&subject=${subject}`, endpoint.get(state));
-        if (resp.ok) {
-          const json = await resp.json();
-          // @ts-ignore
-          dispatch.tests.receivedTopics({subject: subject, topics: json});
-        }
-        else {
-          const message = await resp.text();
-          // @ts-ignore
-          dispatch.app.handleError({ code: resp.status, message: message });
-          // @ts-ignore
-          dispatch.tests.error(message);
-        }
+        fetchjson(`${config.server}tests?topics=all&subject=${subject}`, endpoint.get(state),
+          (json) => {
+            dispatch.tests.receivedTopics({subject: subject, topics: json});
+          },
+          dispatch.app.handleError,
+          dispatch.tests.error);
       }
     },
     async loadChapters(subject: string) {
@@ -212,19 +205,12 @@ export default createModel({
       // @ts-ignore
       if (state.tests.subject !== subject || !state.tests.chapters) {
         dispatch.tests.requestChapters();
-        const resp = await fetch(`${config.server}tests?chapters=all&subject=${subject}`, endpoint.get(state));
-        if (resp.ok) {
-          const json = await resp.json();
-          // @ts-ignore
-          dispatch.tests.receivedChapters({subject: subject, chapters: json});
-        }
-        else {
-          const message = await resp.text();
-          // @ts-ignore
-          dispatch.app.handleError({ code: resp.status, message: message });
-          // @ts-ignore
-          dispatch.tests.error(message);
-        }
+        fetchjson(`${config.server}tests?chapters=all&subject=${subject}`, endpoint.get(state),
+          (json) => {
+            dispatch.tests.receivedChapters({subject: subject, chapters: json});
+          },
+          dispatch.app.handleError,
+          dispatch.tests.error);
       }
     },
     async loadTree(subject: string) {
@@ -233,19 +219,12 @@ export default createModel({
       // @ts-ignore
       if (state.tests.subject !== subject || !state.tests.tree) {
         dispatch.tests.requestTree();
-        const resp = await fetch(`${config.server}data?tree=all&subject=${subject}`, endpoint.get(state));
-        if (resp.ok) {
-          const json = await resp.json();
-          // @ts-ignore
-          dispatch.tests.receivedTree({subject: subject, chapters: json});
-        }
-        else {
-          const message = await resp.text();
-          // @ts-ignore
-          dispatch.app.handleError({ code: resp.status, message: message });
-          // @ts-ignore
-          dispatch.tests.error(message);
-        }
+        fetchjson(`${config.server}data?tree=all&subject=${subject}`, endpoint.get(state),
+          (json) => {
+            dispatch.tests.receivedTree({subject: subject, chapters: json});
+          },
+          dispatch.app.handleError,
+          dispatch.tests.error);
       }
     },
     async loadTests(payload: Path) {
@@ -259,19 +238,13 @@ export default createModel({
         const url = payload.topic
           ? `${config.server}tests?subject=${payload.subject}&chapter=${payload.chapter}&topic=${payload.topic}`
           : `${config.server}tests?subject=${payload.subject}&chapter=${payload.chapter}`;
-        const resp = await fetch(url, endpoint.get(state));
-        if (resp.ok) {
-          const json = await resp.json();
-          // @ts-ignore
-          dispatch.tests.receivedTests({subject: payload.subject, chapter: payload.chapters, topic: payload.topic, tests: json});
-        }
-        else {
-          const message = await resp.text();
-          // @ts-ignore
-          dispatch.app.handleError({ code: resp.status, message: message });
-          // @ts-ignore
-          dispatch.tests.error(message);
-        }
+
+        fetchjson(url, endpoint.get(state),
+          (json) => {
+            dispatch.tests.receivedTests({subject: payload.subject, chapter: payload.chapter, topic: payload.topic, tests: json});
+          },
+          dispatch.app.handleError,
+          dispatch.tests.error);
       }
     },
 
@@ -280,45 +253,30 @@ export default createModel({
       const userid = state.app.userid;
 
       dispatch.tests.requestDeleteTest();
-      const resp = await fetch(`${config.server}tests?userid=${userid}&subject=${test.subject}&save=${test.set}`,
-        {... endpoint.post(state), body: JSON.stringify({delete: test})});
-
-      if (resp.ok) {
-        await resp.json();
-        dispatch.tests.receivedDeleteTest();
-        dispatch.tests.unsetTestForDelete();
-        dispatch.contentSets.maybeObsoleteSet({subject: test.subject, set: test.set});
-      }
-      else {
-        const message = await resp.text();
-        // @ts-ignore
-        dispatch.app.handleError({ code: resp.status, message: message });
-        // @ts-ignore
-        dispatch.tests.error(message);
-      }
+      fetchjson(`${config.server}tests?userid=${userid}&subject=${test.subject}&save=${test.set}`, {... endpoint.post(state), body: JSON.stringify({delete: test})},
+        () => {
+          dispatch.tests.receivedDeleteTest();
+          dispatch.tests.unsetTestForDelete();
+          dispatch.contentSets.maybeObsoleteSet({subject: test.subject, set: test.set});
+        },
+        dispatch.app.handleError,
+        dispatch.tests.error);
     },
     async saveTest(test: Test) {
       const state: State = getState();
       const userid = state.app.userid;
 
       dispatch.tests.requestSaveTest();
-      const resp = await fetch(`${config.server}tests?userid=${userid}&subject=${test.subject}&save=${test.set}`,
+      fetchjson(`${config.server}tests?userid=${userid}&subject=${test.subject}&save=${test.set}`,
         // @ts-ignore
-        {... endpoint.post(state), body: JSON.stringify(test.added ? {changed: test} : {old: test, changed: test})});
-
-      if (resp.ok) {
-        await resp.json();
-        dispatch.tests.receivedSaveTest();
-        dispatch.tests.unsetTestForEdit();
-        dispatch.contentSets.maybeNewSet({subject: test.subject, set: test.set});
-      }
-      else {
-        const message = await resp.text();
-        // @ts-ignore
-        dispatch.app.handleError({ code: resp.status, message: message });
-        // @ts-ignore
-        dispatch.tests.error(message);
-      }
+        {... endpoint.post(state), body: JSON.stringify(test.added ? {changed: test} : {old: test, changed: test})},
+        () => {
+          dispatch.tests.receivedSaveTest();
+          dispatch.tests.unsetTestForEdit();
+          dispatch.contentSets.maybeNewSet({subject: test.subject, set: test.set});
+        },
+        dispatch.app.handleError,
+        dispatch.tests.error);
     },
 
     'maps/subjectChanged': async function() {
@@ -351,3 +309,4 @@ export default createModel({
     },
   })
 })
+

@@ -1,6 +1,6 @@
 import {createModel, RoutingState} from '@captaincodeman/rdx-model';
 import { State, Dispatch } from '../store';
-import {endpoint} from "../endpoint";
+import {endpoint, fetchjson} from "../endpoint";
 import {config} from "../config";
 
 export interface SubjectsState {
@@ -46,19 +46,12 @@ export default createModel({
       // @ts-ignore
       if (Date.now() - state.subjects.timestamp > 3000) {
         dispatch.subjects.requestLoad();
-        const resp = await fetch(`${config.server}data?subjects=all`, endpoint.get(state));
-        if (resp.ok) {
-          const json = await resp.json();
-          // @ts-ignore
-          dispatch.subjects.receivedLoad(json);
-        }
-        else {
-          const message = await resp.text();
-          // @ts-ignore
-          dispatch.app.handleError({ code: resp.status, message: message });
-          // @ts-ignore
-          dispatch.subjects.error(message);
-        }
+        fetchjson(`${config.server}data?subjects=all`, endpoint.get(state),
+          (json) => {
+            dispatch.subjects.receivedLoad(json);
+          },
+          dispatch.app.handleError,
+          dispatch.subjects.error);
       }
     },
 
@@ -67,8 +60,8 @@ export default createModel({
         case 'home':
           document.title = "KMap - Knowledge Map";
         case 'test':
-          // @ts-ignore
-          dispatch.subjects.load();
+          if (Object.keys(routing.params).length === 0)
+            dispatch.subjects.load();
           break;
       }
     },

@@ -1,6 +1,6 @@
 import {createModel} from '@captaincodeman/rdx-model';
 import { State, Dispatch } from '../store';
-import {endpoint} from "../endpoint";
+import {endpoint, fetchjson} from "../endpoint";
 import {config} from "../config";
 import {Path} from "./types";
 import {Attachment} from "./maps";
@@ -64,55 +64,37 @@ export default createModel({
       const state: State = getState();
 
       dispatch.cloud.requestAttachments();
-      const resp = await fetch(`${config.server}edit?attachments=${path.subject}/${path.chapter}/${path.topic}`, endpoint.get(state));
-      if (resp.ok) {
-        const json = await resp.json();
-        // @ts-ignore
-        dispatch.cloud.receivedAttachments(json);
-      }
-      else {
-        const message = await resp.text();
-        // @ts-ignore
-        dispatch.app.handleError({ code: resp.status, message: message });
-        // @ts-ignore
-        dispatch.cloud.error(message);
-      }
+      fetchjson(`${config.server}edit?attachments=${path.subject}/${path.chapter}/${path.topic}`, endpoint.get(state),
+        (json) => {
+          // @ts-ignore
+          dispatch.cloud.receivedAttachments(json);
+        },
+        dispatch.app.handleError,
+        dispatch.cloud.error);
     },
     async createDirectory(path: Path) {
       const state: State = getState();
 
       dispatch.cloud.requestCreateDirectory();
-      const resp = await fetch(`${config.server}edit?directory=${path.subject}/${path.chapter}/${path.topic}`, endpoint.get(state));
-      if (resp.ok) {
-        const json = await resp.json();
-        // @ts-ignore
-        dispatch.cloud.receivedCreateDirectory(json);
-      }
-      else {
-        const message = await resp.text();
-        // @ts-ignore
-        dispatch.app.handleError({ code: resp.status, message: message });
-        // @ts-ignore
-        dispatch.cloud.error(message);
-      }
+      fetchjson(`${config.server}edit?directory=${path.subject}/${path.chapter}/${path.topic}`, endpoint.get(state),
+        (json) => {
+          // @ts-ignore
+          dispatch.cloud.receivedCreateDirectory(json);
+        },
+        dispatch.app.handleError,
+        dispatch.cloud.error);
     },
     async createDirectoryForTests(path: Path) {
       const state: State = getState();
 
       dispatch.cloud.requestCreateDirectory();
-      const resp = await fetch(`${config.server}edit?directory=${path.subject}/${path.chapter}/${path.topic}/tests`, endpoint.get(state));
-      if (resp.ok) {
-        const json = await resp.json();
-        // @ts-ignore
-        dispatch.cloud.receivedCreateDirectory(json);
-      }
-      else {
-        const message = await resp.text();
-        // @ts-ignore
-        dispatch.app.handleError({ code: resp.status, message: message });
-        // @ts-ignore
-        dispatch.cloud.error(message);
-      }
+      fetchjson(`${config.server}edit?directory=${path.subject}/${path.chapter}/${path.topic}/tests`, endpoint.get(state),
+        (json) => {
+          // @ts-ignore
+          dispatch.cloud.receivedCreateDirectory(json);
+        },
+        dispatch.app.handleError,
+        dispatch.cloud.error);
     },
 
     'app/chooseInstance': async function() {

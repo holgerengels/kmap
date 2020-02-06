@@ -1,6 +1,6 @@
 import {createModel, RoutingState} from '@captaincodeman/rdx-model';
 import { State, Dispatch } from '../store';
-import {endpoint} from "../endpoint";
+import {endpoint, fetchblob, fetchjson} from "../endpoint";
 import {config} from "../config";
 
 export interface Module {
@@ -88,19 +88,12 @@ export default createModel({
       // @ts-ignore
       if (Date.now() - state.contentMaps.timestamp > 3000) {
         dispatch.contentMaps.requestLoad();
-        const resp = await fetch(`${config.server}edit?modules=all`, endpoint.get(state));
-        if (resp.ok) {
-          const json = await resp.json();
-          // @ts-ignore
-          dispatch.contentMaps.receivedLoad(json);
-        }
-        else {
-          const message = await resp.text();
-          // @ts-ignore
-          dispatch.app.handleError({ code: resp.status, message: message });
-          // @ts-ignore
-          dispatch.contentMaps.error(message);
-        }
+        fetchjson(`${config.server}edit?modules=all`, endpoint.get(state),
+          (json) => {
+            dispatch.contentMaps.receivedLoad(json);
+          },
+          dispatch.app.handleError,
+          dispatch.contentMaps.error);
       }
     },
     async import(files: File[]) {
@@ -116,64 +109,43 @@ export default createModel({
       }
 
       dispatch.contentMaps.requestImport();
-      const resp = await fetch(`${config.server}content?import-module=${names.join(",")}`, {... endpoint.post(state), body: formData});
-      if (resp.ok) {
-        await resp.json();
-        // @ts-ignore
-        dispatch.contentMaps.receivedImport();
-      }
-      else {
-        const message = await resp.text();
-        // @ts-ignore
-        dispatch.app.handleError({ code: resp.status, message: message });
-        // @ts-ignore
-        dispatch.contentMaps.error(message);
-      }
+      fetchjson(`${config.server}content?import-module=${names.join(",")}`, {... endpoint.post(state), body: formData},
+        () => {
+          dispatch.contentMaps.receivedImport();
+        },
+        dispatch.app.handleError,
+        dispatch.contentMaps.error);
     },
     async export(payload: Module) {
       const state: State = getState();
 
       dispatch.contentMaps.requestExport();
-      const resp = await fetch(`${config.server}content?subject=${payload.subject}&export-module=${payload.module}`, endpoint.get(state));
-      if (resp.ok) {
-        const blob: Blob = await resp.blob();
-
-        let url = window.URL.createObjectURL(blob);
-        var a: HTMLAnchorElement = document.createElement('a');
-        a.href = url;
-        a.download = payload.subject + " - " + payload.module + ".zip";
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        URL.revokeObjectURL(url);
-        // @ts-ignore
-        dispatch.contentMaps.receivedExport();
-      }
-      else {
-        const message = await resp.text();
-        // @ts-ignore
-        dispatch.app.handleError({ code: resp.status, message: message });
-        // @ts-ignore
-        dispatch.contentMaps.error(message);
-      }
+      fetchblob(`${config.server}content?subject=${payload.subject}&export-module=${payload.module}`, endpoint.get(state),
+        (blob) => {
+          let url = window.URL.createObjectURL(blob);
+          var a: HTMLAnchorElement = document.createElement('a');
+          a.href = url;
+          a.download = payload.subject + " - " + payload.module + ".zip";
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          URL.revokeObjectURL(url);
+          // @ts-ignore
+          dispatch.contentMaps.receivedExport();
+        },
+        dispatch.app.handleError,
+        dispatch.contentMaps.error);
     },
     async delete(payload: Module) {
       const state: State = getState();
 
       dispatch.contentMaps.requestDelete();
-      const resp = await fetch(`${config.server}edit?subject=${payload.subject}&delete=${payload.module}`, endpoint.get(state));
-      if (resp.ok) {
-        await resp.json();
-        // @ts-ignore
-        dispatch.contentMaps.receivedDelete();
-      }
-      else {
-        const message = await resp.text();
-        // @ts-ignore
-        dispatch.app.handleError({ code: resp.status, message: message });
-        // @ts-ignore
-        dispatch.contentMaps.error(message);
-      }
+      fetchjson(`${config.server}edit?subject=${payload.subject}&delete=${payload.module}`, endpoint.get(state),
+        () => {
+          dispatch.contentMaps.receivedDelete();
+        },
+        dispatch.app.handleError,
+        dispatch.contentMaps.error);
     },
 
     'routing/change': async function(routing: RoutingState) {

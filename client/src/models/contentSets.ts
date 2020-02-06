@@ -1,6 +1,6 @@
 import {createModel, RoutingState} from '@captaincodeman/rdx-model';
 import { State, Dispatch } from '../store';
-import {endpoint} from "../endpoint";
+import {endpoint, fetchblob, fetchjson} from "../endpoint";
 import {config} from "../config";
 import {Test} from "./tests";
 
@@ -178,6 +178,7 @@ export default createModel({
     maybeObsoleteSet(set: Set) {
       const state: State = getState();
 
+      // @ts-ignore
       if (state.contentSets.set.count === 1 ) {
         dispatch.contentSets.receivedLoad(state.contentSets.sets.filter(s => s.set !== set.set));
         dispatch.contentSets.unselectSet();
@@ -201,64 +202,43 @@ export default createModel({
       }
 
       dispatch.contentSets.requestImport();
-      const resp = await fetch(`${config.server}content?import-set=${names.join(",")}`, {... endpoint.post(state), body: formData});
-      if (resp.ok) {
-        await resp.json();
-        // @ts-ignore
-        dispatch.contentSets.receivedImport();
-      }
-      else {
-        const message = await resp.text();
-        // @ts-ignore
-        dispatch.app.handleError({ code: resp.status, message: message });
-        // @ts-ignore
-        dispatch.contentSets.error(message);
-      }
+      fetchjson(`${config.server}content?import-set=${names.join(",")}`, {... endpoint.post(state), body: formData},
+        () => {
+          dispatch.contentSets.receivedImport();
+        },
+        dispatch.app.handleError,
+        dispatch.contentSets.error);
     },
     async export(payload: Set) {
       const state: State = getState();
 
       dispatch.contentSets.requestExport();
-      const resp = await fetch(`${config.server}content?subject=${payload.subject}&export-set=${payload.set}`, endpoint.get(state));
-      if (resp.ok) {
-        const blob: Blob = await resp.blob();
-
-        let url = window.URL.createObjectURL(blob);
-        var a: HTMLAnchorElement = document.createElement('a');
-        a.href = url;
-        a.download = payload.subject + " - " + payload.set + "-tests.zip";
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        URL.revokeObjectURL(url);
-        // @ts-ignore
-        dispatch.contentSets.receivedExport();
-      }
-      else {
-        const message = await resp.text();
-        // @ts-ignore
-        dispatch.app.handleError({ code: resp.status, message: message });
-        // @ts-ignore
-        dispatch.contentSets.error(message);
-      }
+      fetchblob(`${config.server}content?subject=${payload.subject}&export-set=${payload.set}`, endpoint.get(state),
+        (blob) => {
+          let url = window.URL.createObjectURL(blob);
+          var a: HTMLAnchorElement = document.createElement('a');
+          a.href = url;
+          a.download = payload.subject + " - " + payload.set + "-tests.zip";
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          URL.revokeObjectURL(url);
+          // @ts-ignore
+          dispatch.contentSets.receivedExport();
+        },
+        dispatch.app.handleError,
+        dispatch.contentSets.error);
     },
     async delete(payload: Set) {
       const state: State = getState();
 
       dispatch.contentSets.requestDelete();
-      const resp = await fetch(`${config.server}tests?subject=${payload.subject}&delete=${payload.set}`, endpoint.get(state));
-      if (resp.ok) {
-        await resp.json();
-        // @ts-ignore
-        dispatch.contentSets.receivedDelete();
-      }
-      else {
-        const message = await resp.text();
-        // @ts-ignore
-        dispatch.app.handleError({ code: resp.status, message: message });
-        // @ts-ignore
-        dispatch.contentSets.error(message);
-      }
+      fetchjson(`${config.server}tests?subject=${payload.subject}&delete=${payload.set}`, endpoint.get(state),
+        () => {
+          dispatch.contentSets.receivedDelete();
+        },
+        dispatch.app.handleError,
+        dispatch.contentSets.error);
     },
 
     'routing/change': async function(routing: RoutingState) {

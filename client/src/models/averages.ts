@@ -1,6 +1,6 @@
 import {createModel} from '@captaincodeman/rdx-model';
 import { State, Dispatch } from '../store';
-import {endpoint} from "../endpoint";
+import {endpoint, fetchjson} from "../endpoint";
 import {config} from "../config";
 
 export interface AverageRateState {
@@ -66,19 +66,13 @@ export default createModel({
       // @ts-ignore
       if (Date.now() - state.averages.timestamp > 3000 || state.averages.subject !== subject || state.averages.course !== course) {
         dispatch.averages.requestLoad();
-        const resp = await fetch(`${config.server}state?load=${userid}&subject=${subject}&course=${course}`, endpoint.get(state));
-        if (resp.ok) {
-          const json = await resp.json();
-          // @ts-ignore
-          dispatch.averages.receivedLoad({subject: subject, course: course, rates: json});
-        }
-        else {
-          const message = await resp.text();
-          // @ts-ignore
-          dispatch.app.handleError({ code: resp.status, message: message });
-          // @ts-ignore
-          dispatch.averages.error(message);
-        }
+        fetchjson(`${config.server}state?load=${userid}&subject=${subject}&course=${course}`, endpoint.get(state),
+          (json) => {
+            // @ts-ignore
+            dispatch.averages.receivedLoad({subject: subject, course: course, rates: json});
+          },
+          dispatch.app.handleError,
+          dispatch.averages.error);
       }
     },
 

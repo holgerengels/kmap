@@ -1,6 +1,6 @@
 import {createModel, RoutingState} from '@captaincodeman/rdx-model';
 import {Dispatch, State} from '../store';
-import {endpoint} from "../endpoint";
+import {endpoint, fetchjson} from "../endpoint";
 import {config} from "../config";
 import {Path} from "./types";
 
@@ -176,87 +176,59 @@ export default createModel({
       }
 
       dispatch.maps.request();
-      const resp = await fetch(`${config.server}data?subject=${path.subject}&load=${path.chapter}`, endpoint.get(state));
-      if (resp.ok) {
-        const json = await resp.json();
-        // @ts-ignore
-        dispatch.maps.received(json);
-        if (path.subject !== oldSubject) {
-          dispatch.maps.subjectChanged();
-        }
-      }
-      else {
-        const message = await resp.text();
-        // @ts-ignore
-        dispatch.app.handleError({ code: resp.status, message: message });
-        // @ts-ignore
-        dispatch.maps.error(message);
-      }
+      fetchjson(`${config.server}data?subject=${path.subject}&load=${path.chapter}`, endpoint.get(state),
+        (json) => {
+          dispatch.maps.received(json);
+          if (path.subject !== oldSubject) {
+            dispatch.maps.subjectChanged();
+          }
+        },
+        dispatch.app.handleError,
+        dispatch.maps.error);
     },
     async deleteTopic(card: Card) {
       const state: State = getState();
       const userid = state.app.userid;
 
       dispatch.maps.requestDeleteTopic();
-      const resp = await fetch(`${config.server}edit?userid=${userid}&subject=${card.subject}&save=${card.module}`,
-        {... endpoint.post(state), body: JSON.stringify({delete: card})});
-
-      if (resp.ok) {
-        await resp.json();
-        dispatch.maps.receivedDeleteTopic();
-        dispatch.maps.unsetCardForDelete();
-      }
-      else {
-        const message = await resp.text();
-        // @ts-ignore
-        dispatch.app.handleError({ code: resp.status, message: message });
-        // @ts-ignore
-        dispatch.maps.error(message);
-      }
+      fetchjson(`${config.server}edit?userid=${userid}&subject=${card.subject}&save=${card.module}`,
+        {... endpoint.post(state), body: JSON.stringify({delete: card})},
+        () => {
+          dispatch.maps.receivedDeleteTopic();
+          dispatch.maps.unsetCardForDelete();
+        },
+        dispatch.app.handleError,
+        dispatch.maps.error);
     },
     async renameTopic(card: Card) {
       const state: State = getState();
       const userid = state.app.userid;
 
       dispatch.maps.requestRenameTopic();
-      const resp = await fetch(`${config.server}edit?userid=${userid}&subject=${card.subject}&save=${card.module}`,
+      fetchjson(`${config.server}edit?userid=${userid}&subject=${card.subject}&save=${card.module}`,
         // @ts-ignore
-        {... endpoint.post(state), body: JSON.stringify({rename: card, name: card.newName })});
-
-      if (resp.ok) {
-        await resp.json();
-        dispatch.maps.receivedRenameTopic();
-        dispatch.maps.unsetCardForRename();
-      }
-      else {
-        const message = await resp.text();
-        // @ts-ignore
-        dispatch.app.handleError({ code: resp.status, message: message });
-        // @ts-ignore
-        dispatch.maps.error(message);
-      }
+        {... endpoint.post(state), body: JSON.stringify({rename: card, name: card.newName })},
+        () => {
+          dispatch.maps.receivedRenameTopic();
+          dispatch.maps.unsetCardForRename();
+        },
+        dispatch.app.handleError,
+        dispatch.maps.error);
     },
     async saveTopic(card: Card) {
       const state: State = getState();
       const userid = state.app.userid;
 
       dispatch.maps.requestSaveTopic();
-      const resp = await fetch(`${config.server}edit?userid=${userid}&subject=${card.subject}&save=${card.module}`,
+      fetchjson(`${config.server}edit?userid=${userid}&subject=${card.subject}&save=${card.module}`,
         // @ts-ignore
-        {... endpoint.post(state), body: JSON.stringify(card.added ? {changed: card} : {old: card, changed: card})});
-
-      if (resp.ok) {
-        await resp.json();
-        dispatch.maps.receivedSaveTopic();
-        dispatch.maps.unsetCardForEdit();
-      }
-      else {
-        const message = await resp.text();
-        // @ts-ignore
-        dispatch.app.handleError({ code: resp.status, message: message });
-        // @ts-ignore
-        dispatch.maps.error(message);
-      }
+        {... endpoint.post(state), body: JSON.stringify(card.added ? {changed: card} : {old: card, changed: card})},
+        () => {
+          dispatch.maps.receivedSaveTopic();
+          dispatch.maps.unsetCardForEdit();
+        },
+        dispatch.app.handleError,
+        dispatch.maps.error);
     },
 
     async loadAllTopics(subject: string) {
@@ -267,19 +239,12 @@ export default createModel({
       }
 
       dispatch.maps.requestAllTopics();
-      const resp = await fetch(`${config.server}data?subject=${subject}&topics=all`, endpoint.get(state));
-      if (resp.ok) {
-        const json = await resp.json();
-        // @ts-ignore
-        dispatch.maps.receivedAllTopics({subject: subject, topics: json});
-      }
-      else {
-        const message = await resp.text();
-        // @ts-ignore
-        dispatch.app.handleError({ code: resp.status, message: message });
-        // @ts-ignore
-        dispatch.maps.error(message);
-      }
+      fetchjson(`${config.server}data?subject=${subject}&topics=all`, endpoint.get(state),
+        (json) => {
+          dispatch.maps.receivedAllTopics({subject: subject, topics: json});
+        },
+        dispatch.app.handleError,
+        dispatch.maps.error);
     },
 
     'routing/change': async function(routing: RoutingState) {

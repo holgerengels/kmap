@@ -118,7 +118,20 @@ export class KMapBrowser extends connect(store, LitElement) {
         console.log("topicCard " + this._topicCard + " .. set animFrom " + this._animFrom);
       }
     }
-    this._page = this._topicCard ? "topic" : "map";
+
+    if (changedProperties.has("_topicCard")) {
+      this._page = this._topicCard ? "topic" : "map";
+
+      if (this._topicCard) {
+        store.dispatch.shell.updateMeta({title: this._topicCard.topic, description: this._topicCard.summary});
+      }
+      else {
+        store.dispatch.shell.updateMeta({
+          title: this._chapter,
+          description: this._chapterCard ? this._chapterCard.summary : "Wissenslandkarte zum Kapitel " + this._chapter
+        });
+      }
+    }
 
     if (changedProperties.has("_page") && this._page === 'topic' && this._animFrom) {
       let that = this;
@@ -170,12 +183,6 @@ export class KMapBrowser extends connect(store, LitElement) {
     if (changedProperties.has("_chapter"))
       this._hasTests = this._topics.filter(t => t.startsWith(this._chapter)).length > 1;
 
-    if (this._topicCard) {
-      store.dispatch.shell.updateMeta({title: this._topicCard.topic, description: this._topicCard.summary});
-    }
-    else {
-      store.dispatch.shell.updateMeta({title: this._chapter, description: this._chapterCard ? this._chapterCard.summary : "Wissenslandkarte zum Kapitel " + this._chapter});
-    }
   }
 
   _rated(e) {
