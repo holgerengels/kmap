@@ -1,7 +1,7 @@
-import { css } from 'lit-element';
+import {css, CSSResult} from 'lit-element';
 
 // language=CSS
-export const fontStyles = css`
+export const fontStyles: CSSResult = css`
 h1, .font-title {
   font-family: Roboto, Noto, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -48,7 +48,7 @@ a[disabled] {
 `;
 
 // language=CSS
-export const colorStyles = css`
+export const colorStyles: CSSResult = css`
 h1, h2, h3, p, label, .color-content-text, :host {
   color: var(--color-darkgray);
 }
@@ -58,7 +58,7 @@ h1, h2, h3, p, label, .color-content-text, :host {
 `;
 
 // language=CSS
-export const elevationStyles = css`
+export const elevationStyles: CSSResult = css`
 .elevation-00 { box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0.2),0px 0px 0px 0px rgba(0, 0, 0, 0.14),0px 0px 0px 0px rgba(0, 0, 0, 0.12); transition: box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1); }
 .elevation-01 { box-shadow: 0px 2px 1px -1px rgba(0, 0, 0, 0.2),0px 1px 1px 0px rgba(0, 0, 0, 0.14),0px 1px 3px 0px rgba(0, 0, 0, 0.12); transition: box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1); }
 .elevation-02 { box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2),0px 2px 2px 0px rgba(0, 0, 0, 0.14),0px 1px 5px 0px rgba(0, 0, 0, 0.12); transition: box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1); }
