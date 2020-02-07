@@ -26,9 +26,7 @@
     "plugins": []
   },
   "devDependencies": {
-    "tslib": "^1.10.0",
-    "typescript": "^3.7.4",
-    "@babel/preset-typescript": "^7.7.7",
+    "@babel/preset-typescript": "^7.8.3",
     "@commitlint/cli": "^7.0.0",
     "@commitlint/config-conventional": "^7.0.0",
     "@open-wc/building-rollup": "^0.9.0",
@@ -36,19 +34,21 @@
     "@open-wc/prettier-config": "^0.1.13",
     "@open-wc/testing": "^0.12.6",
     "@open-wc/testing-karma": "^2.0.11",
-    "@open-wc/testing-karma-bs": "^1.3.21",
-    "es-dev-server": "^1.32.0",
+    "@open-wc/testing-karma-bs": "^1.3.38",
+    "@rollup/plugin-node-resolve": "^6.1.0",
+    "@rollup/plugin-typescript": "^2.1.0",
+    "es-dev-server": "^1.38.3",
     "eslint-plugin-lit": "^1.2.0",
     "http-server": "^0.12.1",
     "husky": "^1.0.0",
     "lint-staged": "^8.2.1",
     "rimraf": "^2.6.3",
-    "rollup": "^1.27.14",
+    "rollup": "^1.31.0",
     "rollup-plugin-cpy": "^2.0.0",
     "rollup-plugin-workbox": "^4.0.0",
-    "@rollup/plugin-node-resolve": "^6.0.0",
-    "@rollup/plugin-typescript": "^2.0.2",
-    "source-map-explorer": "^2.1.2"
+    "source-map-explorer": "^2.2.2",
+    "tslib": "^1.10.0",
+    "typescript": "^3.7.5"
   },
   "lint-staged": {
     "*.js": [
@@ -61,7 +61,7 @@
   "license": "MIT",
   "dependencies": {
     "@captaincodeman/rdx": "^1.0.0-rc.1",
-    "@captaincodeman/rdx-model": "^1.0.0-rc.1",
+    "@captaincodeman/rdx-model": "^1.0.0-rc.3",
     "@captaincodeman/router": "^1.0.1",
     "@material/mwc-button": "^0.13.0",
     "@material/mwc-dialog": "^0.13.0",
@@ -83,8 +83,6 @@
     "lit-html": "^1.1.2",
     "pwa-helper-components": "^0.2.1",
     "pwa-helpers": "^0.9.1",
-    "redux": "^4.0.0",
-    "redux-thunk": "^2.3.0",
     "web-animations-js": "^2.3.2"
   }
 }
