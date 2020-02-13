@@ -45,6 +45,7 @@ public class ContentManagerServlet
             if (authentication.handle(req, resp)) {
                 String create = req.getParameter("create");
                 String drop = req.getParameter("drop");
+                String sync = req.getParameter("sync");
                 String importModule = req.getParameter("import-module");
                 String importSet = req.getParameter("import-set");
 
@@ -86,6 +87,12 @@ public class ContentManagerServlet
                     authentication.checkRole(req, "admin");
                     contentManager.dropInstance(drop);
                     writeResponse(req, resp, new JsonPrimitive(drop));
+                }
+                else if (sync != null) {
+                    authentication.checkRole(req, "admin");
+                    String json = IOUtils.toString(new InputStreamReader(req.getInputStream(), StandardCharsets.UTF_8));
+                    contentManager.syncInstance(json);
+                    writeResponse(req, resp, new JsonPrimitive(sync));
                 }
             }
         }

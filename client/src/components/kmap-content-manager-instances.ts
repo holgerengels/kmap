@@ -8,6 +8,7 @@ import '@material/mwc-icon';
 import '@material/mwc-icon-button';
 import '@material/mwc-list/mwc-list';
 import '@material/mwc-list/mwc-list-item';
+import '@material/mwc-select';
 import '@material/mwc-textfield';
 import {Instance} from "../models/instances";
 
@@ -24,6 +25,9 @@ export class KMapContentManagerInstances extends connect(store, LitElement) {
 
   @property()
   private _working: boolean = false;
+
+  @property()
+  private _syncName: string = '';
 
   @property()
   private _newName: string = '';
@@ -57,6 +61,13 @@ export class KMapContentManagerInstances extends connect(store, LitElement) {
 
   _showPage(page) {
     this._page = page;
+  }
+
+  _sync() {
+    if (this._selected === undefined) return;
+
+    console.log(`sync ${this._selected.name} to ${this._syncName}`);
+    store.dispatch.instances.sync({ from: this._selected.name, to: this._syncName});
   }
 
   _create() {
@@ -127,6 +138,7 @@ export class KMapContentManagerInstances extends connect(store, LitElement) {
         <div class="form">
           <label section>Instanzen</label>
           <span style="float: right">
+          <mwc-icon @click="${() => this._showPage('sync')}">merge_type</mwc-icon>
           <mwc-icon @click="${() => this._showPage('create')}">add</mwc-icon>
           <mwc-icon @click="${() => this._showPage('drop')}" ?disabled="${this._selectedIndex === -1}">delete</mwc-icon>
           </span>
@@ -143,6 +155,16 @@ export class KMapContentManagerInstances extends connect(store, LitElement) {
           </div>
         </div>
         <div class="form">
+          <div class="page" ?active="${this._page === 'sync'}">
+            <label section>Instanz replizieren</label>
+            <mwc-select required @change="${e => this._syncName = e.target.value}">
+              ${this._instances.filter(i => this._selected === undefined || i.name !== this._selected.name).map((instance) => html`
+                <mwc-list-item value="${instance.name}">${instance.name}</mwc-list-item>
+              `)}
+            </mwc-select>
+            <mwc-button @click="${() => this._showPage('')}">Abbrechen</mwc-button>
+            <mwc-button outlined @click="${this._sync}">Inhalte Übertragen</mwc-button>
+          </div>
           <div class="page" ?active="${this._page === 'create'}">
             <label section>Instanz anlegen</label>
             <mwc-textfield label="ID" type="text" .value="${this._newName}" @change="${e => this._newName = e.target.value}" required></mwc-textfield>

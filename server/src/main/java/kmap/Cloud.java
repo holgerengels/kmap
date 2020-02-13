@@ -63,14 +63,14 @@ public class Cloud extends Server
 
     private final Namespace d = Namespace.getNamespace("d", "DAV:");
     private final Namespace oc = Namespace.getNamespace("oc", "http://owncloud.org/ns");
-    private CloseableHttpClient client;
+    private static CloseableHttpClient client;
 
     public Cloud(Properties properties) {
         super(properties);
     }
 
     private HttpClientContext clientContext() {
-        HttpHost targetHost = new HttpHost(getProperty("cloud.host"), Integer.valueOf(getProperty("cloud.port")), "https");
+        HttpHost targetHost = new HttpHost(getProperty("cloud.host"), Integer.parseInt(getProperty("cloud.port")), "https");
         CredentialsProvider credsProvider = new BasicCredentialsProvider();
         credsProvider.setCredentials(new AuthScope(targetHost.getHostName(), targetHost.getPort()), new UsernamePasswordCredentials(getProperty("cloud.user"), getProperty("cloud.password")));
         AuthCache authCache = new BasicAuthCache();
@@ -85,12 +85,14 @@ public class Cloud extends Server
     synchronized CloseableHttpClient client() {
         if (client == null) {
             PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
-            connectionManager.setMaxTotal(90);
-            connectionManager.setDefaultMaxPerRoute(90);
-            client = HttpClientBuilder.create()
+            connectionManager.setMaxTotal(20);
+            connectionManager.setDefaultMaxPerRoute(20);
+            client = HttpClients.custom()
                     .setKeepAliveStrategy(DefaultConnectionKeepAliveStrategy.INSTANCE)
                     .setConnectionReuseStrategy(DefaultConnectionReuseStrategy.INSTANCE)
                     .setConnectionManager(connectionManager).build();
+
+            new IdleConnectionMonitor(connectionManager).start();
         }
         return client;
     }
@@ -158,30 +160,30 @@ public class Cloud extends Server
             String uri = getProperty("cloud.url") + getProperty("cloud.files") + "/" + Server.CLIENT.get() + "/" + encode(subject) + "/" + encode(chapter) + "/" + encode(topic) + "/";
             if (tests)
                 uri += "/tests/";
-            System.out.println("uri = " + uri);
 
             HttpPropFind propfind = new HttpPropFind(uri);
             propfind.setEntity(new StringEntity(PROPFIND_DIR, ContentType.APPLICATION_XML));
+            List<Attachment> attachments = new ArrayList<>();
             try (CloseableHttpResponse response = client.execute(propfind, context)) {
-                List<Attachment> attachments = new ArrayList<>();
                 Document dom = new SAXBuilder().build(response.getEntity().getContent());
                 for (Element element : dom.getRootElement().getDescendants(new ElementFilter("response", d))) {
                     if (element.getDescendants(new ElementFilter("collection", d)).hasNext())
                         continue;
                     String fileId = fileId(element);
                     String fileName = fileName(element);
+                    Integer fileSize = fileSize(element);
                     String fileType = fileType(element);
                     fileType = MimeTypes.tweakMimeType(fileType, fileName);
-                    String fileTag = fileTag(client, context, fileId);
-                    if (fileTag == null)
-                        System.out.println("no tag " + fileName);
-
-                    Attachment attachment = new Attachment(fileId, fileName, fileType, fileTag != null ? fileTag.substring("kmap-".length()) : null);
+                    Attachment attachment = new Attachment(fileId, fileName, fileType, fileSize);
                     attachments.add(attachment);
-                    System.out.println(attachment);
                 }
-                return attachments;
             }
+            for (Attachment attachment : attachments) {
+                String fileTag = fileTag(client, context, attachment.id);
+                if (fileTag != null)
+                    attachment.tag = fileTag.substring("kmap-".length());
+            }
+            return attachments;
         }
         catch (IOException | JDOMException e) {
             throw new RuntimeException(e);
@@ -200,6 +202,11 @@ public class Cloud extends Server
         return path.substring(pos + 1);
     }
 
+    private Integer fileSize(Element element) {
+        String text = element.getDescendants(new ElementFilter("size", oc)).next().getText();
+        return text != null ? Integer.parseInt(text) : null;
+    }
+
     private String fileType(Element element) {
         return element.getDescendants(new ElementFilter("getcontenttype", d)).next().getText();
     }
@@ -216,6 +223,39 @@ public class Cloud extends Server
                     return element.getText();
             }
             return null;
+        }
+    }
+
+    public void copy(String fromInstance, String toInstance, String[] file) {
+        try {
+            CloseableHttpClient client = client();
+            HttpClientContext context = clientContext();
+
+            HttpCopy copy = new HttpCopy(
+                    getProperty("cloud.url") + getProperty("cloud.files") + "/" + fromInstance + "/" + Arrays.stream(file).map(Cloud::encode).collect(Collectors.joining("/")),
+                    getProperty("cloud.url") + getProperty("cloud.files") + "/" + toInstance + "/" + Arrays.stream(file).map(Cloud::encode).collect(Collectors.joining("/")));
+
+            try (CloseableHttpResponse response = client.execute(copy, context)) {
+                System.out.println("copy response = " + response);
+            }
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void delete(String instance, String[] file) {
+        try {
+            CloseableHttpClient client = client();
+            HttpClientContext context = clientContext();
+
+            HttpDelete delete = new HttpDelete(getProperty("cloud.url") + getProperty("cloud.files") + "/" + instance + "/" + Arrays.stream(file).map(Cloud::encode).collect(Collectors.joining("/")));
+            try (CloseableHttpResponse response = client.execute(delete, context)) {
+                System.out.println("delete response = " + response);
+            }
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -357,9 +397,9 @@ public class Cloud extends Server
         Cloud cloud = new Cloud(readProperties(args[0]));
         //List<Attachment> attachments = cloud.findAttachments("mathe", "Differentialrechnung", "Graphisches Ableiten");
         //System.out.println("attachments = " + attachments);
-        //CLIENT.set("");
-        //Map<String, String> tags = cloud.listTags("Mathematik");
-        //System.out.println("tags = " + tags);
+        CLIENT.set("vu");
+        Map<String, String> tags = cloud.listTags("Mathematik");
+        System.out.println("tags = " + tags);
         //CLIENT.set("test");
         //cloud.transferTags(tags);
     }
@@ -387,7 +427,6 @@ public class Cloud extends Server
         }
     }
 
-    @NotThreadSafe
     public class HttpMKCol extends HttpRequestBase {
 
         final static String METHOD_NAME = "MKCOL";
@@ -403,18 +442,35 @@ public class Cloud extends Server
         }
     }
 
+    public class HttpCopy extends HttpRequestBase {
+
+        final static String METHOD_NAME = "COPY";
+
+        public HttpCopy(final String from, final String to) {
+            super();
+            setURI(URI.create(from));
+            setHeader("Destination", to);
+            setHeader("Overwrite", "T");
+        }
+
+        @Override
+        public String getMethod() {
+            return METHOD_NAME;
+        }
+    }
+
     static class Attachment {
         String id;
         String name;
-        String tag;
+        String tag = null;
         String type;
-        String href;
+        Integer size;
 
-        public Attachment(String fileId, String fileName, String fileType, String fileTag) {
+        public Attachment(String fileId, String fileName, String fileType, Integer fileSize) {
             id = fileId;
             name = fileName;
             type = fileType;
-            tag = fileTag;
+            size = fileSize;
         }
 
         @Override
@@ -425,6 +481,19 @@ public class Cloud extends Server
                 ", tag='" + tag + '\'' +
                 ", type='" + type + '\'' +
                 '}';
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Attachment that = (Attachment) o;
+            return name.equals(that.name);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(name);
         }
     }
 

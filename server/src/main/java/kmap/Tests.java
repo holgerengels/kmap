@@ -224,7 +224,6 @@ public class Tests {
     public JsonObject importSet(String subject, String set, String json) {
         CouchDbClient client = getClient();
         JsonObject data = client.getGson().fromJson(json, JsonObject.class);
-        System.out.println("data = " + data);
         JsonArray array = (JsonArray)data.get("docs");
         List<JsonObject> newTests = new ArrayList<>();
         for (JsonElement element : array) {
@@ -237,8 +236,6 @@ public class Tests {
         for (JsonObject object : oldTests) {
             object.addProperty("_deleted", true);
         }
-        System.out.println("oldTests = " + oldTests);
-        System.out.println("newTests = " + newTests);
         client.bulk(oldTests, false);
         client.bulk(newTests, false);
 

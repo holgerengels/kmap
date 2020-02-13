@@ -3,6 +3,10 @@ import { State, Dispatch } from '../store';
 import {endpoint, fetchjson} from "../endpoint";
 import {config} from "../config";
 
+export interface Sync {
+  from: string,
+  to: string,
+}
 export interface Instance {
   name: string,
   description?: string,
@@ -13,6 +17,7 @@ export interface InstancesState {
   loading: boolean,
   creating: boolean,
   dropping: boolean,
+  syncing: boolean,
   error: string,
 }
 
@@ -23,6 +28,7 @@ export default createModel({
     loading: false,
     creating: false,
     dropping: false,
+    syncing: false,
     error: "",
   },
   reducers: {
@@ -41,14 +47,12 @@ export default createModel({
     forget(state) {
       return { ...state,
         instances: [],
-        timestamp: Date.now(),
         error: "",
       };
     },
 
     requestCreate(state) {
       return { ...state, creating: true,
-        timestamp: Date.now(),
         error: "",
       };
     },
@@ -61,7 +65,6 @@ export default createModel({
 
     requestDrop(state) {
       return { ...state, dropping: true,
-        timestamp: Date.now(),
         error: "",
       };
     },
@@ -69,6 +72,17 @@ export default createModel({
       return { ...state,
         dropping: false,
         instances: state.instances.filter(i => i !== payload)
+      };
+    },
+
+    requestSync(state) {
+      return { ...state, syncing: true,
+        error: "",
+      };
+    },
+    receivedSync(state) {
+      return { ...state,
+        syncing: false,
       };
     },
 
@@ -115,6 +129,19 @@ export default createModel({
         {... endpoint.post(state), body: JSON.stringify({name: instance.name, description: instance.description})},
         () => {
           dispatch.instances.receivedDrop(instance);
+        },
+        dispatch.app.handleError,
+        dispatch.instances.error);
+    },
+
+    async sync(sync: Sync) {
+      const state: State = getState();
+      // @ts-ignore
+      dispatch.instances.requestSync();
+      fetchjson(`${config.server}content?sync=${sync.from}`,
+        {... endpoint.post(state), body: JSON.stringify(sync)},
+        () => {
+          dispatch.instances.receivedSync();
         },
         dispatch.app.handleError,
         dispatch.instances.error);
