@@ -87,20 +87,8 @@ export class KMapContentManagerModules extends connect(store, LitElement) {
         }
         .form {
           margin: 12px;
-          flex: 0 0 50%;
+          flex: 0 1 50%;
           align-items: stretch;
-        }
-        .space {
-          margin: 12px;
-          flex: 1 1 100%;
-        }
-        .field {
-          display: flex;
-          justify-content: space-between;
-          margin: 12px;
-        }
-        .field input {
-          width: 180px;
         }
         .scroll {
           height: 232px;
@@ -124,6 +112,11 @@ export class KMapContentManagerModules extends connect(store, LitElement) {
           display: block;
           opacity: 1.0;
         }
+        .page > * {
+          display: flex;
+          justify-content: space-between;
+          margin: 8px;
+        }
         `];
   }
 
@@ -131,7 +124,7 @@ export class KMapContentManagerModules extends connect(store, LitElement) {
     return html`
       <div class="main elevation-02">
         <div class="form">
-          <label section>Module</label>
+          <label>Module</label>
           <span style="float: right">
           <mwc-icon @click="${() => this._showPage('import')}"><svg viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet" focusable="false" style="display: block; width: 24px; height: 24px;"><g><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"></path></g></svg></mwc-icon>
           <mwc-icon @click="${() => this._showPage('export')}" ?disabled="${this._selectedIndex === -1}"><svg viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet" focusable="false" style="display: block; width: 24px; height: 24px;"><g><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"></path></g></svg></mwc-icon>
@@ -152,33 +145,35 @@ export class KMapContentManagerModules extends connect(store, LitElement) {
         </div>
         <div class="form">
           <div class="page" ?active="${this._page === 'import'}">
-            <label section>Modul importieren</label>
-            <div class="field">
+            <label>Modul importieren</label>
+            <div>
                 <label for="file">Datei</label>
                 <input id="file" required type="file" multiple/>
             </div>
+            <div>
             <mwc-button @click="${() => this._showPage('')}">Abbrechen</mwc-button>
             <mwc-button outlined @click="${this._import}">Importieren</mwc-button>
+            </div>
           </div>
           <div class="page" ?active="${this._page === 'export'}">
-            <label section>Modul exportieren</label>
-            <div class="field">
+            <label>Modul exportieren</label>
               ${this._selected
-                ? html`<label>Modul '${this._selected.subject} - ${this._selected.module}' exportieren?</label>`
+                ? html`<label secondary>Modul '${this._selected.subject} - ${this._selected.module}' exportieren?</label>`
                 : ''}
-            </div>
+              <div>
             <mwc-button @click="${() => this._showPage('')}">Abbrechen</mwc-button>
             <mwc-button outlined @click="${this._export}">Exportieren</mwc-button>
+            </div>
           </div>
           <div class="page" ?active="${this._page === 'delete'}">
-            <label section>Modul löschen</label>
-            <div class="field">
-              ${this._selected
-                ? html`<label>Soll das Modul '${this._selected.subject} - ${this._selected.module}' wirklich gelöscht werden?</label>`
-                : ''}
+            <label>Modul löschen</label>
+            ${this._selected
+              ? html`<label secondary>Soll das Modul '${this._selected.subject} - ${this._selected.module}' wirklich gelöscht werden?</label>`
+              : ''}
+            <div>
+              <mwc-button @click="${() => this._showPage('')}">Abbrechen</mwc-button>
+              <mwc-button outlined @click="${this._delete}">Löschen</mwc-button>
             </div>
-            <mwc-button @click="${() => this._showPage('')}">Abbrechen</mwc-button>
-            <mwc-button outlined @click="${this._delete}">Löschen</mwc-button>
           </div>
         </div>
       </div>

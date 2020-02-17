@@ -197,7 +197,7 @@ export class KCourses extends connect(store, LitElement) {
       </mwc-top-app-bar>
       <div id="content" class="board">
         <div class="form">
-          <label section>Kurse</label>
+          <label>Kurse</label>
           <span style="float: right">
           <mwc-icon @click="${() => this._showPage('new')}">add</mwc-icon>
           <mwc-icon @click="${() => this._showPage('edit')}" ?disabled="${this._selectedIndex === -1}">edit</mwc-icon>
@@ -217,19 +217,19 @@ export class KCourses extends connect(store, LitElement) {
         </div>
         <div class="form">
           <div class="page" ?active="${this._page === 'new'}">
-            <label section>Neuer Kurs</label>
+            <label>Neuer Kurs</label>
             <mwc-textfield label="Name" type="text" required .value=${this._newName} @change=${e => this._newName = e.target.value}></mwc-textfield>
             <mwc-textarea placeholder="Schüler" required rows="7" .value=${this._newStudents} @change=${e => this._newStudents = e.target.value}></mwc-textarea>
             <mwc-button @click="${this._new}">Speichern</mwc-button>
           </div>
           <div class="page" ?active="${this._page === 'edit'}">
-            <label section>Kurs bearbeiten</label>
+            <label>Kurs bearbeiten</label>
             <mwc-textfield type="text" disabled .value=${this._editName}></mwc-textfield>
             <mwc-textarea placeholder="Schüler" required rows="3" .value=${this._editStudents} @change=${e => this._editStudents = e.target.value}></mwc-textarea>
             <mwc-button @click="${this._edit}">Speichern</mwc-button>
           </div>
           <div class="page" ?active="${this._page === 'delete'}">
-            <label section>Kurs löschen</label>
+            <label>Kurs löschen</label>
             <div class="field">
               ${this._selectedName
                 ? html`<label>Soll der Kurs '${this._selectedName}' wirklich gelöscht werden?</label>`
@@ -238,7 +238,7 @@ export class KCourses extends connect(store, LitElement) {
             <mwc-button @click="${this._delete}">Löschen</mwc-button>
           </div>
           <div class="page" ?active="${this._page === 'default'}">
-            <label section>Kurs</label>
+            <label>Kurs</label>
             <mwc-textfield type="text" disabled .value=${this._selectedName}></mwc-textfield>
             <mwc-textarea placeholder="Schüler" disabled rows="3" .value=${this._selectedStudents}></mwc-textarea>
           </div>

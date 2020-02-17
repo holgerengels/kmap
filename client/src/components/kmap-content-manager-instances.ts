@@ -98,20 +98,8 @@ export class KMapContentManagerInstances extends connect(store, LitElement) {
         }
         .form {
           margin: 12px;
-          flex: 0 0 50%;
+          flex: 0 1 50%;
           align-items: stretch;
-        }
-        .space {
-          margin: 12px;
-          flex: 1 1 100%;
-        }
-        .field {
-          display: flex;
-          justify-content: space-between;
-          margin: 12px;
-        }
-        .field input {
-          width: 180px;
         }
         .scroll {
           height: 232px;
@@ -135,6 +123,11 @@ export class KMapContentManagerInstances extends connect(store, LitElement) {
           display: block;
           opacity: 1.0;
         }
+        .page > * {
+          display: flex;
+          justify-content: space-between;
+          margin: 8px;
+        }
         `];
   }
 
@@ -142,7 +135,7 @@ export class KMapContentManagerInstances extends connect(store, LitElement) {
     return html`
       <div class="main elevation-02">
         <div class="form">
-          <label section>Instanzen</label>
+          <label>Instanzen</label>
           <span style="float: right">
           <mwc-icon @click="${() => this._showPage('sync')}">merge_type</mwc-icon>
           <mwc-icon @click="${() => this._showPage('create')}">add</mwc-icon>
@@ -162,31 +155,35 @@ export class KMapContentManagerInstances extends connect(store, LitElement) {
         </div>
         <div class="form">
           <div class="page" ?active="${this._page === 'sync'}">
-            <label section>Instanz replizieren</label>
+            <label>Instanz replizieren</label>
             <mwc-select required @change="${e => this._syncName = e.target.value}">
               ${this._instances.filter(i => this._selected === undefined || i.name !== this._selected.name).map((instance) => html`
                 <mwc-list-item value="${instance.name}">${instance.name}</mwc-list-item>
               `)}
             </mwc-select>
+            <div>
             <mwc-button @click="${() => this._showPage('')}">Abbrechen</mwc-button>
             <mwc-button outlined @click="${this._sync}">Inhalte Übertragen</mwc-button>
+            </div>
           </div>
           <div class="page" ?active="${this._page === 'create'}">
-            <label section>Instanz anlegen</label>
+            <label>Instanz anlegen</label>
             <mwc-textfield label="ID" type="text" .value="${this._newName}" @change="${e => this._newName = e.target.value}" required></mwc-textfield>
             <mwc-textfield label="Name" type="text" .value="${this._newDescription}" @change="${e => this._newDescription = e.target.value}"></mwc-textfield>
-            <mwc-button @click="${() => this._showPage('')}">Abbrechen</mwc-button>
-            <mwc-button outlined @click="${this._create}">Anlegen</mwc-button>
+            <div>
+              <mwc-button @click="${() => this._showPage('')}">Abbrechen</mwc-button>
+              <mwc-button outlined @click="${this._create}">Anlegen</mwc-button>
+            </div>
           </div>
           <div class="page" ?active="${this._page === 'drop'}">
-            <label section>Instanz löschen</label>
-            <div class="field">
+            <label>Instanz löschen</label>
               ${this._selected
-                ? html`<label>Soll die Instanz '${this._selected.name}' wirklich gelöscht werden?</label>`
+                ? html`<label secondary>Soll die Instanz '${this._selected.name}' wirklich gelöscht werden?</label>`
                 : ''}
+            <div>
+              <mwc-button @click="${() => this._showPage('')}">Abbrechen</mwc-button>
+              <mwc-button outlined @click="${this._drop}">Löschen</mwc-button>
             </div>
-            <mwc-button @click="${() => this._showPage('')}">Abbrechen</mwc-button>
-            <mwc-button outlined @click="${this._drop}">Löschen</mwc-button>
           </div>
         </div>
       </div>

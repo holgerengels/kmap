@@ -69,23 +69,12 @@ export class KMapContentManagerFeedback extends connect(store, LitElement) {
         }
         .form {
           margin: 12px;
-          flex: 0 0 50%;
+          flex: 0 1 50%;
           align-items: stretch;
-        }
-        .field {
-          display: flex;
-          justify-content: space-between;
-          margin: 12px;
-        }
-        .field input {
-          width: 180px;
         }
         .scroll {
           height: 232px;
           overflow-y: auto;
-        }
-        label {
-          display: block;
         }
         mwc-icon {
           pointer-events: all;
@@ -105,6 +94,11 @@ export class KMapContentManagerFeedback extends connect(store, LitElement) {
           display: block;
           opacity: 1.0;
         }
+        .page > * {
+          display: flex;
+          justify-content: space-between;
+          margin: 8px;
+        }
         `];
   }
 
@@ -112,7 +106,7 @@ export class KMapContentManagerFeedback extends connect(store, LitElement) {
     return html`
       <div class="main elevation-02">
         <div class="form">
-          <label section>Feedback</label>
+          <label>Feedback</label>
           <span style="float: right">
           <mwc-icon @click="${() => this._showPage('resolve')}" ?disabled="${this._selectedIndex === -1}">check</mwc-icon>
           </span>
@@ -131,17 +125,17 @@ export class KMapContentManagerFeedback extends connect(store, LitElement) {
         </div>
         <div class="form">
           <div class="page" ?active="${this._page === 'resolve'}">
-            <label section>Feedback bearbeiten</label><br/>
+            <label>Feedback bearbeiten</label>
             ${this._selected !== undefined ? html`
-              <label class="font-body">${this._selected.topic !== undefined ? this._selected.subject + " → " + this._selected.chapter + " → " + this._selected.topic : this._selected.subject + " → " + this._selected.chapter}</label>
-              <br/>
-              <label class="font-subtitle">${this._selected.title}</label>
+              <p>${this._selected.topic !== undefined ? this._selected.subject + " → " + this._selected.chapter + " → " + this._selected.topic : this._selected.subject + " → " + this._selected.chapter}</p>
+              <label secondary>${this._selected.title}</label>
               <div style="max-height: 100px; max-width: 300px; overflow-y: auto">
                 <label class="font-body">${this._selected.text}</label>
               </div>
-              <br/>
-              <mwc-button @click="${() => this._showPage('')}">Abbrechen</mwc-button>
-              <mwc-button outlined @click="${this._resolve}">Bearbeitet</mwc-button>
+              <div>
+                <mwc-button @click="${() => this._showPage('')}">Abbrechen</mwc-button>
+                <mwc-button outlined @click="${this._resolve}">Bearbeitet</mwc-button>
+              </div>
             ` : ''}
           </div>
         </div>
