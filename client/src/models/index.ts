@@ -10,3 +10,4 @@ export { default as contentMaps } from './contentMaps';
 export { default as contentSets } from './contentSets';
 export { default as tests } from './tests';
 export { default as cloud } from './cloud';
+export { default as feedback } from './feedback';

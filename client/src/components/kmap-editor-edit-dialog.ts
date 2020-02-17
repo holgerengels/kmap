@@ -266,7 +266,7 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
       colorStyles,
       css`
         mwc-dialog {
-          --mdc-dialog-max-width: 800px;
+          --mdc-dialog-max-width: 810px;
         }
         mwc-icon-button, mwc-button {
           vertical-align: middle
@@ -274,18 +274,13 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
         mwc-textfield, mwc-textarea {
           margin-bottom: 4px;
         }
-        .preview {
-          position: static;
-          width: 100%;
-          pointer-events: none;
-          text-align: left;
-        }
         .preview-scroller {
-          position: absolute;
-          top: -20px;
-          left: 24px;
-          right: 24px;
-          max-height: 300px;
+          z-index: 10000000;
+          position: fixed;
+          top: 16px;
+          left: 16px;
+          right: 16px;
+          max-height: 360px;
           overflow-y: auto;
           pointer-events: all;
           border-radius: 3px;
@@ -294,10 +289,11 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
           0 3px 1px -2px rgba(0, 0, 0, 0.2);
         }
         kmap-summary-card-summary {
-          position: absolute;
-          top: 4px;
-          left: 0px;
-          width: 100%;
+          z-index: 10000000;
+          position: fixed;
+          top: 16px;
+          left: 16px;
+          width: 300px;
           display: block;
           box-sizing: border-box;
           background-color: var(--color-lightgray);
@@ -363,7 +359,15 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
   render() {
     // language=HTML
     return html`
-<mwc-dialog id="editDialog" title="Editor">
+  ${this._showSummaryPreview ? html`<kmap-summary-card-summary .summary="${this._summary}"></kmap-summary-card-summary>` : ''}
+  ${this._showDescriptionPreview ? html`<div class="preview-scroller"><kmap-knowledge-card-description
+    .subject="${this._card.subject}"
+    .chapter="${this._card.chapter}"
+    .topic="${this._card.topic}"
+    .description="${this._description}"
+    ></kmap-knowledge-card-description></div>` : ''}
+
+<mwc-dialog id="editDialog" heading="Editor">
 ${this._card ? html`
   <form @focus="${this._focus}" @keydown="${this._captureEnter}">
     <mwc-textfield id="topic" name="topic" disabled label="Thema" dense type="text" .value="${this._card.topic !== '_' ? this._card.topic : "Allgemeines zu " + this._card.chapter}"></mwc-textfield>
@@ -393,15 +397,6 @@ ${this._card ? html`
       <mwc-icon class="add" @click="${this._addAttachment}">add_circle</mwc-icon>
     </div>
   </form>` : ''}
-  <div class="preview">
-  ${this._showSummaryPreview ? html`<kmap-summary-card-summary .summary="${this._summary}"></kmap-summary-card-summary>` : ''}
-  ${this._showDescriptionPreview ? html`<div class="preview-scroller"><kmap-knowledge-card-description
-    .subject="${this._card.subject}"
-    .chapter="${this._card.chapter}"
-    .topic="${this._card.topic}"
-    .description="${this._description}"
-    ></kmap-knowledge-card-description></div>` : ''}
-  </div>
 
   <mwc-icon-button slot="secondaryAction" icon="cached" title="Materialien aus Cloud synchronisieren" @click=${this._syncAttachments}></mwc-icon-button>
   <mwc-icon-button slot="secondaryAction" icon="folder_open" title="Cloud Verzeichnis öffnen" @click=${this._createDirectory}></mwc-icon-button>

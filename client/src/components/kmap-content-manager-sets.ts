@@ -2,7 +2,7 @@ import {LitElement, html, css, customElement, property, query} from 'lit-element
 import {connect} from '@captaincodeman/rdx';
 import {State, store} from "../store";
 
-import {colorStyles, fontStyles} from "./kmap-styles";
+import {colorStyles, elevationStyles, fontStyles} from "./kmap-styles";
 
 import '@material/mwc-icon';
 import '@material/mwc-icon-button';
@@ -76,12 +76,17 @@ export class KMapContentManagerSets extends connect(store, LitElement) {
     return [
       fontStyles,
       colorStyles,
+      elevationStyles,
       css`
         :host {
           display: contents;
         }
+        div.main {
+          width: 700px;
+          margin: 8px;
+          display: flex;
+        }
         .form {
-          max-width: 300px;
           margin: 12px;
           flex: 0 0 50%;
           align-items: stretch;
@@ -125,6 +130,7 @@ export class KMapContentManagerSets extends connect(store, LitElement) {
 
   render() {
     return html`
+      <div class="main elevation-02">
         <div class="form">
           <label section>Test Sets</label>
           <span style="float: right">
@@ -176,7 +182,7 @@ export class KMapContentManagerSets extends connect(store, LitElement) {
             <mwc-button outlined @click="${this._delete}">Löschen</mwc-button>
           </div>
         </div>
-        <div class="space"></div>
+      </div>
     `;
   }
 }

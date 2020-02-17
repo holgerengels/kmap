@@ -1,4 +1,4 @@
-import {LitElement, html, css, customElement, property} from 'lit-element';
+import {LitElement, html, css, customElement, property, query} from 'lit-element';
 import { connect } from '@captaincodeman/rdx';
 import {State, store} from "../store";
 import {Attachment, Card} from "../models/maps";
@@ -12,10 +12,12 @@ import './kmap-knowledge-card-depends';
 import './kmap-knowledge-card-progress';
 import './kmap-knowledge-card-description';
 import './kmap-knowledge-card-attachment';
+import './kmap-feedback';
 import {fontStyles, colorStyles} from "./kmap-styles";
+import {KMapFeedback} from "./kmap-feedback";
 
 @customElement('kmap-knowledge-card')
-class KMapKnowledgeCard extends connect(store, LitElement) {
+export class KMapKnowledgeCard extends connect(store, LitElement) {
 
   @property()
   private _instance: string = '';
@@ -49,6 +51,10 @@ class KMapKnowledgeCard extends connect(store, LitElement) {
   private _topics: string[] = [];
 
   private _rates: object = {};
+
+  @query('#feedbackDialog')
+  private _feedbackDialog: KMapFeedback;
+
 
   constructor() {
     super();
@@ -137,6 +143,10 @@ class KMapKnowledgeCard extends connect(store, LitElement) {
         this._exercises = exercises;
     }
 
+  _feedback() {
+    this._feedbackDialog.show();
+  }
+
   static get styles() {
     // language=CSS
     return [
@@ -189,6 +199,11 @@ class KMapKnowledgeCard extends connect(store, LitElement) {
         .attachments > div {
           align-content: start;
           margin: 12px;
+        }
+        mwc-icon-button {
+          --mdc-icon-button-size: 24px;
+          --mdc-icon-size: 22px;
+          color: var(--color-darkgray);
         }
         [hidden] {
           display: none;
@@ -288,7 +303,9 @@ class KMapKnowledgeCard extends connect(store, LitElement) {
       ${this._hasTests ? html`
         <a href="/app/test/${this.subject}/${this.chapter}/${this.card.topic}"><mwc-ripple></mwc-ripple><mwc-icon>help_outline</mwc-icon></a>
       ` : ''}
+      <mwc-icon-button icon="feedback" title="Feedback" @click="${this._feedback}"></mwc-icon-button>
   </div>
+  <kmap-feedback id="feedbackDialog" .subject="${this.subject}" .chapter="${this.chapter}" .topic="${this.card.topic}"></kmap-feedback>
     `;
   }
 }

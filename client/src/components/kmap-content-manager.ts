@@ -7,6 +7,7 @@ import '@material/mwc-icon-button';
 import '@material/mwc-button';
 import '@material/mwc-textfield';
 import '@material/mwc-top-app-bar';
+import './kmap-content-manager-feedback';
 import './kmap-content-manager-instances';
 import './kmap-content-manager-modules';
 import './kmap-content-manager-sets';
@@ -55,27 +56,10 @@ export class KMapContentManager extends connect(store, LitElement) {
         }
         .board {
           height: auto;
-          padding: 8px;
           padding-bottom: 36px;
           display: flex;
           flex-flow: row wrap;
           justify-content: flex-start;
-        }
-        mwc-icon {
-          pointer-events: all;
-          cursor: default;
-        }
-        [disabled], [disabled] svg {
-          color: gray;
-          fill: gray;
-          pointer-events: none;
-        }
-        .page {
-          display: none;
-          padding: 8px;
-        }
-        .page[active] {
-          display: block;
         }
       `];
   }
@@ -92,6 +76,7 @@ export class KMapContentManager extends connect(store, LitElement) {
         ${this._roles.includes('admin') ? html`<kmap-content-manager-instances></kmap-content-manager-instances>` : ''}
         ${this._roles.includes('teacher') ? html`<kmap-content-manager-modules></kmap-content-manager-modules>` : ''}
         ${this._roles.includes('teacher') ? html`<kmap-content-manager-sets></kmap-content-manager-sets>` : ''}
+        ${this._roles.includes('teacher') ? html`<kmap-content-manager-feedback></kmap-content-manager-feedback>` : ''}
       </div>
     `;
   }

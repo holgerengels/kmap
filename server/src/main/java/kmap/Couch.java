@@ -574,6 +574,27 @@ public class Couch extends Server {
         return list;
     }
 
+    public void walk(String subject) {
+        List<String> book = new ArrayList<>();
+        Map<String, String> links = links(subject);
+        walk(book, links, subject, subject);
+        book.forEach(System.out::println);
+    }
+
+    public void walk(List<String> book, Map<String, String> links, String subject, String chapter) {
+        book.add(chapter);
+        JsonObject chapterObject = chapter(subject, chapter);
+        for (JsonElement lineObject : chapterObject.getAsJsonArray("lines")) {
+            for (JsonElement topicObject : ((JsonObject)lineObject).getAsJsonArray("cards")) {
+                book.add(chapter + "." + JSON.string((JsonObject)topicObject, "topic"));
+                String consists = string((JsonObject)topicObject, "links");
+                if (consists != null) {
+                    walk(book, links, subject, links.get(chapter + "." + consists));
+                }
+            }
+        }
+    }
+
     public JsonObject importModule(String subject, String module, String json) {
         CouchDbClient client = createClient("map");
         JsonObject data = client.getGson().fromJson(json, JsonObject.class);
@@ -623,8 +644,8 @@ public class Couch extends Server {
 
     public static void main(String[] args) throws IOException {
         Couch couch = new Couch(readProperties(args[0]));
-        JsonArray instances = couch.instances();
-        System.out.println("instances = " + instances);
+        Server.CLIENT.set("root");
+        couch.walk("Mathematik");
         //JsonObject object = couch.chapter("mathe", "Mathematik");
         //System.out.println("object = " + object);
         //JsonObject states = couch.statesAndProgress("h.engels", "Mathematik");

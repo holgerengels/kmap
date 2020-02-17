@@ -2,7 +2,7 @@ import {LitElement, html, css, customElement, property, query} from 'lit-element
 import {connect} from '@captaincodeman/rdx';
 import {State, store} from "../store";
 
-import {colorStyles, fontStyles} from "./kmap-styles";
+import {colorStyles, elevationStyles, fontStyles} from "./kmap-styles";
 
 import '@material/mwc-icon';
 import '@material/mwc-icon-button';
@@ -25,7 +25,7 @@ export class KMapContentManagerModules extends connect(store, LitElement) {
   private _working: boolean = false;
 
   @query("#file")
-  private _file?: HTMLElement;
+  private _file?: HTMLInputElement;
 
   mapState(state: State) {
     return {
@@ -75,12 +75,17 @@ export class KMapContentManagerModules extends connect(store, LitElement) {
     return [
       fontStyles,
       colorStyles,
+      elevationStyles,
       css`
         :host {
           display: contents;
         }
+        div.main {
+          width: 700px;
+          margin: 8px;
+          display: flex;
+        }
         .form {
-          max-width: 300px;
           margin: 12px;
           flex: 0 0 50%;
           align-items: stretch;
@@ -124,6 +129,7 @@ export class KMapContentManagerModules extends connect(store, LitElement) {
 
   render() {
     return html`
+      <div class="main elevation-02">
         <div class="form">
           <label section>Module</label>
           <span style="float: right">
@@ -175,7 +181,7 @@ export class KMapContentManagerModules extends connect(store, LitElement) {
             <mwc-button outlined @click="${this._delete}">Löschen</mwc-button>
           </div>
         </div>
-        <div class="space"></div>
+      </div>
     `;
   }
 }
