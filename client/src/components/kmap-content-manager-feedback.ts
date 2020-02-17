@@ -81,7 +81,7 @@ export class KMapContentManagerFeedback extends connect(store, LitElement) {
           width: 180px;
         }
         .scroll {
-          height: 224px;
+          height: 232px;
           overflow-y: auto;
         }
         label {
