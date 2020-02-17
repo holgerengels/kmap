@@ -57,10 +57,13 @@ export class KMapTestCard extends connect(store, LitElement) {
   private _answerFlex: string = '';
 
   @query('#question')
+  // @ts-ignore
   private _question: HTMLElement;
   @query('#answer')
+  // @ts-ignore
   private _answer: HTMLElement;
   @query('#blinky')
+  // @ts-ignore
   private _blinky: HTMLElement;
 
 
@@ -177,10 +180,17 @@ export class KMapTestCard extends connect(store, LitElement) {
     for (var i = 0; i < inputs.length; i++) {
       var input = inputs[i];
       var value = "" + (input.type === "checkbox" ? input.checked : input.value);
-      if (value)
+      if (value) {
         value = value.replace(/ /g, "");
+        value = value.replace(/²/g, "^2");
+        value = value.replace(/³/g, "^3");
+      }
 
       var expected = this.values[i];
+      if (expected) {
+        expected = expected.replace(/²/g, "^2");
+        expected = expected.replace(/³/g, "^3");
+      }
       var correct = value == expected;
       everythingCorrect = everythingCorrect && correct;
       input.setAttribute("correction", correct ? "correct" : "incorrect");
