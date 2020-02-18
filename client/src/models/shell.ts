@@ -58,5 +58,10 @@ export default createModel({
       if (routing.page !== 'browser')
         dispatch.shell.updateMeta({});
     },
+
+    'app/receivedLogout': async function() {
+      dispatch.shell.removeLayer("averages");
+      dispatch.shell.removeLayer("editor");
+    },
   })
 })
