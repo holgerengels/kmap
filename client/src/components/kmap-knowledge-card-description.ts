@@ -28,15 +28,30 @@ export class KMapKnowledgeCardDescription extends LitElement {
         window.MathJaxLoader
           .then(() => {
           let buffer = "";
-          let t = false;
+          let to = false;
           description.split("`").reverse().forEach(function (element) {
-            if (t) {
+            if (to) {
               // @ts-ignore
               buffer = " " + window.MathJax.asciimath2svg(element).getElementsByTagName("svg")[0].outerHTML + " " + buffer;
-            } else
-              buffer = element + buffer;
-            t = !t;
+            }
+            else {
+              let inner = "";
+              let ti = false;
+              element.split("´").reverse().forEach(function (ilimint) {
+                if (ti) {
+                  // @ts-ignore
+                  inner = " " + window.MathJax.tex2svg(ilimint).getElementsByTagName("svg")[0].outerHTML + " " + inner;
+                }
+                else {
+                  inner = ilimint + inner;
+                }
+                ti = !ti;
+              });
+              buffer = inner + buffer;
+            }
+            to = !to;
           });
+
           this._description = buffer;
         });
       }
