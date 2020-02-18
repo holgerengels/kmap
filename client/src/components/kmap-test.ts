@@ -1,5 +1,5 @@
-import {LitElement, html, css, customElement, property, query} from 'lit-element';
-import { connect } from '@captaincodeman/rdx';
+import {css, customElement, html, LitElement, property, query} from 'lit-element';
+import {connect} from '@captaincodeman/rdx';
 import {State, store} from "../store";
 import {RoutingState} from "@captaincodeman/rdx-model";
 
@@ -70,8 +70,8 @@ class KmapTest extends connect(store, LitElement) {
     }
 
     if (changedProperties.has("_page")) {
-      const page = this.shadowRoot.getElementById(this._page);
-      this._bar.scrollTarget = page;
+      // @ts-ignore
+      this._bar.scrollTarget = this.shadowRoot.getElementById(this._page);
 
       switch (this._page) {
         case 'chooser':
@@ -143,10 +143,13 @@ class KmapTest extends connect(store, LitElement) {
       </mwc-top-app-bar>
 
       <div class="modules">
-        ${this._page === 'chooser' ? html`<kmap-test-chooser id="chooser" class="page"></kmap-test-chooser>` : ''}
-        ${this._page === 'exercise' ? html`<kmap-test-exercise id="exercise" class="page"></kmap-test-exercise>` : ''}
-        ${this._page === 'results' ? html`<kmap-test-results id="results" class="page"></kmap-test-results>` : ''}
-        <kmap-test-editor-scroller id="editor" ?hidden="${!this._layers.includes('editor')}"></kmap-test-editor-scroller>
+        ${!this._layers.includes('editor') ? html`
+            ${this._page === 'chooser' ? html`<kmap-test-chooser id="chooser" class="page"></kmap-test-chooser>` : ''}
+            ${this._page === 'exercise' ? html`<kmap-test-exercise id="exercise" class="page"></kmap-test-exercise>` : ''}
+            ${this._page === 'results' ? html`<kmap-test-results id="results" class="page"></kmap-test-results>` : ''}
+        `: html`
+          <kmap-test-editor-scroller id="editor" ?hidden="${!this._layers.includes('editor')}"></kmap-test-editor-scroller>
+        `}
       </div>
       <div class="buttons">
         <mwc-button ?hidden="${this._page === 'chooser'}" @click="${this._goChoose}">Aufgabenauswahl</mwc-button>

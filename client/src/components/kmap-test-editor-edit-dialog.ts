@@ -233,24 +233,22 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
       fontStyles,
       colorStyles,
       css`
-        form {
-          width: 510px;
+        mwc-dialog {
+          --mdc-dialog-max-width: 810px;
         }
         mwc-icon-button, mwc-button {
           vertical-align: middle
         }
-        .preview {
-          position: static;
-          width: 100%;
-          pointer-events: none;
-          text-align: left;
+        mwc-textfield, mwc-textarea {
+          margin-bottom: 4px;
         }
         .preview-scroller {
-          position: absolute;
-          top: -20px;
-          left: 24px;
-          right: 24px;
-          max-height: 300px;
+          z-index: 10000000;
+          position: fixed;
+          top: 16px;
+          left: 16px;
+          right: 16px;
+          max-height: 360px;
           overflow-y: auto;
           pointer-events: all;
           border-radius: 3px;
@@ -259,10 +257,6 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
           0 3px 1px -2px rgba(0, 0, 0, 0.2);
         }
         kmap-test-card {
-          position: absolute;
-          top: 4px;
-          left: 0px;
-          width: 100%;
           display: block;
           box-sizing: border-box;
           background-color: var(--color-lightgray);
@@ -271,44 +265,37 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
           0 1px 5px 0 rgba(0, 0, 0, 0.12),
           0 3px 1px -2px rgba(0, 0, 0, 0.2);
         }
-        select {
-          border: none;
-          border-bottom: 2px solid var(--color-mediumgray);
-          padding: 12px 6px;
-          background-color: var(--color-lightgray);
-          outline: none;
-        }
-        select:focus {
-          border-bottom-color: var(--color-primary);
-        }
-        option {
-          font-size:16px;
-          background-color:#ffffff;
-        }
       `];
   }
 
   render() {
     // language=HTML
     return html`
-<mwc-dialog id="editDialog" title="Editor">
+  ${this._showPreview ? html`<div class="preview-scroller"><kmap-test-card hideHeader hideActions
+    .subject="${this._subject}"
+    .chapter="${this._chapter}"
+    .topic="${this._topic}"
+    .level="${this._level}"
+    .balance="${this._balance}"
+    .question="${this._question}"
+    .answer="${this._answer}"
+    .num="1" .of="1">
+</kmap-test-card></div>` : ''}
+
+<mwc-dialog id="editDialog" heading="Test Editor">
 ${this._test ? html`
   <form @focus="${this._focus}" @keydown="${this._captureEnter}" @input="${this._checkValidity}">
-    <mwc-formfield alignend="" label="Kapitel">
-      <mwc-select required @change="${e => this._chapter = e.target.value}">
+      <mwc-select required label="Kapitel" @change="${e => this._chapter = e.target.value}">
         ${this._chapters.map((chapter) => html`<mwc-list-item value="${chapter}" ?selected="${chapter === this._chapter}">${chapter}</mwc-list-item>`)}
       </mwc-select>
-      </mwc-formfield>
-      <mwc-formfield alignend="" label="Thema">
-      <mwc-select required @change="${e => this._topic = e.target.value}">
+      <mwc-select required label="Thema" @change="${e => this._topic = e.target.value}">
         ${this._topics.map((topic) => html`<mwc-list-item value="${topic}" ?selected="${topic === this._topic}">${topic}</mwc-list-item>`)}
       </mwc-select>
-    </mwc-formfield>
     <br/><br/>
     <mwc-textfield id="key" name="key" label="Titel" dense type="text" required .value="${this._key}" @change="${e => this._key = e.target.value}"></mwc-textfield>
     <mwc-textfield id="level" name="level" label="Level" dense type="number" inputmode="numeric" min="1" max="3" step="1" .value="${this._level}" @change="${e => this._level = e.target.value}"></mwc-textfield>
     <br/>
-    <mwc-formfield alignend="" label="Layout Verhältnis Frage zu Antwort: ${this._balance} zu ${6 - this._balance}   ">
+    <mwc-formfield alignend="" label="Layout Verhältnis Frage : Antwort = ${this._balance} : ${6 - this._balance}">&nbsp;&nbsp;
       <mwc-slider id="balance" style="vertical-align:middle" .value="${this._balance}" pin markers step="1" min="0" max="5" @change=${e => this._balance = e.target.value}></mwc-slider>
     </mwc-formfield>
     <br/>
@@ -316,21 +303,11 @@ ${this._test ? html`
     <mwc-textarea id="answer" placeholder="Antwort" required fullwidth rows="4" .value=${this._answer} @keyup="${this._setAnswer}" @focus="${this._focus}" @blur="${this._focus}"></mwc-textarea>
 
     <div class="field values">
-      <label for="attachments">Werte (Checkboxen: true/false, Dezimalzahlen mit Punkt statt Komma)</label>
+      <label secondary>Werte (Checkboxen: true/false, Dezimalzahlen mit Punkt statt Komma)</label><br/>
+
       ${this._values.map((value, i) => html`<input type="text" .value="${this._values[i]}" @change="${e => this._values[i] = e.target.value}"/>`)}
     </div>
   </form>` : ''}
-  <div class="preview">
-    ${this._showPreview ? html`<kmap-test-card hideHeader hideActions
-                                .subject="${this._subject}"
-                                .chapter="${this._chapter}"
-                                .topic="${this._topic}"
-                                .level="${this._level}"
-                                .balance="${this._balance}"
-                                .question="${this._question}"
-                                .answer="${this._answer}"
-                                .num="1" .of="1"></kmap-test-card>` : ''}
-  </div>
 
   <mwc-icon-button slot="secondaryAction" icon="folder_open" title="Cloud Verzeichnis öffnen" @click=${this._createDirectory}></mwc-icon-button>
   <mwc-button slot="secondaryAction" @click=${this._cancel}>Abbrechen</mwc-button>

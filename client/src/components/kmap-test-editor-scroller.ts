@@ -60,7 +60,7 @@ export class KMapTestEditorScroller extends connect(store, LitElement) {
           background-color: whitesmoke;
         }
         .scroller {
-          height: 102px;
+          height: 238px;
           overflow-y: auto;
         }
         .item {
