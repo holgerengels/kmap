@@ -1,4 +1,4 @@
-import {LitElement, html, css, customElement, property, query} from 'lit-element';
+import {LitElement, html, css, customElement, property, query, queryAll} from 'lit-element';
 import {store} from "../store";
 
 import '@material/mwc-button';
@@ -9,6 +9,7 @@ import '@material/mwc-textarea';
 import '@material/mwc-textfield';
 import {colorStyles, fontStyles} from "./kmap-styles";
 import {Dialog} from "@material/mwc-dialog/mwc-dialog";
+import {Radio} from "@material/mwc-radio/mwc-radio";
 
 @customElement('kmap-feedback')
 export class KMapFeedback extends LitElement {
@@ -29,6 +30,10 @@ export class KMapFeedback extends LitElement {
   @query('#dialog')
   // @ts-ignore
   private _dialog: Dialog;
+  @queryAll('mwc-radio')
+  // @ts-ignore
+  private _radios: Radio[];
+
 
   static get styles() {
     // language=CSS
@@ -37,6 +42,7 @@ export class KMapFeedback extends LitElement {
       colorStyles,
       css`
         mwc-dialog {
+          --mdc-dialog-min-width: 630px;
           --mdc-dialog-max-width: 810px;
         }
         form > * {
@@ -52,6 +58,9 @@ export class KMapFeedback extends LitElement {
     this._type = '';
     this._title = '';
     this._text = '';
+    for (const radio of this._radios)
+      radio.checked = false;
+
     this._dialog.show();
   }
   _cancel() {
@@ -68,10 +77,10 @@ export class KMapFeedback extends LitElement {
     return html`
   <mwc-dialog id="dialog" heading="Feedback">
     <form>
-      <label>${this.topic !== undefined ? this.subject + " → " + this.chapter + " → " + this.topic : this.subject + " → " + this.chapter}</label>
+      <label secondary>${this.topic !== undefined ? this.subject + " → " + this.chapter + " → " + this.topic : this.subject + " → " + this.chapter}</label>
       <div>
-        <mwc-formfield label="Fehler"><mwc-radio name="type" value="bug" dialogInitialFocus @change="${() => this._type = 'bug'}"></mwc-radio></mwc-formfield>
-        <mwc-formfield label="Verbesserungsvorschlag"><mwc-radio name="type" value="proposal" @change="${() => this._type = 'proposal'}"></mwc-radio></mwc-formfield>
+        <mwc-formfield label="Fehler"><mwc-radio id="bug" name="type" value="bug" dialogInitialFocus @change="${() => this._type = 'bug'}"></mwc-radio></mwc-formfield>
+        <mwc-formfield label="Verbesserungsvorschlag"><mwc-radio id="proposal" name="type" value="proposal" @change="${() => this._type = 'proposal'}"></mwc-radio></mwc-formfield>
       </div>
       <mwc-textfield id="title" label="Titel" dense .value=${this._title} @input="${e => this._title = e.target.value}"></mwc-textfield>
       <mwc-textarea id="text" placeholder="Text" dense fullwidth rows="7" .value=${this._text} @input="${e => this._text = e.target.value}"></mwc-textarea>

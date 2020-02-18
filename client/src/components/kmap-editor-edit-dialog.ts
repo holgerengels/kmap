@@ -379,7 +379,7 @@ ${this._card ? html`
     <mwc-textarea id="description" placeholder="Langtext" dense fullwidth rows="7" .value=${this._card.description} @keyup="${this._setDescription}" @focus="${this._focus}" @blur="${this._focus}"></mwc-textarea>
 
     <div class="field attachments">
-      <label for="attachments">Materialien</label>
+      <label for="attachments">Materialien</label><br/>
       ${this._card.attachments.map((attachment) => html`
         <div class="attachment">
           ${attachment.type === 'link' ? html`<mwc-icon @click="${() => this._deleteAttachment(attachment)}">delete</mwc-icon>` : ''}

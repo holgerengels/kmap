@@ -57,6 +57,7 @@ export class KMapContentManagerModules extends connect(store, LitElement) {
 
   _import() {
     if (!this._file) return;
+    // @ts-ignore
     store.dispatch.contentMaps.import(this._file.files);
   }
 
