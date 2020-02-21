@@ -19,6 +19,8 @@ export class KMapFeedback extends LitElement {
   private chapter: string = '';
   @property()
   private topic: string = '';
+  @property()
+  private test?: string = undefined;
 
   @property()
   private _type: string = '';
@@ -78,6 +80,9 @@ export class KMapFeedback extends LitElement {
   <mwc-dialog id="dialog" heading="Feedback">
     <form>
       <label secondary>${this.topic !== undefined ? this.subject + " → " + this.chapter + " → " + this.topic : this.subject + " → " + this.chapter}</label>
+      ${this.test !== undefined ? html`
+        <br/><label secondary>${this.test}</label>
+      ` : ''}
       <div>
         <mwc-formfield label="Fehler"><mwc-radio id="bug" name="type" value="bug" dialogInitialFocus @change="${() => this._type = 'bug'}"></mwc-radio></mwc-formfield>
         <mwc-formfield label="Verbesserungsvorschlag"><mwc-radio id="proposal" name="type" value="proposal" @change="${() => this._type = 'proposal'}"></mwc-radio></mwc-formfield>
