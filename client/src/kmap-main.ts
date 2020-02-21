@@ -117,23 +117,9 @@ export class KmapMain extends connect(store, LitElement) {
       else if (cookie) {
         console.log("instance from cookie .. " + cookie);
         document.cookie = "instance=" + cookie + "; path=/; expires=0";
-        /*
-        set("instance", cookie)
-          .then(() => store.dispatch.app.chooseInstance(cookie));
-         */
         store.dispatch.app.chooseInstance(cookie);
       }
       else {
-        /*
-        get('instance').then((instance: string) => {
-          if (instance) {
-            console.log("instance from idb .. " + instance);
-            store.dispatch.app.chooseInstance(instance);
-          }
-          else
-            this._instancePopup.show();
-        });
-         */
         if (!store.state.app.instance)
           this._instancePopup.show();
       }
