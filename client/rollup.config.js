@@ -1,7 +1,8 @@
-import createDefaultConfig from '@open-wc/building-rollup';
+import { createDefaultConfig } from '@open-wc/building-rollup';
 import cpy from 'rollup-plugin-cpy';
 import deepmerge from 'deepmerge';
-const { injectManifest, generateSW } = require('rollup-plugin-workbox');
+const { generateSW } = require('rollup-plugin-workbox');
+
 
 // if you need to support IE11 use "modern-and-legacy-config" instead.
 // import { createCompatibilityConfig } from '@open-wc/building-rollup';

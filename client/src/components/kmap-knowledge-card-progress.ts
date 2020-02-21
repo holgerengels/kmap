@@ -2,7 +2,7 @@ import {LitElement, html, css, customElement, property} from 'lit-element';
 import {colorStyles, fontStyles} from "./kmap-styles";
 
 @customElement('kmap-knowledge-card-progress')
-class KMapKnowledgeCardProgress extends LitElement {
+export class KMapKnowledgeCardProgress extends LitElement {
   @property({type: Number})
   private progressNum: number = 0;
   @property({type: Number})

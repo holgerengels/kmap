@@ -32,7 +32,7 @@ export class KMapLoginPopup extends connect(store, LitElement) {
   mapState(state: State) {
     return {
       _userid: state.app.userid,
-      _message: state.app.loginResponse,
+      //_message: state.app.loginResponse,
     };
   }
 

@@ -2,7 +2,7 @@ import {LitElement, html, css, customElement, property} from 'lit-element';
 import { colorStyles, fontStyles } from "./kmap-styles";
 
 @customElement('kmap-summary-card-summary')
-class KMapSummaryCardSummary extends LitElement {
+export class KMapSummaryCardSummary extends LitElement {
 
   @property({type: String})
   private summary: string = '';

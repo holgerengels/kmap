@@ -2,7 +2,7 @@ import {LitElement, html, css, customElement, property} from 'lit-element';
 import {colorStyles, fontStyles} from "./kmap-styles";
 
 @customElement('kmap-knowledge-card-depends')
-class KMapKnowledgeCardDepends extends LitElement {
+export class KMapKnowledgeCardDepends extends LitElement {
   @property({type: String})
   private subject: string = '';
   @property({type: String})

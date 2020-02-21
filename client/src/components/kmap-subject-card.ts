@@ -8,7 +8,7 @@ import {STATE_COLORS} from './state-colors';
 import {fontStyles, colorStyles} from "./kmap-styles";
 
 @customElement('kmap-subject-card')
-class KMapSubjectCard extends connect(store, LitElement) {
+export class KMapSubjectCard extends connect(store, LitElement) {
 
   @property({type: String})
   private subject: string = '';

@@ -6,7 +6,7 @@ import '@material/mwc-icon';
 import {fontStyles, colorStyles} from "./kmap-styles";
 
 @customElement('kmap-login-button')
-class KMapLoginButton extends connect(store, LitElement) {
+export class KMapLoginButton extends connect(store, LitElement) {
   @property()
   private _userid: string = '';
   @property()
