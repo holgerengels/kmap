@@ -1,11 +1,8 @@
-import {createStore, routingPluginFactory, ModelsState, ModelsDispatch, RoutingState, RoutingDispatch} from '@captaincodeman/rdx-model'
+import { createStore, StoreState, StoreDispatch, EffectStore } from '@captaincodeman/rdx-model'
 import { devtools, persist} from '@captaincodeman/rdx'
-import { routeMatcher } from './routes'
-import * as models from './models'
+import { config } from './config'
 
-const routingPlugin = routingPluginFactory(routeMatcher);
-
-let store = createStore({ models, plugins: [routingPlugin] });
+let _store = createStore(config)
 
 // These could be commented out if the extra functionality
 // wasn't required, to create a production bundle without
@@ -15,11 +12,11 @@ let store = createStore({ models, plugins: [routingPlugin] });
 // if (process.env.NODE_ENV !== 'production') {
 //   store = devtools(store)
 
-store = devtools(store);
-store = persist(store);
+_store = devtools(_store);
+_store = persist(_store);
 
-export { store }
+export const store = _store
 
-export type Store = typeof store
-export type State = ModelsState<typeof models> & { routing: RoutingState }
-export type Dispatch = ModelsDispatch<typeof models> & { routing: RoutingDispatch }
+export interface State extends StoreState<typeof config> {}
+export interface Dispatch extends StoreDispatch<typeof config> {}
+export interface Store extends EffectStore<Dispatch, State> {}

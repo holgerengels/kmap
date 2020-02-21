@@ -1,4 +1,4 @@
-import {Dispatch, State} from "./store";
+import {State} from "./store";
 
 export const endpoint = {
   get(state: State): RequestInit {

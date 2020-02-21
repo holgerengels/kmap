@@ -1,5 +1,5 @@
 import {LitElement, html, css, customElement, property} from 'lit-element';
-import {config} from '../config';
+import {urls} from '../urls';
 
 import '@material/mwc-icon';
 import {Attachment} from "../models/maps";
@@ -24,7 +24,7 @@ export class KMapKnowledgeCardAttachment extends LitElement {
   updated(changedProperties) {
     if (changedProperties.has("attachment")) {
       let attachment: Attachment = this.attachment;
-      this._handler = attachment.type === "application/vnd.geogebra.file" ? "/geogebra.html?path=" + config.server : "";
+      this._handler = attachment.type === "application/vnd.geogebra.file" ? "/geogebra.html?path=" + urls.server : "";
       this._mimeIcon = this.mimeIcon(attachment.type);
       this._isDownload = attachment.type !== "link" && attachment.type !== "text/html" && this._supportsDownload ? attachment.name : undefined;
       this._isTarget = attachment.type === "link" || attachment.type === "text/html" || !this._supportsDownload ? "_blank" : undefined;
@@ -99,28 +99,28 @@ export class KMapKnowledgeCardAttachment extends LitElement {
     else if (this._handler && this._isTarget)
       return html `
             <a href="${this._handler}${this.attachment.href}" target="_blank" rel="external noopener">${this.attachment.name}&nbsp;<mwc-icon>open_in_new</mwc-icon></a>
-            <a href="${config.server}${this.attachment.href}?instance=${this.instance}" download="${this._isDownload}" target="${this._isTarget}"><mwc-icon>cloud_download</mwc-icon></a>
+            <a href="${urls.server}${this.attachment.href}?instance=${this.instance}" download="${this._isDownload}" target="${this._isTarget}"><mwc-icon>cloud_download</mwc-icon></a>
         `;
     else if (this._handler)
       return html `
             <a href="${this._handler}${this.attachment.href}" target="_blank" rel="external noopener">${this.attachment.name}&nbsp;<mwc-icon>open_in_new</mwc-icon></a>
-            <a href="${config.server}${this.attachment.href}?instance=${this.instance}" download="${this._isDownload}"><mwc-icon>cloud_download</mwc-icon></a>
+            <a href="${urls.server}${this.attachment.href}?instance=${this.instance}" download="${this._isDownload}"><mwc-icon>cloud_download</mwc-icon></a>
         `;
     else if (this._isDownload && this._isTarget)
       return html `
-            <a href="${config.server}${this.attachment.href}?instance=${this.instance}" download="${this._isDownload}" target="${this._isTarget}">${this.attachment.name}</a>
+            <a href="${urls.server}${this.attachment.href}?instance=${this.instance}" download="${this._isDownload}" target="${this._isTarget}">${this.attachment.name}</a>
         `;
     else if (this._isDownload)
       return html `
-            <a href="${config.server}${this.attachment.href}?instance=${this.instance}" download="${this._isDownload}">${this.attachment.name}</a>
+            <a href="${urls.server}${this.attachment.href}?instance=${this.instance}" download="${this._isDownload}">${this.attachment.name}</a>
         `;
     else if (this._isTarget)
       return html `
-            <a href="${config.server}${this.attachment.href}?instance=${this.instance}" target="${this._isTarget}">${this.attachment.name}</a>
+            <a href="${urls.server}${this.attachment.href}?instance=${this.instance}" target="${this._isTarget}">${this.attachment.name}</a>
         `;
     else
       return html `
-            <a href="${config.server}${this.attachment.href}?instance=${this.instance}">${this.attachment.name}</a>
+            <a href="${urls.server}${this.attachment.href}?instance=${this.instance}">${this.attachment.name}</a>
         `;
   }
 }

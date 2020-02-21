@@ -1,7 +1,7 @@
 import {createModel, RoutingState} from '@captaincodeman/rdx-model';
-import { State, Dispatch } from '../store';
+import { Store } from '../store';
 import {endpoint, fetchjson} from "../endpoint";
-import {config} from "../config";
+import {urls} from "../urls";
 
 export interface Feedback {
   subject: string,
@@ -59,13 +59,14 @@ export default createModel({
   },
 
   // @ts-ignore
-  effects: (dispatch: Dispatch, getState) => ({
+  effects: (store: Store) => ({
     async load() {
-      const state: State = getState();
+      const dispatch = store.dispatch();
+      const state = store.getState();
       // @ts-ignore
       if (Date.now() - state.feedback.timestamp > 3000) {
         dispatch.feedback.requestLoad();
-        fetchjson(`${config.server}feedback?load=all`, endpoint.get(state),
+        fetchjson(`${urls.server}feedback?load=all`, endpoint.get(state),
           (json) => {
             dispatch.feedback.receivedLoad(json);
           },
@@ -74,10 +75,11 @@ export default createModel({
       }
     },
     async submit(feedback: Feedback) {
-      const state: State = getState();
+      const dispatch = store.dispatch();
+      const state = store.getState();
       feedback.state = 'open';
       dispatch.feedback.requestSubmit();
-      fetchjson(`${config.server}feedback?submit=${feedback.type}`, {... endpoint.post(state), body: JSON.stringify(feedback)},
+      fetchjson(`${urls.server}feedback?submit=${feedback.type}`, {... endpoint.post(state), body: JSON.stringify(feedback)},
         () => {
           dispatch.feedback.receivedSubmit();
         },
@@ -86,21 +88,25 @@ export default createModel({
     },
 
     'routing/change': async function(routing: RoutingState) {
-      const state: State = getState();
+      const dispatch = store.dispatch();
+      const state = store.getState();
       if (state.app.roles.includes("teacher") && (routing.page === 'content-manager'))
         dispatch.feedback.load();
     },
     'app/receivedLogin': async function() {
-      const state: State = getState();
+      const dispatch = store.dispatch();
+      const state = store.getState();
       const routing: RoutingState = state.routing;
       if (state.app.roles.includes("teacher") && (routing.page === 'content-manager'))
         dispatch.feedback.load();
     },
 
     'app/receivedLogout': async function() {
+      const dispatch = store.dispatch();
       dispatch.feedback.forget();
     },
     'app/chooseInstance': async function() {
+      const dispatch = store.dispatch();
       dispatch.feedback.forget();
     },
   })

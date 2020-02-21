@@ -56,6 +56,7 @@ export class KMapInstancePopup extends connect(store, LitElement) {
   }
 
   show() {
+    store.dispatch.instances.load();
     this._instanceDialog.show();
   }
 

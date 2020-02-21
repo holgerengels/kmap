@@ -137,9 +137,9 @@ class KmapTest extends connect(store, LitElement) {
     // language=HTML
     return html`
       <mwc-top-app-bar id="bar" dense>
-        <mwc-icon-button icon="menu" slot="navigationIcon" @click="${e => this._fire('toggleDrawer')}"></mwc-icon-button>
+        <mwc-icon-button icon="menu" slot="navigationIcon" @click="${() => this._fire('toggleDrawer')}"></mwc-icon-button>
         <div slot="title">${this._title}</div>
-        <kmap-login-button slot="actionItems" @lclick="${e => this._fire('login')}"></kmap-login-button>
+        <kmap-login-button slot="actionItems" @lclick="${() => this._fire('login')}"></kmap-login-button>
       </mwc-top-app-bar>
 
       <div class="modules">

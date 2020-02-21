@@ -2,7 +2,7 @@ import {LitElement, html, css, customElement, property, query} from 'lit-element
 import {connect} from '@captaincodeman/rdx';
 import {State, store} from "../store";
 
-import {config} from '../config';
+import {urls} from '../urls';
 import {STATE_COLORS} from './state-colors';
 import {fontStyles, colorStyles} from "./kmap-styles";
 import './star-rating';
@@ -119,7 +119,7 @@ export class KMapTestCard extends connect(store, LitElement) {
 
   math(text, element) {
     if (text) {
-      let replace = text.replace(/inline:([^"]*)/g, config.server + "data/" + this.subject + "/" + this.chapter + "/" + this.topic + "/tests/$1?instance=" + this._instance);
+      let replace = text.replace(/inline:([^"]*)/g, urls.server + "data/" + this.subject + "/" + this.chapter + "/" + this.topic + "/tests/$1?instance=" + this._instance);
       replace = replace.replace(/<check\/>/g, "<input type='checkbox'/>");
       replace = replace.replace(/<text\/>/g, "<input type='text' inputmode='text'/>");
       replace = replace.replace(/<text ([0-9]+)\/>/g, "<input type='text' inputmode='text' maxlength='$1' style='width: $1em'/>");

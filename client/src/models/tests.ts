@@ -1,7 +1,7 @@
 import {createModel, RoutingState} from '@captaincodeman/rdx-model';
-import {State, Dispatch} from '../store';
+import { Store } from '../store';
 import {endpoint, fetchjson} from "../endpoint";
-import {config} from "../config";
+import {urls} from "../urls";
 import {Path} from "./types";
 
 export interface Test {
@@ -181,9 +181,10 @@ export default createModel({
   },
 
   // @ts-ignore
-  effects: (dispatch: Dispatch, getState) => ({
+  effects: (store: Store) => ({
     async loadTopics() {
-      const state: State = getState();
+      const dispatch = store.dispatch();
+      const state = store.getState();
       const subject = state.maps.subject;
       if (!subject)
         return;
@@ -191,7 +192,7 @@ export default createModel({
       // @ts-ignore
       if (state.tests.subject !== subject || !state.tests.tests) {
         dispatch.tests.requestTopics();
-        fetchjson(`${config.server}tests?topics=all&subject=${subject}`, endpoint.get(state),
+        fetchjson(`${urls.server}tests?topics=all&subject=${subject}`, endpoint.get(state),
           (json) => {
             dispatch.tests.receivedTopics({subject: subject, topics: json});
           },
@@ -200,12 +201,13 @@ export default createModel({
       }
     },
     async loadChapters(subject: string) {
-      const state: State = getState();
+      const dispatch = store.dispatch();
+      const state = store.getState();
 
       // @ts-ignore
       if (state.tests.subject !== subject || !state.tests.chapters) {
         dispatch.tests.requestChapters();
-        fetchjson(`${config.server}tests?chapters=all&subject=${subject}`, endpoint.get(state),
+        fetchjson(`${urls.server}tests?chapters=all&subject=${subject}`, endpoint.get(state),
           (json) => {
             dispatch.tests.receivedChapters({subject: subject, chapters: json});
           },
@@ -214,12 +216,13 @@ export default createModel({
       }
     },
     async loadTree(subject: string) {
-      const state: State = getState();
+      const dispatch = store.dispatch();
+      const state = store.getState();
 
       // @ts-ignore
       if (state.tests.subject !== subject || !state.tests.tree) {
         dispatch.tests.requestTree();
-        fetchjson(`${config.server}data?tree=all&subject=${subject}`, endpoint.get(state),
+        fetchjson(`${urls.server}data?tree=all&subject=${subject}`, endpoint.get(state),
           (json) => {
             dispatch.tests.receivedTree({subject: subject, chapters: json});
           },
@@ -228,7 +231,8 @@ export default createModel({
       }
     },
     async loadTests(payload: Path) {
-      const state: State = getState();
+      const dispatch = store.dispatch();
+      const state = store.getState();
       if (!payload.subject || !payload.chapter)
         return;
 
@@ -236,8 +240,8 @@ export default createModel({
       if (state.tests.subject !== payload.subject || state.tests.chapter !== payload.chapter || state.tests.topic !== payload.topic || !state.tests.tests) {
         dispatch.tests.requestTests();
         const url = payload.topic
-          ? `${config.server}tests?subject=${payload.subject}&chapter=${payload.chapter}&topic=${payload.topic}`
-          : `${config.server}tests?subject=${payload.subject}&chapter=${payload.chapter}`;
+          ? `${urls.server}tests?subject=${payload.subject}&chapter=${payload.chapter}&topic=${payload.topic}`
+          : `${urls.server}tests?subject=${payload.subject}&chapter=${payload.chapter}`;
 
         fetchjson(url, endpoint.get(state),
           (json) => {
@@ -249,11 +253,12 @@ export default createModel({
     },
 
     async deleteTest(test: Test) {
-      const state: State = getState();
+      const dispatch = store.dispatch();
+      const state = store.getState();
       const userid = state.app.userid;
 
       dispatch.tests.requestDeleteTest();
-      fetchjson(`${config.server}tests?userid=${userid}&subject=${test.subject}&save=${test.set}`, {... endpoint.post(state), body: JSON.stringify({delete: test})},
+      fetchjson(`${urls.server}tests?userid=${userid}&subject=${test.subject}&save=${test.set}`, {... endpoint.post(state), body: JSON.stringify({delete: test})},
         () => {
           dispatch.tests.receivedDeleteTest();
           dispatch.tests.unsetTestForDelete();
@@ -263,11 +268,12 @@ export default createModel({
         dispatch.tests.error);
     },
     async saveTest(test: Test) {
-      const state: State = getState();
+      const dispatch = store.dispatch();
+      const state = store.getState();
       const userid = state.app.userid;
 
       dispatch.tests.requestSaveTest();
-      fetchjson(`${config.server}tests?userid=${userid}&subject=${test.subject}&save=${test.set}`,
+      fetchjson(`${urls.server}tests?userid=${userid}&subject=${test.subject}&save=${test.set}`,
         // @ts-ignore
         {... endpoint.post(state), body: JSON.stringify(test.added ? {changed: test} : {old: test, changed: test})},
         () => {
@@ -280,14 +286,15 @@ export default createModel({
     },
 
     'maps/subjectChanged': async function() {
-        dispatch.tests.loadTopics();
+      const dispatch = store.dispatch();
+      dispatch.tests.loadTopics();
     },
     'routing/change': async function(routing: RoutingState) {
+      const dispatch = store.dispatch();
       console.log(routing.page);
       console.log(routing.params);
       switch (routing.page) {
         case 'test':
-          // @ts-ignore
           dispatch.tests.loadTests({ subject: routing.params["subject"], chapter: routing.params["chapter"], topic: routing.params["topic"]});
 
           if (routing.params["chapter"])
@@ -300,7 +307,8 @@ export default createModel({
       }
     },
     'app/chooseInstance': async function() {
-      const state: State = getState();
+      const dispatch = store.dispatch();
+      const state = store.getState();
       const routing: RoutingState = state.routing;
       if (routing.page === 'test')
         dispatch.tests.loadTests({ subject: routing.params["subject"], chapter: routing.params["chapter"], topic: routing.params["topic"]});

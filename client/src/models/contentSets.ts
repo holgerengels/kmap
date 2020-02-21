@@ -1,7 +1,7 @@
 import {createModel, RoutingState} from '@captaincodeman/rdx-model';
-import { State, Dispatch } from '../store';
+import { Store } from '../store';
 import {endpoint, fetchblob, fetchjson} from "../endpoint";
-import {config} from "../config";
+import {urls} from "../urls";
 import {Test} from "./tests";
 
 export interface Set {
@@ -110,13 +110,13 @@ export default createModel({
   },
 
   // @ts-ignore
-  effects: (dispatch: Dispatch, getState) => ({
+  effects: (store: Store) => ({
     async load() {
-      const state: State = getState();
-      // @ts-ignore
+      const dispatch = store.dispatch();
+      const state = store.getState();
       if (Date.now() - state.contentSets.timestamp > 3000) {
         dispatch.contentSets.requestLoad();
-        const resp = await fetch(`${config.server}tests?sets=all`, endpoint.get(state));
+        const resp = await fetch(`${urls.server}tests?sets=all`, endpoint.get(state));
         if (resp.ok) {
           const json = await resp.json();
           // @ts-ignore
@@ -132,12 +132,13 @@ export default createModel({
       }
     },
     async loadSet(set: Set) {
-      const state: State = getState();
+      const dispatch = store.dispatch();
+      const state = store.getState();
       if (!set.subject || !set.set)
         return;
 
       dispatch.contentSets.requestSet();
-      const resp = await fetch(`${config.server}tests?subject=${set.subject}&set=${set.set}`, endpoint.get(state));
+      const resp = await fetch(`${urls.server}tests?subject=${set.subject}&set=${set.set}`, endpoint.get(state));
       if (resp.ok) {
         const json = await resp.json();
         dispatch.contentSets.receivedSet({subject: set.subject, set: set.set, tests: json});
@@ -157,6 +158,7 @@ export default createModel({
       }
     },
     selectSet(set: Set) {
+      const dispatch = store.dispatch();
       if (!set.subject || !set.set)
         return;
 
@@ -164,7 +166,8 @@ export default createModel({
       dispatch.maps.loadAllTopics(set.subject);
     },
     maybeNewSet(set: Set) {
-      const state: State = getState();
+      const dispatch = store.dispatch();
+      const state = store.getState();
       if (!state.contentSets.sets.includes(set)) {
         // @ts-ignore
         dispatch.contentSets.receivedLoad([...new Set(state.contentSets.sets).add(set)].sort((a, b) => a.set.localeCompare(b.set)));
@@ -176,7 +179,8 @@ export default createModel({
         }.bind(undefined, set), 1000);
     },
     maybeObsoleteSet(set: Set) {
-      const state: State = getState();
+      const dispatch = store.dispatch();
+      const state = store.getState();
 
       // @ts-ignore
       if (state.contentSets.set.count === 1 ) {
@@ -190,7 +194,8 @@ export default createModel({
     },
 
     async import(files: File[]) {
-      const state: State = getState();
+      const dispatch = store.dispatch();
+      const state = store.getState();
 
       let names: string[] = [];
       var formData: FormData = new FormData();
@@ -202,7 +207,7 @@ export default createModel({
       }
 
       dispatch.contentSets.requestImport();
-      fetchjson(`${config.server}content?import-set=${names.join(",")}`, {... endpoint.post(state), body: formData},
+      fetchjson(`${urls.server}content?import-set=${names.join(",")}`, {... endpoint.post(state), body: formData},
         () => {
           dispatch.contentSets.receivedImport();
         },
@@ -210,10 +215,11 @@ export default createModel({
         dispatch.contentSets.error);
     },
     async export(payload: Set) {
-      const state: State = getState();
+      const dispatch = store.dispatch();
+      const state = store.getState();
 
       dispatch.contentSets.requestExport();
-      fetchblob(`${config.server}content?subject=${payload.subject}&export-set=${payload.set}`, endpoint.get(state),
+      fetchblob(`${urls.server}content?subject=${payload.subject}&export-set=${payload.set}`, endpoint.get(state),
         (blob) => {
           let url = window.URL.createObjectURL(blob);
           var a: HTMLAnchorElement = document.createElement('a');
@@ -230,10 +236,11 @@ export default createModel({
         dispatch.contentSets.error);
     },
     async delete(payload: Set) {
-      const state: State = getState();
+      const dispatch = store.dispatch();
+      const state = store.getState();
 
       dispatch.contentSets.requestDelete();
-      fetchjson(`${config.server}tests?subject=${payload.subject}&delete=${payload.set}`, endpoint.get(state),
+      fetchjson(`${urls.server}tests?subject=${payload.subject}&delete=${payload.set}`, endpoint.get(state),
         () => {
           dispatch.contentSets.receivedDelete();
         },
@@ -242,21 +249,25 @@ export default createModel({
     },
 
     'routing/change': async function(routing: RoutingState) {
-      const state: State = getState();
+      const dispatch = store.dispatch();
+      const state = store.getState();
       if (state.app.roles.includes("teacher") && (routing.page === 'content-manager' || routing.page === 'test'))
         dispatch.contentSets.load();
     },
     'app/receivedLogin': async function() {
-      const state: State = getState();
+      const dispatch = store.dispatch();
+      const state = store.getState();
       const routing: RoutingState = state.routing;
       if (state.app.roles.includes("teacher") && (routing.page === 'content-manager' || routing.page === 'test'))
         dispatch.contentSets.load();
     },
 
     'app/receivedLogout': async function() {
+      const dispatch = store.dispatch();
       dispatch.contentSets.forget();
     },
     'app/chooseInstance': async function() {
+      const dispatch = store.dispatch();
       dispatch.contentSets.forget();
     },
   })

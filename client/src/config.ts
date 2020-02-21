@@ -1,4 +1,6 @@
-import createMatcher from '@captaincodeman/router';
+import createMatcher from '@captaincodeman/router'
+import { routingPluginFactory } from '@captaincodeman/rdx-model'
+import * as models from './models'
 
 // NOTE: the /:app prefix of the routes is to handle github pages
 
@@ -13,4 +15,7 @@ const routes = {
   '/app/content-manager':                  'content-manager',
 }                                                 ;
 
-export const routeMatcher = createMatcher(routes);
+const matcher = createMatcher(routes)
+const routing = routingPluginFactory(matcher)
+
+export const config = { models, plugins: { routing } }

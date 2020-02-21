@@ -1,7 +1,7 @@
 import {createModel, RoutingState} from '@captaincodeman/rdx-model';
-import {Dispatch, State} from '../store';
+import { Store } from '../store';
 import {endpoint, fetchjson} from "../endpoint";
-import {config} from "../config";
+import {urls} from "../urls";
 
 export interface Course {
   name: string,
@@ -114,9 +114,10 @@ export default createModel({
   },
 
   // @ts-ignore
-  effects: (dispatch: Dispatch, getState) => ({
+  effects: (store: Store) => ({
     async load() {
-      const state: State = getState();
+      const dispatch = store.dispatch();
+      const state = store.getState();
       const userid = state.app.userid;
       if (!userid)
         return;
@@ -127,7 +128,7 @@ export default createModel({
       }
 
       dispatch.courses.requestLoad();
-      fetchjson(`${config.server}state?courses=${userid}`, endpoint.get(state),
+      fetchjson(`${urls.server}state?courses=${userid}`, endpoint.get(state),
         (json) => {
           dispatch.courses.receivedLoad(json);
         },
@@ -136,13 +137,14 @@ export default createModel({
     },
 
     async store(payload: string[]) {
-      const state: State = getState();
+      const dispatch = store.dispatch();
+      const state = store.getState();
       const userid = state.app.userid;
       if (!userid)
         return;
 
       dispatch.courses.requestStore();
-      fetchjson(`${config.server}state?userid=${userid}&storeCourses=${userid}`, {... endpoint.post(state), body: JSON.stringify(payload)},
+      fetchjson(`${urls.server}state?userid=${userid}&storeCourses=${userid}`, {... endpoint.post(state), body: JSON.stringify(payload)},
         () => {
           dispatch.courses.receivedStore(payload);
         },
@@ -150,13 +152,14 @@ export default createModel({
         dispatch.courses.error);
     },
     async loadCourse(course: string) {
-      const state: State = getState();
+      const dispatch = store.dispatch();
+      const state = store.getState();
       const userid = state.app.userid;
       if (!userid || !course)
         return;
 
       dispatch.courses.requestLoadCourse();
-      fetchjson(`${config.server}state?userid=${userid}&course=${course}`, endpoint.get(state),
+      fetchjson(`${urls.server}state?userid=${userid}&course=${course}`, endpoint.get(state),
         (json) => {
           dispatch.courses.receivedLoadCourse(json);
         },
@@ -164,13 +167,14 @@ export default createModel({
         dispatch.courses.error);
     },
     async storeChange(payload: Course) {
-      const state: State = getState();
+      const dispatch = store.dispatch();
+      const state = store.getState();
       const userid = state.app.userid;
       if (!userid)
         return;
 
       dispatch.courses.requestStoreChange();
-      fetchjson(`${config.server}state?userid=${userid}&storeCourse=${payload.name}`, {... endpoint.post(state), body: JSON.stringify(payload.students)},
+      fetchjson(`${urls.server}state?userid=${userid}&storeCourse=${payload.name}`, {... endpoint.post(state), body: JSON.stringify(payload.students)},
         () => {
           dispatch.courses.receivedStoreChange(payload.students);
 
@@ -188,14 +192,17 @@ export default createModel({
       }
     },
     'app/receivedLogin': async function() {
-      const state: State = getState();
+      const dispatch = store.dispatch();
+      const state = store.getState();
       if (state.app.roles.includes("teacher"))
         dispatch.courses.load();
     },
     'app/receivedLogout': async function() {
+      const dispatch = store.dispatch();
       dispatch.courses.forget();
     },
     'app/chooseInstance': async function() {
+      const dispatch = store.dispatch();
       dispatch.courses.forget();
     },
   })

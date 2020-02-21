@@ -1,7 +1,7 @@
 import {createModel, RoutingState} from '@captaincodeman/rdx-model';
-import { State, Dispatch } from '../store';
+import { Store } from '../store';
 import {endpoint, fetchblob, fetchjson} from "../endpoint";
-import {config} from "../config";
+import {urls} from "../urls";
 
 export interface Module {
   subject: string,
@@ -82,13 +82,14 @@ export default createModel({
   },
 
   // @ts-ignore
-  effects: (dispatch: Dispatch, getState) => ({
+  effects: (store: Store) => ({
     async load() {
-      const state: State = getState();
+      const dispatch = store.dispatch();
+      const state = store.getState();
       // @ts-ignore
       if (Date.now() - state.contentMaps.timestamp > 3000) {
         dispatch.contentMaps.requestLoad();
-        fetchjson(`${config.server}edit?modules=all`, endpoint.get(state),
+        fetchjson(`${urls.server}edit?modules=all`, endpoint.get(state),
           (json) => {
             dispatch.contentMaps.receivedLoad(json);
           },
@@ -97,7 +98,8 @@ export default createModel({
       }
     },
     async import(files: File[]) {
-      const state: State = getState();
+      const dispatch = store.dispatch();
+      const state = store.getState();
 
       let names: string[] = [];
       var formData: FormData = new FormData();
@@ -109,7 +111,7 @@ export default createModel({
       }
 
       dispatch.contentMaps.requestImport();
-      fetchjson(`${config.server}content?import-module=${names.join(",")}`, {... endpoint.post(state), body: formData},
+      fetchjson(`${urls.server}content?import-module=${names.join(",")}`, {... endpoint.post(state), body: formData},
         () => {
           dispatch.contentMaps.receivedImport();
         },
@@ -117,10 +119,11 @@ export default createModel({
         dispatch.contentMaps.error);
     },
     async export(payload: Module) {
-      const state: State = getState();
+      const dispatch = store.dispatch();
+      const state = store.getState();
 
       dispatch.contentMaps.requestExport();
-      fetchblob(`${config.server}content?subject=${payload.subject}&export-module=${payload.module}`, endpoint.get(state),
+      fetchblob(`${urls.server}content?subject=${payload.subject}&export-module=${payload.module}`, endpoint.get(state),
         (blob) => {
           let url = window.URL.createObjectURL(blob);
           var a: HTMLAnchorElement = document.createElement('a');
@@ -137,10 +140,11 @@ export default createModel({
         dispatch.contentMaps.error);
     },
     async delete(payload: Module) {
-      const state: State = getState();
+      const dispatch = store.dispatch();
+      const state = store.getState();
 
       dispatch.contentMaps.requestDelete();
-      fetchjson(`${config.server}edit?subject=${payload.subject}&delete=${payload.module}`, endpoint.get(state),
+      fetchjson(`${urls.server}edit?subject=${payload.subject}&delete=${payload.module}`, endpoint.get(state),
         () => {
           dispatch.contentMaps.receivedDelete();
         },
@@ -149,21 +153,25 @@ export default createModel({
     },
 
     'routing/change': async function(routing: RoutingState) {
-      const state: State = getState();
+      const dispatch = store.dispatch();
+      const state = store.getState();
       if (state.app.roles.includes("teacher") && (routing.page === 'content-manager' || routing.page === 'browser'))
         dispatch.contentMaps.load();
     },
     'app/receivedLogin': async function() {
-      const state: State = getState();
+      const dispatch = store.dispatch();
+      const state = store.getState();
       const routing: RoutingState = state.routing;
       if (state.app.roles.includes("teacher") && (routing.page === 'content-manager' || routing.page === 'browser'))
         dispatch.contentMaps.load();
     },
 
     'app/receivedLogout': async function() {
+      const dispatch = store.dispatch();
       dispatch.contentMaps.forget();
     },
     'app/chooseInstance': async function() {
+      const dispatch = store.dispatch();
       dispatch.contentMaps.forget();
     },
   })

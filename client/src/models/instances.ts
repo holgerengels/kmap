@@ -1,7 +1,7 @@
 import {createModel, RoutingState} from '@captaincodeman/rdx-model';
-import { State, Dispatch } from '../store';
+import {store, Store} from '../store';
 import {endpoint, fetchjson} from "../endpoint";
-import {config} from "../config";
+import {urls} from "../urls";
 
 export interface Sync {
   from: string,
@@ -95,13 +95,14 @@ export default createModel({
   },
 
   // @ts-ignore
-  effects: (dispatch: Dispatch, getState) => ({
+  effects: (store: Store) => ({
     async load() {
-      const state: State = getState();
+      const dispatch = store.dispatch();
+      const state = store.getState();
       // @ts-ignore
       if (Date.now() - state.instances.timestamp > 3000) {
         dispatch.instances.requestLoad();
-        fetchjson(`${config.server}content?instances=all`, endpoint.get(state),
+        fetchjson(`${urls.server}content?instances=all`, endpoint.get(state),
           (json) => {
             dispatch.instances.receivedLoad(json);
           },
@@ -110,10 +111,11 @@ export default createModel({
       }
     },
     async create(instance: Instance) {
-      const state: State = getState();
+      const dispatch = store.dispatch();
+      const state = store.getState();
       // @ts-ignore
       dispatch.instances.requestCreate();
-      fetchjson(`${config.server}content?create=${instance.name}`,
+      fetchjson(`${urls.server}content?create=${instance.name}`,
         {... endpoint.post(state), body: JSON.stringify({name: instance.name, description: instance.description})},
         () => {
           dispatch.instances.receivedCreate(instance);
@@ -122,10 +124,11 @@ export default createModel({
         dispatch.instances.error);
     },
     async drop(instance: Instance) {
-      const state: State = getState();
+      const dispatch = store.dispatch();
+      const state = store.getState();
       // @ts-ignore
       dispatch.instances.requestDrop();
-      fetchjson(`${config.server}content?drop=${instance.name}`,
+      fetchjson(`${urls.server}content?drop=${instance.name}`,
         {... endpoint.post(state), body: JSON.stringify({name: instance.name, description: instance.description})},
         () => {
           dispatch.instances.receivedDrop(instance);
@@ -135,10 +138,11 @@ export default createModel({
     },
 
     async sync(sync: Sync) {
-      const state: State = getState();
+      const dispatch = store.dispatch();
+      const state = store.getState();
       // @ts-ignore
       dispatch.instances.requestSync();
-      fetchjson(`${config.server}content?sync=${sync.from}`,
+      fetchjson(`${urls.server}content?sync=${sync.from}`,
         {... endpoint.post(state), body: JSON.stringify(sync)},
         () => {
           dispatch.instances.receivedSync();
@@ -148,17 +152,12 @@ export default createModel({
     },
 
     'routing/change': async function(routing: RoutingState) {
+      const dispatch = store.dispatch();
       switch (routing.page) {
         case 'content-manager':
           document.title = "KMap - Content Manager";
+          dispatch.instances.load();
       }
-    },
-
-    'app/receivedLogin': async function() {
-      dispatch.instances.load();
-    },
-    'app/receivedLogout': async function() {
-      dispatch.instances.forget();
     },
   })
 })

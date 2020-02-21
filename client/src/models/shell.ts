@@ -1,5 +1,5 @@
 import {createModel, RoutingState} from '@captaincodeman/rdx-model';
-import {Dispatch} from '../store';
+import { Store } from '../store';
 
 export interface Meta {
   title?: string,
@@ -48,18 +48,21 @@ export default createModel({
   },
 
   // @ts-ignore
-  effects: (dispatch: Dispatch, getState) => ({
+  effects: (store: Store) => ({
     showMessage(payload: string) {
+      const dispatch = store.dispatch();
       window.setTimeout(() => dispatch.shell.removeMessage(payload), 3000);
       dispatch.shell.addMessage(payload);
     },
 
     'routing/change': async function(routing: RoutingState) {
+      const dispatch = store.dispatch();
       if (routing.page !== 'browser')
         dispatch.shell.updateMeta({});
     },
 
     'app/receivedLogout': async function() {
+      const dispatch = store.dispatch();
       dispatch.shell.removeLayer("averages");
       dispatch.shell.removeLayer("editor");
     },

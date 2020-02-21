@@ -1,6 +1,6 @@
 import {LitElement, html, css, customElement, property} from 'lit-element';
 import {unsafeHTML} from 'lit-html/directives/unsafe-html';
-import {config} from "../config";
+import {urls} from "../urls";
 import {colorStyles, fontStyles} from "./kmap-styles";
 
 @customElement('kmap-knowledge-card-description')
@@ -21,8 +21,8 @@ export class KMapKnowledgeCardDescription extends LitElement {
   updated(changedProperties) {
     if (changedProperties.has("description")) {
       if (this.description) {
-        let description = this.description.replace(/inline:([^"]*)/g, config.server + "data/" + this.subject + "/" + this.chapter + "/" + this.topic + "/$1?instance=" + this.instance);
-        description = description.replace(/link:/g, config.client + this.instance + "//app/browser/");
+        let description = this.description.replace(/inline:([^"]*)/g, urls.server + "data/" + this.subject + "/" + this.chapter + "/" + this.topic + "/$1?instance=" + this.instance);
+        description = description.replace(/link:/g, urls.client + this.instance + "//app/browser/");
 
         // @ts-ignore
         window.MathJaxLoader

@@ -1,7 +1,7 @@
 import { createModel } from '@captaincodeman/rdx-model';
-import { State, Dispatch } from '../store';
+import { Store } from '../store';
 import {endpoint, fetchjson} from "../endpoint";
-import {config} from "../config";
+import {urls} from "../urls";
 
 export interface Error {
   code: number,
@@ -75,12 +75,13 @@ export default createModel({
   },
 
   // @ts-ignore
-  effects: (dispatch: Dispatch, getState) => ({
+  effects: (store: Store) => ({
     async login(payload: Credentials) {
-      const state: State = getState();
+      const dispatch = store.dispatch();
+      const state = store.getState();
       // @ts-ignore
       dispatch.app.requestLogin();
-      fetchjson(`${config.server}state?login=${payload.userid}`, {... endpoint.post(state), body: JSON.stringify(payload)},
+      fetchjson(`${urls.server}state?login=${payload.userid}`, {... endpoint.post(state), body: JSON.stringify(payload)},
         (json) => {
           dispatch.app.receivedLogin({ userid: payload.userid, roles: json});
         },
@@ -88,10 +89,11 @@ export default createModel({
         dispatch.app.error);
     },
     async logout() {
-      const state: State = getState();
+      const dispatch = store.dispatch();
+      const state = store.getState();
       // @ts-ignore
       dispatch.app.requestLogout();
-      fetchjson(`${config.server}state?logout=${state.app.userid}`, {... endpoint.post(state), body: JSON.stringify({userid: state.app.userid})},
+      fetchjson(`${urls.server}state?logout=${state.app.userid}`, {... endpoint.post(state), body: JSON.stringify({userid: state.app.userid})},
         () => {
           dispatch.app.receivedLogout();
         },
@@ -99,6 +101,7 @@ export default createModel({
         dispatch.app.error);
     },
     handleError(error: Error) {
+      const dispatch = store.dispatch();
       switch (error.code) {
         case 401:
           dispatch.shell.showMessage(error.message);

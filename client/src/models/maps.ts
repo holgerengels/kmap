@@ -1,7 +1,7 @@
 import {createModel, RoutingState} from '@captaincodeman/rdx-model';
-import {Dispatch, State} from '../store';
+import { Store } from '../store';
 import {endpoint, fetchjson} from "../endpoint";
-import {config} from "../config";
+import {urls} from "../urls";
 import {Path} from "./types";
 
 export interface Attachment {
@@ -166,9 +166,10 @@ export default createModel({
   },
 
   // @ts-ignore
-  effects: (dispatch: Dispatch, getState) => ({
+  effects: (store: Store) => ({
     async load(path: Path) {
-      const state: State = getState();
+      const dispatch = store.dispatch();
+      const state = store.getState();
       const oldSubject: string = state.maps.subject;
 
       if (state.maps.subject === path.subject && state.maps.chapter === path.chapter) {
@@ -176,7 +177,7 @@ export default createModel({
       }
 
       dispatch.maps.request();
-      fetchjson(`${config.server}data?subject=${path.subject}&load=${path.chapter}`, endpoint.get(state),
+      fetchjson(`${urls.server}data?subject=${path.subject}&load=${path.chapter}`, endpoint.get(state),
         (json) => {
           dispatch.maps.received(json);
           if (path.subject !== oldSubject) {
@@ -187,11 +188,12 @@ export default createModel({
         dispatch.maps.error);
     },
     async deleteTopic(card: Card) {
-      const state: State = getState();
+      const dispatch = store.dispatch();
+      const state = store.getState();
       const userid = state.app.userid;
 
       dispatch.maps.requestDeleteTopic();
-      fetchjson(`${config.server}edit?userid=${userid}&subject=${card.subject}&save=${card.module}`,
+      fetchjson(`${urls.server}edit?userid=${userid}&subject=${card.subject}&save=${card.module}`,
         {... endpoint.post(state), body: JSON.stringify({delete: card})},
         () => {
           dispatch.maps.receivedDeleteTopic();
@@ -201,11 +203,12 @@ export default createModel({
         dispatch.maps.error);
     },
     async renameTopic(card: Card) {
-      const state: State = getState();
+      const dispatch = store.dispatch();
+      const state = store.getState();
       const userid = state.app.userid;
 
       dispatch.maps.requestRenameTopic();
-      fetchjson(`${config.server}edit?userid=${userid}&subject=${card.subject}&save=${card.module}`,
+      fetchjson(`${urls.server}edit?userid=${userid}&subject=${card.subject}&save=${card.module}`,
         // @ts-ignore
         {... endpoint.post(state), body: JSON.stringify({rename: card, name: card.newName })},
         () => {
@@ -216,11 +219,12 @@ export default createModel({
         dispatch.maps.error);
     },
     async saveTopic(card: Card) {
-      const state: State = getState();
+      const dispatch = store.dispatch();
+      const state = store.getState();
       const userid = state.app.userid;
 
       dispatch.maps.requestSaveTopic();
-      fetchjson(`${config.server}edit?userid=${userid}&subject=${card.subject}&save=${card.module}`,
+      fetchjson(`${urls.server}edit?userid=${userid}&subject=${card.subject}&save=${card.module}`,
         // @ts-ignore
         {... endpoint.post(state), body: JSON.stringify(card.added ? {changed: card} : {old: card, changed: card})},
         () => {
@@ -232,14 +236,15 @@ export default createModel({
     },
 
     async loadAllTopics(subject: string) {
-      const state: State = getState();
+      const dispatch = store.dispatch();
+      const state = store.getState();
 
       if (state.maps.allTopics && state.maps.allTopics.subject === subject) {
         console.warn("reloading all topics " + subject);
       }
 
       dispatch.maps.requestAllTopics();
-      fetchjson(`${config.server}data?subject=${subject}&topics=all`, endpoint.get(state),
+      fetchjson(`${urls.server}data?subject=${subject}&topics=all`, endpoint.get(state),
         (json) => {
           dispatch.maps.receivedAllTopics({subject: subject, topics: json});
         },
@@ -248,9 +253,9 @@ export default createModel({
     },
 
     'routing/change': async function(routing: RoutingState) {
+      const dispatch = store.dispatch();
       switch (routing.page) {
         case 'browser':
-          // @ts-ignore
           dispatch.maps.load({ subject: routing.params["subject"], chapter: routing.params["chapter"]});
           document.title = "KMap - " + (routing.params["topic"] ? decodeURIComponent(routing.params["topic"]) : decodeURIComponent(routing.params["chapter"]));
           break;
@@ -262,7 +267,8 @@ export default createModel({
       }
     },
     'app/chooseInstance': async function() {
-      const state: State = getState();
+      const dispatch = store.dispatch();
+      const state = store.getState();
       const routing: RoutingState = state.routing;
       if (routing.page === 'browser')
         dispatch.maps.load({ subject: routing.params["subject"], chapter: routing.params["chapter"]});

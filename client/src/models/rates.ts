@@ -1,7 +1,7 @@
 import {createModel} from '@captaincodeman/rdx-model';
-import { State, Dispatch } from '../store';
+import { Store } from '../store';
 import {endpoint, fetchjson} from "../endpoint";
-import {config} from "../config";
+import {urls} from "../urls";
 
 export interface Rate {
   subject: string,
@@ -75,9 +75,10 @@ export default createModel({
   },
 
   // @ts-ignore
-  effects: (dispatch: Dispatch, getState) => ({
+  effects: (store: Store) => ({
     async load() {
-      const state: State = getState();
+      const dispatch = store.dispatch();
+      const state = store.getState();
       const userid = state.app.userid;
       const subject = state.maps.subject;
       if (!userid || !subject)
@@ -86,7 +87,7 @@ export default createModel({
       // @ts-ignore
       if (state.rates.subject !== subject || !state.rates.rates) {
         dispatch.rates.requestLoad();
-        fetchjson(`${config.server}state?load=${userid}&subject=${subject}`, endpoint.get(state),
+        fetchjson(`${urls.server}state?load=${userid}&subject=${subject}`, endpoint.get(state),
           (json) => {
             // @ts-ignore
             dispatch.rates.receivedLoad({subject: subject, rates: json});
@@ -96,10 +97,11 @@ export default createModel({
       }
     },
     async store(payload: Rate) {
-      const state: State = getState();
+      const dispatch = store.dispatch();
+      const state = store.getState();
       dispatch.rates.requestStore();
       let body = {... payload, save: state.app.userid};
-      fetchjson(`${config.server}state?save=${state.app.userid}&subject=${payload.subject}`, {... endpoint.post(state), body: JSON.stringify(body)},
+      fetchjson(`${urls.server}state?save=${state.app.userid}&subject=${payload.subject}`, {... endpoint.post(state), body: JSON.stringify(body)},
         (json) => {
           // @ts-ignore
           dispatch.rates.receivedStore({subject: payload.subject, rates: json});
@@ -109,15 +111,19 @@ export default createModel({
     },
 
     'maps/received': async function() {
+      const dispatch = store.dispatch();
         dispatch.rates.load();
     },
     'app/receivedLogin': async function() {
+      const dispatch = store.dispatch();
         dispatch.rates.load();
     },
     'app/receivedLogout': async function() {
+      const dispatch = store.dispatch();
       dispatch.rates.forget();
     },
     'app/chooseInstance': async function() {
+      const dispatch = store.dispatch();
       dispatch.rates.forget();
     },
   })

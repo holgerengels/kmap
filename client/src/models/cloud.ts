@@ -1,7 +1,7 @@
 import {createModel} from '@captaincodeman/rdx-model';
-import { State, Dispatch } from '../store';
+import { Store } from '../store';
 import {endpoint, fetchjson} from "../endpoint";
-import {config} from "../config";
+import {urls} from "../urls";
 import {Path} from "./types";
 import {Attachment} from "./maps";
 
@@ -59,12 +59,13 @@ export default createModel({
   },
 
   // @ts-ignore
-  effects: (dispatch: Dispatch, getState) => ({
+  effects: (store: Store) => ({
     async fetchAttachments(path: Path) {
-      const state: State = getState();
+      const dispatch = store.dispatch();
+      const state = store.getState();
 
       dispatch.cloud.requestAttachments();
-      fetchjson(`${config.server}edit?attachments=${path.subject}/${path.chapter}/${path.topic}`, endpoint.get(state),
+      fetchjson(`${urls.server}edit?attachments=${path.subject}/${path.chapter}/${path.topic}`, endpoint.get(state),
         (json) => {
           // @ts-ignore
           dispatch.cloud.receivedAttachments(json);
@@ -73,10 +74,11 @@ export default createModel({
         dispatch.cloud.error);
     },
     async createDirectory(path: Path) {
-      const state: State = getState();
+      const dispatch = store.dispatch();
+      const state = store.getState();
 
       dispatch.cloud.requestCreateDirectory();
-      fetchjson(`${config.server}edit?directory=${path.subject}/${path.chapter}/${path.topic}`, endpoint.get(state),
+      fetchjson(`${urls.server}edit?directory=${path.subject}/${path.chapter}/${path.topic}`, endpoint.get(state),
         (json) => {
           // @ts-ignore
           dispatch.cloud.receivedCreateDirectory(json);
@@ -85,10 +87,11 @@ export default createModel({
         dispatch.cloud.error);
     },
     async createDirectoryForTests(path: Path) {
-      const state: State = getState();
+      const dispatch = store.dispatch();
+      const state = store.getState();
 
       dispatch.cloud.requestCreateDirectory();
-      fetchjson(`${config.server}edit?directory=${path.subject}/${path.chapter}/${path.topic}/tests`, endpoint.get(state),
+      fetchjson(`${urls.server}edit?directory=${path.subject}/${path.chapter}/${path.topic}/tests`, endpoint.get(state),
         (json) => {
           // @ts-ignore
           dispatch.cloud.receivedCreateDirectory(json);
@@ -98,6 +101,7 @@ export default createModel({
     },
 
     'app/chooseInstance': async function() {
+      const dispatch = store.dispatch();
       dispatch.cloud.forgetPath();
     },
   })

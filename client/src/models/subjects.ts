@@ -1,7 +1,7 @@
 import {createModel, RoutingState} from '@captaincodeman/rdx-model';
-import { State, Dispatch } from '../store';
+import { Store } from '../store';
 import {endpoint, fetchjson} from "../endpoint";
-import {config} from "../config";
+import {urls} from "../urls";
 
 export interface SubjectsState {
   subjects: string[],
@@ -40,13 +40,14 @@ export default createModel({
   },
 
   // @ts-ignore
-  effects: (dispatch: Dispatch, getState) => ({
+  effects: (store: Store) => ({
     async load() {
-      const state: State = getState();
+      const dispatch = store.dispatch();
+      const state = store.getState();
       // @ts-ignore
       if (Date.now() - state.subjects.timestamp > 3000) {
         dispatch.subjects.requestLoad();
-        fetchjson(`${config.server}data?subjects=all`, endpoint.get(state),
+        fetchjson(`${urls.server}data?subjects=all`, endpoint.get(state),
           (json) => {
             dispatch.subjects.receivedLoad(json);
           },
@@ -56,6 +57,7 @@ export default createModel({
     },
 
     'routing/change': async function(routing: RoutingState) {
+      const dispatch = store.dispatch();
       switch (routing.page) {
         case 'home':
           document.title = "KMap - Knowledge Map";
@@ -66,6 +68,7 @@ export default createModel({
       }
     },
     'app/chooseInstance': async function() {
+      const dispatch = store.dispatch();
       dispatch.subjects.load();
     },
   })

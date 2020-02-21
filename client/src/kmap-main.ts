@@ -325,7 +325,7 @@ export class KmapMain extends connect(store, LitElement) {
   <kmap-login-popup id="login-popup"></kmap-login-popup>
 
   ${this._messages.map((message, i) => html`
-      <mwc-snackbar id="snackbar" labeltext="${this._messages[i]}" ?isOpen="${i === 0}" style="bottom: 100px"></mwc-snackbar>
+      <mwc-snackbar id="snackbar" labeltext="${message}" ?isOpen="${i === 0}" style="bottom: 100px"></mwc-snackbar>
 `)}
 `;
   }

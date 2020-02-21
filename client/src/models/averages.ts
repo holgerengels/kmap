@@ -1,7 +1,7 @@
 import {createModel} from '@captaincodeman/rdx-model';
-import { State, Dispatch } from '../store';
+import { Store } from '../store';
 import {endpoint, fetchjson} from "../endpoint";
-import {config} from "../config";
+import {urls} from "../urls";
 
 export interface AverageRateState {
   subject: string,
@@ -54,9 +54,10 @@ export default createModel({
   },
 
   // @ts-ignore
-  effects: (dispatch: Dispatch, getState) => ({
+  effects: (store: Store) => ({
     async load() {
-      const state: State = getState();
+      const dispatch = store.dispatch();
+      const state = store.getState();
       const userid = state.app.userid;
       const subject = state.maps.subject;
       const course = state.courses.selectedCourse;
@@ -66,7 +67,7 @@ export default createModel({
       // @ts-ignore
       if (Date.now() - state.averages.timestamp > 3000 || state.averages.subject !== subject || state.averages.course !== course) {
         dispatch.averages.requestLoad();
-        fetchjson(`${config.server}state?load=${userid}&subject=${subject}&course=${course}`, endpoint.get(state),
+        fetchjson(`${urls.server}state?load=${userid}&subject=${subject}&course=${course}`, endpoint.get(state),
           (json) => {
             // @ts-ignore
             dispatch.averages.receivedLoad({subject: subject, course: course, rates: json});
@@ -77,21 +78,27 @@ export default createModel({
     },
 
     'maps/received': async function() {
+      const dispatch = store.dispatch();
       dispatch.rates.load();
     },
     'courses/selectCourse': async function() {
+      const dispatch = store.dispatch();
       dispatch.averages.load();
     },
     'courses/unselectCourse': async function() {
+      const dispatch = store.dispatch();
       dispatch.averages.forget();
     },
     'app/receivedLogin': async function() {
+      const dispatch = store.dispatch();
       dispatch.rates.load();
     },
     'app/receivedLogout': async function() {
+      const dispatch = store.dispatch();
       dispatch.rates.forget();
     },
     'app/chooseInstance': async function() {
+      const dispatch = store.dispatch();
       dispatch.rates.forget();
     },
   })
