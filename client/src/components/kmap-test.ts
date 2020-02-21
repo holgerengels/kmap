@@ -17,7 +17,7 @@ import {colorStyles, fontStyles} from "./kmap-styles";
 import {TopAppBar} from "@material/mwc-top-app-bar/mwc-top-app-bar";
 
 @customElement('kmap-test')
-class KmapTest extends connect(store, LitElement) {
+export class KmapTest extends connect(store, LitElement) {
   @property()
   private _page: string = 'chooser';
   @property()

@@ -23,7 +23,7 @@ export interface Card {
   links: string,
   depends: string[],
   attachments: Attachment[];
-  annotation: string,
+  annotations: string,
 }
 
 interface AllTopics {

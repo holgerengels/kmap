@@ -1,5 +1,5 @@
 import {createModel, RoutingState} from '@captaincodeman/rdx-model';
-import {store, Store} from '../store';
+import { Store } from '../store';
 import {endpoint, fetchjson} from "../endpoint";
 import {urls} from "../urls";
 
