@@ -78,7 +78,6 @@
     "@material/mwc-textfield": "^0.13.0",
     "@material/mwc-top-app-bar": "^0.13.0",
     "@material/mwc-top-app-bar-fixed": "^0.13.0",
-    "idb-keyval": "^3.2.0",
     "lit-element": "^2.2.1",
     "lit-html": "^1.1.2",
     "pwa-helper-components": "^0.2.1",
