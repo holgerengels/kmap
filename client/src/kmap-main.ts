@@ -270,10 +270,10 @@ export class KmapMain extends connect(store, LitElement) {
         <a ?selected="${this._page === 'test'}" href="/app/test">Test</a>
         <a ?selected="${this._page === 'courses'}" ?disabled="${!this._roles.includes("teacher")}" href="/app/courses">Kurse</a>
         <a ?selected="${this._page === 'content-mananer'}" ?disabled="${!this._roles.includes("teacher")}" href="/app/content-manager">Content Manager</a>
-        <a href="#browser/Hilfe/Hilfe">Hilfe</a>
+        <a href="/app/browser/Hilfe/Hilfe">Hilfe</a>
 
-        <pwa-install-button><mwc-button>App installieren</mwc-button></pwa-install-button>
-        <pwa-update-available><mwc-button>App aktualisieren</mwc-button></pwa-update-available>
+        <pwa-install-button><mwc-button outlined>App installieren</mwc-button></pwa-install-button>
+        <pwa-update-available><mwc-button outlined>App aktualisieren</mwc-button></pwa-update-available>
       </nav>
       <hr/>
       <nav class="drawer-list">
