@@ -75,7 +75,7 @@ export default createModel({
       }
     },
     loginError(state, message) {
-      return { ...state, authenticating: false, error: message,
+      return { ...state, authenticating: false, loginResponse: message,
       }
     },
   },
