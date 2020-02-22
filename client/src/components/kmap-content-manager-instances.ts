@@ -66,8 +66,8 @@ export class KMapContentManagerInstances extends connect(store, LitElement) {
   _sync() {
     if (this._selected === undefined) return;
 
-    console.log(`sync ${this._selected.name} to ${this._syncName}`);
-    store.dispatch.instances.sync({ from: this._selected.name, to: this._syncName});
+    console.log(`sync from ${this._syncName} to ${this._selected.name}`);
+    //store.dispatch.instances.sync({ from: this._syncName, to: this._selected.name});
   }
 
   _create() {
@@ -156,12 +156,12 @@ export class KMapContentManagerInstances extends connect(store, LitElement) {
         <div class="form">
           <div class="page" ?active="${this._page === 'sync'}">
             <label>Instanz replizieren</label>
-            <mwc-select required label="Von Instanz" @change="${e => this._syncName = e.target.value}">
+            <mwc-select required label="Von" @change="${e => this._syncName = e.target.value}">
               ${this._instances.filter(i => this._selected === undefined || i.name !== this._selected.name).map((instance) => html`
                 <mwc-list-item value="${instance.name}">${instance.name}</mwc-list-item>
               `)}
             </mwc-select>
-            <label secondary>Nach Instanz '${this._syncName}'</label>
+            <label secondary>${this._selected ? "Nach " + this._selected.name : ''}</label><br/>
             <div>
             <mwc-button @click="${() => this._showPage('')}">Abbrechen</mwc-button>
             <mwc-button outlined @click="${this._sync}">Inhalte Übertragen</mwc-button>
