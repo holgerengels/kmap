@@ -12,7 +12,6 @@
     "importHelpers": true,
     "noEmitHelpers": true,
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
     "allowSyntheticDefaultImports": true,
     "lib": ["esnext", "dom", "dom.iterable"],
     "baseUrl": "src",

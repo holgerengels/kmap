@@ -120,8 +120,9 @@ export class KmapMain extends connect(store, LitElement) {
         store.dispatch.app.chooseInstance(cookie);
       }
       else {
-        if (!store.state.app.instance)
-          this._instancePopup.show();
+        if (!store.state.app.instance) {
+          //requestAnimationFrame(() => this._instancePopup.show());
+        }
       }
     }
     else if (!store.state.app.instance)
