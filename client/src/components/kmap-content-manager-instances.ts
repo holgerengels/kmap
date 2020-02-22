@@ -67,7 +67,7 @@ export class KMapContentManagerInstances extends connect(store, LitElement) {
     if (this._selected === undefined) return;
 
     console.log(`sync from ${this._syncName} to ${this._selected.name}`);
-    //store.dispatch.instances.sync({ from: this._syncName, to: this._selected.name});
+    store.dispatch.instances.sync({ from: this._syncName, to: this._selected.name});
   }
 
   _create() {

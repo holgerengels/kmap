@@ -46,7 +46,7 @@ export default createModel({
       return { ...state, offline: offline }
     },
     requestLogin(state) {
-      return { ...state, authenticating: true };
+      return { ...state, authenticating: true, loginResponse: "" };
     },
     receivedLogin(state, payload: Login) {
       return { ...state,
@@ -56,7 +56,7 @@ export default createModel({
       };
     },
     requestLogout(state) {
-      return { ...state, authenticating: true };
+      return { ...state, authenticating: true, error: "" };
     },
     receivedLogout(state) {
       return { ...state,
@@ -75,8 +75,7 @@ export default createModel({
       }
     },
     loginError(state, message) {
-      return { ...state, authenticating: false, loginResponse: message,
-      }
+      return { ...state, authenticating: false, loginResponse: message }
     },
   },
 
@@ -106,6 +105,7 @@ export default createModel({
         dispatch.app.handleError,
         dispatch.app.error);
     },
+
     handleError(error: Error) {
       const dispatch = store.dispatch();
       switch (error.code) {

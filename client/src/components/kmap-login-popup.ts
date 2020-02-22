@@ -106,8 +106,8 @@ export class KMapLoginPopup extends connect(store, LitElement) {
     </div>
     <mwc-button slot="primaryAction" ?hidden="${this._userid}" @click=${this._login}>Anmelden</mwc-button>
     <mwc-button slot="secondaryAction" ?hidden="${!this._userid}" @click=${this._logout}>Abmelden</mwc-button>
-    <pwa-install-button slot="secondaryAction"><mwc-button>App installieren</mwc-button></pwa-install-button>
-    <pwa-update-available slot="secondaryAction"><mwc-button>App aktualisieren</mwc-button></pwa-update-available>
+    <pwa-install-button slot="secondaryAction"><mwc-button outlined>App installieren</mwc-button></pwa-install-button>
+    <pwa-update-available slot="secondaryAction"><mwc-button outlined>App aktualisieren</mwc-button></pwa-update-available>
   </mwc-dialog>
     `;
   }
