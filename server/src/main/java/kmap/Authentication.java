@@ -10,6 +10,7 @@ import javax.naming.directory.Attributes;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -78,7 +79,7 @@ public class Authentication {
         if (login != null) {
             login = login.toLowerCase();
             if ("POST".equals(request.getMethod())) {
-                String json = IOUtils.toString(new InputStreamReader(request.getInputStream(), "UTF-8"));
+                String json = IOUtils.toString(new InputStreamReader(request.getInputStream(), StandardCharsets.UTF_8));
                 Gson gson = new GsonBuilder().create();
                 JsonObject object = gson.fromJson(json, JsonObject.class);
                 String password = object.getAsJsonPrimitive("password").getAsString();
@@ -90,14 +91,14 @@ public class Authentication {
                         request.getSession().setAttribute("roles", roles);
                         writeRoles(request, response, roles);
                     } else
-                        JsonServlet.writeResponse(request, response, new JsonPrimitive("invalid credentials"));
+                        JsonServlet.sendError(request, response, HttpServletResponse.SC_NOT_ACCEPTABLE, "invalid credentials");
                 }
                 catch (Exception e) {
                     JsonServlet.sendError(request, response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
                 }
             }
             else
-                JsonServlet.writeResponse(request, response, new JsonPrimitive("invalid login request"));
+                JsonServlet.sendError(request, response, HttpServletResponse.SC_NOT_ACCEPTABLE, "invalid login request");
 
             return false;
         }

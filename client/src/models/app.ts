@@ -25,6 +25,7 @@ export interface AppState {
   offline: boolean,
   authenticating: boolean,
   error: string,
+  loginResponse: string,
 }
 
 export default createModel({
@@ -35,6 +36,7 @@ export default createModel({
     offline: false,
     authenticating: false,
     error: "",
+    loginResponse: "",
   },
   reducers: {
     chooseInstance(state, instance: string | null) {
@@ -72,6 +74,10 @@ export default createModel({
         error: message,
       }
     },
+    loginError(state, message) {
+      return { ...state, authenticating: false, error: message,
+      }
+    },
   },
 
   // @ts-ignore
@@ -86,7 +92,7 @@ export default createModel({
           dispatch.app.receivedLogin({ userid: payload.userid, roles: json});
         },
         dispatch.app.handleError,
-        dispatch.app.error);
+        dispatch.app.loginError);
     },
     async logout() {
       const dispatch = store.dispatch();
