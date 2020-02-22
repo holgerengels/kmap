@@ -41,7 +41,7 @@ public class FeedbackServlet
         try {
             Server.CLIENT.set(extractClient(req));
 
-            if (authentication.handle(req, resp)) {
+            //if (authentication.handle(req, resp)) {
                 String submit = req.getParameter("submit");
 
                 if (submit != null) {
@@ -49,7 +49,7 @@ public class FeedbackServlet
                     feedback.submit(json);
                     writeResponse(req, resp, new JsonPrimitive(submit));
                 }
-            }
+            //}
         }
         catch (Exception e) {
             e.printStackTrace();
