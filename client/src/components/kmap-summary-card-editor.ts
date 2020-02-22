@@ -29,22 +29,25 @@ export class KMapSummaryCardEditor extends connect(store, LitElement) {
 
   updated(changedProperties) {
     if (changedProperties.has("card") || changedProperties.has("_selectedModule")) {
-      this._enabled = this.card && this._selectedModule
+      this._enabled = this.card !== undefined && this._selectedModule !== undefined
         && this._subject === this._selectedModule.subject
         && this.card.module === this._selectedModule.module;
     }
   }
 
   _showEdit() {
-    store.dispatch.maps.setCardForEdit(this.card);
+    if (this.card !== undefined)
+      store.dispatch.maps.setCardForEdit(this.card);
   }
 
   _showRename() {
-    store.dispatch.maps.setCardForRename(this.card);
+    if (this.card !== undefined)
+      store.dispatch.maps.setCardForRename(this.card);
   }
 
   _showDelete() {
-    store.dispatch.maps.setCardForDelete(this.card);
+    if (this.card !== undefined)
+      store.dispatch.maps.setCardForDelete(this.card);
   }
 
   getState() { return 0; }
@@ -82,7 +85,7 @@ export class KMapSummaryCardEditor extends connect(store, LitElement) {
       <mwc-button icon="edit" ?disabled="${!this._enabled}" @click="${this._showEdit}"></mwc-button>
       <mwc-button icon="label" ?disabled="${!this._enabled}" @click="${this._showRename}"></mwc-button>
       <mwc-button icon="delete" ?disabled="${!this._enabled}" @click="${this._showDelete}"></mwc-button>
-      ${this.card.annotations ? html`<div class="warn">${this.card.annotations}</div>` : ''}
+      ${this.card && this.card.annotations ? html`<div class="warn">${this.card.annotations}</div>` : ''}
     `;
   }
 }

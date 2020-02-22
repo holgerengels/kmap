@@ -26,6 +26,7 @@ export class KMapKnowledgeCard extends connect(store, LitElement) {
   @property({type: String})
   private chapter: string = '';
   @property({type: Object})
+  // @ts-ignore // TODO
   private card: Card = {};
   @property({type: Number})
   private state: number = 0;
@@ -53,6 +54,7 @@ export class KMapKnowledgeCard extends connect(store, LitElement) {
   private _rates: object = {};
 
   @query('#feedbackDialog')
+  // @ts-ignore
   private _feedbackDialog: KMapFeedback;
 
 
@@ -117,11 +119,11 @@ export class KMapKnowledgeCard extends connect(store, LitElement) {
     }
 
     divideAttachments(attachments) {
-        var explanations = [];
-        var examples = [];
-        var usages = [];
-        var ideas = [];
-        var exercises = [];
+        var explanations: Attachment[] = [];
+        var examples: Attachment[] = [];
+        var usages: Attachment[] = [];
+        var ideas: Attachment[] = [];
+        var exercises: Attachment[] = [];
         if (attachments) {
             for (let attachment of attachments) {
                 if (attachment.tag === "explanation")

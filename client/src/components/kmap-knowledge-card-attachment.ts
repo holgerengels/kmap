@@ -11,6 +11,7 @@ export class KMapKnowledgeCardAttachment extends LitElement {
   @property()
   private _supportsDownload: boolean = !(/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream);
   @property({type: Object})
+  // @ts-ignore // TODO
   private attachment: Attachment = {};
   @property()
   private _handler: string = '';

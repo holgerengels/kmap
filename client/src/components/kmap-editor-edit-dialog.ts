@@ -34,6 +34,10 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
   @property()
   private _depends: string = '';
   @property()
+  private _links: string = '';
+  @property()
+  private _priority: string = '';
+  @property()
   private _attachmentTag: string = '';
   @property()
   private _attachmentName: string = '';
@@ -101,6 +105,8 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
       this._summary = this._card.summary;
       this._description = this._card.description;
       this._depends = this._card.depends.join(", ");
+      this._links = this._card.links;
+      this._priority = this._card.priority !== undefined ? this._card.priority + '' : '';
       this._syncAttachments();
 
       this._editDialog.show();
@@ -163,6 +169,8 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
     card.summary = this._summary;
     card.description = this._description;
     card.depends = this._depends.split(",").map(d => d.trim()).filter(d => d.length > 0);
+    card.links = this._links;
+    card.priority = this._priority !== '' ? parseInt(this._priority) : undefined;
     console.log(card);
 
     store.dispatch.maps.saveTopic(card);
@@ -359,6 +367,7 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
   render() {
     // language=HTML
     return html`
+${this._card ? html`
   ${this._showSummaryPreview ? html`<kmap-summary-card-summary .summary="${this._summary}"></kmap-summary-card-summary>` : ''}
   ${this._showDescriptionPreview ? html`<div class="preview-scroller"><kmap-knowledge-card-description
     .subject="${this._card.subject}"
@@ -366,14 +375,15 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
     .topic="${this._card.topic}"
     .description="${this._description}">
 </kmap-knowledge-card-description></div>` : ''}
+  ` : ''}
 
 <mwc-dialog id="editDialog" heading="Editor">
 ${this._card ? html`
   <form @focus="${this._focus}" @keydown="${this._captureEnter}">
     <mwc-textfield id="topic" name="topic" disabled label="Thema" dense type="text" .value="${this._card.topic !== '_' ? this._card.topic : "Allgemeines zu " + this._card.chapter}"></mwc-textfield>
     <br/>
-    <mwc-textfield ?hidden="${this._card.topic === '_'}" id="links" name="links" label="Verweist auf ..." dense type="text" .value="${this._card.links}" @change="${e => this._card.links = e.target.value}"></mwc-textfield>
-    <mwc-textfield ?hidden="${this._card.topic === '_'}" id="priority" name="priority" label="Priorität" dense type="number" inputmode="numeric" min="0" step="1" .value="${this._card.priority}" @change="${e => this._card.priority = e.target.value}"></mwc-textfield>
+    <mwc-textfield ?hidden="${this._card.topic === '_'}" id="links" name="links" label="Verweist auf ..." dense type="text" .value="${this._links}" @change="${e => this._links = e.target.value}"></mwc-textfield>
+    <mwc-textfield ?hidden="${this._card.topic === '_'}" id="priority" name="priority" label="Priorität" dense type="number" inputmode="numeric" min="0" step="1" .value="${this._priority}" @change="${e => this._priority = e.target.value}"></mwc-textfield>
     <mwc-textarea ?hidden="${this._card.topic === '_'}" ?dialogInitialFocus="${this._card.topic !== '_'}" id="depends" placeholder="Basiert auf ..." dense fullwidth rows="2" .value=${this._depends} @change="${e => this._depends = e.target.value}"></mwc-textarea>
     <mwc-textarea id="summary" placeholder="Kurztext" ?dialogInitialFocus="${this._card.topic === '_'}" dense fullwidth rows="2" .value=${this._card.summary} @keyup="${this._setSummary}" @focus="${this._focus}" @blur="${this._focus}"></mwc-textarea>
     <mwc-textarea id="description" placeholder="Langtext" dense fullwidth rows="9" .value=${this._card.description} @keyup="${this._setDescription}" @focus="${this._focus}" @blur="${this._focus}"></mwc-textarea>

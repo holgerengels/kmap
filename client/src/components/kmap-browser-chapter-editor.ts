@@ -32,7 +32,7 @@ export class KMapBrowserChapterEditor extends connect(store, LitElement) {
 
   updated(changedProperties) {
     if (changedProperties.has("subject") || changedProperties.has("_selectedModule")) {
-      this._enabled = this._selectedModule && ((this.chapterCard
+      this._enabled = this._selectedModule !== undefined && ((this.chapterCard
         && this.subject === this._selectedModule.subject
         && (this.chapterCard.module === this._selectedModule.module || this.chapterCard.module === null))
         || !this.chapterCard);
@@ -44,7 +44,7 @@ export class KMapBrowserChapterEditor extends connect(store, LitElement) {
   }
 
   _showEdit() {
-    let card: Card = this.chapterCard && this.chapterCard.module ? {
+    let card: Card | any = this.chapterCard && this.chapterCard.module ? {
       module: this.chapterCard.module,
       subject: this.subject,
       chapter: this.chapter,
@@ -54,7 +54,9 @@ export class KMapBrowserChapterEditor extends connect(store, LitElement) {
       attachments: this.chapterCard.attachments,
     } : {
       added: true,
+      // @ts-ignore
       module: this._selectedModule.module,
+      // @ts-ignore
       subject: this._selectedModule.subject,
       chapter: this.chapter,
       topic: '_',
@@ -68,8 +70,11 @@ export class KMapBrowserChapterEditor extends connect(store, LitElement) {
   }
 
   _showDelete() {
+    // @ts-ignore
     let card: Card = {
+      // @ts-ignore
       module: this._selectedModule.module,
+      // @ts-ignore
       subject: this._selectedModule.subject,
       chapter: this.chapter,
       topic: '_',

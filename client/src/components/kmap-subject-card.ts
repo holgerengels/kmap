@@ -1,6 +1,4 @@
 import {LitElement, html, css, customElement, property} from 'lit-element';
-import { connect } from '@captaincodeman/rdx';
-import {State, store} from "../store";
 
 import '@material/mwc-icon';
 import '@material/mwc-ripple';
@@ -8,7 +6,7 @@ import {STATE_COLORS} from './state-colors';
 import {fontStyles, colorStyles} from "./kmap-styles";
 
 @customElement('kmap-subject-card')
-export class KMapSubjectCard extends connect(store, LitElement) {
+export class KMapSubjectCard extends LitElement {
 
   @property({type: String})
   private subject: string = '';
@@ -17,12 +15,14 @@ export class KMapSubjectCard extends connect(store, LitElement) {
   @property()
   private _hasStates: boolean = false;
   @property()
+  // @ts-ignore
   private _state: number = 0;
   @property()
   private _progressNum: number = 0;
   @property()
   private _progressOf: number = 0;
   @property()
+  // @ts-ignore
   private _progressPercent: number = 0;
 
   constructor() {
@@ -30,11 +30,13 @@ export class KMapSubjectCard extends connect(store, LitElement) {
     this._colorize("0");
   }
 
+  /*
   mapState(state: State) {
     return {
       //_states: state.rates.rates,
     };
   }
+   */
 
   _colorize(rate) {
     let _opaque = STATE_COLORS[rate][0];
@@ -63,7 +65,7 @@ export class KMapSubjectCard extends connect(store, LitElement) {
       }
     }
 
-    this.dispatchEvent(new CustomEvent('statecolor', { bubbles: true, composed: true, detail: {source: 'averages', key: this.key, state: this._state} }));
+    //this.dispatchEvent(new CustomEvent('statecolor', { bubbles: true, composed: true, detail: {source: 'averages', key: this.key, state: this._state} }));
   }
 
   _getStateValue(key) {

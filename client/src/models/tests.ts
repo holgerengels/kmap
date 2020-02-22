@@ -4,13 +4,23 @@ import {endpoint, fetchjson} from "../endpoint";
 import {urls} from "../urls";
 import {Path} from "./types";
 
+export interface TestResult {
+  subject: string;
+  chapter: string;
+  topic: string;
+  attempts: number;
+  num: number;
+  wrong?: number;
+  correct?: number;
+  state?: number;
+}
 export interface Test {
   subject: string,
   chapter: string,
   topic: string,
   set: string,
   key: string,
-  level: number;
+  level?: number;
   balance: number,
   values: string[],
   question: string,

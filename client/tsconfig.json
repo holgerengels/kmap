@@ -12,11 +12,12 @@
     "importHelpers": true,
     "noEmitHelpers": true,
     "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "allowSyntheticDefaultImports": true,
     "lib": ["esnext", "dom", "dom.iterable"],
     "baseUrl": "src",
-    "allowJs": true,
+    "allowJs": true
   },
-  "include": ["node_modules/@open-wc/**/*.js"],
+  "include": ["node_modules/@open-wc/**/*.js", "src/**/*.ts"],
   "exclude": ["node_modules/!(@open-wc)"]
 }

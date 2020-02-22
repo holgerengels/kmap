@@ -26,16 +26,19 @@ export class KmapTest extends connect(store, LitElement) {
   private _title: string = 'Test - Aufgabenbereich wählen';
   @property()
   private _noRoute?: string = 'chooser';
+  /*
   @property()
   private _subject: string = '';
   @property()
   private _chapter: string = '';
   @property()
   private _topic: string = '';
+   */
   @property()
   private _results: string[] = [];
 
   @query('#bar')
+  // @ts-ignore
   private _bar: TopAppBar;
 
   set route(val: RoutingState) {
@@ -46,9 +49,11 @@ export class KmapTest extends connect(store, LitElement) {
         this._noRoute = 'chooser';
       else {
         this._noRoute = undefined;
+        /*
         this._subject = val.params.subject;
         this._chapter = val.params.chapter ? decodeURIComponent(val.params.chapter) : '';
         this._topic = val.params.topic ? decodeURIComponent(val.params.topic) : '';
+         */
       }
     }
   }

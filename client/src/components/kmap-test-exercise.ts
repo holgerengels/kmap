@@ -25,6 +25,7 @@ export class KmapTestExercise extends connect(store, LitElement) {
   private _currentTest?: Test = undefined;
 
   @query('#test-card')
+  // @ts-ignore
   private _testCard: KMapTestCard;
 
   mapState(state: State) {
@@ -102,6 +103,8 @@ export class KmapTestExercise extends connect(store, LitElement) {
   }
 
   _next(e) {
+    if (this._tests === undefined) return;
+
     let detail = e.detail;
     console.log(detail);
     store.dispatch.tests.addResult(detail);
@@ -134,7 +137,7 @@ export class KmapTestExercise extends connect(store, LitElement) {
         .subject="${this._subject}"
         .chapter="${this._currentTest.chapter}"
         .topic="${this._currentTest.topic}"
-        .num="${this._currentIndex}" of="${this._tests.length}"
+        .num="${this._currentIndex}" of="${this._tests ? this._tests.length : 0}"
         .level="${this._currentTest.level}"
         .question="${this._currentTest.question}"
         .answer="${this._currentTest.answer}"

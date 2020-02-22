@@ -10,7 +10,7 @@ import './kmap-login-button';
 import './kmap-summary-card';
 import './kmap-knowledge-card';
 import './kmap-browser-chapter-editor';
-import {Card} from "../models/maps";
+import {Card, Line} from "../models/maps";
 import {RoutingState} from "@captaincodeman/rdx-model";
 import {TopAppBar} from "@material/mwc-top-app-bar/mwc-top-app-bar";
 
@@ -35,7 +35,7 @@ export class KMapBrowser extends connect(store, LitElement) {
   @property()
   private _topicCard?: Card = undefined;
   @property()
-  private _lines: Card[][] = [];
+  private _lines: Line[] = [];
   @property()
   private _hasTests: boolean = false;
   @property()
@@ -93,6 +93,7 @@ export class KMapBrowser extends connect(store, LitElement) {
         this._topicCard = this._chapterCard;
       }
       else if (this._topic && this._lines) {
+        // @ts-ignore
         let lala: Card = {};
         for (let line of this._lines) {
           for (let card of line.cards) {

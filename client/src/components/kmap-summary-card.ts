@@ -2,7 +2,7 @@ import {LitElement, html, css, customElement, property} from 'lit-element';
 import { connect } from '@captaincodeman/rdx';
 import {State, store} from "../store";
 
-import {styleMap} from "lit-html/directives/style-map";
+import {StyleInfo, styleMap} from "lit-html/directives/style-map";
 import '@material/mwc-icon';
 import '@material/mwc-ripple';
 import './kmap-summary-card-summary';
@@ -24,6 +24,7 @@ export class KMapSummaryCard extends connect(store, LitElement) {
   @property({type: String})
   private chapter: string = '';
   @property({type: Object})
+  // @ts-ignore // TODO
   private card: Card = {};
   @property()
   private _key: string = '';
@@ -34,7 +35,7 @@ export class KMapSummaryCard extends connect(store, LitElement) {
   @property()
   private _layers: string[] = [];
   @property()
-  private _colorStyles: object = { "--color-rated":  "--color-darkgray", "--color-unrated": "--color-lightgray" };
+  private _colorStyles: StyleInfo = { "--color-rated":  "--color-darkgray", "--color-unrated": "--color-lightgray" };
   @property()
   private _hasTests: boolean = false;
   @property()

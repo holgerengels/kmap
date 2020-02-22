@@ -16,16 +16,19 @@ export interface Card {
   module: string,
   chapter: string,
   topic: string,
-  row: number,
-  col: number,
+  row?: number,
+  col?: number,
   summary: string,
   description: string,
-  links: string,
-  depends: string[],
+  links?: string,
+  depends?: string[],
+  priority?: number,
   attachments: Attachment[];
-  annotations: string,
+  annotations?: string,
 }
-
+export interface Line {
+  cards: Card[],
+}
 interface AllTopics {
   subject: string,
   topics: string[],
@@ -34,7 +37,7 @@ interface AllTopics {
 export interface MapState {
   subject: string,
   chapter: string,
-  lines: Card[][],
+  lines: Line[],
   chapterCard?: Card,
   timestamp: number,
   loading: boolean,
@@ -72,7 +75,7 @@ export default createModel({
   },
   reducers: {
     selectCard(state, card: Card) {
-      return { ...state, selected: card.topic, selectedDependencies: card.depends }
+      return { ...state, selected: card.topic, selectedDependencies: card.depends || [] }
     },
 
     unselectCard(state) {

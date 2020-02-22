@@ -7,11 +7,12 @@ import '@material/mwc-icon';
 import '@material/mwc-icon-button';
 import './kmap-test-result-card';
 import {colorStyles, elevationStyles, fontStyles} from "./kmap-styles";
+import {TestResult} from "../models/tests";
 
 interface Summary {
   achievedPoints: string,
   achievablePoints: number,
-  cards: object[],
+  cards: TestResult[],
   hasCards: boolean,
 }
 
@@ -21,7 +22,7 @@ export class KmapTestResults extends connect(store, LitElement) {
   private _userid: string = '';
 
   @property()
-  private _results: object[] = [];
+  private _results: TestResult[] = [];
 
   @property()
   private _summary?: Summary = undefined;
@@ -40,7 +41,7 @@ export class KmapTestResults extends connect(store, LitElement) {
 
   _buildSummary() {
     var points = 0;
-    var cards = [];
+    var cards: TestResult[] = [];
     var map = new Map();
     for (let result of this._results) {
       if (result.attempts > 0)
@@ -50,6 +51,8 @@ export class KmapTestResults extends connect(store, LitElement) {
           subject: result.subject,
           chapter: result.chapter,
           topic: result.topic,
+          attempts: 0,
+          num: 0,
         });
       var key = result.chapter + "." + result.topic;
       var num = map.get(key);
@@ -64,7 +67,7 @@ export class KmapTestResults extends connect(store, LitElement) {
       return (a.chapter + "." + a.topic).localeCompare(b.chapter + "." + b.topic)
     });
     var last;
-    var newCards = [];
+    var newCards: TestResult[] = [];
     for (let card of cards) {
       var key = card.chapter + "." + card.topic;
       if (last === key)

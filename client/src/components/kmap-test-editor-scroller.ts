@@ -4,14 +4,11 @@ import {State, store} from "../store";
 
 import {fontStyles, colorStyles, elevationStyles} from "./kmap-styles";
 import './kmap-test-card';
-import {Set} from "../models/contentSets";
 import {Test} from "../models/tests";
 
 
 @customElement('kmap-test-editor-scroller')
 export class KMapTestEditorScroller extends connect(store, LitElement) {
-  @property()
-  private _set?: Set = undefined;
   @property()
   private _tests: Test[] = [];
   @property()
@@ -21,7 +18,6 @@ export class KMapTestEditorScroller extends connect(store, LitElement) {
 
   mapState(state: State) {
     return {
-      _set: state.contentSets.selected,
       _tests: state.contentSets.tests,
     };
   }

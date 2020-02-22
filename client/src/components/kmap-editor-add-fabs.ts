@@ -152,6 +152,13 @@ export class KMapEditorAddFabs extends connect(store, LitElement) {
     this._addDialog.close();
   }
 
+  _maybeEnter(event) {
+    if (event.keyCode === 13) {
+      event.preventDefault();
+      this._ok();
+    }
+  }
+
   static get styles() {
     // language=CSS
     return [

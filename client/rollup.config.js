@@ -1,3 +1,4 @@
+//import typescript from 'rollup-plugin-typescript2';
 import { createDefaultConfig } from '@open-wc/building-rollup';
 import cpy from 'rollup-plugin-cpy';
 import deepmerge from 'deepmerge';
@@ -32,5 +33,11 @@ export default deepmerge(config, {
       navigateFallback: '/',
       navigateFallbackBlacklist: [/geogebra.html/],
     }),
+    /*
+    typescript({
+      experimentalDecorators: true,
+      emitDecoratorMetadata: true,
+    }),
+     */
   ],
 });

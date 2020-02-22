@@ -3,11 +3,12 @@ import { connect } from '@captaincodeman/rdx';
 import {State, store} from "../store";
 
 
-import {styleMap} from 'lit-html/directives/style-map.js';
+import {StyleInfo, styleMap} from 'lit-html/directives/style-map.js';
 import { STATE_COLORS } from './state-colors';
 import '@material/mwc-icon';
 import './star-rating';
 import {colorStyles, fontStyles} from "./kmap-styles";
+import {TestResult} from "../models/tests";
 
 @customElement('kmap-test-result-card')
 export class KMapTestResultCard extends connect(store, LitElement) {
@@ -15,16 +16,18 @@ export class KMapTestResultCard extends connect(store, LitElement) {
   private _userid: string = '';
 
   @property()
-  private card?: object = undefined;
+  private card?: TestResult = undefined;
   @property()
   private _states: object = {};
   @property({type: Number})
   private state: number = 0;
   @property()
   private _state: number = 0;
+  @property()
+  private _rateModified: boolean = false;
 
   @property()
-  private _colorStyles: object = { "--color-rated":  "--color-darkgray", "--color-unrated": "--color-lightgray" };
+  private _colorStyles: StyleInfo = { "--color-rated":  "--color-darkgray", "--color-unrated": "--color-lightgray" };
 
   constructor() {
     super();
@@ -51,6 +54,7 @@ export class KMapTestResultCard extends connect(store, LitElement) {
 
   _rating() {
     if (this._rateModified && this._states && Object.keys(this._states).length !== 0) {
+      // @ts-ignore
       let key = this.card.chapter + "." + this.card.topic;
       this._state = this._getStateValue(key);
     }
@@ -75,6 +79,8 @@ export class KMapTestResultCard extends connect(store, LitElement) {
   }
 
   _rated(e) {
+    if (this.card === undefined) return;
+
     if (this._userid)
       this._rateModified = true;
 
@@ -145,7 +151,7 @@ export class KMapTestResultCard extends connect(store, LitElement) {
   }
 
   render() {
-    return html`
+    return this.card !== undefined ? html`
         <div class="card-header">
           <span>${this.card.chapter} → ${this.card.topic}</span>
         </div>
@@ -158,6 +164,6 @@ export class KMapTestResultCard extends connect(store, LitElement) {
             <div slot="footer" style="flex: 1 0 auto"></div>
             <a slot="footer" href="/app/browser/${this.card.subject}/${this.card.chapter}/${this.card.topic}"><mwc-icon>open_in_new</mwc-icon></a>
         </div>
-    `;
+    ` : html``;
   }
 }

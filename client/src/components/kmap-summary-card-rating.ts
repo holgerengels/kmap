@@ -28,7 +28,7 @@ export class KMapSummaryCardRating extends connect(store, LitElement) {
   }
 
   _rating() {
-    if (this._states && this._states.length !== 0) {
+    if (this._states && Object.keys(this._states).length !== 0) {
       this._state = this._getStateValue(this.key);
     }
     else {
