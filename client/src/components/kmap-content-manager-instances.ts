@@ -156,11 +156,12 @@ export class KMapContentManagerInstances extends connect(store, LitElement) {
         <div class="form">
           <div class="page" ?active="${this._page === 'sync'}">
             <label>Instanz replizieren</label>
-            <mwc-select required @change="${e => this._syncName = e.target.value}">
+            <mwc-select required label="Von Instanz" @change="${e => this._syncName = e.target.value}">
               ${this._instances.filter(i => this._selected === undefined || i.name !== this._selected.name).map((instance) => html`
                 <mwc-list-item value="${instance.name}">${instance.name}</mwc-list-item>
               `)}
             </mwc-select>
+            <label secondary>Nach Instanz '${this._syncName}'</label>
             <div>
             <mwc-button @click="${() => this._showPage('')}">Abbrechen</mwc-button>
             <mwc-button outlined @click="${this._sync}">Inhalte Übertragen</mwc-button>
