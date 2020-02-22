@@ -22,7 +22,7 @@ export class KMapKnowledgeCardDescription extends LitElement {
     if (changedProperties.has("description")) {
       if (this.description) {
         let description = this.description.replace(/inline:([^"]*)/g, urls.server + "data/" + this.subject + "/" + this.chapter + "/" + this.topic + "/$1?instance=" + this.instance);
-        description = description.replace(/link:/g, urls.client + this.instance + "//app/browser/");
+        description = description.replace(/link:/g, urls.client + "/app/browser/");
 
         // @ts-ignore
         window.MathJaxLoader

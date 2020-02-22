@@ -50,6 +50,7 @@ export class KMapLoginPopup extends connect(store, LitElement) {
   }
 
   show() {
+    store.dispatch.app.clearLoginResponse();
     this._loginDialog.show();
   }
 

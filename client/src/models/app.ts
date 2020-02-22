@@ -74,8 +74,11 @@ export default createModel({
         error: message,
       }
     },
-    loginError(state, message) {
+    loginResponse(state, message) {
       return { ...state, authenticating: false, loginResponse: message }
+    },
+    clearLoginResponse(state) {
+      return { ...state, loginResponse: "" }
     },
   },
 
@@ -91,7 +94,7 @@ export default createModel({
           dispatch.app.receivedLogin({ userid: payload.userid, roles: json});
         },
         dispatch.app.handleError,
-        dispatch.app.loginError);
+        dispatch.app.loginResponse);
     },
     async logout() {
       const dispatch = store.dispatch();
