@@ -121,7 +121,7 @@ export class KmapMain extends connect(store, LitElement) {
       }
       else {
         if (!store.state.app.instance) {
-          //requestAnimationFrame(() => this._instancePopup.show());
+          requestAnimationFrame(() => this._instancePopup.show());
         }
       }
     }
