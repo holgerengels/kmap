@@ -2,7 +2,7 @@
   "scripts": {
     "start:build": "cd dist && es-dev-server --open",
     "build": "rimraf dist && tsc -p tsconfig.build.json && rollup -c rollup.config.js",
-    "start": "es-dev-server --app-index index.html --node-resolve --open --watch",
+    "start": "es-dev-server --base-path /app --app-index index.html --node-resolve --open --watch",
     "tsc": "tsc -w -p tsconfig.build.json"
   },
   "devDependencies": {

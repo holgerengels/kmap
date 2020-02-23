@@ -2,7 +2,6 @@ package kmap;
 
 import org.apache.http.HttpHost;
 import org.apache.http.StatusLine;
-import org.apache.http.annotation.NotThreadSafe;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.AuthCache;
@@ -411,7 +410,6 @@ public class Cloud extends Server
         return value;
     }
 
-    @NotThreadSafe
     public class HttpPropFind extends HttpEntityEnclosingRequestBase {
 
         final static String METHOD_NAME = "PROPFIND";

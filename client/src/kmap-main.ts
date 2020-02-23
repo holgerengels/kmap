@@ -121,7 +121,8 @@ export class KmapMain extends connect(store, LitElement) {
       }
       else {
         if (!store.state.app.instance) {
-          requestAnimationFrame(() => this._instancePopup.show());
+          //requestAnimationFrame(() => this._instancePopup.show());
+          store.dispatch.app.chooseInstance("root");
         }
       }
     }
@@ -246,10 +247,10 @@ export class KmapMain extends connect(store, LitElement) {
       mwc-icon-button[icon="polymer"] {
         --mdc-icon-size: 18px;
         --mdc-icon-button-size: 18px;
-        transition: filter ease-in-out .3s;
+        transition: color ease-in-out .3s;
       }
-      mwc-icon-button[icon="polymer"]:hover {
-        filter: brightness(120%);
+      span:hover mwc-icon-button[icon="polymer"] {
+        color: var(--color-primary-dark);
       }
       `,
     ];

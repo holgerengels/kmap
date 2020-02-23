@@ -1,5 +1,4 @@
-import {LitElement, html, css, customElement, query, property, TemplateResult} from 'lit-element';
-import {ifDefined} from "lit-html/directives/if-defined";
+import {LitElement, html, css, customElement, query, property} from 'lit-element';
 import { connect } from '@captaincodeman/rdx';
 import {State, store} from "../store";
 
@@ -9,10 +8,12 @@ import '@material/mwc-radio';
 import '@material/mwc-textfield';
 import 'pwa-helper-components/pwa-install-button';
 import 'pwa-helper-components/pwa-update-available';
+import './datalist-textfield';
 import {Dialog} from "@material/mwc-dialog/mwc-dialog";
 import {TextField} from "@material/mwc-textfield/mwc-textfield";
-import {colorStyles, fontStyles} from "./kmap-styles";
 import {Instance} from "../models/instances";
+import {DatalistTextField} from "./datalist-textfield";
+import {colorStyles, fontStyles} from "./kmap-styles";
 
 @customElement('kmap-instance-popup')
 export class KMapInstancePopup extends connect(store, LitElement) {
@@ -120,43 +121,5 @@ export class KMapInstancePopup extends connect(store, LitElement) {
     <mwc-button slot="primaryAction" @click=${this._chooseInstance}>Auswählen</mwc-button>
   </mwc-dialog>
     `;
-  }
-}
-
-
-interface Option {
-  value: string,
-  label?: string,
-}
-
-@customElement('datalist-textfield')
-class DatalistTextField extends TextField {
-  @property()
-  private datalist: Option[] = [];
-
-  protected renderInput(): TemplateResult {
-    const maxOrUndef = this.maxLength === -1 ? undefined : this.maxLength;
-    return html`
-      <input
-          id="text-field"
-          class="mdc-text-field__input"
-          type="${this.type}"
-          .value="${this.value}"
-          ?disabled="${this.disabled}"
-          placeholder="${this.placeholder}"
-          ?required="${this.required}"
-          maxlength="${ifDefined(maxOrUndef)}"
-          pattern="${ifDefined(this.pattern ? this.pattern : undefined)}"
-          min="${ifDefined(this.min === '' ? undefined : this.min as number)}"
-          max="${ifDefined(this.max === '' ? undefined : this.max as number)}"
-          step="${ifDefined(this.step === null ? undefined : this.step)}"
-          @input="${this.handleInputChange}"
-          @blur="${this.onInputBlur}"
-          list="datalist">
-
-        <datalist id="datalist">
-          ${this.datalist.map(option => html`<option value=${option.value} label="${ifDefined(option.label)}"/>`)}
-        </datalist>
-        `;
   }
 }
