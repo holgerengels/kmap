@@ -93,6 +93,7 @@ export class KMapContentManagerModules extends connect(store, LitElement) {
         }
         .scroll {
           height: 232px;
+          overflow-x: hidden;
           overflow-y: auto;
         }
         mwc-icon {
