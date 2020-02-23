@@ -1,5 +1,5 @@
 import {LitElement, html, css, customElement, property} from 'lit-element';
-import {colorStyles, fontStyles} from "./kmap-styles";
+import {colorStyles, fontStyles, themeStyles} from "./kmap-styles";
 
 @customElement('kmap-knowledge-card-progress')
 export class KMapKnowledgeCardProgress extends LitElement {
@@ -13,6 +13,7 @@ export class KMapKnowledgeCardProgress extends LitElement {
     return [
       fontStyles,
       colorStyles,
+      themeStyles,
       css`
         :host {
           display: block;

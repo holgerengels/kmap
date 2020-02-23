@@ -7,7 +7,7 @@ import '@material/mwc-formfield';
 import '@material/mwc-radio';
 import '@material/mwc-textarea';
 import '@material/mwc-textfield';
-import {colorStyles, fontStyles} from "./kmap-styles";
+import {colorStyles, fontStyles, themeStyles} from "./kmap-styles";
 import {Dialog} from "@material/mwc-dialog/mwc-dialog";
 import {Radio} from "@material/mwc-radio/mwc-radio";
 
@@ -42,6 +42,7 @@ export class KMapFeedback extends LitElement {
     return [
       fontStyles,
       colorStyles,
+      themeStyles,
       css`
         mwc-dialog {
           --mdc-dialog-min-width: 630px;

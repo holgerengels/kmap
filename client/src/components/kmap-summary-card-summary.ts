@@ -1,5 +1,5 @@
 import {LitElement, html, css, customElement, property} from 'lit-element';
-import { colorStyles, fontStyles } from "./kmap-styles";
+import {colorStyles, fontStyles, themeStyles} from "./kmap-styles";
 
 @customElement('kmap-summary-card-summary')
 export class KMapSummaryCardSummary extends LitElement {
@@ -12,6 +12,7 @@ export class KMapSummaryCardSummary extends LitElement {
     return [
       fontStyles,
       colorStyles,
+      themeStyles,
       css`
         :host {
           display: block;

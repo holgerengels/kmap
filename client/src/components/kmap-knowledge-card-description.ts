@@ -1,7 +1,7 @@
 import {LitElement, html, css, customElement, property} from 'lit-element';
 import {unsafeHTML} from 'lit-html/directives/unsafe-html';
 import {urls} from "../urls";
-import {colorStyles, fontStyles} from "./kmap-styles";
+import {colorStyles, fontStyles, themeStyles} from "./kmap-styles";
 
 @customElement('kmap-knowledge-card-description')
 export class KMapKnowledgeCardDescription extends LitElement {
@@ -65,6 +65,7 @@ export class KMapKnowledgeCardDescription extends LitElement {
     return [
       fontStyles,
       colorStyles,
+      themeStyles,
       css`
         :host {
           display: block;

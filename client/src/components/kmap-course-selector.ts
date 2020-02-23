@@ -5,7 +5,7 @@ import {State, store} from "../store";
 import '@material/mwc-icon';
 import '@material/mwc-list/mwc-list';
 import '@material/mwc-list/mwc-list-item';
-import {fontStyles, colorStyles} from "./kmap-styles";
+import {fontStyles, colorStyles, themeStyles} from "./kmap-styles";
 
 @customElement('kmap-course-selector')
 export class KMapCourseSelector extends connect(store, LitElement) {
@@ -36,6 +36,7 @@ export class KMapCourseSelector extends connect(store, LitElement) {
     return [
       fontStyles,
       colorStyles,
+      themeStyles,
     ];
   }
 

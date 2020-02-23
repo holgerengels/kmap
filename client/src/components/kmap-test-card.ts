@@ -4,7 +4,7 @@ import {State, store} from "../store";
 
 import {urls} from '../urls';
 import {STATE_COLORS} from './state-colors';
-import {fontStyles, colorStyles} from "./kmap-styles";
+import {fontStyles, colorStyles, themeStyles} from "./kmap-styles";
 import './star-rating';
 import '@material/mwc-icon';
 import '@material/mwc-button';
@@ -252,6 +252,7 @@ export class KMapTestCard extends connect(store, LitElement) {
     return [
       fontStyles,
       colorStyles,
+      themeStyles,
       css`
         :host {
           --color-opaque: #f5f5f5;

@@ -13,7 +13,7 @@ import './kmap-test-chooser';
 import './kmap-test-exercise';
 import './kmap-test-results';
 import './kmap-test-editor-scroller';
-import {colorStyles, fontStyles} from "./kmap-styles";
+import {colorStyles, fontStyles, themeStyles} from "./kmap-styles";
 import {TopAppBar} from "@material/mwc-top-app-bar/mwc-top-app-bar";
 
 @customElement('kmap-test')
@@ -109,6 +109,7 @@ export class KmapTest extends connect(store, LitElement) {
     return [
       fontStyles,
       colorStyles,
+      themeStyles,
       css`
         :host {
           display: contents;

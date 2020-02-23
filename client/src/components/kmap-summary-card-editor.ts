@@ -4,7 +4,7 @@ import {State, store} from "../store";
 
 import '@material/mwc-button';
 import {Card} from "../models/maps";
-import {colorStyles, fontStyles} from "./kmap-styles";
+import {colorStyles, fontStyles, themeStyles} from "./kmap-styles";
 import {Module} from "../models/contentMaps";
 
 @customElement('kmap-summary-card-editor')
@@ -57,6 +57,7 @@ export class KMapSummaryCardEditor extends connect(store, LitElement) {
     return [
       fontStyles,
       colorStyles,
+      themeStyles,
       css`
         :host {
           display: block;

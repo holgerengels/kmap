@@ -7,7 +7,7 @@ import {StyleInfo, styleMap} from 'lit-html/directives/style-map.js';
 import { STATE_COLORS } from './state-colors';
 import '@material/mwc-icon';
 import './star-rating';
-import {colorStyles, fontStyles} from "./kmap-styles";
+import {colorStyles, fontStyles, themeStyles} from "./kmap-styles";
 import {TestResult} from "../models/tests";
 
 @customElement('kmap-test-result-card')
@@ -93,6 +93,7 @@ export class KMapTestResultCard extends connect(store, LitElement) {
     return [
       fontStyles,
       colorStyles,
+      themeStyles,
       css`
         :host {
           --color-opaque: #f5f5f5;

@@ -2,7 +2,7 @@ import {LitElement, html, css, customElement, property, query, queryAll} from 'l
 import {connect} from '@captaincodeman/rdx';
 import {State, store} from "../store";
 
-import {colorStyles, fontStyles} from "./kmap-styles";
+import {colorStyles, fontStyles, themeStyles} from "./kmap-styles";
 
 import '@material/mwc-button';
 import '@material/mwc-icon-button';
@@ -232,6 +232,7 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
     return [
       fontStyles,
       colorStyles,
+      themeStyles,
       css`
         mwc-dialog {
           --mdc-dialog-max-width: 810px;

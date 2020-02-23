@@ -6,7 +6,7 @@ import '@material/mwc-button';
 import '@material/mwc-icon';
 import '@material/mwc-icon-button';
 import './kmap-test-result-card';
-import {colorStyles, elevationStyles, fontStyles} from "./kmap-styles";
+import {colorStyles, elevationStyles, fontStyles, themeStyles} from "./kmap-styles";
 import {TestResult} from "../models/tests";
 
 interface Summary {
@@ -113,6 +113,7 @@ export class KmapTestResults extends connect(store, LitElement) {
     return [
       fontStyles,
       colorStyles,
+      themeStyles,
       elevationStyles,
       css`
         :host {

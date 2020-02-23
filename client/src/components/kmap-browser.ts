@@ -2,7 +2,7 @@ import {LitElement, html, css, customElement, property, query} from 'lit-element
 import { connect } from '@captaincodeman/rdx';
 import {State, store} from "../store";
 
-import {colorStyles, fontStyles} from "./kmap-styles";
+import {colorStyles, fontStyles, themeStyles} from "./kmap-styles";
 import '@material/mwc-icon';
 import '@material/mwc-icon-button';
 import '@material/mwc-top-app-bar';
@@ -207,6 +207,7 @@ export class KMapBrowser extends connect(store, LitElement) {
     return [
       fontStyles,
       colorStyles,
+      themeStyles,
       css`
         :host {
           display: contents;

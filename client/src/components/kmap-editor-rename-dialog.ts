@@ -5,7 +5,7 @@ import {State, store} from "../store";
 import '@material/mwc-button';
 import '@material/mwc-dialog';
 import '@material/mwc-textfield';
-import {colorStyles, fontStyles} from "./kmap-styles";
+import {colorStyles, fontStyles, themeStyles} from "./kmap-styles";
 import {Dialog} from "@material/mwc-dialog/mwc-dialog";
 import {Card} from "../models/maps";
 
@@ -64,6 +64,7 @@ export class KMapEditorRenameDialog extends connect(store, LitElement) {
     return [
       fontStyles,
       colorStyles,
+      themeStyles,
       css`
         form {
           width: 510px;

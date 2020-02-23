@@ -2,7 +2,7 @@ import {LitElement, html, css, customElement, property} from 'lit-element';
 import {connect} from '@captaincodeman/rdx';
 import {State, store} from "../store";
 
-import {colorStyles, elevationStyles, fontStyles} from "./kmap-styles";
+import {colorStyles, elevationStyles, fontStyles, themeStyles} from "./kmap-styles";
 
 import '@material/mwc-icon';
 import '@material/mwc-icon-button';
@@ -86,6 +86,7 @@ export class KMapContentManagerInstances extends connect(store, LitElement) {
     return [
       fontStyles,
       colorStyles,
+      themeStyles,
       elevationStyles,
       css`
         :host {
@@ -103,6 +104,7 @@ export class KMapContentManagerInstances extends connect(store, LitElement) {
         }
         .scroll {
           height: 232px;
+          width: 326px;
           overflow-x: hidden;
           overflow-y: auto;
         }

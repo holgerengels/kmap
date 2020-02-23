@@ -6,7 +6,7 @@ import '@material/mwc-button';
 import '@material/mwc-dialog';
 import '@material/mwc-fab';
 import '@material/mwc-textfield';
-import {fontStyles, colorStyles} from "./kmap-styles";
+import {fontStyles, colorStyles, themeStyles} from "./kmap-styles";
 import {Test} from "../models/tests";
 
 @customElement('kmap-test-editor-add-fabs')
@@ -121,6 +121,7 @@ export class KMapTestEditorAddFabs extends connect(store, LitElement) {
     return [
       fontStyles,
       colorStyles,
+      themeStyles,
       css`
         :host {
           display: contents;

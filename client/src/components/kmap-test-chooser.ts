@@ -12,7 +12,7 @@ import '@material/mwc-slider';
 import '@material/mwc-top-app-bar';
 import '@material/mwc-top-app-bar';
 import '@material/menu-surface';
-import {colorStyles, elevationStyles, fontStyles} from "./kmap-styles";
+import {colorStyles, elevationStyles, fontStyles, themeStyles} from "./kmap-styles";
 
 @customElement('kmap-test-chooser')
 export class KmapTestChooser extends connect(store, LitElement) {
@@ -105,6 +105,7 @@ export class KmapTestChooser extends connect(store, LitElement) {
     return [
       fontStyles,
       colorStyles,
+      themeStyles,
       elevationStyles,
       css`
         :host {

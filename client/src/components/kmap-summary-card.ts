@@ -12,7 +12,7 @@ import './kmap-summary-card-rating';
 import './kmap-summary-card-ratecolors';
 import {Card} from "../models/maps";
 import {STATE_COLORS} from './state-colors';
-import {fontStyles, colorStyles} from "./kmap-styles";
+import {fontStyles, colorStyles, themeStyles} from "./kmap-styles";
 
 @customElement('kmap-summary-card')
 export class KMapSummaryCard extends connect(store, LitElement) {
@@ -104,6 +104,7 @@ export class KMapSummaryCard extends connect(store, LitElement) {
     return [
       fontStyles,
       colorStyles,
+      themeStyles,
       css`
         :host {
           display: block;

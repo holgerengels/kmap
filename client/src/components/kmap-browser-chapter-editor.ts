@@ -4,7 +4,7 @@ import {State, store} from "../store";
 
 import '@material/mwc-button';
 import {Card} from "../models/maps";
-import {colorStyles, fontStyles} from "./kmap-styles";
+import {colorStyles, fontStyles, themeStyles} from "./kmap-styles";
 
 interface Module {
   subject: string,
@@ -87,6 +87,7 @@ export class KMapBrowserChapterEditor extends connect(store, LitElement) {
     return [
       fontStyles,
       colorStyles,
+      themeStyles,
       css`
         mwc-button[disabled] {
           pointer-events: none;

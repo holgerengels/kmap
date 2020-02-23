@@ -9,7 +9,7 @@ import 'pwa-helper-components/pwa-install-button';
 import 'pwa-helper-components/pwa-update-available';
 import {Dialog} from "@material/mwc-dialog/mwc-dialog";
 import {TextField} from "@material/mwc-textfield/mwc-textfield";
-import {colorStyles, fontStyles} from "./kmap-styles";
+import {colorStyles, fontStyles, themeStyles} from "./kmap-styles";
 import {Instance} from "../models/instances";
 
 @customElement('kmap-login-popup')
@@ -101,6 +101,7 @@ export class KMapLoginPopup extends connect(store, LitElement) {
     return [
       fontStyles,
       colorStyles,
+      themeStyles,
       css`
         form {
           width: 300px;

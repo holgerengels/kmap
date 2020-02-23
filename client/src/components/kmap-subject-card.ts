@@ -3,7 +3,7 @@ import {LitElement, html, css, customElement, property} from 'lit-element';
 import '@material/mwc-icon';
 import '@material/mwc-ripple';
 import {STATE_COLORS} from './state-colors';
-import {fontStyles, colorStyles} from "./kmap-styles";
+import {fontStyles, colorStyles, themeStyles} from "./kmap-styles";
 
 @customElement('kmap-subject-card')
 export class KMapSubjectCard extends LitElement {
@@ -78,6 +78,7 @@ export class KMapSubjectCard extends LitElement {
     return [
       fontStyles,
       colorStyles,
+      themeStyles,
       css`
         :host {
           display: block;

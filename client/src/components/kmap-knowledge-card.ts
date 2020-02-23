@@ -13,7 +13,7 @@ import './kmap-knowledge-card-progress';
 import './kmap-knowledge-card-description';
 import './kmap-knowledge-card-attachment';
 import './kmap-feedback';
-import {fontStyles, colorStyles} from "./kmap-styles";
+import {fontStyles, colorStyles, themeStyles} from "./kmap-styles";
 import {KMapFeedback} from "./kmap-feedback";
 
 @customElement('kmap-knowledge-card')
@@ -154,6 +154,7 @@ export class KMapKnowledgeCard extends connect(store, LitElement) {
     return [
       fontStyles,
       colorStyles,
+      themeStyles,
       css`
         :host {
           display: block;

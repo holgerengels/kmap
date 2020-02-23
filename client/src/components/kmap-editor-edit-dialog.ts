@@ -13,7 +13,7 @@ import '@material/mwc-textarea';
 import '@material/mwc-textfield';
 import './kmap-summary-card-summary';
 import './kmap-knowledge-card-description';
-import {colorStyles, fontStyles} from "./kmap-styles";
+import {colorStyles, fontStyles, themeStyles} from "./kmap-styles";
 
 import {Attachment, Card} from "../models/maps";
 import {Dialog} from "@material/mwc-dialog/mwc-dialog";
@@ -272,6 +272,7 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
     return [
       fontStyles,
       colorStyles,
+      themeStyles,
       css`
         mwc-dialog {
           --mdc-dialog-max-width: 810px;
