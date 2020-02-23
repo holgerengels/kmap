@@ -467,6 +467,8 @@ curl -X PUT -u $1 http://localhost:5984/$2-test/_design/test -d @design-test.jso
             try (CloseableHttpResponse ignored = httpClient.execute(put, context)){}
             put = new HttpPut(url() + name + "-state");
             try (CloseableHttpResponse ignored = httpClient.execute(put, context)){}
+            put = new HttpPut(url() + name + "-feedback");
+            try (CloseableHttpResponse ignored = httpClient.execute(put, context)){}
 
             put = new HttpPut(url() + name + "-map/_design/net");
             entity = new InputStreamEntity(Files.newInputStream(Paths.get(getProperty("kmap.designDocs") + "design-map.json")));
