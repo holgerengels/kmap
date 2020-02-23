@@ -131,7 +131,7 @@ export class KMapLoginPopup extends connect(store, LitElement) {
   <mwc-dialog id="loginDialog" heading="Anmelden">
     <form id="loginForm" ?hidden="${this._userid}" @keyup="${this._maybeEnter}">
       ${!this._showInstanceChooser ? html`
-        <span secondary>Anmelden an Instanz: ${this._instance}
+        <span secondary>Anmelden an Instanz: ${this._instance}&nbsp;
           <mwc-icon-button icon="polymer" class="secondary" @click="${this._showChooseInstance}" title="Instanz wechseln"></mwc-icon-button>
         </span>
       ` : html`
@@ -150,8 +150,8 @@ export class KMapLoginPopup extends connect(store, LitElement) {
     <div class="layout horizontal">
       <div id="message" style="height: 32px; padding-top: 10px">${this._message}</div>
     </div>
-    <pwa-install-button slot="secondaryAction"><mwc-button outlined>App installieren</mwc-button></pwa-install-button>
-    <pwa-update-available slot="secondaryAction"><mwc-button outlined>App aktualisieren</mwc-button></pwa-update-available>
+    <pwa-install-button slot="secondaryAction"><mwc-button outlined style="--mdc-theme-primary: var(--color-secondary-dark);">App installieren</mwc-button></pwa-install-button>
+    <pwa-update-available slot="secondaryAction"><mwc-button outlined style="--mdc-theme-primary: var(--color-secondary-dark);">App aktualisieren</mwc-button></pwa-update-available>
     <mwc-button slot="primaryAction" ?hidden="${this._userid}" @click=${this._login}>Anmelden</mwc-button>
     <mwc-button slot="secondaryAction" ?hidden="${!this._userid}" @click=${this._logout}>Abmelden</mwc-button>
   </mwc-dialog>
