@@ -1,4 +1,4 @@
 export const urls = {
-  server: "http://127.0.0.1:8081/kmap/",
-  client: "http://127.0.0.1:8080/",
+  server: "http://127.0.0.1:8081/server/",
+  client: "http://127.0.0.1:8080/app/",
 };

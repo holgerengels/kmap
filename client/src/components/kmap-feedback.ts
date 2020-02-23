@@ -81,7 +81,7 @@ export class KMapFeedback extends LitElement {
     <form>
       <label secondary>${this.topic !== undefined ? this.subject + " → " + this.chapter + " → " + this.topic : this.subject + " → " + this.chapter}</label>
       ${this.test !== undefined ? html`
-        <br/><label secondary>${this.test}</label>
+        <br/><label secondary>Aufgabe '${this.test}'</label>
       ` : ''}
       <div>
         <mwc-formfield label="Fehler"><mwc-radio id="bug" name="type" value="bug" dialogInitialFocus @change="${() => this._type = 'bug'}"></mwc-radio></mwc-formfield>

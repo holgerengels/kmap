@@ -8,6 +8,8 @@ import {fontStyles, colorStyles} from "./kmap-styles";
 import './star-rating';
 import '@material/mwc-icon';
 import '@material/mwc-button';
+import "./kmap-feedback";
+import {KMapFeedback} from "./kmap-feedback";
 
 @customElement('kmap-test-card')
 export class KMapTestCard extends connect(store, LitElement) {
@@ -66,6 +68,9 @@ export class KMapTestCard extends connect(store, LitElement) {
   // @ts-ignore
   private _blinky: HTMLElement;
 
+  @query('#feedbackDialog')
+  // @ts-ignore
+  private _feedbackDialog: KMapFeedback;
 
   constructor() {
     super();
@@ -238,6 +243,10 @@ export class KMapTestCard extends connect(store, LitElement) {
     }));
   }
 
+  _feedback() {
+    this._feedbackDialog.show();
+  }
+
   static get styles() {
     // language=CSS
     return [
@@ -273,6 +282,16 @@ export class KMapTestCard extends connect(store, LitElement) {
         }
         .card-header a {
           color: white;
+        }
+        .card-header mwc-icon-button {
+          color: white;
+          vertical-align: middle;
+          --mdc-icon-button-size: 20px;
+          --mdc-icon-size: 20px;
+        }
+        .card-header mwc-icon {
+          vertical-align: middle;
+          --mdc-icon-size: 1.2em;
         }
         .card-content {
           padding: 12px;
@@ -332,10 +351,6 @@ export class KMapTestCard extends connect(store, LitElement) {
             text-shadow: 1px 1px 4px var(--color-darkgray);
           }
         }
-        mwc-icon {
-          vertical-align: middle;
-          --mdc-icon-size: 1.2em;
-        }
       `];
   }
 
@@ -344,7 +359,8 @@ export class KMapTestCard extends connect(store, LitElement) {
   <div class="card-header" ?hidden="${this.hideHeader}">
       <span>Aufgabe ${this.num + 1} von ${this.of} (${this._levelText(this.level)})</span>
       <div style="flex: 1 0 auto"></div>
-      <a href="/app/browser/${this.subject}/${this.chapter}/${this.topic}" target="_blank" id="blinky">Wissenskarte ansehen <mwc-icon>open_in_new</mwc-icon></a>
+      <a href="/app/browser/${this.subject}/${this.chapter}/${this.topic}" target="_blank" id="blinky">Wissenskarte ansehen <mwc-icon>open_in_new</mwc-icon></a>&nbsp;
+      <mwc-icon-button icon="feedback" title="Feedback" @click="${this._feedback}"></mwc-icon-button>
   </div>
   <div class="card-content">
       <div id="question" style="${this._questionFlex}"></div>
@@ -358,6 +374,7 @@ export class KMapTestCard extends connect(store, LitElement) {
         <mwc-button @click="${this.next}" ?hidden="${!this.correct || this.num + 1 == this.of}">Weiter</mwc-button>
     </div>`
       : ''}
+  <kmap-feedback id="feedbackDialog" .subject="${this.subject}" .chapter="${this.chapter}" .topic="${this.topic}" .test="${this.key}"></kmap-feedback>
     `;
   }
 }

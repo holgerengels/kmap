@@ -12,9 +12,6 @@ import {KMapTestCard} from "./kmap-test-card";
 @customElement('kmap-test-exercise')
 export class KmapTestExercise extends connect(store, LitElement) {
   @property()
-  private _subject: string = '';
-
-  @property()
   private _allTests?: Test[] = undefined;
   @property()
   private _tests?: Test[] = undefined;
@@ -30,7 +27,6 @@ export class KmapTestExercise extends connect(store, LitElement) {
 
   mapState(state: State) {
     return {
-      _subject: state.tests.subject,
       _allTests: state.tests.tests,
     };
   }
@@ -134,9 +130,10 @@ export class KmapTestExercise extends connect(store, LitElement) {
   <div>
     ${this._currentTest ? html`
       <kmap-test-card id="test-card" @next="${this._next}"
-        .subject="${this._subject}"
+        .subject="${this._currentTest.subject}"
         .chapter="${this._currentTest.chapter}"
         .topic="${this._currentTest.topic}"
+        .key="${this._currentTest.key}"
         .num="${this._currentIndex}" of="${this._tests ? this._tests.length : 0}"
         .level="${this._currentTest.level}"
         .question="${this._currentTest.question}"
