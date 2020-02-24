@@ -17,7 +17,7 @@ export function debounce(func, wait, scope) {
     clearTimeout(timeout);
     timeout = setTimeout(later, wait);
   };
-},
+}
 
 /**
  * In case of a "storm of events", this executes once every $threshold
