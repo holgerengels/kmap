@@ -50,8 +50,8 @@ export class KMapBrowserChapterEditor extends connect(store, LitElement) {
       attachments: this.chapterCard.attachments,
     } : {
       added: true,
-      module: this._selectedModule?.module,
-      subject: this._selectedModule?.subject,
+      module: this._selectedModule ? this._selectedModule.module : undefined,
+      subject: this._selectedModule ? this._selectedModule.subject : undefined,
       chapter: this.chapter,
       topic: '_',
       summary: '',
@@ -65,8 +65,8 @@ export class KMapBrowserChapterEditor extends connect(store, LitElement) {
 
   _showDelete() {
     let card: Partial<Card> = {
-      module: this._selectedModule?.module,
-      subject: this._selectedModule?.subject,
+      module: this._selectedModule ? this._selectedModule.module : undefined,
+      subject: this._selectedModule ? this._selectedModule.subject : undefined,
       chapter: this.chapter,
       topic: '_',
     };
