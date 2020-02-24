@@ -42,8 +42,7 @@ export class KCourses extends connect(store, LitElement) {
   // @ts-ignore
   private _content: HTMLElement;
 
-  // @ts-ignore
-  firstUpdated(changedProperties) {
+  firstUpdated() {
     this._bar.scrollTarget = this._content;
   }
 

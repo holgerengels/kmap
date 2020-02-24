@@ -24,8 +24,7 @@ export class KMapSummaryCard extends connect(store, LitElement) {
   @property({type: String})
   private chapter: string = '';
   @property({type: Object})
-  // @ts-ignore // TODO
-  private card: Card = {};
+  private card?: Card;
   @property()
   private _key: string = '';
   @property({type: Boolean})
@@ -51,17 +50,17 @@ export class KMapSummaryCard extends connect(store, LitElement) {
       _userid: state.app.userid,
       _topics: state.tests.topics ? state.tests.topics.topics : [],
       _layers: state.shell.layers,
-      selected: state.maps.selected == this.card.topic,
-      highlighted: state.maps.selectedDependencies && state.maps.selectedDependencies.includes(this.card.topic),
+      selected: this.card !== undefined && state.maps.selected === this.card.topic,
+      highlighted: this.card !== undefined && state.maps.selectedDependencies && state.maps.selectedDependencies.includes(this.card.topic),
     };
   }
 
   updated(changedProperties) {
-    if (changedProperties.has("card"))
+    if (changedProperties.has("card") && this.card !== undefined)
       this._key = this.card.links ? this.card.links : this.chapter + "." + this.card.topic;
 
     if (changedProperties.has("card") || changedProperties.has("_topics"))
-      this._hasTests = this._topics.includes(this.chapter + "." + this.card.topic);
+      this._hasTests = this.card !== undefined && this._topics.includes(this.chapter + "." + this.card.topic);
 
     if (changedProperties.has("_userid") || changedProperties.has("_layers") || changedProperties.has("_key"))
       this._colorizeEvent( );
@@ -96,6 +95,7 @@ export class KMapSummaryCard extends connect(store, LitElement) {
   }
 
   _clicked() {
+    if (this.card == undefined) return;
     store.dispatch.maps.selectCard(this.card);
   }
 
@@ -168,7 +168,11 @@ export class KMapSummaryCard extends connect(store, LitElement) {
   }
 
   render() {
-    return html`
+    // language=CSS
+    if (this.card === undefined)
+      return html`card undefined`;
+    else
+      return html`
 <div class="card" @click="${this._clicked}" ?selected="${this.selected}" ?highlighted="${this.highlighted}">
   <div class="card-header font-body">
     <span>${this.card.topic}</span>

@@ -67,7 +67,6 @@ export class KMapInstancePopup extends connect(store, LitElement) {
       store.dispatch.shell.showMessage("Ungültige Instanz!");
     }
     else {
-      // @ts-ignore
       store.dispatch.app.chooseInstance(instance);
       this._instanceDialog.close();
     }

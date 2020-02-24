@@ -25,7 +25,8 @@ export class KMapContentManagerModules extends connect(store, LitElement) {
   private _working: boolean = false;
 
   @query("#file")
-  private _file?: HTMLInputElement;
+  // @ts-ignore
+  private _file: HTMLInputElement;
 
   mapState(state: State) {
     return {
@@ -56,8 +57,7 @@ export class KMapContentManagerModules extends connect(store, LitElement) {
   }
 
   _import() {
-    if (!this._file) return;
-    // @ts-ignore
+    if (!this._file.files) return;
     store.dispatch.contentMaps.import(this._file.files);
   }
 

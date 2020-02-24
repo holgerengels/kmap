@@ -193,7 +193,7 @@ export default createModel({
         }.bind(undefined, set), 1000);
     },
 
-    async import(files: File[]) {
+    async import(files: FileList) {
       const dispatch = store.dispatch();
       const state = store.getState();
 

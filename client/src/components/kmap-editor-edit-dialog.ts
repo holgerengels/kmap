@@ -18,6 +18,7 @@ import {colorStyles, fontStyles, themeStyles} from "./kmap-styles";
 import {Attachment, Card} from "../models/maps";
 import {Dialog} from "@material/mwc-dialog/mwc-dialog";
 import {TextArea} from "@material/mwc-textarea/mwc-textarea";
+import {throttle} from "../debounce";
 
 @customElement('kmap-editor-edit-dialog')
 export class KMapEditorEditDialog extends connect(store, LitElement) {
@@ -73,8 +74,8 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
 
   constructor() {
     super();
-    this._setSummary = this._debounce(this._setSummary.bind(this), 1000, false);
-    this._setDescription = this._debounce(this._setDescription.bind(this), 1000, false);
+    this._setSummary = throttle(this._setSummary, 1000, this);
+    this._setDescription = throttle(this._setDescription, 1000, this);
   }
 
   updated(changedProperties) {
@@ -176,7 +177,6 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
     store.dispatch.maps.saveTopic(card);
     window.setTimeout(function (subject, chapter, navigateAfterSafe) {
       if (navigateAfterSafe) {
-        // @ts-ignore
         store.dispatch.routing.replace(navigateAfterSafe);
       }
       else
@@ -195,22 +195,6 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
 
   _setDescription() {
     this._description = this._descriptionTextArea.value;
-  }
-
-  _debounce(func, wait, immediate) {
-    var timeout;
-    return function (...args) {
-      // @ts-ignore
-      var context = this;
-      var later = function () {
-        timeout = null;
-        if (!immediate) func.apply(context, args);
-      };
-      var callNow = immediate && !timeout;
-      clearTimeout(timeout);
-      timeout = setTimeout(later, wait);
-      if (callNow) func.apply(context, args);
-    }
   }
 
   _addAttachment() {

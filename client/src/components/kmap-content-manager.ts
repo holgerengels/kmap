@@ -30,8 +30,7 @@ export class KMapContentManager extends connect(store, LitElement) {
   // @ts-ignore
   private _textfield: TextField;
 
-  // @ts-ignore
-  firstUpdated(changedProperties) {
+  firstUpdated() {
     this._bar.scrollTarget = this._content;
   }
 

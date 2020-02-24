@@ -26,8 +26,7 @@ export class KMapKnowledgeCard extends connect(store, LitElement) {
   @property({type: String})
   private chapter: string = '';
   @property({type: Object})
-  // @ts-ignore // TODO
-  private card: Card = {};
+  private card?: Card;
   @property({type: Number})
   private state: number = 0;
   @property({type: Number})
@@ -79,7 +78,7 @@ export class KMapKnowledgeCard extends connect(store, LitElement) {
       this.divideAttachments(this.card ? this.card.attachments : []);
 
     if (changedProperties.has("card") || changedProperties.has("_topics"))
-      this._hasTests = this._topics.includes(this.chapter + "." + this.card.topic);
+      this._hasTests = this.card !== undefined && this._topics.includes(this.chapter + "." + this.card.topic);
   }
 
   _colorize(rate) {
@@ -92,58 +91,59 @@ export class KMapKnowledgeCard extends connect(store, LitElement) {
     this._colorStyles = { "--color-rated":  _opaque, "--color-unrated": _lightest };
   }
 
-    _rated(e) {
-        let key = this.chapter + "." + this.card.topic;
-        this.dispatchEvent(new CustomEvent('rated', { bubbles: true, composed: true, detail: {key: key, rate: e.detail.rate}}));
+  _rated(e) {
+    if (this.card === undefined) return;
+    let key = this.chapter + "." + this.card.topic;
+    this.dispatchEvent(new CustomEvent('rated', { bubbles: true, composed: true, detail: {key: key, rate: e.detail.rate}}));
+  }
+
+  _rating(state) {
+    if (this.card !== undefined && state.states && state.states.state) {
+      let key = this.chapter + "." + this.card.topic;
+      this.state = this._getStateValue(state, key);
+      this.progressNum = this._getStateValue(state, key + "*");
+      this.progressOf = this._getStateValue(state, key + "#");
+    }
+    else {
+      this.state = 0;
+      this.progressNum = 0;
+      this.progressOf = 0;
     }
 
-    _rating(state) {
-        if (state.states && state.states.state) {
-            let key = this.chapter + "." + this.card.topic;
-            this.state = this._getStateValue(state, key);
-            this.progressNum = this._getStateValue(state, key + "*");
-            this.progressOf = this._getStateValue(state, key + "#");
-        }
-        else {
-            this.state = 0;
-            this.progressNum = 0;
-            this.progressOf = 0;
-        }
+    this._colorize(this.state);
+  }
 
-        this._colorize(this.state);
-    }
+  _getStateValue(state, key) {
+    var value = state.states.state[key];
+    return value !== undefined ? value : 0;
+  }
 
-    _getStateValue(state, key) {
-        var value = state.states.state[key];
-        return value !== undefined ? value : 0;
+  divideAttachments(attachments) {
+    var explanations: Attachment[] = [];
+    var examples: Attachment[] = [];
+    var usages: Attachment[] = [];
+    var ideas: Attachment[] = [];
+    var exercises: Attachment[] = [];
+    if (attachments) {
+      for (let attachment of attachments) {
+        if (attachment.tag === "explanation")
+          explanations.push(attachment);
+        if (attachment.tag === "example")
+          examples.push(attachment);
+        if (attachment.tag === "usage")
+          usages.push(attachment);
+        if (attachment.tag === "idea")
+          ideas.push(attachment);
+        else if (attachment.tag === "exercise")
+          exercises.push(attachment);
+      }
     }
-
-    divideAttachments(attachments) {
-        var explanations: Attachment[] = [];
-        var examples: Attachment[] = [];
-        var usages: Attachment[] = [];
-        var ideas: Attachment[] = [];
-        var exercises: Attachment[] = [];
-        if (attachments) {
-            for (let attachment of attachments) {
-                if (attachment.tag === "explanation")
-                    explanations.push(attachment);
-                if (attachment.tag === "example")
-                    examples.push(attachment);
-                if (attachment.tag === "usage")
-                    usages.push(attachment);
-                if (attachment.tag === "idea")
-                    ideas.push(attachment);
-                else if (attachment.tag === "exercise")
-                    exercises.push(attachment);
-            }
-        }
-        this._explanations = explanations;
-        this._examples = examples;
-        this._usages = usages;
-        this._ideas = ideas;
-        this._exercises = exercises;
-    }
+    this._explanations = explanations;
+    this._examples = examples;
+    this._usages = usages;
+    this._ideas = ideas;
+    this._exercises = exercises;
+  }
 
   _feedback() {
     this._feedbackDialog.show();
@@ -215,7 +215,11 @@ export class KMapKnowledgeCard extends connect(store, LitElement) {
   }
 
   render() {
-    return html`
+    // language=CSS
+    if (this.card === undefined)
+      return html`card undefined`;
+    else
+      return html`
   <div class="card-header font-body">
       <span>${this.card.topic !== "_" ? this.card.topic : this.chapter}</span>
       <div style="flex: 1 0 auto"></div>

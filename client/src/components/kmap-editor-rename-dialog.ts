@@ -43,9 +43,7 @@ export class KMapEditorRenameDialog extends connect(store, LitElement) {
     if (!this._card)
       return;
 
-    const card: Card = this._card;
-
-    // @ts-ignore
+    const card: Card | any = this._card;
     card.newName = this._newName;
 
     store.dispatch.maps.renameTopic(card);

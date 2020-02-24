@@ -96,7 +96,6 @@ export class KmapTestChooser extends connect(store, LitElement) {
   }
 
   _start() {
-    // @ts-ignore
     store.dispatch.routing.replace(`/app/test/${[this._subject, ...this._chapter.split('.')].join('/')}`);
   }
 

@@ -1,4 +1,4 @@
-import {LitElement, html, css, customElement, property} from 'lit-element';
+import {css, customElement, html, LitElement, property} from 'lit-element';
 import {urls} from '../urls';
 
 import '@material/mwc-icon';
@@ -11,8 +11,7 @@ export class KMapKnowledgeCardAttachment extends LitElement {
   @property()
   private _supportsDownload: boolean = !(/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream);
   @property({type: Object})
-  // @ts-ignore // TODO
-  private attachment: Attachment = {};
+  private attachment?: Attachment;
   @property()
   private _handler: string = '';
   @property()
@@ -23,12 +22,11 @@ export class KMapKnowledgeCardAttachment extends LitElement {
   private _isTarget?: string = undefined;
 
   updated(changedProperties) {
-    if (changedProperties.has("attachment")) {
-      let attachment: Attachment = this.attachment;
-      this._handler = attachment.type === "application/vnd.geogebra.file" ? "/geogebra.html?path=" + urls.server : "";
-      this._mimeIcon = this.mimeIcon(attachment.type);
-      this._isDownload = attachment.type !== "link" && attachment.type !== "text/html" && this._supportsDownload ? attachment.name : undefined;
-      this._isTarget = attachment.type === "link" || attachment.type === "text/html" || !this._supportsDownload ? "_blank" : undefined;
+    if (changedProperties.has("attachment") && this.attachment) {
+      this._handler = this.attachment.type === "application/vnd.geogebra.file" ? "/geogebra.html?path=" + urls.server : "";
+      this._mimeIcon = this.mimeIcon(this.attachment.type);
+      this._isDownload = this.attachment.type !== "link" && this.attachment.type !== "text/html" && this._supportsDownload ? this.attachment.name : undefined;
+      this._isTarget = this.attachment.type === "link" || this.attachment.type === "text/html" || !this._supportsDownload ? "_blank" : undefined;
     }
   }
 
@@ -91,9 +89,11 @@ export class KMapKnowledgeCardAttachment extends LitElement {
   }
 
   // TODO spread
-  // TODO rel
   _renderAttachment() {
-    if (this.attachment.type === "link")
+    if (this.attachment === undefined) {
+      return html `attachment undefined`;
+    }
+    else if (this.attachment.type === "link")
       return html `
             <a href="${this.attachment.href}" target="_blank" rel="external noopener">${this.attachment.name}</a>
         `;

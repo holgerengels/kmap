@@ -50,8 +50,8 @@ export interface MapState {
   allTopics?: AllTopics,
   loadingAllTopics: boolean,
   cardForEdit?: Card,
-  cardForRename?: Card,
-  cardForDelete?: Card,
+  cardForRename?: Partial<Card>,
+  cardForDelete?: Partial<Card>,
 }
 
 export default createModel({
@@ -147,13 +147,13 @@ export default createModel({
     unsetCardForEdit(state) {
       return { ...state, cardForEdit: undefined }
     },
-    setCardForRename(state, cardForRename: Card) {
+    setCardForRename(state, cardForRename: Partial<Card>) {
       return { ...state, cardForRename: cardForRename }
     },
     unsetCardForRename(state) {
       return { ...state, cardForRename: undefined }
     },
-    setCardForDelete(state, cardForDelete: Card) {
+    setCardForDelete(state, cardForDelete: Partial<Card>) {
       return { ...state, cardForDelete: cardForDelete }
     },
     unsetCardForDelete(state) {

@@ -97,8 +97,7 @@ export class KMapTestEditorAddFabs extends connect(store, LitElement) {
   }
 
   _ok() {
-    let test: Test = {
-      // @ts-ignore
+    let test: Test | any = {
       added: true,
       subject: this._subject,
       set: this._set,

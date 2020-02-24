@@ -53,8 +53,9 @@ export class KMapTestResultCard extends connect(store, LitElement) {
   }
 
   _rating() {
+    if (this.card === undefined) return;
+
     if (this._rateModified && this._states && Object.keys(this._states).length !== 0) {
-      // @ts-ignore
       let key = this.card.chapter + "." + this.card.topic;
       this._state = this._getStateValue(key);
     }

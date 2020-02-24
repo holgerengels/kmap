@@ -65,7 +65,6 @@ export class KMapLoginPopup extends connect(store, LitElement) {
   }
 
   _login() {
-    // @ts-ignore
     store.dispatch.app.login({ userid: this._loginId.value, password: this._loginPassword.value });
   }
 

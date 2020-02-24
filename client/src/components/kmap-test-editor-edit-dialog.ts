@@ -18,6 +18,7 @@ import './kmap-knowledge-card-description';
 import {Test} from "../models/tests";
 import {Dialog} from "@material/mwc-dialog/mwc-dialog";
 import {TextArea} from "@material/mwc-textarea/mwc-textarea";
+import {throttle} from "../debounce";
 
 @customElement('kmap-test-editor-edit-dialog')
 export class KMapTestEditorEditDialog extends connect(store, LitElement) {
@@ -84,8 +85,8 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
 
   constructor() {
     super();
-    this._setQuestion = this._debounce(this._setQuestion.bind(this), 1000, false);
-    this._setAnswer = this._debounce(this._setAnswer.bind(this), 1000, false);
+    this._setQuestion = throttle(this._setQuestion, 1000, this);
+    this._setAnswer = throttle(this._setAnswer, 1000, this);
   }
 
   updated(changedProperties) {
@@ -185,22 +186,6 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
 
   _setAnswer() {
     this._answer = this._answerTextArea.value;
-  }
-
-  _debounce(func, wait, immediate) {
-    var timeout;
-    return function (...args) {
-      // @ts-ignore
-      var context = this;
-      var later = function () {
-        timeout = null;
-        if (!immediate) func.apply(context, args);
-      };
-      var callNow = immediate && !timeout;
-      clearTimeout(timeout);
-      timeout = setTimeout(later, wait);
-      if (callNow) func.apply(context, args);
-    }
   }
 
   _createDirectory() {

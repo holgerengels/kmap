@@ -26,7 +26,6 @@ export class KMapCourseSelector extends connect(store, LitElement) {
 
   mapState(state: State) {
     return {
-      // @ts-ignore
       _courses: state.courses.courses,
     };
   }

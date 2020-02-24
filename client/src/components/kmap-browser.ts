@@ -93,8 +93,7 @@ export class KMapBrowser extends connect(store, LitElement) {
         this._topicCard = this._chapterCard;
       }
       else if (this._topic && this._lines) {
-        // @ts-ignore
-        let lala: Card = {};
+        let lala: Card | undefined = undefined;
         for (let line of this._lines) {
           for (let card of line.cards) {
             if (card.topic === this._topic)

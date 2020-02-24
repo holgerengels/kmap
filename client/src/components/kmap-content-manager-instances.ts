@@ -76,8 +76,8 @@ export class KMapContentManagerInstances extends connect(store, LitElement) {
   }
 
   _drop() {
+    if (this._selected === undefined) return;
     console.log("drop instance");
-    // @ts-ignore
     store.dispatch.instances.drop(this._selected);
   }
 

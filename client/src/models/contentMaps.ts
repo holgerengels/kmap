@@ -97,7 +97,7 @@ export default createModel({
           dispatch.contentMaps.error);
       }
     },
-    async import(files: File[]) {
+    async import(files: FileList) {
       const dispatch = store.dispatch();
       const state = store.getState();
 

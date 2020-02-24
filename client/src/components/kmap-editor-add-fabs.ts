@@ -133,8 +133,7 @@ export class KMapEditorAddFabs extends connect(store, LitElement) {
   }
 
   _ok() {
-    let card: Card = {
-      // @ts-ignore
+    let card: Card | any = {
       added: true,
       subject: this._subject,
       module: this._module,

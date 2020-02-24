@@ -266,7 +266,7 @@ export class KmapMain extends connect(store, LitElement) {
     ]</span>
     <div class="drawer-content">
       <nav class="drawer-list">
-        <a ?selected="${this._page === 'home'}" href="/app">Home</a>
+        <a ?selected="${this._page === 'home'}" href="/app/">Home</a>
         <a ?selected="${this._page === 'browser'}" href="/app/browser/${this._path}" ?disabled="${!this._path}">Browser</a>
         <a ?selected="${this._page === 'test'}" href="/app/test">Test</a>
         <a ?selected="${this._page === 'courses'}" ?disabled="${!this._roles.includes("teacher")}" href="/app/courses">Kurse</a>
