@@ -13,6 +13,7 @@
     "noEmitHelpers": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
+    "optionalChaining": true,
     "lib": ["esnext", "dom", "dom.iterable"],
     "baseUrl": "src",
     "allowJs": true
