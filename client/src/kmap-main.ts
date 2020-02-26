@@ -278,7 +278,7 @@ export class KmapMain extends connect(store, LitElement) {
       </nav>
       <hr/>
       <nav class="drawer-list">
-        <label section>Layer ein-/ausblenden</label>
+        <label section>Layer ein-/ausblenden</label><br/>
         <mwc-button @click="${() => this._toggleLayer('summaries')}" icon="short_text" outlined ?raised="${this._layers.includes('summaries')}">Kurztexte</mwc-button>
         <mwc-button @click="${() => this._toggleLayer('averages')}" icon="group_work" outlined ?raised="${this._layers.includes('averages')}" ?disabled="${!this._roles.includes("teacher")}" title="Erfordert die Rolle 'Lehrer'">Mittelwerte</mwc-button>
         ${this._layers.includes('averages') ? html`<kmap-course-selector></kmap-course-selector>` : ''}

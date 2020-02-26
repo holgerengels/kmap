@@ -61,10 +61,10 @@ a[disabled] {
 
 // language=CSS
 export const colorStyles: CSSResult = css`
-h1, h2, h3, h4, p, th, td, label, .color-content-text, :host {
+h1, h2, h3, h4, p, th, td, .color-content-text, :host {
   color: var(--color-darkgray);
 }
-.secondary {
+.secondary, label {
   color: var(--color-mediumgray);
 }
 `;
