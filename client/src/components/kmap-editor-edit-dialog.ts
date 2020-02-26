@@ -141,9 +141,9 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
     }
     if (changedProperties.has("_cloudPath")) {
       if (this._cloudPath) {
-        store.dispatch.cloud.forgetPath();
         console.log(this._cloudPath);
-        //window.open(this._cloudPath, '_blank');
+        window.open(this._cloudPath, '_blank');
+        store.dispatch.cloud.forgetPath();
       }
     }
   }
