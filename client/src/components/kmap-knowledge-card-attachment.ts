@@ -99,12 +99,12 @@ export class KMapKnowledgeCardAttachment extends LitElement {
         `;
     else if (this._handler && this._isTarget)
       return html `
-            <a href="${this._handler}${this.attachment.href}" target="_blank" rel="external noopener">${this.attachment.name}&nbsp;<mwc-icon>open_in_new</mwc-icon></a>
+            <a href="${this._handler}${this.attachment.href}?instance=${this.instance}" target="_blank" rel="external noopener">${this.attachment.name}&nbsp;<mwc-icon>open_in_new</mwc-icon></a>
             <a href="${urls.server}${this.attachment.href}?instance=${this.instance}" download="${this._isDownload}" target="${this._isTarget}"><mwc-icon>cloud_download</mwc-icon></a>
         `;
     else if (this._handler)
       return html `
-            <a href="${this._handler}${this.attachment.href}" target="_blank" rel="external noopener">${this.attachment.name}&nbsp;<mwc-icon>open_in_new</mwc-icon></a>
+            <a href="${this._handler}${this.attachment.href}?instance=${this.instance}" target="_blank" rel="external noopener">${this.attachment.name}&nbsp;<mwc-icon>open_in_new</mwc-icon></a>
             <a href="${urls.server}${this.attachment.href}?instance=${this.instance}" download="${this._isDownload}"><mwc-icon>cloud_download</mwc-icon></a>
         `;
     else if (this._isDownload && this._isTarget)
