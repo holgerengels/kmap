@@ -41,7 +41,7 @@
         var urlParams = new URLSearchParams(window.location.search);
         parameters.appName = urlParams.get("app");
         if (parameters.appName == null)
-            parameters.appName = "graphing";
+            parameters.appName = "classic";
         var path = urlParams.get("path");
         var request = new XMLHttpRequest();
         request.open("GET", path, true);
