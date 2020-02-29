@@ -20,12 +20,22 @@ export interface Card {
   col?: number,
   summary: string,
   description: string,
+  thumb?: string;
   links?: string,
   depends?: string[],
   priority?: number,
   attachments: Attachment[];
   annotations?: string,
 }
+const defaults: object = {
+  summary: '',
+  description: '',
+  thumb: '',
+  links: '',
+  depends: [],
+  attachments: []
+};
+
 export interface Line {
   cards: Card[],
 }
@@ -79,7 +89,7 @@ export default createModel({
     },
 
     unselectCard(state) {
-      return { ...state, selected: "" }
+      return { ...state, selected: "", selectedDependencies: [] }
     },
 
     request(state) {
@@ -142,7 +152,14 @@ export default createModel({
     },
 
     setCardForEdit(state, cardForEdit: Card) {
-      return { ...state, cardForEdit: cardForEdit }
+      return {
+        ...state, cardForEdit: {
+          ...defaults,
+          subject: state.subject,
+          chapter: state.chapter,
+          ...cardForEdit
+        }
+      }
     },
     unsetCardForEdit(state) {
       return { ...state, cardForEdit: undefined }
@@ -183,6 +200,7 @@ export default createModel({
       fetchjson(`${urls.server}data?subject=${path.subject}&load=${path.chapter}`, endpoint.get(state),
         (json) => {
           dispatch.maps.received(json);
+          dispatch.maps.unselectCard();
           if (path.subject !== oldSubject) {
             dispatch.maps.subjectChanged();
           }

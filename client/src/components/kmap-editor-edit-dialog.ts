@@ -29,6 +29,8 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
   @property()
   private _description: string = '';
   @property()
+  private _thumb: string = '';
+  @property()
   private _showSummaryPreview: boolean = false;
   @property()
   private _showDescriptionPreview: boolean = false;
@@ -63,7 +65,6 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
   // @ts-ignore
   private _descriptionTextArea: TextArea;
 
-
   mapState(state: State) {
     return {
       _card: state.maps.cardForEdit,
@@ -80,33 +81,19 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
 
   updated(changedProperties) {
     if (changedProperties.has('_card') && this._card) {
-      if (!this._card.subject)
-        this._card.subject = store.state.maps.subject;
-      if (!this._card.chapter)
-        this._card.chapter = store.state.maps.chapter;
 
       this._navigateAfterSave = store.state.maps.subject !== this._card.subject || store.state.maps.chapter !== this._card.chapter
         ? "/app/browser/" + this._card.subject + "/" + this._card.chapter
         : undefined;
-
-      if (!this._card.summary)
-        this._card.summary = '';
-      if (!this._card.description)
-        this._card.description = '';
-      if (!this._card.links)
-        this._card.links = '';
-      if (!this._card.depends)
-        this._card.depends = [];
-      if (!this._card.attachments)
-        this._card.attachments = [];
 
       this._attachmentTag = '';
       this._attachmentName = '';
       this._attachmentHref = '';
       this._summary = this._card.summary;
       this._description = this._card.description;
-      this._depends = this._card.depends.join(", ");
-      this._links = this._card.links;
+      this._thumb = this._card.thumb || '';
+      this._depends = this._card.depends ? this._card.depends.join(", ") : '';
+      this._links = this._card.links || '';
       this._priority = this._card.priority !== undefined ? this._card.priority + '' : '';
       this._syncAttachments();
 
@@ -137,7 +124,7 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
       }
 
       this._card.attachments = attachments;
-      this.requestUpdate();
+      //this.requestUpdate();
     }
     if (changedProperties.has("_cloudPath")) {
       if (this._cloudPath) {
@@ -169,6 +156,7 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
     const card: Card = this._card;
     card.summary = this._summary;
     card.description = this._description;
+    card.thumb = this._thumb;
     card.depends = this._depends.split(",").map(d => d.trim()).filter(d => d.length > 0);
     card.links = this._links;
     card.priority = this._priority !== '' ? parseInt(this._priority) : undefined;
@@ -369,7 +357,9 @@ ${this._card ? html`
     <br/>
     <mwc-textfield ?hidden="${this._card.topic === '_'}" id="links" name="links" label="Verweist auf ..." dense type="text" .value="${this._links}" @change="${e => this._links = e.target.value}"></mwc-textfield>
     <mwc-textfield ?hidden="${this._card.topic === '_'}" id="priority" name="priority" label="Priorität" dense type="number" inputmode="numeric" min="0" step="1" .value="${this._priority}" @change="${e => this._priority = e.target.value}"></mwc-textfield>
-    <mwc-textarea ?hidden="${this._card.topic === '_'}" ?dialogInitialFocus="${this._card.topic !== '_'}" id="depends" placeholder="Basiert auf ..." dense fullwidth rows="2" .value=${this._depends} @change="${e => this._depends = e.target.value}"></mwc-textarea>
+    <br/>
+    <mwc-textfield ?hidden="${this._card.topic === '_'}" ?dialogInitialFocus="${this._card.topic !== '_'}" id="depends" label="Basiert auf ..." dense style="width: 470px" .value=${this._depends} @change="${e => this._depends = e.target.value}"></mwc-textfield>
+    <mwc-textfield ?hidden="${this._card.topic === '_'}" id="thumb" label="Thumbnail" dense .value=${this._thumb} @change="${e => this._thumb = e.target.value}"></mwc-textfield>
     <mwc-textarea id="summary" placeholder="Kurztext" ?dialogInitialFocus="${this._card.topic === '_'}" dense fullwidth rows="2" .value=${this._card.summary} @keyup="${this._setSummary}" @focus="${this._focus}" @blur="${this._focus}"></mwc-textarea>
     <mwc-textarea id="description" placeholder="Langtext" dense fullwidth rows="9" .value=${this._card.description} @keyup="${this._setDescription}" @focus="${this._focus}" @blur="${this._focus}"></mwc-textarea>
 

@@ -172,6 +172,7 @@ public class Couch extends Server {
                         existing.add("depends", changed.get("depends"));
                         existing.add("priority", changed.get("priority"));
                         existing.add("description", changed.get("description"));
+                        existing.add("thumb", changed.get("thumb"));
                         existing.add("summary", changed.get("summary"));
                         existing.add("attachments", changed.get("attachments"));
                         if (checks(changed))
@@ -258,6 +259,7 @@ public class Couch extends Server {
                 node.setModule(string(topic, "module"));
                 node.setDescription(string(topic, "description"));
                 node.setSummary(string(topic, "summary"));
+                node.setThumb(string(topic, "thumb"));
                 node.setPriority(integer(topic, "priority"));
                 node.setLinks(string(topic, "links"));
                 node.setAttachments((JsonArray)topic.get("attachments"));
@@ -328,6 +330,7 @@ public class Couch extends Server {
             card.addProperty("col", node.getColumn());
             addProperty(card, "description", node.getDescription());
             addProperty(card, "summary", node.getSummary());
+            addProperty(card, "thumb", node.getThumb());
             addProperty(card, "links", node.getLinks());
             add(card, "attachments", node.getAttachments());
             cloudLinks(node.getAttachments(), subject, name, node.getTopic());

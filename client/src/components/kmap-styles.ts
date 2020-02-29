@@ -67,6 +67,9 @@ h1, h2, h3, h4, p, th, td, .color-content-text, :host {
 .secondary, label {
   color: var(--color-mediumgray);
 }
+hr {
+  border: 1px solid var(--color-mediumgray);
+}
 `;
 
 // language=CSS

@@ -18,6 +18,7 @@ public class Node {
     private String links;
     private String description;
     private String summary;
+    private String thumb;
     private JsonArray attachments;
     private List<String> annotations = new ArrayList<>();
 
@@ -107,6 +108,14 @@ public class Node {
 
     public void setSummary(String summary) {
         this.summary = summary;
+    }
+
+    public String getThumb() {
+        return thumb;
+    }
+
+    public void setThumb(String thumb) {
+        this.thumb = thumb;
     }
 
     public JsonArray getAttachments() {
