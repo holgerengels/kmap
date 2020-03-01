@@ -98,7 +98,7 @@ export class KmapMain extends connect(store, LitElement) {
       _layers: state.shell.layers,
       _metaTitle: state.shell.title,
       _metaDescription: state.shell.description,
-      _drawerOpen: state.shell.drawerOpen,
+      //_drawerOpen: state.shell.drawerOpen,
       _narrow: state.shell.narrow,
       _messages: state.shell.messages,
     };
