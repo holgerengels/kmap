@@ -142,9 +142,11 @@ export class KMapSummaryCard extends connect(store, LitElement) {
           display: inline-block;
           box-sizing: border-box;
           width: 300px;
-          min-height: 134px;
           border-radius: 4px;
           color: var(--color-darkgray);
+        }
+        div.card[thumb] {
+          min-height: 134px;
         }
         div.card[selected] {
           filter: saturate(1.5) brightness(1);
@@ -174,7 +176,7 @@ export class KMapSummaryCard extends connect(store, LitElement) {
         .card-header span, .card-footer span { align-self: center; }
         .card-header a, .card-footer a { height: 24px; color: black; display: block }
         .card-footer a { color: var(--color-darkgray); }
-        kmap-summary-card-summary {
+        div.card[thumb] > kmap-summary-card-summary {
           height: 54px;
         }
       `];
@@ -186,7 +188,11 @@ export class KMapSummaryCard extends connect(store, LitElement) {
       return html`card undefined`;
     else
       return html`
-<div class="${classMap({"card": true, "elevation-02": !this.selected && !this.highlighted, "elevation-05": this.selected || this.highlighted})}" style=${ifDefined(this._thumbStyles ? styleMap(this._thumbStyles) : undefined)} @click="${this._clicked}" ?selected="${this.selected}" ?highlighted="${this.highlighted}">
+<div
+    class="${classMap({"card": true, "elevation-02": !this.selected && !this.highlighted, "elevation-05": this.selected || this.highlighted})}"
+    style=${ifDefined(this._thumbStyles ? styleMap(this._thumbStyles) : undefined)}
+    ?thumb="${this.card.thumb}"
+    @click="${this._clicked}" ?selected="${this.selected}" ?highlighted="${this.highlighted}">
   <mwc-ripple id="ripple"></mwc-ripple>
   <div class="card-header font-body">
     <span>${this.card.topic}</span>
