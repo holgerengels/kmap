@@ -21,6 +21,7 @@ export default deepmerge(config, {
   plugins: [
     indexHTML({
       polyfills: {
+        dynamicImport: true,
         customPolyfills: [
           {
             name: 'event-target',
