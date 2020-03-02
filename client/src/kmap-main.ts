@@ -116,12 +116,11 @@ export class KmapMain extends connect(store, LitElement) {
       }
       else if (cookie) {
         console.log("instance from cookie .. " + cookie);
-        document.cookie = "instance=" + cookie + "; path=/; expires=0";
+        document.cookie = "instance=" + cookie + "; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
         store.dispatch.app.chooseInstance(cookie);
       }
       else {
         if (!store.state.app.instance) {
-          //requestAnimationFrame(() => this._instancePopup.show());
           store.dispatch.app.chooseInstance("root");
         }
       }
