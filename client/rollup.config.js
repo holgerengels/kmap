@@ -25,12 +25,12 @@ export default deepmerge(config, {
         customPolyfills: [
           {
             name: 'event-target',
-            test: "EventTarget === undefined || EventTarget.constructor === undefined",
+            test: "!('EventTarget' in window) || !('constructor' in window.ResizeObserver.prototype)",
             path: require.resolve('event-target/min.js'),
           },
           {
             name: 'resize-observer',
-            test: "ResizeObserver === undefined",
+            test: "!('ResizeObserver' in window)",
             path: require.resolve('resize-observer-polyfill/dist/ResizeObserver.js'),
           },
         ],
