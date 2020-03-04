@@ -119,7 +119,7 @@ export class KMapBrowser extends connect(store, LitElement) {
       }
     }
 
-    if (changedProperties.has("_topicCard")) {
+    if (changedProperties.has("_topicCard") || changedProperties.has("_chapterCard")) {
       this._page = this._topicCard ? "topic" : "map";
 
       if (this._topicCard) {
@@ -128,7 +128,7 @@ export class KMapBrowser extends connect(store, LitElement) {
       else {
         store.dispatch.shell.updateMeta({
           title: this._chapter,
-          description: this._chapterCard ? this._chapterCard.summary : "Wissenslandkarte zum Kapitel " + this._chapter
+          description: this._chapterCard && this._chapterCard.summary ? this._chapterCard.summary : "Wissenslandkarte zum Kapitel " + this._chapter
         });
       }
     }
