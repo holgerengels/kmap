@@ -486,7 +486,7 @@ public class Couch extends Server {
         }
     }
 
-    private void fixAttachments(JsonArray array, String subject, String chapter, String topic) {
+    void fixAttachments(JsonArray array, String subject, String chapter, String topic) {
         if (array == null)
             return;
 

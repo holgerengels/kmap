@@ -141,13 +141,13 @@ public class ContentManager extends Server
                 JsonObject object = couch.getGson().fromJson(json, JsonObject.class);
                 subject = string(object, "subject");
                 module = string(object, "module");
-                couch.importModule(subject, module, json);
                 JsonArray docs = object.getAsJsonArray("docs");
                 for (JsonElement doc : docs) {
                     JsonObject topicObject = (JsonObject)doc;
                     String chapter = string(topicObject, "chapter");
                     String topic = string(topicObject, "topic");
                     JsonArray array = topicObject.getAsJsonArray("attachments");
+                    couch.fixAttachments(array, subject, chapter, topic);
                     if (array != null) {
                         for (JsonElement element : array) {
                             JsonObject attachment = (JsonObject)element;
@@ -159,6 +159,7 @@ public class ContentManager extends Server
                         }
                     }
                 }
+                couch.importModule(subject, module, object.toString());
             }
             else {
                 String[] dirs = zipEntry.getName().split("/");
