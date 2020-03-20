@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.util.Properties;
 
 public class JsonServlet extends HttpServlet {
-    //protected final String cors_url = "http://localhost:8080";
     protected Properties properties;
     protected Authentication authentication;
 
@@ -29,11 +28,6 @@ public class JsonServlet extends HttpServlet {
         }
     }
 
-    @Override
-    protected void doOptions(HttpServletRequest request, HttpServletResponse resp) {
-        corsHeaders(request, resp);
-    }
-
     protected String getProperty(String key) {
         String value = properties.getProperty(key);
         if (value == null)
@@ -41,14 +35,22 @@ public class JsonServlet extends HttpServlet {
         return value;
     }
 
+    @Override
+    protected void doOptions(HttpServletRequest request, HttpServletResponse resp) {
+        newSessionHeader(request, resp);
+        corsHeaders(request, resp);
+    }
+
     static protected void writeResponse(HttpServletRequest request, HttpServletResponse resp, JsonElement object) throws IOException {
+        newSessionHeader(request, resp);
+        corsHeaders(request, resp);
         resp.setContentType("application/json");
         resp.setCharacterEncoding("utf-8");
-        corsHeaders(request, resp);
         resp.getWriter().print(object.toString());
     }
 
     static void sendError(HttpServletRequest req, HttpServletResponse resp, Exception e) {
+        newSessionHeader(req, resp);
         corsHeaders(req, resp);
         resp.setStatus(500);
         resp.setContentType("text/plain");
@@ -62,6 +64,7 @@ public class JsonServlet extends HttpServlet {
     }
 
     static void sendError(HttpServletRequest req, HttpServletResponse resp, int status, String message) {
+        newSessionHeader(req, resp);
         corsHeaders(req, resp);
         resp.setStatus(status);
         resp.setContentType("text/plain");
@@ -71,6 +74,13 @@ public class JsonServlet extends HttpServlet {
         }
         catch (IOException ex) {
             ex.printStackTrace();
+        }
+    }
+
+    static void newSessionHeader(HttpServletRequest request, HttpServletResponse resp) {
+        if (request.getSession().isNew()) {
+            resp.setHeader("Access-Control-Expose-Headers","X-New-Session");
+            resp.setHeader("X-New-Session", "" + request.getSession().getMaxInactiveInterval());
         }
     }
 

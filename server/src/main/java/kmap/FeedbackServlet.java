@@ -81,12 +81,4 @@ public class FeedbackServlet
             Server.CLIENT.remove();
         }
     }
-
-    @Deprecated
-    protected void writeObject(HttpServletRequest request, HttpServletResponse resp, String node) throws IOException {
-        resp.setContentType("application/json");
-        resp.setCharacterEncoding("utf-8");
-        corsHeaders(request, resp);
-        resp.getWriter().print(node);
-    }
 }

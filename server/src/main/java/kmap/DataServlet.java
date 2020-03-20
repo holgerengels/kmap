@@ -2,6 +2,7 @@ package kmap;
 
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.apache.commons.io.IOUtils;
 
@@ -44,43 +45,43 @@ public class DataServlet
                 log("subjects");
                 JsonArray result = couch.loadSubjects();
                 if (result != null)
-                    writeObject(req, resp, result.toString());
+                    writeResponse(req, resp, result);
             }
             else if (load != null) {
                 log("load " + subject + " - " + load);
                 JsonObject board = couch.chapter(subject, load);
                 if (board != null)
-                    writeObject(req, resp, board.toString());
+                    writeResponse(req, resp, board);
             }
             else if (search != null) {
                 log("search = " + search);
                 JsonArray result = couch.search(search);
                 if (result != null)
-                    writeObject(req, resp, result.toString());
+                    writeResponse(req, resp, result);
             }
             else if (dependencies != null) {
                 log("dependencies = " + dependencies);
                 JsonObject result = couch.dependencies(subject);
                 if (result != null)
-                    writeObject(req, resp, result.toString());
+                    writeResponse(req, resp, result);
             }
             else if (tree != null) {
                 log("tree = " + tree);
                 JsonArray result = couch.tree(subject);
                 if (result != null)
-                    writeObject(req, resp, result.toString());
+                    writeResponse(req, resp, result);
             }
             else if (chapters != null) {
                 log("chapters = " + chapters);
                 JsonArray result = couch.chapters(subject);
                 if (result != null)
-                    writeObject(req, resp, result.toString());
+                    writeResponse(req, resp, result);
             }
             else if (topics != null) {
                 log("topics = " + topics);
                 JsonArray result = "all".equals(topics) ? couch.topics(subject) : couch.topics(subject, topics);
                 if (result != null)
-                    writeObject(req, resp, result.toString());
+                    writeResponse(req, resp, result);
             }
             else if (file != null) {
                 log("load file = " + file);
@@ -131,13 +132,5 @@ public class DataServlet
             e.printStackTrace();
             throw new RuntimeException(e);
         }
-    }
-
-    @Deprecated
-    protected void writeObject(HttpServletRequest request, HttpServletResponse resp, String node) throws IOException {
-        resp.setContentType("application/json");
-        resp.setCharacterEncoding("utf-8");
-        corsHeaders(request, resp);
-        resp.getWriter().print(node);
     }
 }

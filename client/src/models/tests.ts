@@ -143,6 +143,7 @@ export default createModel({
         results: [],
         testForDelete: undefined,
         testForEdit: undefined,
+        topics: undefined,
       };
     },
 
@@ -200,7 +201,7 @@ export default createModel({
         return;
 
       // @ts-ignore
-      if (state.tests.subject !== subject || !state.tests.tests) {
+      if (!state.topics || state.topics.subject !== subject) {
         dispatch.tests.requestTopics();
         fetchjson(`${urls.server}tests?topics=all&subject=${subject}`, endpoint.get(state),
           (json) => {
@@ -247,7 +248,7 @@ export default createModel({
         return;
 
       // @ts-ignore
-      if (state.tests.subject !== payload.subject || state.tests.chapter !== payload.chapter || state.tests.topic !== payload.topic || !state.tests.tests) {
+      if (!state.tests || state.tests.subject !== payload.subject || state.tests.chapter !== payload.chapter || state.tests.topic !== payload.topic || !state.tests.tests) {
         dispatch.tests.requestTests();
         const url = payload.topic
           ? `${urls.server}tests?subject=${payload.subject}&chapter=${payload.chapter}&topic=${payload.topic}`
@@ -301,8 +302,6 @@ export default createModel({
     },
     'routing/change': async function(routing: RoutingState) {
       const dispatch = store.dispatch();
-      console.log(routing.page);
-      console.log(routing.params);
       switch (routing.page) {
         case 'test':
           dispatch.tests.loadTests({ subject: routing.params["subject"], chapter: routing.params["chapter"], topic: routing.params["topic"]});
@@ -314,6 +313,9 @@ export default createModel({
           else
             document.title = "KMap - Aufgaben wählen";
           break;
+        case 'browser':
+          dispatch.tests.loadTopics();
+          break;
       }
     },
     'app/chooseInstance': async function() {
@@ -322,6 +324,8 @@ export default createModel({
       const routing: RoutingState = state.routing;
       if (routing.page === 'test')
         dispatch.tests.loadTests({ subject: routing.params["subject"], chapter: routing.params["chapter"], topic: routing.params["topic"]});
+      else if (routing.page === 'browser')
+        dispatch.tests.loadTopics();
       else
         dispatch.tests.forget();
     },

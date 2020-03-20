@@ -47,7 +47,7 @@ export class KMapLoginPopup extends connect(store, LitElement) {
 
   updated(changedProps) {
     if (changedProps.has('_userid')) {
-      if (this._userid && !changedProps.get("_userid")) {
+      if (this._userid && !changedProps.get("_userid") && this._loginDialog.open) {
         this._loginDialog.close();
         store.dispatch.shell.showMessage("Du bist jetzt angemeldet!");
       }

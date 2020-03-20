@@ -2,7 +2,6 @@ package kmap;
 
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import org.apache.commons.io.IOUtils;
 
@@ -11,11 +10,8 @@ import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by holger on 09.05.16.
@@ -128,18 +124,20 @@ public class ContentManagerServlet
             if (instances != null) {
                 JsonArray result = contentManager.instances();
                 if (result != null)
-                    writeObject(req, resp, result.toString());
+                    writeResponse(req, resp, result);
             }
             else if (exportModule != null) {
                 log("export module " + subject + " - " + exportModule);
-                resp.setContentType("application/zip");
+                newSessionHeader(req, resp);
                 corsHeaders(req, resp);
+                resp.setContentType("application/zip");
                 contentManager.exportModule(subject, exportModule, resp.getOutputStream());
             }
             else if (exportSet != null) {
                 log("export set " + subject + " - " + exportSet);
-                resp.setContentType("application/zip");
+                newSessionHeader(req, resp);
                 corsHeaders(req, resp);
+                resp.setContentType("application/zip");
                 contentManager.exportSet(subject, exportSet, resp.getOutputStream());
             }
         }
@@ -150,13 +148,5 @@ public class ContentManagerServlet
         finally {
             Server.CLIENT.remove();
         }
-    }
-
-    @Deprecated
-    protected void writeObject(HttpServletRequest request, HttpServletResponse resp, String node) throws IOException {
-        resp.setContentType("application/json");
-        resp.setCharacterEncoding("utf-8");
-        corsHeaders(request, resp);
-        resp.getWriter().print(node);
     }
 }
