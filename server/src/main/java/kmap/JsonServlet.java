@@ -97,11 +97,6 @@ public class JsonServlet extends HttpServlet {
     String extractClient(HttpServletRequest request) {
         String client;
 
-        if ((client = request.getParameter("instance")) != null) {
-            System.out.println("instance from parameter = " + client);
-            return client;
-        }
-
         if ((client = getHeader(request, "X-Instance")) != null) {
             System.out.println("instance from header = " + client);
             return client;
@@ -114,6 +109,11 @@ public class JsonServlet extends HttpServlet {
                 client = client.substring(start + 1, end);
                 System.out.println("instance from referer = " + client);
             }
+        }
+
+        if ((client = request.getParameter("instance")) != null) {
+            System.out.println("instance from parameter = " + client);
+            return client;
         }
 
         System.out.println("instance not specified = lala");

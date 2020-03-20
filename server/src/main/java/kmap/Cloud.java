@@ -127,8 +127,11 @@ public class Cloud extends Server
         HttpGet get = new HttpGet(files + "/" + path);
         try (CloseableHttpResponse response = client.execute(get, context)) {
             StatusLine statusLine = response.getStatusLine();
+            if (statusLine.getStatusCode() == 200)
+                System.out.println("Load " + path + " from cloud");
+
             sender.accept(statusLine.getStatusCode() == 200
-                    ? new AttachmentInputStream(response.getEntity().getContent(), response.getEntity().getContentType().getValue(), response.getEntity().getContentLength())
+                    ? new AttachmentInputStream(response.getEntity().getContent(), dirs[dirs.length-1], response.getEntity().getContentType().getValue(), response.getEntity().getContentLength())
                     : new AttachmentInputStream(statusLine.getStatusCode(), statusLine.getReasonPhrase()));
         }
     }
@@ -172,7 +175,7 @@ public class Cloud extends Server
                     String fileName = fileName(element);
                     Integer fileSize = fileSize(element);
                     String fileType = fileType(element);
-                    fileType = MimeTypes.tweakMimeType(fileType, fileName);
+                    fileType = MimeTypes.guessType(fileName);
                     Attachment attachment = new Attachment(fileId, fileName, fileType, fileSize);
                     attachments.add(attachment);
                 }
@@ -496,8 +499,9 @@ public class Cloud extends Server
     }
 
     static class AttachmentInputStream {
-        public AttachmentInputStream(InputStream stream, String mimeType, long contentLength) {
+        public AttachmentInputStream(InputStream stream, String fileName, String mimeType, long contentLength) {
             this.stream = stream;
+            this.fileName = fileName;
             this.mimeType = mimeType;
             this.contentLength = contentLength;
             this.responseCode = 200;
@@ -510,7 +514,9 @@ public class Cloud extends Server
 
         int responseCode;
         String responseMessage;
+
         InputStream stream;
+        String fileName;
         String mimeType;
         long contentLength;
     }

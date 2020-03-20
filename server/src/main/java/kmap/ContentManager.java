@@ -30,6 +30,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+import static kmap.JSON.string;
+
 public class ContentManager extends Server
 {
     Cloud cloud;
@@ -51,6 +53,7 @@ public class ContentManager extends Server
             JsonObject object = (JsonObject) element;
             object.remove("_id");
             object.remove("_rev");
+            object.remove("_attachments");
         }
 
         JsonObject doc = new JsonObject();
@@ -62,21 +65,21 @@ public class ContentManager extends Server
             JsonObject object = (JsonObject)element;
             String chapter = object.get("chapter").getAsString();
             String topic  = object.get("topic").getAsString();
-            List<String> added = new ArrayList<>();
             JsonArray attachments = object.getAsJsonArray("attachments");
+            List<String> added = new ArrayList<>();
             if (attachments != null) {
                 for (JsonElement elefant : attachments) {
                     JsonObject attachment = (JsonObject) elefant;
                     if ("link".equals(attachment.getAsJsonPrimitive("type").getAsString()))
                         continue;
 
-                    String name = attachment.get("name").getAsString();
-                    zipFile(out, String.join("/", subject, chapter, topic, name));
-                    added.add(name);
+                    String file = attachment.get("file").getAsString();
+                    zipFile(out, String.join("/", subject, chapter, topic, file));
+                    added.add(file);
                 }
             }
-            List<Cloud.Attachment> attachmes = cloud.findAttachments(subject, chapter, topic, false);
-            for (Cloud.Attachment attachment : attachmes) {
+            List<Cloud.Attachment> cloudAttachments = cloud.findAttachments(subject, chapter, topic, false);
+            for (Cloud.Attachment attachment : cloudAttachments) {
                 if (added.contains(attachment.name))
                     continue;
 
@@ -89,76 +92,84 @@ public class ContentManager extends Server
     private void zipModuleDoc(ZipOutputStream out, JsonObject doc) throws IOException {
         ZipEntry entry = new ZipEntry("META/module.json");
         out.putNextEntry(entry);
-        IOUtils.copy(new StringReader(doc.toString()), out);
+        IOUtils.copy(new StringReader(doc.toString()), new OutputStreamWriter(out, StandardCharsets.UTF_8));
         out.closeEntry();
     }
 
     void zipFile(ZipOutputStream out, String file) throws IOException {
         String[] dirs = file.split("/");
-        cloud.loadAttachment(attachment -> {
-            if (attachment.responseCode == 200) {
-                try {
-                    String fileName = dirs[dirs.length - 1];
-                    System.out.println("fileName = " + fileName + " (" + attachment.contentLength + ")");
-                    ZipEntry entry = new ZipEntry(file);
-                    out.putNextEntry(entry);
-                    IOUtils.copy(attachment.stream, out);
-                    out.closeEntry();
+        if (!couch.loadAttachment(attachment -> {
+            doZipFile(dirs, attachment, out);
+        }, dirs)) {
+            cloud.loadAttachment(attachment -> {
+                if (attachment.responseCode == 200) {
+                    doZipFile(dirs, attachment, out);
                 }
-                catch (Exception e) {
-                    e.printStackTrace();
-                    throw new RuntimeException(e);
-                }
-            }
-            else
-                System.out.println("attachment = " + attachment.responseMessage);
-        }, dirs);
+                else
+                    System.out.println("ERROR: attachment " + file + ": " + attachment.responseMessage);
+            }, dirs);
+        }
+    }
+
+    private void doZipFile(String[] dirs, Cloud.AttachmentInputStream attachment, ZipOutputStream out) {
+        try {
+            String fileName = dirs[dirs.length - 1];
+            System.out.println("fileName = " + fileName + " (" + attachment.contentLength + ")");
+            ZipEntry entry = new ZipEntry(String.join("/", dirs));
+            out.putNextEntry(entry);
+            IOUtils.copy(attachment.stream, out);
+            out.closeEntry();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
     }
 
     String[] importModule(InputStream inputStream) throws IOException {
         String subject = null;
         String module = null;
 
+        Map<String, JsonObject> attachments = new HashMap<>();
+        String[] idrev = null;
+        String idrevOrigin = null;
         ZipInputStream in = new ZipInputStream(inputStream, StandardCharsets.UTF_8);
-
-        Map<String,String> tags = new HashMap<>();
-
         ZipEntry zipEntry;
         while ((zipEntry = in.getNextEntry()) != null) {
             if ("META/module.json".equals(zipEntry.getName())) {
                 String json = IOUtils.toString(new InputStreamReader(in, StandardCharsets.UTF_8));
                 JsonObject object = couch.getGson().fromJson(json, JsonObject.class);
-                subject = object.get("subject").getAsString();
-                module = object.get("module").getAsString();
-
-                JsonArray array = object.getAsJsonArray("docs");
-                for (JsonElement element : array) {
-                    JsonObject card = (JsonObject) element;
-                    String chapter = card.get("chapter").getAsString();
-                    String topic = card.get("topic").getAsString();
-                    JsonArray attachments = card.getAsJsonArray("attachments");
-                    if (attachments != null) {
-                        for (JsonElement elefant : attachments) {
-                            JsonObject attachment = (JsonObject) elefant;
-                            if ("link".equals(attachment.getAsJsonPrimitive("type").getAsString()))
+                subject = string(object, "subject");
+                module = string(object, "module");
+                couch.importModule(subject, module, json);
+                JsonArray docs = object.getAsJsonArray("docs");
+                for (JsonElement doc : docs) {
+                    JsonObject topicObject = (JsonObject)doc;
+                    String chapter = string(topicObject, "chapter");
+                    String topic = string(topicObject, "topic");
+                    JsonArray array = topicObject.getAsJsonArray("attachments");
+                    if (array != null) {
+                        for (JsonElement element : array) {
+                            JsonObject attachment = (JsonObject)element;
+                            String type = string(attachment, "type");
+                            if ("link".equals(type))
                                 continue;
-
-                            String name = attachment.get("name").getAsString();
-                            String tag = attachment.get("tag").getAsString();
-                            String path = Arrays.stream(new String[] {subject, chapter, topic, name}).map(Cloud::encode).collect(Collectors.joining("/"));
-                            tags.put(path, "kmap-" + tag);
+                            String file = string(attachment, "file");
+                            attachments.put(String.join("/", subject, chapter, topic, file), attachment);
                         }
                     }
                 }
-                couch.importModule(subject, module, json);
             }
             else {
-                int responseCode = cloud.storeAttachment(new KeepOpenInputStream(in), zipEntry.getName().split("/"));
-                System.out.println(zipEntry.getName() + " " + responseCode);
+                String[] dirs = zipEntry.getName().split("/");
+                if (!(dirs[1] + dirs[2]).equals(idrevOrigin))
+                    idrev = null;
+                JsonObject attachment = attachments.get(zipEntry.getName());
+                String mime = attachment != null ? string(attachment, "mime") : MimeTypes.guessType(zipEntry.getName());
+                idrev = couch.importFile(idrev, zipEntry.getName(), mime, new KeepOpenInputStream(in));
+                idrevOrigin = dirs[1] + dirs[2];
             }
         }
-        System.out.println("tags = " + tags);
-        cloud.transferTags(tags);
 
         return new String[] { subject, module};
     }
@@ -455,8 +466,8 @@ curl -X PUT -u $1 http://localhost:5984/$2-test/_design/test -d @design-test.jso
 
             CouchDbClient client = couch.createClient("map");
             JsonObject object = client.getGson().fromJson(json, JsonObject.class);
-            String name = JSON.string(object, "name");
-            String description = JSON.string(object, "description");
+            String name = string(object, "name");
+            String description = string(object, "description");
 
             HttpPut put;
             InputStreamEntity entity;
@@ -559,22 +570,22 @@ curl -X DELETE -u $1 http://127.0.0.1:5984/$2-state
 
     public void syncInstance(String json) {
         JsonObject object = couch.getGson().fromJson(json, JsonObject.class);
-        String from = JSON.string(object, "from");
-        String to = JSON.string(object, "to");
+        String from = string(object, "from");
+        String to = string(object, "to");
         System.out.println("sync from " + from + " to " + to);
         Server.CLIENT.set(from);
         JsonArray array = couch.loadModules();
         for (JsonElement element : array) {
-            String subject = JSON.string((JsonObject)element, "subject");
-            String module = JSON.string((JsonObject)element, "module");
+            String subject = string((JsonObject)element, "subject");
+            String module = string((JsonObject)element, "module");
             System.out.println("sync module " + subject + " " + module);
             syncModule(from, to, subject, module);
         }
         Server.CLIENT.set(from);
         array = tests.loadSets();
         for (JsonElement element : array) {
-            String subject = JSON.string((JsonObject)element, "subject");
-            String set = JSON.string((JsonObject)element, "set");
+            String subject = string((JsonObject)element, "subject");
+            String set = string((JsonObject)element, "set");
             System.out.println("sync set " + subject + " " + set);
             syncSet(from, to, subject, set);
         }

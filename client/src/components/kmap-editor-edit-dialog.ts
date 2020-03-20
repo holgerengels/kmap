@@ -3,9 +3,10 @@ import {connect} from '@captaincodeman/rdx';
 import {State, store} from "../store";
 
 import '@material/mwc-button';
-import '@material/mwc-icon-button';
 import '@material/mwc-dialog';
 import '@material/mwc-formfield';
+import '@material/mwc-icon-button';
+import '@material/mwc-icon-button-toggle';
 import '@material/mwc-list/mwc-list-item';
 import '@material/mwc-select';
 import '@material/mwc-slider';
@@ -13,12 +14,15 @@ import '@material/mwc-textarea';
 import '@material/mwc-textfield';
 import './kmap-summary-card-summary';
 import './kmap-knowledge-card-description';
+import './file-drop';
 import {colorStyles, fontStyles, themeStyles} from "./kmap-styles";
 
 import {Attachment, Card} from "../models/maps";
 import {Dialog} from "@material/mwc-dialog/mwc-dialog";
 import {TextArea} from "@material/mwc-textarea/mwc-textarea";
 import {throttle} from "../debounce";
+import {Upload} from "../models/uploads";
+
 
 @customElement('kmap-editor-edit-dialog')
 export class KMapEditorEditDialog extends connect(store, LitElement) {
@@ -41,19 +45,25 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
   @property()
   private _priority: string = '';
   @property()
+  private _attachmentType: string = 'link';
+  @property()
   private _attachmentTag: string = '';
   @property()
   private _attachmentName: string = '';
   @property()
   private _attachmentHref: string = '';
+  @property()
+  private _attachmentFile?: File = undefined;
 
   @property()
   private _navigateAfterSave?: string = '';
 
   @property()
-  private _syncedAttachments: Attachment[] = [];
+  private _attachments: Attachment[] = [];
   @property()
-  private _cloudPath?: string = undefined;
+  private _uploads: Upload[] = [];
+  @property()
+  private _pendingUploads: boolean = false;
 
   @query('#editDialog')
   // @ts-ignore
@@ -68,8 +78,7 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
   mapState(state: State) {
     return {
       _card: state.maps.cardForEdit,
-      _syncedAttachments: state.cloud.attachments,
-      _cloudPath: state.cloud.path,
+      _uploads: state.uploads.uploads,
     };
   }
 
@@ -89,49 +98,20 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
       this._attachmentTag = '';
       this._attachmentName = '';
       this._attachmentHref = '';
+      this._attachmentFile = undefined;
       this._summary = this._card.summary;
       this._description = this._card.description;
       this._thumb = this._card.thumb || '';
       this._depends = this._card.depends ? this._card.depends.join(", ") : '';
       this._links = this._card.links || '';
       this._priority = this._card.priority !== undefined ? this._card.priority + '' : '';
-      this._syncAttachments();
+      this._attachments = this._card.attachments;
 
       this._editDialog.show();
     }
-    if (changedProperties.has("_syncedAttachments") && this._card) {
-      console.log(this._syncedAttachments);
 
-      var attachments: Attachment[] = [];
-      if (this._card.attachments)
-        attachments.push(...this._card.attachments);
-
-      var i = attachments.length;
-      while (i--) {
-        if (attachments[i].type !== "link") {
-          attachments.splice(i, 1);
-        }
-      }
-
-      if (this._syncedAttachments) {
-        for (let attachment of this._syncedAttachments) {
-          if (attachment.tag)
-            attachments.unshift(attachment);
-          else {
-            console.log(attachment.name + " ist nicht getaggt");
-          }
-        }
-      }
-
-      this._card.attachments = attachments;
-      //this.requestUpdate();
-    }
-    if (changedProperties.has("_cloudPath")) {
-      if (this._cloudPath) {
-        console.log(this._cloudPath);
-        window.open(this._cloudPath, '_blank');
-        store.dispatch.cloud.forgetPath();
-      }
+    if (changedProperties.has("_uploads")) {
+      this._pendingUploads = this._uploads.some(u => u.uploading);
     }
   }
 
@@ -160,6 +140,7 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
     card.depends = this._depends.split(",").map(d => d.trim()).filter(d => d.length > 0);
     card.links = this._links;
     card.priority = this._priority !== '' ? parseInt(this._priority) : undefined;
+    card.attachments = this._attachments;
     console.log(card);
 
     store.dispatch.maps.saveTopic(card);
@@ -170,11 +151,13 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
       else
         store.dispatch.maps.load({subject: subject, chapter: chapter});
     }.bind(undefined, card.subject, card.chapter, this._navigateAfterSave), 1000);
+    store.dispatch.uploads.clearUploads();
   }
 
   _cancel() {
     this._editDialog.close();
     store.dispatch.maps.unsetCardForEdit();
+    store.dispatch.uploads.clearUploads();
   }
 
   _setSummary() {
@@ -188,50 +171,44 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
   _addAttachment() {
     if (!this._card) return;
 
-    if (!this._attachmentTag || !this._attachmentName || !this._attachmentHref) {
+    if (!this._attachmentName || !(this._attachmentHref || this._attachmentFile)) {
       store.dispatch.shell.showMessage("unvollständig!");
+      return;
     }
-    else {
-      this._card.attachments = [...this._card.attachments, {
+    else if (this._attachmentHref && this._attachmentType === "link") {
+      this._attachments = [...this._attachments, {
         tag: this._attachmentTag,
         name: this._attachmentName,
         href: this._attachmentHref,
         type: "link",
       }];
-      this._attachmentTag = '';
-      this._attachmentName = '';
-      this._attachmentHref = '';
-      this.requestUpdate();
     }
+    else if (this._attachmentFile && this._attachmentType === "file") {
+      this._attachments = [...this._attachments, {
+        tag: this._attachmentTag,
+        name: this._attachmentName,
+        file: this._attachmentFile.name,
+        mime: this._attachmentFile.type,
+        type: "file",
+      }];
+      console.log("upload file");
+      store.dispatch.uploads.upload(this._attachmentFile);
+    }
+
+    this._attachmentTag = '';
+    this._attachmentName = '';
+    this._attachmentHref = '';
+    this._attachmentFile = undefined;
+    this.requestUpdate();
   }
 
   _deleteAttachment(attachment) {
     if (!this._card) return;
 
-    let attachments = [...this._card.attachments];
+    let attachments = [...this._attachments];
     attachments.splice(attachments.indexOf(attachment), 1);
-    this._card.attachments = attachments;
+    this._attachments = attachments;
     this.requestUpdate();
-  }
-
-  _syncAttachments() {
-    if (!this._card) return;
-
-    store.dispatch.cloud.fetchAttachments({
-      subject: this._card.subject,
-      chapter: this._card.chapter,
-      topic: this._card.topic
-    });
-  }
-
-  _createDirectory() {
-    if (!this._card) return;
-
-    store.dispatch.cloud.createDirectory({
-      subject: this._card.subject,
-      chapter: this._card.chapter,
-      topic: this._card.topic
-    });
   }
 
   _captureEnter(e) {
@@ -252,7 +229,7 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
         mwc-icon-button, mwc-button {
           vertical-align: middle
         }
-        mwc-textfield, mwc-textarea {
+        mwc-textfield, mwc-textarea, file-drop {
           margin-bottom: 4px;
         }
         .preview-scroller {
@@ -288,14 +265,21 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
           box-sizing: border-box;
           background-color: var(--color-lightgray);
         }
+        div.fields {
+          display: flex;
+          flex-flow: row wrap;
+        }
+        div.fields > [s1] {
+          flex: 1 1 33.3%;
+        }
+        div.fields > [s2] {
+          flex: 1 1 66.6%;
+        }
+        div.fields > [s3] {
+          flex: 1 1 100%;
+        }
         .attachment {
           display: block;
-        }
-        .attachments mwc-icon {
-          pointer-events: all;
-          cursor: pointer;
-          vertical-align: middle;
-          float: right;
         }
         .attachment span[slot=secondary] {
           display: block;
@@ -310,26 +294,6 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
           font-size: small;
           letter-spacing: 0px;
           vertical-align: middle;
-        }
-        select {
-          font-size:16px;
-          border: none;
-          border-bottom: 1px solid var(--color-mediumgray);
-          padding: 18px 6px;
-          background-color: var(--color-lightgray);
-          outline: none;
-        }
-        select:focus {
-          border-bottom: 2px solid var(--color-primary);
-          padding-bottom: 17px;
-        }
-        option {
-          font-size:16px;
-          background-color:#ffffff;
-        }
-        mwc-icon.add {
-          margin-left: 4px;
-          margin-top: 16px;
         }
         [hidden] {
           display: none;
@@ -353,49 +317,60 @@ ${this._card ? html`
 <mwc-dialog id="editDialog" heading="Editor">
 ${this._card ? html`
   <form @focus="${this._focus}" @keydown="${this._captureEnter}">
-    <mwc-textfield id="topic" name="topic" disabled label="Thema" dense type="text" .value="${this._card.topic !== '_' ? this._card.topic : "Allgemeines zu " + this._card.chapter}"></mwc-textfield>
-    <br/>
-    <mwc-textfield ?hidden="${this._card.topic === '_'}" id="links" name="links" label="Verweist auf ..." dense type="text" .value="${this._links}" @change="${e => this._links = e.target.value}"></mwc-textfield>
-    <mwc-textfield ?hidden="${this._card.topic === '_'}" id="priority" name="priority" label="Priorität" dense type="number" inputmode="numeric" min="0" step="1" .value="${this._priority}" @change="${e => this._priority = e.target.value}"></mwc-textfield>
-    <br/>
-    <mwc-textfield ?hidden="${this._card.topic === '_'}" ?dialogInitialFocus="${this._card.topic !== '_'}" id="depends" label="Basiert auf ..." dense style="width: 470px" .value=${this._depends} @change="${e => this._depends = e.target.value}"></mwc-textfield>
-    <mwc-textfield ?hidden="${this._card.topic === '_'}" id="thumb" label="Thumbnail" dense .value=${this._thumb} @change="${e => this._thumb = e.target.value}"></mwc-textfield>
-    <mwc-textarea id="summary" placeholder="Kurztext" ?dialogInitialFocus="${this._card.topic === '_'}" dense fullwidth rows="2" .value=${this._card.summary} @keyup="${this._setSummary}" @focus="${this._focus}" @blur="${this._focus}"></mwc-textarea>
-    <mwc-textarea id="description" placeholder="Langtext" dense fullwidth rows="9" .value=${this._card.description} @keyup="${this._setDescription}" @focus="${this._focus}" @blur="${this._focus}"></mwc-textarea>
+  <div class="fields">
+    <mwc-textfield s1 id="topic" name="topic" disabled label="Thema" dense type="text" .value="${this._card.topic !== '_' ? this._card.topic : "Allgemeines zu " + this._card.chapter}"></mwc-textfield>
+    <mwc-textfield s1 ?hidden="${this._card.topic === '_'}" id="links" name="links" label="Verweist auf ..." dense type="text" .value="${this._links}" @change="${e => this._links = e.target.value}"></mwc-textfield>
+    <mwc-textfield s1 ?hidden="${this._card.topic === '_'}" id="priority" name="priority" label="Priorität" dense type="number" inputmode="numeric" min="0" step="1" .value="${this._priority}" @change="${e => this._priority = e.target.value}"></mwc-textfield>
+    <mwc-textfield s2 ?hidden="${this._card.topic === '_'}" ?dialogInitialFocus="${this._card.topic !== '_'}" id="depends" label="Basiert auf ..." dense .value=${this._depends} @change="${e => this._depends = e.target.value}"></mwc-textfield>
+    <mwc-textfield s1 ?hidden="${this._card.topic === '_'}" id="thumb" label="Thumbnail" dense .value=${this._thumb} @change="${e => this._thumb = e.target.value}"></mwc-textfield>
+    <mwc-textarea s3 id="summary" placeholder="Kurztext" ?dialogInitialFocus="${this._card.topic === '_'}" dense fullwidth rows="2" .value=${this._card.summary} @keyup="${this._setSummary}" @focus="${this._focus}" @blur="${this._focus}"></mwc-textarea>
+    <mwc-textarea s3 id="description" placeholder="Langtext" dense fullwidth rows="9" .value=${this._card.description} @keyup="${this._setDescription}" @focus="${this._focus}" @blur="${this._focus}"></mwc-textarea>
+</div>
 
-    <div class="field attachments">
+    <div class="attachments">
       <label for="attachments">Materialien</label><br/>
-      ${this._card.attachments.map((attachment) => html`
-        <div class="attachment">
-          ${attachment.type === 'link' ? html`<mwc-icon @click="${() => this._deleteAttachment(attachment)}">delete</mwc-icon>` : ''}
-          <span class="tag">[${_tags.get(attachment.tag)}]</span> ${attachment.name}
-          ${attachment.type === 'link' ? html`<span slot="secondary">${attachment.href}</span>` : ''}
+      ${this._attachments.map((attachment) => html`
+        <div class="fields">
+          <div style="flex: 1 0 auto">
+            <span>[${_tags.get(attachment.tag)}] ${attachment.name}</span><br/>
+            ${attachment.type === 'link' ? html`
+              <span slot="secondary">${attachment.href}</span>
+            ` : html`
+              <span slot="secondary">${attachment.file} (${attachment.mime})</span>
+            `}
+          </div>
+          <mwc-icon-button icon="delete" @click="${() => this._deleteAttachment(attachment)}" style="flex: 0 0 48px"></mwc-icon-button>
         </div>
       `)}
-      <mwc-select id="tag" placeholder="Tag" .value="${this._attachmentTag}" @change="${e => this._attachmentTag = e.target.value}" required>
+    </div>
+    <div class="fields" @dragover="${() => this._attachmentType = 'file'}">
+      <mwc-select id="tag" label="Tag" .value="${this._attachmentTag}" @change="${e => this._attachmentTag = e.target.value}" style="flex: 1 0 15%">
+        <mwc-list-item value="">Kein Tag</mwc-list-item>
         ${Array.from(_tags).map(([key, value]) => html`
           <mwc-list-item value="${key}">${value}</mwc-list-item>
         `)}
       </mwc-select>
-      <mwc-textfield id="name" type="text" required placeholder="Name" .value="${this._attachmentName}" @change="${e => this._attachmentName = e.target.value}"></mwc-textfield>
-      <mwc-textfield id="href" type="url" required placeholder="Link" .value="${this._attachmentHref}" @change="${e => this._attachmentHref = e.target.value}"></mwc-textfield>
-      <mwc-icon class="add" @click="${this._addAttachment}">add_circle</mwc-icon>
+      <mwc-textfield id="name" type="text" required label="Name" .value="${this._attachmentName}" @change="${e => this._attachmentName = e.target.value}" style="flex: 1 0 25%"></mwc-textfield>
+      <mwc-icon-button-toggle ?on="${this._attachmentType === 'file'}" onIcon="attachment" offIcon="link" @MDCIconButtonToggle:change="${e => this._attachmentType = e.detail.isOn ? 'file' : 'link'}" style="flex: 0 0 48px"></mwc-icon-button-toggle>
+      <mwc-textfield ?hidden="${this._attachmentType === "file"}" id="href" type="url" required label="Link" .value="${this._attachmentHref}" @change="${e => this._attachmentHref = e.target.value}" style="flex: 1 0 35%"></mwc-textfield>
+      <file-drop ?hidden="${this._attachmentType === "link"}" id="file" required @filedrop="${e => this._attachmentFile = e.detail.file}" style="flex: 1 0 35%"></file-drop>
+      <mwc-icon-button class="add" icon="add_circle" @click="${this._addAttachment}" style="flex: 0 0 48px"></mwc-icon-button>
     </div>
   </form>` : ''}
 
-  <mwc-icon-button slot="secondaryAction" icon="cached" title="Materialien aus Cloud synchronisieren" @click=${this._syncAttachments}></mwc-icon-button>
-  <mwc-icon-button slot="secondaryAction" icon="folder_open" title="Cloud Verzeichnis öffnen" @click=${this._createDirectory}></mwc-icon-button>
   <mwc-button slot="secondaryAction" @click=${this._cancel}>Abbrechen</mwc-button>
-  <mwc-button slot="primaryAction" @click=${this._save}>Speichern</mwc-button>
+  <mwc-button ?disabled="${this._pendingUploads}" slot="primaryAction" @click=${this._save}>Speichern</mwc-button>
 </mwc-dialog>
     `;
   }
 }
 
 const _tags = new Map([
-  ["explanation", "Erklärung "],
-  ["example",     "Beispiel  "],
-  ["usage",       "Anwendung "],
+  [undefined, "---"],
+  ["", "---"],
+  ["explanation", "Erklärung"],
+  ["example",     "Beispiel"],
+  ["usage",       "Anwendung"],
   ["idea",        "Anschauung"],
-  ["exercise",    "Aufgaben  "],
+  ["exercise",    "Aufgaben"],
 ]);

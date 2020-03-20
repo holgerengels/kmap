@@ -86,35 +86,20 @@ public class DataServlet
                 log("load file = " + file);
                 String[] split = file.split("/");
                 String[] dirs = Arrays.copyOfRange(split, 1, split.length);
-                //String userAgent = req.getHeader("User-Agent").toLowerCase();
-                //boolean iosHack = userAgent.indexOf("applewebkit") != -1 && userAgent.indexOf("mobile") != -1;
 
-                cloud.loadAttachment(attachment -> {
-                    if (attachment.responseCode == 200) {
-                        String fileName = dirs[dirs.length - 1];
-                        System.out.println("fileName = " + fileName);
-                        String mimeType = MimeTypes.tweakMimeType(attachment.mimeType, fileName);
-                        System.out.println("mimeType = " + mimeType);
-                        System.out.println("contentLength = " + attachment.contentLength);
-                        resp.setContentType(mimeType);
-                        resp.setContentLength((int) attachment.contentLength);
-                        if (!"text/html".equals(mimeType))
-                            resp.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
-                        resp.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
-                        resp.setHeader("Expires", "0");
-                        resp.setHeader("Pragma", "no-cache");
-                        corsHeaders(req, resp);
-                        try {
-                            IOUtils.copy(attachment.stream, resp.getOutputStream());
-                            resp.getOutputStream().flush();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            throw new RuntimeException(e);
+                corsHeaders(req, resp);
+
+                if (!couch.loadAttachment(attachment -> {
+                    sendAttachment(resp, attachment);
+                }, dirs)) {
+                    cloud.loadAttachment(attachment -> {
+                        if (attachment.responseCode == 200) {
+                            sendAttachment(resp, attachment);
                         }
-                    }
-                    else
-                        sendError(req, resp, attachment.responseCode, attachment.responseMessage);
-                }, dirs);
+                        else
+                            sendError(req, resp, attachment.responseCode, attachment.responseMessage);
+                    }, dirs);
+                }
             }
         }
         catch (Exception e) {
@@ -123,6 +108,28 @@ public class DataServlet
         }
         finally {
             Server.CLIENT.remove();
+        }
+    }
+
+    private void sendAttachment(HttpServletResponse resp, Cloud.AttachmentInputStream attachment) {
+        String fileName = attachment.fileName;
+        String mimeType = attachment.mimeType != null ? attachment.mimeType : MimeTypes.guessType(fileName);
+        resp.setContentType(mimeType);
+        resp.setContentLength((int) attachment.contentLength);
+        if (!"text/html".equals(mimeType))
+            resp.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
+        resp.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
+        resp.setHeader("Expires", "0");
+        resp.setHeader("Pragma", "no-cache");
+        try {
+            long millis = System.currentTimeMillis();
+            IOUtils.copy(attachment.stream, resp.getOutputStream());
+            resp.getOutputStream().flush();
+            System.out.println("millis = " + (System.currentTimeMillis() - millis));
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 

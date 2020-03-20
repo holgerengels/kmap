@@ -207,7 +207,7 @@ export default createModel({
       }
 
       dispatch.contentSets.requestImport();
-      fetchjson(`${urls.server}content?import-set=${names.join(",")}`, {... endpoint.post(state), body: formData},
+      fetchjson(`${urls.server}content?import-set=${names.join(",")}`, {... endpoint.postFormData(state), body: formData},
         () => {
           dispatch.contentSets.receivedImport();
         },

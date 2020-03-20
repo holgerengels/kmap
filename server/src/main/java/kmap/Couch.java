@@ -4,12 +4,15 @@ import com.google.gson.*;
 import org.lightcouch.*;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import static kmap.JSON.*;
 
@@ -44,9 +47,7 @@ public class Couch extends Server {
     public synchronized JsonArray loadModule(String subject, String module) {
         List<JsonObject> objects = loadModuleAsList(subject, module);
         JsonArray array = new JsonArray();
-        for (JsonObject object : objects) {
-            array.add(object);
-        }
+        objects.forEach(array::add);
         return array;
     }
 
@@ -58,6 +59,10 @@ public class Couch extends Server {
         List<JsonObject> objects = view.query(JsonObject.class);
         objects.removeIf(o -> string(o, "chapter") == null || string(o,"topic") == null);
         objects.forEach(o -> o.addProperty("module", module));
+        objects.forEach(o -> {
+            JsonArray attachments = o.getAsJsonArray("attachments");
+            fixAttachments(attachments, subject, string(o, "chapter"), string(o, "topic"));
+        });
         objects.sort(Comparator.comparing((JsonObject o) -> string(o, "chapter")).thenComparing(o -> string(o, "topic")));
         return objects;
     }
@@ -98,7 +103,7 @@ public class Couch extends Server {
         return array;
     }
 
-    public synchronized String storeTopic(String subject, String module, String json) {
+    public synchronized String storeTopic(String subject, String module, String json, Map<String, Upload> uploads) {
         CouchDbClient client = createClient("map");
         JsonObject object = client.getGson().fromJson(json, JsonObject.class);
         if (object.has("delete")) {
@@ -160,34 +165,48 @@ public class Couch extends Server {
                 String topic = string(old, "topic");
                 assert chapter != null;
                 assert topic != null;
+
+                JsonObject existing = null;
                 JsonArray array = loadModule(subject, module);
                 for (JsonElement element : array) {
-                    JsonObject existing = (JsonObject)element;
-                    if (chapter.equals(string(existing, "chapter")) &&
-                        topic.equals(string(existing, "topic"))) {
-                        existing.addProperty("subject", subject);
-                        existing.add("chapter", changed.get("chapter"));
-                        existing.add("topic", changed.get("topic"));
-                        existing.add("links", changed.get("links"));
-                        existing.add("depends", changed.get("depends"));
-                        existing.add("priority", changed.get("priority"));
-                        existing.add("description", changed.get("description"));
-                        existing.add("thumb", changed.get("thumb"));
-                        existing.add("summary", changed.get("summary"));
-                        existing.add("attachments", changed.get("attachments"));
-                        if (checks(changed))
-                            client.update(element);
-                        else
-                            return "error:module, subject, chapter or topic missing";
+                    if (chapter.equals(string((JsonObject)element, "chapter")) &&
+                        topic.equals(string((JsonObject)element, "topic"))) {
+                        existing = (JsonObject)element;
                     }
+                }
+
+                if (existing != null) {
+                    existing.addProperty("subject", subject);
+                    existing.add("chapter", changed.get("chapter"));
+                    existing.add("topic", changed.get("topic"));
+                    existing.add("links", changed.get("links"));
+                    existing.add("depends", changed.get("depends"));
+                    existing.add("priority", changed.get("priority"));
+                    existing.add("description", changed.get("description"));
+                    existing.add("thumb", changed.get("thumb"));
+                    existing.add("summary", changed.get("summary"));
+                    existing.add("attachments", changed.get("attachments"));
+                    if (checks(changed)) {
+                        Response response = client.update(existing);
+                        JsonArray attachments = changed.getAsJsonArray("attachments");
+                        response = saveFiles(client, response, uploads, attachments);
+                        JsonObject _attachments = existing.getAsJsonObject("_attachments");
+                        deleteFiles(client, response, attachments, _attachments);
+                    }
+                    else
+                        return "error:module, subject, chapter or topic missing";
+
                 }
             }
             else {
                 command = "add:";
                 changed.addProperty("subject", subject);
                 changed.remove("added");
-                if (checks(changed))
-                    client.save(changed);
+                if (checks(changed)) {
+                    Response response = client.save(changed);
+                    JsonArray attachments = changed.getAsJsonArray("attachments");
+                    saveFiles(client, response, uploads, attachments);
+                }
                 else
                     return "error:module, subject, chapter or topic missing";
             }
@@ -207,6 +226,59 @@ public class Couch extends Server {
             }
             return "reload:";
         }
+    }
+
+    public String[] importFile(String[] idrev, String file, String contentType , InputStream in) {
+        CouchDbClient client = createClient("map");
+        String[] dirs = file.split("/");
+        if (idrev == null) {
+            View view = client.view("net/byTopic")
+                    .key(dirs[0], dirs[1], dirs[2])
+                    .reduce(false)
+                    .includeDocs(true);
+            List<JsonObject> objects = view.query(JsonObject.class);
+            JsonObject object = objects.get(0);
+            String id = string(object,"_id");
+            String rev = string(object,"_rev");
+            idrev = new String[] { id, rev };
+        }
+        Response response = client.saveAttachment(in, encode(dirs[3]), contentType, idrev[0], idrev[1]);
+        return new String[] { response.getId(), response.getRev() };
+    }
+
+    private Response saveFiles(CouchDbClient client, Response response, Map<String, Upload> uploads, JsonArray attachments) {
+        for (JsonElement alement : attachments) {
+            String file = string((JsonObject)alement,"file");
+            if (file != null) {
+                Upload upload = uploads.get(file);
+                if (upload != null) {
+                    try {
+                        System.out.println("uploading " + upload);
+                        response = client.saveAttachment(Files.newInputStream(upload.tmp), encode(upload.fileName), upload.contentType, response.getId(), response.getRev());
+                    }
+                    catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+        return response;
+    }
+
+    private Response deleteFiles(CouchDbClient client, Response response, JsonArray attachments, JsonObject _attachments) {
+        Set<String> existingNames = _attachments.keySet();
+        for (JsonElement alement : attachments) {
+            String file = string((JsonObject)alement,"file");
+            if (file != null) {
+                System.out.println("keeping " + file);
+                existingNames.remove(file);
+            }
+        }
+        for (String name : existingNames) {
+            System.out.println("removing " + name);
+            response = client.removeAttachment(encode(name), response.getId(), response.getRev());
+        }
+        return response;
     }
 
     private boolean checks(JsonObject object) {
@@ -251,7 +323,7 @@ public class Couch extends Server {
                 chapterNode.setModule(string(topic, "module"));
                 chapterNode.setDescription(string(topic, "description"));
                 chapterNode.setSummary(string(topic, "summary"));
-                chapterNode.setAttachments((JsonArray)topic.get("attachments"));
+                chapterNode.setAttachments(amendAttachments(topic.getAsJsonArray("attachments"), topic.getAsJsonObject("_attachments")));
                 iterator.remove();
             }
             else {
@@ -262,7 +334,7 @@ public class Couch extends Server {
                 node.setThumb(string(topic, "thumb"));
                 node.setPriority(integer(topic, "priority"));
                 node.setLinks(string(topic, "links"));
-                node.setAttachments((JsonArray)topic.get("attachments"));
+                node.setAttachments(amendAttachments(topic.getAsJsonArray("attachments"), topic.getAsJsonObject("_attachments")));
                 nodes.put(topicName, node);
             }
         }
@@ -323,6 +395,7 @@ public class Couch extends Server {
                 lines.add(line);
                 row++;
             }
+            fixAttachments(node.getAttachments(), subject, name, node.getTopic());
             JsonObject card = new JsonObject();
             card.addProperty("module", node.getModule());
             card.addProperty("topic", node.getTopic());
@@ -333,7 +406,6 @@ public class Couch extends Server {
             addProperty(card, "thumb", node.getThumb());
             addProperty(card, "links", node.getLinks());
             add(card, "attachments", node.getAttachments());
-            cloudLinks(node.getAttachments(), subject, name, node.getTopic());
             JsonArray depends = new JsonArray();
             for (String dependName : node.getDepends()) {
                 depends.add(dependName);
@@ -345,6 +417,7 @@ public class Couch extends Server {
         }
 
         if (chapterNode != null) {
+            fixAttachments(chapterNode.getAttachments(), subject, name, "_");
             JsonObject card = new JsonObject();
             card.addProperty("module", chapterNode.getModule());
             card.addProperty("topic", "_");
@@ -356,10 +429,35 @@ public class Couch extends Server {
             addProperty(card, "description", chapterNode.getDescription());
             addProperty(card, "summary", chapterNode.getSummary());
             add(card, "attachments", chapterNode.getAttachments());
-            cloudLinks(chapterNode.getAttachments(), subject, name, "_");
             board.add("chapterCard", card);
         }
         return board;
+    }
+
+    private JsonArray amendAttachments(JsonArray attachments, JsonObject _attachments) {
+        if (attachments == null)
+            attachments = new JsonArray();
+
+        Set<String> existing = StreamSupport.stream(attachments.spliterator(), false)
+                .filter(a -> string((JsonObject) a, "file") != null)
+                .map(a -> string((JsonObject) a, "file"))
+                .collect(Collectors.toSet());
+
+        if (_attachments != null) {
+            for (Map.Entry<String, JsonElement> entry : _attachments.entrySet()) {
+                if (existing.contains(entry.getKey()))
+                    continue;
+
+                String type = string((JsonObject) entry.getValue(), "content_type");
+                JsonObject attachment = new JsonObject();
+                attachment.addProperty("type", "file");
+                attachment.addProperty("name", entry.getKey());
+                attachment.addProperty("file", entry.getKey());
+                attachment.addProperty("mime", type);
+                attachments.add(attachment);
+            }
+        }
+        return attachments;
     }
 
     private void debugLinks(String subject, Map<String, String> links) {
@@ -388,17 +486,80 @@ public class Couch extends Server {
         }
     }
 
-    private void cloudLinks(JsonArray array, String subject, String chapter, String topic) {
-        if (array != null) {
-            for (JsonElement element: array) {
-                JsonObject attachment = (JsonObject)element;
-                if (!attachment.has("href")) {
-                    String fileName = encode(string(attachment, "name"));
-                    String path = "data/" + encode(subject) + "/" + encode(chapter) + "/" + encode(topic) + "/" + fileName;
-                    attachment.addProperty("href", path);
+    private void fixAttachments(JsonArray array, String subject, String chapter, String topic) {
+        if (array == null)
+            return;
+
+        for (JsonElement element: array) {
+            JsonObject attachment = (JsonObject)element;
+            String name = string(attachment, "name");
+            String file = string(attachment, "file");
+            String type = string(attachment, "type");
+            String mime = string(attachment, "mime");
+            String href = string(attachment, "href");
+            if ("link".equals(type)) {
+                if (mime == null) {
+                    mime = "text/html";
+                    attachment.addProperty("mime", mime);
                 }
             }
+            else if ("file".equals(type)) {
+                if (file == null && name != null) {
+                    file = name;
+                    attachment.addProperty("file", file);
+                }
+                if (mime == null && file != null) {
+                    mime = MimeTypes.guessType(file);
+                    attachment.addProperty("mime", mime);
+                }
+                String fileName = encode(file);
+                String path = "data/" + encode(subject) + "/" + encode(chapter) + "/" + encode(topic) + "/" + fileName;
+                attachment.addProperty("href", path);
+            }
+            else {
+                if (mime == null && type.contains("/")) {
+                    mime = type;
+                    attachment.addProperty("mime", mime);
+                    type = "file";
+                    attachment.addProperty("type", type);
+                }
+                if (file == null && name != null) {
+                    file = name;
+                    attachment.addProperty("file", file);
+                }
+                String fileName = encode(file);
+                String path = "data/" + encode(subject) + "/" + encode(chapter) + "/" + encode(topic) + "/" + fileName;
+                attachment.addProperty("href", path);
+            }
         }
+    }
+
+    public boolean loadAttachment(Consumer<Cloud.AttachmentInputStream> sender, String... dirs) throws IOException {
+        CouchDbClient client = createClient("map");
+        View view = client.view("net/byTopic")
+                .key(dirs[0], dirs[1], dirs[2])
+                .reduce(false)
+                .includeDocs(true);
+        List<JsonObject> objects = view.query(JsonObject.class);
+        JsonObject object = objects.get(0);
+        String id = string(object,"_id");
+        JsonObject attachments = object.getAsJsonObject("_attachments");
+        String type = null;
+        Integer length = null;
+        InputStream in = null;
+        if (attachments != null) {
+            JsonObject attachment = attachments.getAsJsonObject(dirs[3]);
+            if (attachment != null) {
+                type = string(attachment, "content_type");
+                length = integer(attachment, "length");
+                in = client.find(id + "/" + encode(dirs[3]));
+                System.out.println("Load " + id + "/" + dirs[3] + " from couch");
+                sender.accept(new Cloud.AttachmentInputStream(in, dirs[3], type, length));
+                in.close();
+                return true;
+            }
+        }
+        return false;
     }
 
     public synchronized JsonArray search(String filter) {
@@ -409,9 +570,9 @@ public class Couch extends Server {
         return result.getAsJsonArray("rows");
     }
 
-    private String encode(String chapter) {
+    private String encode(String string) {
         try {
-            return URLEncoder.encode(chapter, "UTF-8").replace("+", "%20");
+            return URLEncoder.encode(string, "UTF-8").replace("+", "%20");
         }
         catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
@@ -589,7 +750,7 @@ public class Couch extends Server {
         JsonObject chapterObject = chapter(subject, chapter);
         for (JsonElement lineObject : chapterObject.getAsJsonArray("lines")) {
             for (JsonElement topicObject : ((JsonObject)lineObject).getAsJsonArray("cards")) {
-                book.add(chapter + "." + JSON.string((JsonObject)topicObject, "topic"));
+                book.add(chapter + "." + string((JsonObject)topicObject, "topic"));
                 String consists = string((JsonObject)topicObject, "links");
                 if (consists != null) {
                     walk(book, links, subject, links.get(chapter + "." + consists));
@@ -618,8 +779,9 @@ public class Couch extends Server {
         }
         System.out.println("oldTopics = " + oldTopics);
         System.out.println("newTopics = " + newTopics);
-        List<Response> olds = client.bulk(oldTopics, false);
-        List<Response> news = client.bulk(newTopics, false);
+        if (!oldTopics.isEmpty())
+            client.bulk(oldTopics, true);
+        client.bulk(newTopics, true);
 
         JsonObject object = new JsonObject();
         object.addProperty("subject", subject);
@@ -647,8 +809,46 @@ public class Couch extends Server {
 
     public static void main(String[] args) throws IOException {
         Couch couch = new Couch(readProperties(args[0]));
-        Server.CLIENT.set("root");
-        couch.walk("Mathematik");
+        Server.CLIENT.set("lala");
+        String json = "[" +
+                "   {" +
+                "    'name': 'Alles im Fluss.md'," +
+                "    'tag': 'idea'," +
+                "    'type': 'text/markdown'" +
+                "   }," +
+                "   {" +
+                "    'tag': 'explanation'," +
+                "    'type': 'link'," +
+                "    'name': 'Serlo'," +
+                "    'href': 'https://de.serlo.org/mathe/funktionen/wichtige-funktionstypen-ihre-eigenschaften/lineare-funktionen-geraden/geradengleichung'" +
+                "   }," +
+                "   {" +
+                "    'name': 'Kugel'," +
+                "    'file': 'Kugel.png'," +
+                "    'type': 'file'," +
+                "    'tag': 'idea'," +
+                "    'href': 'data/Mathematik/Grundwissen/Type%20System/Kugel.png'," +
+                "    'mime': 'image/png'" +
+                "   }" +
+                "  ]";
+        JsonArray array = couch.getGson().fromJson(json, JsonArray.class);
+
+        couch.fixAttachments(array,"Meta", "Mathe", "Matik");
+        System.out.println("array = " + array);
+        /*
+        couch.loadAttachment(attachment -> {
+            if (attachment.responseCode == 200) {
+                try {
+                    IOUtils.copy(attachment.stream, System.out);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                System.out.flush();
+            }
+        }, "Hilfe", "Hilfe", "Aktuelles", "ich.jpg");
+         */
+
+        //couch.walk("Mathematik");
         //JsonObject object = couch.chapter("mathe", "Mathematik");
         //System.out.println("object = " + object);
         //JsonObject states = couch.statesAndProgress("h.engels", "Mathematik");

@@ -23,10 +23,10 @@ export class KMapKnowledgeCardAttachment extends LitElement {
 
   updated(changedProperties) {
     if (changedProperties.has("attachment") && this.attachment) {
-      this._handler = this.attachment.type === "application/vnd.geogebra.file" ? "/geogebra.html?path=" + urls.server : "";
-      this._mimeIcon = this.mimeIcon(this.attachment.type);
-      this._isDownload = this.attachment.type !== "link" && this.attachment.type !== "text/html" && this._supportsDownload ? this.attachment.name : undefined;
-      this._isTarget = this.attachment.type === "link" || this.attachment.type === "text/html" || !this._supportsDownload ? "_blank" : undefined;
+      this._handler = this.attachment.mime === "application/vnd.geogebra.file" ? "/geogebra.html?path=" + urls.server : "";
+      this._mimeIcon = this.mimeIcon(this.attachment.mime);
+      this._isDownload = this.attachment.type === "file" && this.attachment.mime !== "text/html" && this._supportsDownload ? this.attachment.name : undefined;
+      this._isTarget = this.attachment.type === "link" || this.attachment.mime === "text/html" || !this._supportsDownload ? "_blank" : undefined;
     }
   }
 

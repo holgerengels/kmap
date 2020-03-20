@@ -111,7 +111,7 @@ export default createModel({
       }
 
       dispatch.contentMaps.requestImport();
-      fetchjson(`${urls.server}content?import-module=${names.join(",")}`, {... endpoint.post(state), body: formData},
+      fetchjson(`${urls.server}content?import-module=${names.join(",")}`, {... endpoint.postFormData(state), body: formData},
         () => {
           dispatch.contentMaps.receivedImport();
         },

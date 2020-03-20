@@ -49,6 +49,7 @@
     "@material/mwc-fab": "^0.13.0",
     "@material/mwc-formfield": "^0.13.0",
     "@material/mwc-icon-button": "^0.13.0",
+    "@material/mwc-icon-button-toggle": "^0.13.0",
     "@material/mwc-list": "^0.13.0",
     "@material/mwc-radio": "^0.13.0",
     "@material/mwc-select": "^0.13.0",

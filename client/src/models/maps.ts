@@ -8,7 +8,9 @@ export interface Attachment {
   name: string,
   tag: string,
   type: string,
-  href: string,
+  href?: string,
+  file?: string,
+  mime?: string,
 }
 
 export interface Card {

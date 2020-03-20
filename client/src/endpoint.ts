@@ -25,7 +25,17 @@ export const endpoint = {
       })
     };
   },
-
+  postFormData(state: State): RequestInit {
+    return {
+      method: "POST",
+      mode: "cors",
+      cache: "no-cache",
+      credentials: "include",
+      headers: new Headers({
+        "X-Instance": state.app.instance,
+      })
+    };
+  },
 };
 export async function fetchjson(input: RequestInfo, init: RequestInit,
                              success: (Response) => void,
