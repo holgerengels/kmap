@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -82,6 +83,7 @@ public class TestsServlet
             String topics = req.getParameter("topics");
             String directory = req.getParameter("directory");
             String attachments = req.getParameter("attachments");
+            String file = req.getPathInfo();
             if (sets != null) {
                 log("sets = " + sets);
                 JsonArray array = tests.loadSets();
@@ -127,7 +129,7 @@ public class TestsServlet
             else if (attachments != null) {
                 log("attachments for = " + attachments);
                 String[] split = attachments.split("/");
-                List<Cloud.Attachment> list = cloud.findAttachments(split[0], split[1], split[2], false);
+                List<Cloud.Attachment> list = cloud.findAttachments(split[0], split[1], split[2], true);
                 if (list != null) {
                     JsonArray array = new JsonArray();
                     for (Cloud.Attachment attachment : list) {
@@ -140,6 +142,17 @@ public class TestsServlet
                     writeResponse(req, resp, array);
                 }
             }
+            else if (file != null) {
+                log("load file = " + file);
+                String[] split = file.split("/");
+                String[] dirs = Arrays.copyOfRange(split, 1, split.length);
+
+                corsHeaders(req, resp);
+
+                tests.loadAttachment(attachment -> {
+                    sendAttachment(resp, attachment);
+                }, dirs);
+            }
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -147,6 +160,28 @@ public class TestsServlet
         }
         finally {
             Server.CLIENT.remove();
+        }
+    }
+
+    private void sendAttachment(HttpServletResponse resp, Cloud.AttachmentInputStream attachment) {
+        String fileName = attachment.fileName;
+        String mimeType = attachment.mimeType != null ? attachment.mimeType : MimeTypes.guessType(fileName);
+        resp.setContentType(mimeType);
+        resp.setContentLength((int) attachment.contentLength);
+        if (!"text/html".equals(mimeType))
+            resp.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
+        resp.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
+        resp.setHeader("Expires", "0");
+        resp.setHeader("Pragma", "no-cache");
+        try {
+            long millis = System.currentTimeMillis();
+            IOUtils.copy(attachment.stream, resp.getOutputStream());
+            resp.getOutputStream().flush();
+            System.out.println("millis = " + (System.currentTimeMillis() - millis));
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 }

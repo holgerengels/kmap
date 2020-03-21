@@ -66,10 +66,10 @@ public class ContentManager extends Server
             String chapter = object.get("chapter").getAsString();
             String topic  = object.get("topic").getAsString();
             JsonArray attachments = object.getAsJsonArray("attachments");
-            List<String> added = new ArrayList<>();
+            Set<String> added = new HashSet<>();
             if (attachments != null) {
                 for (JsonElement elefant : attachments) {
-                    JsonObject attachment = (JsonObject) elefant;
+                    JsonObject attachment = (JsonObject)elefant;
                     if ("link".equals(attachment.getAsJsonPrimitive("type").getAsString()))
                         continue;
 
@@ -78,6 +78,7 @@ public class ContentManager extends Server
                     added.add(file);
                 }
             }
+
             List<Cloud.Attachment> cloudAttachments = cloud.findAttachments(subject, chapter, topic, false);
             for (Cloud.Attachment attachment : cloudAttachments) {
                 if (added.contains(attachment.name))
@@ -92,13 +93,14 @@ public class ContentManager extends Server
     private void zipModuleDoc(ZipOutputStream out, JsonObject doc) throws IOException {
         ZipEntry entry = new ZipEntry("META/module.json");
         out.putNextEntry(entry);
-        IOUtils.copy(new StringReader(doc.toString()), new OutputStreamWriter(out, StandardCharsets.UTF_8));
+        OutputStreamWriter writer = new OutputStreamWriter(out, StandardCharsets.UTF_8);
+        IOUtils.copy(new StringReader(doc.toString()), writer);
         out.closeEntry();
     }
 
     void zipFile(ZipOutputStream out, String file) throws IOException {
         String[] dirs = file.split("/");
-        if (!couch.loadAttachment(attachment -> {
+        if (!tests.loadAttachment(attachment -> {
             doZipFile(dirs, attachment, out);
         }, dirs)) {
             cloud.loadAttachment(attachment -> {
@@ -167,12 +169,140 @@ public class ContentManager extends Server
                     idrev = null;
                 JsonObject attachment = attachments.get(zipEntry.getName());
                 String mime = attachment != null ? string(attachment, "mime") : MimeTypes.guessType(zipEntry.getName());
-                idrev = couch.importFile(idrev, zipEntry.getName(), mime, new KeepOpenInputStream(in));
+                idrev = couch.importAttachment(idrev, zipEntry.getName(), mime, new KeepOpenInputStream(in));
                 idrevOrigin = dirs[1] + dirs[2];
             }
         }
 
         return new String[] { subject, module};
+    }
+
+    public static void main(String[] args) throws IOException {
+        ContentManager manager = new ContentManager(readProperties(args[0]));
+        /*
+        CLIENT.set("vu");
+        manager.exportSet("Mathematik", "Parabeln", Files.newOutputStream(Paths.get("/tmp/test.zip")));
+        CLIENT.set("lala");
+        manager.createInstance("lala");
+        manager.importSet(Files.newInputStream(Paths.get("/tmp/test.zip")));
+         */
+        //CLIENT.remove();
+        //manager.syncModule("vu", "root", "Hilfe", "Hilfe");
+        //manager.syncModule("vu", "root", "Mathematik", "Grundwissen");
+        manager.syncSet("vu", "root", "Mathematik", "Geraden");
+        manager.syncModule("vu", "root", "Mathematik", "Analysis");
+        manager.syncModule("vu", "root", "Mathematik", "Analysis Plus");
+        manager.syncModule("vu", "root", "Mathematik", "Lineare Algebra");
+        manager.syncModule("vu", "root", "Mathematik", "Stochastik");
+    }
+
+    void exportSet(String subject, String set, OutputStream outputStream) throws IOException {
+        ZipOutputStream out = new ZipOutputStream(outputStream, StandardCharsets.UTF_8);
+
+        JsonArray array = tests.loadSet(subject, set);
+        for (JsonElement element : array) {
+            JsonObject object = (JsonObject)element;
+            object.remove("_id");
+            object.remove("_rev");
+        }
+
+        JsonObject doc = new JsonObject();
+        doc.addProperty("subject", subject);
+        doc.addProperty("set", set);
+        doc.add("docs", array);
+        zipSetDoc(out, doc);
+        for (JsonElement element : array) {
+            JsonObject object = (JsonObject)element;
+            String chapter = string(object, "chapter");
+            String topic  = string(object, "topic");
+            String key = string(object, "key");
+            String question = string(object, "question");
+            String answer = string(object, "answer");
+            String both = question + "\n---\n" + answer;
+            JsonObject attachments = object.getAsJsonObject("_attachments");
+            Set<String> added = new HashSet<>();
+            if (attachments != null) {
+                for (String file : attachments.keySet()) {
+                    zipFile(out, String.join("/", subject, set, key, file));
+                    added.add(file);
+                }
+            }
+
+            List<Cloud.Attachment> cloudAttachments = cloud.findAttachments(subject, chapter, topic, true);
+            for (Cloud.Attachment attachment : cloudAttachments) {
+                if (added.contains(attachment.name))
+                    continue;
+
+                if (!both.contains("inline:" + attachment.name))
+                    continue;
+
+                String zipPath = String.join("/", subject, set, key, attachment.name);
+                String cloudPath = String.join("/", subject, chapter, topic, "tests", attachment.name);
+                zipTestFile(out, zipPath, cloudPath);
+            }
+        }
+        out.close();
+    }
+
+    private void zipSetDoc(ZipOutputStream out, JsonObject doc) throws IOException {
+        ZipEntry entry = new ZipEntry("META/set.json");
+        out.putNextEntry(entry);
+        OutputStreamWriter writer = new OutputStreamWriter(out, StandardCharsets.UTF_8);
+        IOUtils.copy(new StringReader(doc.toString()), writer);
+        writer.flush();
+        out.closeEntry();
+    }
+
+    void zipTestFile(ZipOutputStream out, String zipPath, String cloudPath) throws IOException {
+        String[] zipDirs = zipPath.split("/");
+        String[] cloudDirs = cloudPath.split("/");
+        if (!couch.loadAttachment(attachment -> {
+            doZipFile(zipDirs, attachment, out);
+        }, zipDirs)) {
+            cloud.loadAttachment(attachment -> {
+                if (attachment.responseCode == 200) {
+                    doZipFile(zipDirs, attachment, out);
+                } else
+                    System.out.println("ERROR: attachment " + zipPath + ": " + attachment.responseMessage);
+            }, cloudDirs);
+        }
+    }
+
+    String[] importSet(InputStream inputStream) throws IOException {
+        String subject = null;
+        String set = null;
+
+        Map<String, JsonObject> attachments = new HashMap<>();
+        String[] idrev = null;
+        String idrevOrigin = null;
+        ZipInputStream in = new ZipInputStream(inputStream, StandardCharsets.UTF_8);
+        ZipEntry zipEntry;
+        while ((zipEntry = in.getNextEntry()) != null) {
+            if ("META/set.json".equals(zipEntry.getName())) {
+                String json = IOUtils.toString(new InputStreamReader(in, StandardCharsets.UTF_8));
+                JsonObject object = couch.getGson().fromJson(json, JsonObject.class);
+                subject = string(object, "subject");
+                set = string(object, "set");
+                JsonArray array = object.getAsJsonArray("docs");
+                for (JsonElement element : array) {
+                    JsonObject doc = (JsonObject)element;
+                    doc.remove("_id");
+                    doc.remove("_rev");
+                    doc.remove("_attachments");
+                }
+                tests.importSet(subject, set, object.toString());
+            }
+            else {
+                String[] dirs = zipEntry.getName().split("/");
+                if (!(dirs[1] + dirs[2]).equals(idrevOrigin))
+                    idrev = null;
+                String mime = MimeTypes.guessType(zipEntry.getName());
+                idrev = tests.importTestAttachment(idrev, zipEntry.getName(), mime, new KeepOpenInputStream(in));
+                idrevOrigin = dirs[1] + dirs[2];
+            }
+        }
+
+        return new String[] { subject, set};
     }
 
     void syncModule(String fromInstance, String toInstance, String subject, String module) {
@@ -241,7 +371,7 @@ public class ContentManager extends Server
                 cloud.copy(fromInstance, toInstance, file);
 
                 if (attachment.tag != null) {
-                    String path = Arrays.stream(file).map(Cloud::encode).collect(Collectors.joining("/"));
+                    String path = Arrays.stream(file).map(JsonServlet::encode).collect(Collectors.joining("/"));
                     tags.put(path, "kmap-" + attachment.tag);
                 }
             }
@@ -256,7 +386,7 @@ public class ContentManager extends Server
                 cloud.copy(fromInstance, toInstance, file);
 
                 if (entry.getValue().tag != null) {
-                    String path = Arrays.stream(file).map(Cloud::encode).collect(Collectors.joining("/"));
+                    String path = Arrays.stream(file).map(JsonServlet::encode).collect(Collectors.joining("/"));
                     tags.put(path, "kmap-" + entry.getValue().tag);
                 }
             }
@@ -275,92 +405,6 @@ public class ContentManager extends Server
         }
 
         Server.CLIENT.set(restoreInstance);
-    }
-
-    public static void main(String[] args) throws IOException {
-        ContentManager manager = new ContentManager(readProperties(args[0]));
-        /*
-        CLIENT.set("vu");
-        manager.exportSet("Mathematik", "Parabeln", Files.newOutputStream(Paths.get("/tmp/test.zip")));
-        CLIENT.set("lala");
-        manager.createInstance("lala");
-        manager.importSet(Files.newInputStream(Paths.get("/tmp/test.zip")));
-         */
-        //CLIENT.remove();
-        //manager.syncModule("vu", "root", "Hilfe", "Hilfe");
-        //manager.syncModule("vu", "root", "Mathematik", "Grundwissen");
-        manager.syncSet("vu", "root", "Mathematik", "Geraden");
-        manager.syncModule("vu", "root", "Mathematik", "Analysis");
-        manager.syncModule("vu", "root", "Mathematik", "Analysis Plus");
-        manager.syncModule("vu", "root", "Mathematik", "Lineare Algebra");
-        manager.syncModule("vu", "root", "Mathematik", "Stochastik");
-    }
-
-    void exportSet(String subject, String set, OutputStream outputStream) throws IOException {
-        ZipOutputStream out = new ZipOutputStream(outputStream, StandardCharsets.UTF_8);
-        Set<String> added = new HashSet<>();
-
-        JsonArray array = tests.loadSet(subject, set);
-        for (JsonElement element : array) {
-            JsonObject object = (JsonObject)element;
-            object.remove("_id");
-            object.remove("_rev");
-        }
-
-        JsonObject doc = new JsonObject();
-        doc.addProperty("subject", subject);
-        doc.addProperty("set", set);
-        doc.add("docs", array);
-        exportSetDoc(out, doc);
-        for (JsonElement element : array) {
-            JsonObject object = (JsonObject)element;
-            String chapter = object.get("chapter").getAsString();
-            String topic  = object.get("topic").getAsString();
-            String path = String.join("/", subject, chapter, topic);
-            if (!added.contains(path)) {
-                added.add(path);
-                List<Cloud.Attachment> attachmes = cloud.findAttachments(subject, chapter, topic, true);
-                for (Cloud.Attachment attachment : attachmes) {
-                    zipFile(out, String.join("/", subject, chapter, topic, "tests", attachment.name));
-                }
-            }
-        }
-        out.close();
-    }
-
-    private void exportSetDoc(ZipOutputStream out, JsonObject doc) throws IOException {
-        ZipEntry entry = new ZipEntry("META/set.json");
-        out.putNextEntry(entry);
-        IOUtils.copy(new StringReader(doc.toString()), out);
-        out.closeEntry();
-    }
-
-    String[] importSet(InputStream inputStream) throws IOException {
-        String subject = null;
-        String set = null;
-
-        ZipInputStream in = new ZipInputStream(inputStream, StandardCharsets.UTF_8);
-
-        Map<String,String> tags = new HashMap<>();
-
-        ZipEntry zipEntry;
-        while ((zipEntry = in.getNextEntry()) != null) {
-            if ("META/set.json".equals(zipEntry.getName())) {
-                String json = IOUtils.toString(new InputStreamReader(in, StandardCharsets.UTF_8));
-                JsonObject object = couch.getGson().fromJson(json, JsonObject.class);
-                subject = object.get("subject").getAsString();
-                set = object.get("set").getAsString();
-                tests.importSet(subject, set, json);
-            }
-            else {
-                int responseCode = cloud.storeAttachment(new KeepOpenInputStream(in), zipEntry.getName().split("/"));
-                System.out.println(zipEntry.getName() + " " + responseCode);
-            }
-        }
-        System.out.println("tags = " + tags);
-        cloud.transferTags(tags);
-
-        return new String[] { subject, set};
     }
 
     void syncSet(String fromInstance, String toInstance, String subject, String set) {

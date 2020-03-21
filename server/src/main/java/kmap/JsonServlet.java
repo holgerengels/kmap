@@ -8,11 +8,32 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.Properties;
 
 public class JsonServlet extends HttpServlet {
     protected Properties properties;
     protected Authentication authentication;
+
+    public static String encode(String string) {
+        try {
+            return URLEncoder.encode(string, "UTF-8").replace("+", "%20");
+        }
+        catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static String decode(String string) {
+        try {
+            return URLDecoder.decode(string, "UTF-8");
+        }
+        catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @Override
     public void init() throws ServletException {

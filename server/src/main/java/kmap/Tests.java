@@ -9,8 +9,11 @@ import org.lightcouch.View;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
+import java.util.function.Consumer;
 
+import static kmap.JsonServlet.encode;
 import static kmap.JSON.*;
 
 public class Tests {
@@ -117,6 +120,34 @@ public class Tests {
         return array;
     }
 
+    public boolean loadAttachment(Consumer<Cloud.AttachmentInputStream> sender, String... dirs) throws IOException {
+        CouchDbClient client = getClient();
+        View view = client.view("test/byKey")
+                .key(dirs[0], dirs[1], dirs[2])
+                .reduce(false)
+                .includeDocs(true);
+        List<JsonObject> objects = view.query(JsonObject.class);
+        JsonObject object = objects.get(0);
+        String id = string(object,"_id");
+        JsonObject attachments = object.getAsJsonObject("_attachments");
+        String type = null;
+        Integer length = null;
+        InputStream in = null;
+        if (attachments != null) {
+            JsonObject attachment = attachments.getAsJsonObject(dirs[3]);
+            if (attachment != null) {
+                type = string(attachment, "content_type");
+                length = integer(attachment, "length");
+                in = client.find(id + "/" + encode(dirs[3]));
+                System.out.println("Load " + id + "/" + dirs[3] + " from couch");
+                sender.accept(new Cloud.AttachmentInputStream(in, dirs[3], type, length));
+                in.close();
+                return true;
+            }
+        }
+        return false;
+    }
+
     public synchronized String storeTest(String subject, String set, String json) {
         CouchDbClient client = getClient();
         JsonObject object = client.getGson().fromJson(json, JsonObject.class);
@@ -205,6 +236,24 @@ public class Tests {
         }
     }
 
+    public String[] importTestAttachment(String[] idrev, String file, String contentType , InputStream in) {
+        CouchDbClient client = getClient();
+        String[] dirs = file.split("/");
+        if (idrev == null) {
+            View view = client.view("test/byKey")
+                    .key(dirs[0], dirs[1], dirs[2])
+                    .reduce(false)
+                    .includeDocs(true);
+            List<JsonObject> objects = view.query(JsonObject.class);
+            JsonObject object = objects.get(0);
+            String id = string(object,"_id");
+            String rev = string(object,"_rev");
+            idrev = new String[] { id, rev };
+        }
+        Response response = client.saveAttachment(in, encode(dirs[3]), contentType, idrev[0], idrev[1]);
+        return new String[] { response.getId(), response.getRev() };
+    }
+
     private boolean checks(JsonObject object) {
         return !isNull(object, "set") && string(object, "set") != null
             && !isNull(object, "subject") && string(object, "subject") != null
@@ -236,8 +285,9 @@ public class Tests {
         for (JsonObject object : oldTests) {
             object.addProperty("_deleted", true);
         }
-        client.bulk(oldTests, false);
-        client.bulk(newTests, false);
+        if (!oldTests.isEmpty())
+            client.bulk(oldTests, true);
+        client.bulk(newTests, true);
 
         JsonObject object = new JsonObject();
         object.addProperty("subject", subject);

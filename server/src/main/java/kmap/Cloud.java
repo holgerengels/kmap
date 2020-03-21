@@ -24,10 +24,7 @@ import org.jdom2.input.SAXBuilder;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -106,7 +103,7 @@ public class Cloud extends Server
             try (CloseableHttpResponse ignored = client.execute(new HttpMKCol(files), context)){}
             String path = "";
             for (String dir : dirs) {
-                path += "/" + encode(dir);
+                path += "/" + JsonServlet.encode(dir);
                 try (CloseableHttpResponse ignored = client.execute(new HttpMKCol(files + path), context)){}
             }
 
@@ -122,7 +119,7 @@ public class Cloud extends Server
         HttpClientContext context = clientContext();
 
         String files = getProperty("cloud.url") + getProperty("cloud.files") + "/" + Server.CLIENT.get();
-        String path = Arrays.stream(dirs).map(Cloud::encode).collect(Collectors.joining("/"));
+        String path = Arrays.stream(dirs).map(JsonServlet::encode).collect(Collectors.joining("/"));
 
         HttpGet get = new HttpGet(files + "/" + path);
         try (CloseableHttpResponse response = client.execute(get, context)) {
@@ -144,7 +141,7 @@ public class Cloud extends Server
         HttpClientContext context = clientContext();
 
         String files = getProperty("cloud.url") + getProperty("cloud.files") + "/" + Server.CLIENT.get();
-        String path = Arrays.stream(dirs).map(Cloud::encode).collect(Collectors.joining("/"));
+        String path = Arrays.stream(dirs).map(JsonServlet::encode).collect(Collectors.joining("/"));
 
         HttpPut put = new HttpPut(files + "/" + path);
         put.setEntity(new InputStreamEntity(in));
@@ -159,7 +156,7 @@ public class Cloud extends Server
             CloseableHttpClient client = client();
             HttpClientContext context = clientContext();
 
-            String uri = getProperty("cloud.url") + getProperty("cloud.files") + "/" + Server.CLIENT.get() + "/" + encode(subject) + "/" + encode(chapter) + "/" + encode(topic) + "/";
+            String uri = getProperty("cloud.url") + getProperty("cloud.files") + "/" + Server.CLIENT.get() + "/" + JsonServlet.encode(subject) + "/" + JsonServlet.encode(chapter) + "/" + JsonServlet.encode(topic) + "/";
             if (tests)
                 uri += "/tests/";
 
@@ -199,7 +196,7 @@ public class Cloud extends Server
     private String fileName(Element element) {
         Element child = element.getChild("href", d);
         String path = child.getText();
-        path = decode(path);
+        path = JsonServlet.decode(path);
         int pos = path.lastIndexOf('/');
         return path.substring(pos + 1);
     }
@@ -234,8 +231,8 @@ public class Cloud extends Server
             HttpClientContext context = clientContext();
 
             HttpCopy copy = new HttpCopy(
-                    getProperty("cloud.url") + getProperty("cloud.files") + "/" + fromInstance + "/" + Arrays.stream(file).map(Cloud::encode).collect(Collectors.joining("/")),
-                    getProperty("cloud.url") + getProperty("cloud.files") + "/" + toInstance + "/" + Arrays.stream(file).map(Cloud::encode).collect(Collectors.joining("/")));
+                    getProperty("cloud.url") + getProperty("cloud.files") + "/" + fromInstance + "/" + Arrays.stream(file).map(JsonServlet::encode).collect(Collectors.joining("/")),
+                    getProperty("cloud.url") + getProperty("cloud.files") + "/" + toInstance + "/" + Arrays.stream(file).map(JsonServlet::encode).collect(Collectors.joining("/")));
 
             try (CloseableHttpResponse response = client.execute(copy, context)) {
                 System.out.println("copy response = " + response);
@@ -251,7 +248,7 @@ public class Cloud extends Server
             CloseableHttpClient client = client();
             HttpClientContext context = clientContext();
 
-            HttpDelete delete = new HttpDelete(getProperty("cloud.url") + getProperty("cloud.files") + "/" + instance + "/" + Arrays.stream(file).map(Cloud::encode).collect(Collectors.joining("/")));
+            HttpDelete delete = new HttpDelete(getProperty("cloud.url") + getProperty("cloud.files") + "/" + instance + "/" + Arrays.stream(file).map(JsonServlet::encode).collect(Collectors.joining("/")));
             try (CloseableHttpResponse response = client.execute(delete, context)) {
                 System.out.println("delete response = " + response);
             }
@@ -264,28 +261,10 @@ public class Cloud extends Server
     private String dirName(Element element) {
         Element child = element.getChild("href", d);
         String path = child.getText();
-        path = decode(path);
+        path = JsonServlet.decode(path);
         path = path.substring(0, path.length() - 1);
         int pos = path.lastIndexOf('/');
         return path.substring(pos + 1);
-    }
-
-    public static String encode(String string) {
-        try {
-            return URLEncoder.encode(string, "UTF-8").replace("+", "%20");
-        }
-        catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static String decode(String string) {
-        try {
-            return URLDecoder.decode(string, "UTF-8");
-        }
-        catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     Map<String,String> listTags(String path) {
@@ -308,7 +287,7 @@ public class Cloud extends Server
                     if (element.getDescendants(new ElementFilter("collection", d)).hasNext()) {
                         String dirName = dirName(element);
                         System.out.println("dir:  " + dirName);
-                        map.putAll(listTags(path + "/" + encode(dirName)));
+                        map.putAll(listTags(path + "/" + JsonServlet.encode(dirName)));
                     }
                     else {
                         String fileId = fileId(element);
@@ -316,7 +295,7 @@ public class Cloud extends Server
                         String fileTag = fileTag(client, context, fileId);
 
                         if (fileTag != null) {
-                            map.put(path + "/" + encode(fileName), fileTag);
+                            map.put(path + "/" + JsonServlet.encode(fileName), fileTag);
                         }
                     }
                 }

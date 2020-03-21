@@ -66,7 +66,7 @@
 
     <servlet-mapping>
         <servlet-name>tests</servlet-name>
-        <url-pattern>/tests</url-pattern>
+        <url-pattern>/tests/*</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>

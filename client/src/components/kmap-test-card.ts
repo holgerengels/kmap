@@ -23,6 +23,8 @@ export class KMapTestCard extends connect(store, LitElement) {
   @property({type: String})
   private subject: string = '';
   @property({type: String})
+  private set: string = '';
+  @property({type: String})
   private chapter: string = '';
   @property({type: String})
   private topic: string = '';
@@ -124,7 +126,7 @@ export class KMapTestCard extends connect(store, LitElement) {
 
   math(text, element) {
     if (text) {
-      let replace = text.replace(/inline:([^"]*)/g, urls.server + "data/" + this.subject + "/" + this.chapter + "/" + this.topic + "/tests/$1?instance=" + this._instance);
+      let replace = text.replace(/inline:([^"]*)/g, urls.server + "tests/" + this.subject + "/" + this.set + "/" + this.key + "/$1?instance=" + this._instance);
       replace = replace.replace(/<check\/>/g, "<input type='checkbox'/>");
       replace = replace.replace(/<text\/>/g, "<input type='text' inputmode='text'/>");
       replace = replace.replace(/<text ([0-9]+)\/>/g, "<input type='text' inputmode='text' maxlength='$1' style='width: $1em'/>");

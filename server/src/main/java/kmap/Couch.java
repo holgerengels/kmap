@@ -228,7 +228,7 @@ public class Couch extends Server {
         }
     }
 
-    public String[] importFile(String[] idrev, String file, String contentType , InputStream in) {
+    public String[] importAttachment(String[] idrev, String file, String contentType , InputStream in) {
         CouchDbClient client = createClient("map");
         String[] dirs = file.split("/");
         if (idrev == null) {

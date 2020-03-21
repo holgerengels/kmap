@@ -10,6 +10,9 @@
     "bySet": {
       "map": "function(doc) {\n    if (doc.subject && doc.set)\n      emit([doc.subject, doc.set]);\n}"
     },
+    "byKey": {
+      "map": "function(doc) {\n    if (doc.subject && doc.set && doc.key)\n      emit([doc.subject, doc.set, doc.key]);\n}"
+    },
     "availableSets": {
       "map": "function(doc) {\n    if (doc.subject && doc.set)\n      emit([doc.subject, doc.set], 1);\n}",
       "reduce": "_sum"

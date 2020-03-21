@@ -91,6 +91,8 @@ export class KMapTestEditorScroller extends connect(store, LitElement) {
     <div style="margin: 32px">
     ${this._selected ? html`<kmap-test-card hideActions
                                 .subject="${this._selected.subject}"
+                                .set="${this._selected.set}"
+                                .key="${this._selected.key}"
                                 .chapter="${this._selected.chapter}"
                                 .topic="${this._selected.topic}"
                                 .level="${this._selected.level}"
