@@ -272,7 +272,7 @@ public class ContentManager extends Server
         String subject = null;
         String set = null;
 
-        Map<String, JsonObject> attachments = new HashMap<>();
+        JsonObject object = null;
         String[] idrev = null;
         String idrevOrigin = null;
         ZipInputStream in = new ZipInputStream(inputStream, StandardCharsets.UTF_8);
@@ -280,7 +280,7 @@ public class ContentManager extends Server
         while ((zipEntry = in.getNextEntry()) != null) {
             if ("META/set.json".equals(zipEntry.getName())) {
                 String json = IOUtils.toString(new InputStreamReader(in, StandardCharsets.UTF_8));
-                JsonObject object = couch.getGson().fromJson(json, JsonObject.class);
+                object = couch.getGson().fromJson(json, JsonObject.class);
                 subject = string(object, "subject");
                 set = string(object, "set");
                 JsonArray array = object.getAsJsonArray("docs");
@@ -293,16 +293,42 @@ public class ContentManager extends Server
                 tests.importSet(subject, set, object.toString());
             }
             else {
-                String[] dirs = zipEntry.getName().split("/");
+                String path = zipEntry.getName();
+                String[] dirs = path.split("/");
+                if (dirs.length == 5 && "tests".equals(dirs[3])) {
+                    String key = findKey(object, path);
+                    if (key == null) {
+                        System.out.println("no key for " + path);
+                        continue;
+                    }
+                    dirs = new String[] { subject, set, key, dirs[4]};
+                    path = String.join("/", dirs);
+                }
                 if (!(dirs[1] + dirs[2]).equals(idrevOrigin))
                     idrev = null;
-                String mime = MimeTypes.guessType(zipEntry.getName());
-                idrev = tests.importTestAttachment(idrev, zipEntry.getName(), mime, new KeepOpenInputStream(in));
+                String mime = MimeTypes.guessType(path);
+                idrev = tests.importTestAttachment(idrev, path, mime, new KeepOpenInputStream(in));
                 idrevOrigin = dirs[1] + dirs[2];
             }
         }
 
         return new String[] { subject, set};
+    }
+
+    private String findKey(JsonObject object, String path) {
+        String[] dirs = path.split("/");
+        JsonArray array = object.getAsJsonArray("docs");
+        for (JsonElement element : array) {
+            JsonObject doc = (JsonObject)element;
+            String chapter = string(doc, "chapter");
+            String topic = string(doc, "topic");
+            String question = string(doc, "question");
+            String answer = string(doc, "answer");
+            if (dirs[1].equals(chapter) && dirs[2].equals(topic)
+                    && (question.contains("inline:" + dirs[4]) || answer.contains("inline:" + dirs[4])))
+                return string(doc, "key");
+        }
+        return null;
     }
 
     void syncModule(String fromInstance, String toInstance, String subject, String module) {
