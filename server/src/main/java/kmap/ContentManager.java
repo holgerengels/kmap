@@ -100,7 +100,7 @@ public class ContentManager extends Server
 
     void zipFile(ZipOutputStream out, String file) throws IOException {
         String[] dirs = file.split("/");
-        if (!tests.loadAttachment(attachment -> {
+        if (!couch.loadAttachment(attachment -> {
             doZipFile(dirs, attachment, out);
         }, dirs)) {
             cloud.loadAttachment(attachment -> {

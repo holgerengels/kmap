@@ -107,6 +107,7 @@ export class KMapInstancePopup extends connect(store, LitElement) {
   render() {
     // language=HTML
     return html`
+  <!--googleoff: all-->
   <mwc-dialog id="instanceDialog" title="Instanz wählen">
     <div>
         <h3>Instanzen</h3>
@@ -120,6 +121,7 @@ export class KMapInstancePopup extends connect(store, LitElement) {
     </datalist-textfield>
     <mwc-button slot="primaryAction" @click=${this._chooseInstance}>Auswählen</mwc-button>
   </mwc-dialog>
+  <!--googleon: all-->
     `;
   }
 }

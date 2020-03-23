@@ -38,6 +38,9 @@ p, .font-body, td, div, span {
   font-size: 0.95rem;
   font-weight: 400;
 }
+h1:first-child, h2:first-child, h3:first-child, h4:first-child, h5:first-child, p:first-child {
+  margin-top: 0px;
+}
 .secondary {
   font-family: Roboto,sans-serif;
   -webkit-font-smoothing: antialiased;

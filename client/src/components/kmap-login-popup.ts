@@ -128,6 +128,7 @@ export class KMapLoginPopup extends connect(store, LitElement) {
   render() {
     // language=HTML
     return html`
+  <!--googleoff: all-->
   <mwc-dialog id="loginDialog" heading="Anmelden">
     <form id="loginForm" ?hidden="${this._userid}" @keyup="${this._maybeEnter}">
       ${!this._showInstanceChooser ? html`
@@ -155,6 +156,7 @@ export class KMapLoginPopup extends connect(store, LitElement) {
     <mwc-button slot="primaryAction" ?hidden="${this._userid}" @click=${this._login}>Anmelden</mwc-button>
     <mwc-button slot="secondaryAction" ?hidden="${!this._userid}" @click=${this._logout}>Abmelden</mwc-button>
   </mwc-dialog>
+  <!--googleon: all-->
     `;
   }
 }

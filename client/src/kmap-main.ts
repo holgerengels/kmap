@@ -271,11 +271,13 @@ export class KmapMain extends connect(store, LitElement) {
         <a ?selected="${this._page === 'courses'}" ?disabled="${!this._roles.includes("teacher")}" href="/app/courses">Kurse</a>
         <a ?selected="${this._page === 'content-mananer'}" ?disabled="${!this._roles.includes("teacher")}" href="/app/content-manager">Content Manager</a>
         <a href="/app/browser/Hilfe/Hilfe">Hilfe</a>
+        <a href="/app/browser/Hilfe/Hilfe/Impressum">Impressum</a>
 
         <pwa-install-button><mwc-button outlined style="--mdc-theme-primary: var(--color-secondary-dark);">App installieren</mwc-button></pwa-install-button>
         <pwa-update-available><mwc-button outlined style="--mdc-theme-primary: var(--color-secondary-dark);">App aktualisieren</mwc-button></pwa-update-available>
       </nav>
       <hr/>
+      <!--googleoff: all-->
       <nav class="drawer-list">
         <label section>Layer ein-/ausblenden</label><br/>
         <mwc-button @click="${() => this._toggleLayer('summaries')}" icon="short_text" outlined ?raised="${this._layers.includes('summaries')}">Kurztexte</mwc-button>
@@ -287,6 +289,7 @@ export class KmapMain extends connect(store, LitElement) {
           ${this._page === 'test' ? html`<kmap-set-selector></kmap-set-selector>` : ''}
         ` : ''}
       </nav>
+      <!--googleon: all-->
     </div>
 
     <div slot="appContent" class="main-content" role="main" @toggleDrawer="${() => this._drawerOpen = !this._drawerOpen}" @lclick="${this._showLogin}">
