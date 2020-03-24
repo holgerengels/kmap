@@ -2,14 +2,12 @@ package kmap;
 
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.apache.commons.io.IOUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.Arrays;
 
 /**
@@ -20,13 +18,11 @@ public class DataServlet
     extends JsonServlet
 {
     private Couch couch;
-    private Cloud cloud;
 
     @Override
     public void init() throws ServletException {
         super.init();
         couch = new Couch(properties);
-        cloud = new Cloud(properties);
     }
 
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
@@ -91,17 +87,9 @@ public class DataServlet
 
                 corsHeaders(req, resp);
 
-                if (!couch.loadAttachment(attachment -> {
+                couch.loadAttachment(attachment -> {
                     sendAttachment(resp, attachment);
-                }, dirs)) {
-                    cloud.loadAttachment(attachment -> {
-                        if (attachment.responseCode == 200) {
-                            sendAttachment(resp, attachment);
-                        }
-                        else
-                            sendError(req, resp, attachment.responseCode, attachment.responseMessage);
-                    }, dirs);
-                }
+                }, dirs);
             }
         }
         catch (Exception e) {
@@ -113,7 +101,7 @@ public class DataServlet
         }
     }
 
-    private void sendAttachment(HttpServletResponse resp, Cloud.AttachmentInputStream attachment) {
+    private void sendAttachment(HttpServletResponse resp, AttachmentInputStream attachment) {
         String fileName = attachment.fileName;
         String mimeType = attachment.mimeType != null ? attachment.mimeType : MimeTypes.guessType(fileName);
         resp.setContentType(mimeType);

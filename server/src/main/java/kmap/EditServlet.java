@@ -1,7 +1,6 @@
 package kmap;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import org.apache.commons.io.IOUtils;
 
@@ -10,14 +9,12 @@ import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -33,7 +30,6 @@ public class EditServlet
     extends JsonServlet
 {
     private Couch couch;
-    private Cloud cloud;
 
     Map<String, Upload> uploads = Collections.synchronizedMap(new HashMap<>());
 
@@ -41,7 +37,6 @@ public class EditServlet
     public void init() throws ServletException {
         super.init();
         couch = new Couch(properties);
-        cloud = new Cloud(properties);
     }
 
     @Override
@@ -98,8 +93,6 @@ public class EditServlet
             String modules = req.getParameter("modules");
             String subject = req.getParameter("subject");
             String load = req.getParameter("load");
-            String directory = req.getParameter("directory");
-            String attachments = req.getParameter("attachments");
             if (modules != null) {
                 log("modules = " + modules);
                 JsonArray array = couch.loadModules();
@@ -111,28 +104,6 @@ public class EditServlet
                 JsonArray array = couch.loadModule(subject, load);
                 if (array != null)
                     writeResponse(req, resp, array);
-            }
-            else if (directory != null) { // TODO: move to POST
-                log("directory for = " + directory);
-                String[] split = directory.split("/");
-                String link = cloud.createDirectory(split[0], split[1], split[2]);
-                writeResponse(req, resp, new JsonPrimitive(link));
-            }
-            else if (attachments != null) {
-                log("attachments for = " + attachments);
-                String[] split = attachments.split("/");
-                List<Cloud.Attachment> list = cloud.findAttachments(split[0], split[1], split[2], false);
-                if (list != null) {
-                    JsonArray array = new JsonArray();
-                    for (Cloud.Attachment attachment : list) {
-                        JsonObject object = new JsonObject();
-                        object.addProperty("name", attachment.name);
-                        object.addProperty("tag", attachment.tag);
-                        object.addProperty("type", attachment.type);
-                        array.add(object);
-                    }
-                    writeResponse(req, resp, array);
-                }
             }
         }
         catch (Exception e) {

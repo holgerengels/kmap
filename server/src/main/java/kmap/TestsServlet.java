@@ -8,11 +8,9 @@ import org.apache.commons.io.IOUtils;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * Created by holger on 09.05.16.
@@ -21,13 +19,11 @@ public class TestsServlet
     extends JsonServlet
 {
     private Tests tests;
-    private Cloud cloud;
 
     @Override
     public void init() throws ServletException {
         super.init();
         tests = new Tests(new Couch(properties));
-        cloud = new Cloud(properties);
     }
 
     @Override
@@ -81,8 +77,6 @@ public class TestsServlet
             String topic = req.getParameter("topic");
             String chapters = req.getParameter("chapters");
             String topics = req.getParameter("topics");
-            String directory = req.getParameter("directory");
-            String attachments = req.getParameter("attachments");
             String file = req.getPathInfo();
             if (sets != null) {
                 log("sets = " + sets);
@@ -120,28 +114,6 @@ public class TestsServlet
                 if (array != null)
                     writeResponse(req, resp, array);
             }
-            else if (directory != null) { // TODO: move to POST
-                log("directory for = " + directory);
-                String[] split = directory.split("/");
-                String link = cloud.createDirectory(split[0], split[1], split[2], "tests");
-                writeResponse(req, resp, new JsonPrimitive(link));
-            }
-            else if (attachments != null) {
-                log("attachments for = " + attachments);
-                String[] split = attachments.split("/");
-                List<Cloud.Attachment> list = cloud.findAttachments(split[0], split[1], split[2], true);
-                if (list != null) {
-                    JsonArray array = new JsonArray();
-                    for (Cloud.Attachment attachment : list) {
-                        JsonObject object = new JsonObject();
-                        object.addProperty("name", attachment.name);
-                        object.addProperty("tag", attachment.tag);
-                        object.addProperty("type", attachment.type);
-                        array.add(object);
-                    }
-                    writeResponse(req, resp, array);
-                }
-            }
             else if (file != null) {
                 log("load file = " + file);
                 String[] split = file.split("/");
@@ -163,7 +135,7 @@ public class TestsServlet
         }
     }
 
-    private void sendAttachment(HttpServletResponse resp, Cloud.AttachmentInputStream attachment) {
+    private void sendAttachment(HttpServletResponse resp, AttachmentInputStream attachment) {
         String fileName = attachment.fileName;
         String mimeType = attachment.mimeType != null ? attachment.mimeType : MimeTypes.guessType(fileName);
         resp.setContentType(mimeType);

@@ -61,6 +61,8 @@ public class Couch extends Server {
         objects.forEach(o -> o.addProperty("module", module));
         objects.forEach(o -> {
             JsonArray attachments = o.getAsJsonArray("attachments");
+            JsonObject _attachments = o.getAsJsonObject("_attachments");
+            o.add("attachments", amendAttachments(attachments, _attachments));
             fixAttachments(attachments, subject, string(o, "chapter"), string(o, "topic"));
         });
         objects.sort(Comparator.comparing((JsonObject o) -> string(o, "chapter")).thenComparing(o -> string(o, "topic")));
@@ -232,12 +234,7 @@ public class Couch extends Server {
         CouchDbClient client = createClient("map");
         String[] dirs = file.split("/");
         if (idrev == null) {
-            View view = client.view("net/byTopic")
-                    .key(dirs[0], dirs[1], dirs[2])
-                    .reduce(false)
-                    .includeDocs(true);
-            List<JsonObject> objects = view.query(JsonObject.class);
-            JsonObject object = objects.get(0);
+            JsonObject object = loadTopic(client, dirs);
             String id = string(object,"_id");
             String rev = string(object,"_rev");
             idrev = new String[] { id, rev };
@@ -445,19 +442,26 @@ public class Couch extends Server {
 
         if (_attachments != null) {
             for (Map.Entry<String, JsonElement> entry : _attachments.entrySet()) {
-                if (existing.contains(entry.getKey()))
+                String file = entry.getKey();
+                JsonObject object = (JsonObject)entry.getValue();
+                if (existing.contains(file))
                     continue;
 
-                String type = string((JsonObject) entry.getValue(), "content_type");
-                JsonObject attachment = new JsonObject();
-                attachment.addProperty("type", "file");
-                attachment.addProperty("name", entry.getKey());
-                attachment.addProperty("file", entry.getKey());
-                attachment.addProperty("mime", type);
+                String type = string(object, "content_type");
+                JsonObject attachment = attachmentFromAttachment(file, type);
                 attachments.add(attachment);
             }
         }
         return attachments;
+    }
+
+    public JsonObject attachmentFromAttachment(String file, String type) {
+        JsonObject attachment = new JsonObject();
+        attachment.addProperty("type", "file");
+        attachment.addProperty("name", file);
+        attachment.addProperty("file", file);
+        attachment.addProperty("mime", type);
+        return attachment;
     }
 
     private void debugLinks(String subject, Map<String, String> links) {
@@ -534,14 +538,9 @@ public class Couch extends Server {
         }
     }
 
-    public boolean loadAttachment(Consumer<Cloud.AttachmentInputStream> sender, String... dirs) throws IOException {
+    public boolean loadAttachment(Consumer<AttachmentInputStream> sender, String... dirs) throws IOException {
         CouchDbClient client = createClient("map");
-        View view = client.view("net/byTopic")
-                .key(dirs[0], dirs[1], dirs[2])
-                .reduce(false)
-                .includeDocs(true);
-        List<JsonObject> objects = view.query(JsonObject.class);
-        JsonObject object = objects.get(0);
+        JsonObject object = loadTopic(client, dirs);
         String id = string(object,"_id");
         JsonObject attachments = object.getAsJsonObject("_attachments");
         String type = null;
@@ -554,12 +553,33 @@ public class Couch extends Server {
                 length = integer(attachment, "length");
                 in = client.find(id + "/" + encode(dirs[3]));
                 System.out.println("Load " + id + "/" + dirs[3] + " from couch");
-                sender.accept(new Cloud.AttachmentInputStream(in, dirs[3], type, length));
+                sender.accept(new AttachmentInputStream(in, dirs[3], type, length));
                 in.close();
                 return true;
             }
         }
         return false;
+    }
+
+    public void fix(String path, List<JsonObject> list) {
+        String[] dirs = path.split("/");
+        CouchDbClient client = createClient("map");
+        JsonObject object = loadTopic(client, dirs);
+        JsonArray attachments = object.getAsJsonArray("attachments");
+        if (attachments == null)
+            attachments = new JsonArray();
+        list.forEach(attachments::add);
+        object.add("attachments", attachments);
+        client.update(object);
+    }
+
+    private JsonObject loadTopic(CouchDbClient client, String[] dirs) {
+        View view = client.view("net/byTopic")
+                .key(dirs[0], dirs[1], dirs[2])
+                .reduce(false)
+                .includeDocs(true);
+        List<JsonObject> objects = view.query(JsonObject.class);
+        return objects.get(0);
     }
 
     public synchronized JsonArray search(String filter) {
@@ -810,49 +830,16 @@ public class Couch extends Server {
     public static void main(String[] args) throws IOException {
         Couch couch = new Couch(readProperties(args[0]));
         Server.CLIENT.set("lala");
-        String json = "[" +
-                "   {" +
-                "    'name': 'Alles im Fluss.md'," +
-                "    'tag': 'idea'," +
-                "    'type': 'text/markdown'" +
-                "   }," +
-                "   {" +
-                "    'tag': 'explanation'," +
-                "    'type': 'link'," +
-                "    'name': 'Serlo'," +
-                "    'href': 'https://de.serlo.org/mathe/funktionen/wichtige-funktionstypen-ihre-eigenschaften/lineare-funktionen-geraden/geradengleichung'" +
-                "   }," +
-                "   {" +
-                "    'name': 'Kugel'," +
-                "    'file': 'Kugel.png'," +
-                "    'type': 'file'," +
-                "    'tag': 'idea'," +
-                "    'href': 'data/Mathematik/Grundwissen/Type%20System/Kugel.png'," +
-                "    'mime': 'image/png'" +
-                "   }" +
-                "  ]";
-        JsonArray array = couch.getGson().fromJson(json, JsonArray.class);
 
-        couch.fixAttachments(array,"Meta", "Mathe", "Matik");
-        System.out.println("array = " + array);
+        couch.walk("Mathematik");
+
         /*
-        couch.loadAttachment(attachment -> {
-            if (attachment.responseCode == 200) {
-                try {
-                    IOUtils.copy(attachment.stream, System.out);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                System.out.flush();
-            }
-        }, "Hilfe", "Hilfe", "Aktuelles", "ich.jpg");
+        JsonObject object = couch.chapter("mathe", "Mathematik");
+        System.out.println("object = " + object);
+        States states = new States(couch);
+        JsonObject snp = states.statesAndProgress("h.engels", "Mathematik");
+        System.out.println("states = " + snp);
          */
-
-        //couch.walk("Mathematik");
-        //JsonObject object = couch.chapter("mathe", "Mathematik");
-        //System.out.println("object = " + object);
-        //JsonObject states = couch.statesAndProgress("h.engels", "Mathematik");
-        //System.out.println("states = " + states);
     }
 
     public JsonArray instances() {

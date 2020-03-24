@@ -120,7 +120,7 @@ public class Tests {
         return array;
     }
 
-    public boolean loadAttachment(Consumer<Cloud.AttachmentInputStream> sender, String... dirs) throws IOException {
+    public boolean loadAttachment(Consumer<AttachmentInputStream> sender, String... dirs) throws IOException {
         CouchDbClient client = getClient();
         View view = client.view("test/byKey")
                 .key(dirs[0], dirs[1], dirs[2])
@@ -140,7 +140,7 @@ public class Tests {
                 length = integer(attachment, "length");
                 in = client.find(id + "/" + encode(dirs[3]));
                 System.out.println("Load " + id + "/" + dirs[3] + " from couch");
-                sender.accept(new Cloud.AttachmentInputStream(in, dirs[3], type, length));
+                sender.accept(new AttachmentInputStream(in, dirs[3], type, length));
                 in.close();
                 return true;
             }

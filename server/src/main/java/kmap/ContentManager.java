@@ -25,7 +25,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -34,13 +33,11 @@ import static kmap.JSON.string;
 
 public class ContentManager extends Server
 {
-    Cloud cloud;
     Couch couch;
     Tests tests;
 
     public ContentManager(Properties properties) {
         super(properties);
-        cloud = new Cloud(properties);
         couch = new Couch(properties);
         tests = new Tests(couch);
     }
@@ -78,14 +75,6 @@ public class ContentManager extends Server
                     added.add(file);
                 }
             }
-
-            List<Cloud.Attachment> cloudAttachments = cloud.findAttachments(subject, chapter, topic, false);
-            for (Cloud.Attachment attachment : cloudAttachments) {
-                if (added.contains(attachment.name))
-                    continue;
-
-                zipFile(out, String.join("/", subject, chapter, topic, attachment.name));
-            }
         }
         out.close();
     }
@@ -95,25 +84,18 @@ public class ContentManager extends Server
         out.putNextEntry(entry);
         OutputStreamWriter writer = new OutputStreamWriter(out, StandardCharsets.UTF_8);
         IOUtils.copy(new StringReader(doc.toString()), writer);
+        writer.flush();
         out.closeEntry();
     }
 
     void zipFile(ZipOutputStream out, String file) throws IOException {
         String[] dirs = file.split("/");
-        if (!couch.loadAttachment(attachment -> {
+        couch.loadAttachment(attachment -> {
             doZipFile(dirs, attachment, out);
-        }, dirs)) {
-            cloud.loadAttachment(attachment -> {
-                if (attachment.responseCode == 200) {
-                    doZipFile(dirs, attachment, out);
-                }
-                else
-                    System.out.println("ERROR: attachment " + file + ": " + attachment.responseMessage);
-            }, dirs);
-        }
+        }, dirs);
     }
 
-    private void doZipFile(String[] dirs, Cloud.AttachmentInputStream attachment, ZipOutputStream out) {
+    private void doZipFile(String[] dirs, AttachmentInputStream attachment, ZipOutputStream out) {
         try {
             String fileName = dirs[dirs.length - 1];
             System.out.println("fileName = " + fileName + " (" + attachment.contentLength + ")");
@@ -133,6 +115,7 @@ public class ContentManager extends Server
         String module = null;
 
         Map<String, JsonObject> attachments = new HashMap<>();
+        Map<String, List<JsonObject>> fixes = new HashMap<>();
         String[] idrev = null;
         String idrevOrigin = null;
         ZipInputStream in = new ZipInputStream(inputStream, StandardCharsets.UTF_8);
@@ -169,10 +152,16 @@ public class ContentManager extends Server
                     idrev = null;
                 JsonObject attachment = attachments.get(zipEntry.getName());
                 String mime = attachment != null ? string(attachment, "mime") : MimeTypes.guessType(zipEntry.getName());
+                if (attachment == null) {
+                    attachment = couch.attachmentFromAttachment(dirs[3], mime);
+                    fixes.computeIfAbsent(String.join("/", Arrays.copyOfRange(dirs, 0, 3)), a -> new ArrayList<>()).add(attachment);
+                }
                 idrev = couch.importAttachment(idrev, zipEntry.getName(), mime, new KeepOpenInputStream(in));
                 idrevOrigin = dirs[1] + dirs[2];
             }
         }
+
+        fixes.forEach((key, value) -> couch.fix(key, value));
 
         return new String[] { subject, module};
     }
@@ -220,25 +209,10 @@ public class ContentManager extends Server
             String answer = string(object, "answer");
             String both = question + "\n---\n" + answer;
             JsonObject attachments = object.getAsJsonObject("_attachments");
-            Set<String> added = new HashSet<>();
             if (attachments != null) {
                 for (String file : attachments.keySet()) {
                     zipFile(out, String.join("/", subject, set, key, file));
-                    added.add(file);
                 }
-            }
-
-            List<Cloud.Attachment> cloudAttachments = cloud.findAttachments(subject, chapter, topic, true);
-            for (Cloud.Attachment attachment : cloudAttachments) {
-                if (added.contains(attachment.name))
-                    continue;
-
-                if (!both.contains("inline:" + attachment.name))
-                    continue;
-
-                String zipPath = String.join("/", subject, set, key, attachment.name);
-                String cloudPath = String.join("/", subject, chapter, topic, "tests", attachment.name);
-                zipTestFile(out, zipPath, cloudPath);
             }
         }
         out.close();
@@ -253,19 +227,11 @@ public class ContentManager extends Server
         out.closeEntry();
     }
 
-    void zipTestFile(ZipOutputStream out, String zipPath, String cloudPath) throws IOException {
+    void zipTestFile(ZipOutputStream out, String zipPath) throws IOException {
         String[] zipDirs = zipPath.split("/");
-        String[] cloudDirs = cloudPath.split("/");
-        if (!couch.loadAttachment(attachment -> {
+        couch.loadAttachment(attachment -> {
             doZipFile(zipDirs, attachment, out);
-        }, zipDirs)) {
-            cloud.loadAttachment(attachment -> {
-                if (attachment.responseCode == 200) {
-                    doZipFile(zipDirs, attachment, out);
-                } else
-                    System.out.println("ERROR: attachment " + zipPath + ": " + attachment.responseMessage);
-            }, cloudDirs);
-        }
+        }, zipDirs);
     }
 
     String[] importSet(InputStream inputStream) throws IOException {
@@ -347,89 +313,6 @@ public class ContentManager extends Server
 
         Server.CLIENT.set(toInstance);
         couch.importModule(subject, module, doc.toString());
-
-        Set<String[]> dirs = new HashSet<>();
-        for (JsonElement element : array) {
-            JsonObject card = (JsonObject)element;
-            String chapter = card.get("chapter").getAsString();
-            String topic = card.get("topic").getAsString();
-            dirs.add(new String[] {subject, chapter, topic});
-        }
-
-        for (String[] dir : dirs) {
-            System.out.println(Arrays.asList(dir));
-            Map<String, String> tags = new HashMap<>();
-
-            Server.CLIENT.set(fromInstance);
-            List<Cloud.Attachment> fromAttachments = cloud.findAttachments(dir[0], dir[1], dir[2], false);
-            Server.CLIENT.set(toInstance);
-            List<Cloud.Attachment> toAttachments = cloud.findAttachments(dir[0], dir[1], dir[2], false);
-
-            List<Cloud.Attachment> added = new ArrayList<>(fromAttachments);
-            added.removeAll(toAttachments);
-
-            List<Cloud.Attachment> removed = new ArrayList<>(toAttachments);
-            removed.removeAll(fromAttachments);
-
-            List<Cloud.Attachment> kept = new ArrayList<>(toAttachments);
-            kept.retainAll(fromAttachments);
-
-            Map<Cloud.Attachment,Cloud.Attachment> changed = new HashMap<>();
-            for (Cloud.Attachment attachment : kept) {
-                int i = fromAttachments.indexOf(attachment);
-                Cloud.Attachment master = fromAttachments.get(i);
-                if (!Objects.equals(attachment.type, master.type))
-                    changed.put(attachment, master);
-                else if (!Objects.equals(attachment.tag, master.tag))
-                    changed.put(attachment, master);
-                else if (!Objects.equals(attachment.size, master.size))
-                    changed.put(attachment, master);
-            }
-
-            if (fromAttachments.size() != 0) {
-                Server.CLIENT.set(toInstance);
-                cloud.createDirectory(dir);
-            }
-
-            for (Cloud.Attachment attachment : added) {
-                String[] file = file(dir, attachment.name);
-                System.out.println("copy added " + Arrays.toString(file));
-                cloud.copy(fromInstance, toInstance, file);
-
-                if (attachment.tag != null) {
-                    String path = Arrays.stream(file).map(JsonServlet::encode).collect(Collectors.joining("/"));
-                    tags.put(path, "kmap-" + attachment.tag);
-                }
-            }
-            for (Cloud.Attachment attachment : removed) {
-                String[] file = file(dir, attachment.name);
-                System.out.println("delete " + Arrays.toString(file));
-                cloud.delete(toInstance, file);
-            }
-            for (Map.Entry<Cloud.Attachment, Cloud.Attachment> entry : changed.entrySet()) {
-                String[] file = file(dir, entry.getValue().name);
-                System.out.println("copy changed " + Arrays.toString(file));
-                cloud.copy(fromInstance, toInstance, file);
-
-                if (entry.getValue().tag != null) {
-                    String path = Arrays.stream(file).map(JsonServlet::encode).collect(Collectors.joining("/"));
-                    tags.put(path, "kmap-" + entry.getValue().tag);
-                }
-            }
-
-            if (tags.size() > 0) {
-                System.out.println("tags = " + tags);
-                Server.CLIENT.set(toInstance);
-                cloud.transferTags(tags);
-            }
-            try {
-                Thread.sleep(2000);
-            }
-            catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
         Server.CLIENT.set(restoreInstance);
     }
 
@@ -449,72 +332,6 @@ public class ContentManager extends Server
 
         Server.CLIENT.set(toInstance);
         tests.importSet(subject, set, doc.toString());
-
-        Set<String[]> dirs = new HashSet<>();
-        for (JsonElement element : array) {
-            JsonObject card = (JsonObject)element;
-            String chapter = card.get("chapter").getAsString();
-            String topic = card.get("topic").getAsString();
-            dirs.add(new String[] {subject, chapter, topic});
-        }
-
-        for (String[] dir : dirs) {
-            System.out.println(Arrays.asList(dir));
-
-            Server.CLIENT.set(fromInstance);
-            List<Cloud.Attachment> fromAttachments = cloud.findAttachments(dir[0], dir[1], dir[2], true);
-            Server.CLIENT.set(toInstance);
-            List<Cloud.Attachment> toAttachments = cloud.findAttachments(dir[0], dir[1], dir[2], true);
-
-            List<Cloud.Attachment> added = new ArrayList<>(fromAttachments);
-            added.removeAll(toAttachments);
-
-            List<Cloud.Attachment> removed = new ArrayList<>(toAttachments);
-            removed.removeAll(fromAttachments);
-
-            List<Cloud.Attachment> kept = new ArrayList<>(toAttachments);
-            kept.retainAll(fromAttachments);
-
-            Map<Cloud.Attachment,Cloud.Attachment> changed = new HashMap<>();
-            for (Cloud.Attachment attachment : kept) {
-                int i = fromAttachments.indexOf(attachment);
-                Cloud.Attachment master = fromAttachments.get(i);
-                if (!Objects.equals(attachment.type, master.type))
-                    changed.put(attachment, master);
-                else if (!Objects.equals(attachment.size, master.size))
-                    changed.put(attachment, master);
-            }
-
-            if (fromAttachments.size() != 0) {
-                Server.CLIENT.set(toInstance);
-                String[] file = file(dir, "tests");
-                cloud.createDirectory(file);
-            }
-
-            for (Cloud.Attachment attachment : added) {
-                String[] file = file(dir, "tests", attachment.name);
-                System.out.println("copy added " + Arrays.toString(file));
-                cloud.copy(fromInstance, toInstance, file);
-            }
-            for (Cloud.Attachment attachment : removed) {
-                String[] file = file(dir, "tests", attachment.name);
-                System.out.println("delete " + Arrays.toString(file));
-                cloud.delete(toInstance, file);
-            }
-            for (Map.Entry<Cloud.Attachment, Cloud.Attachment> entry : changed.entrySet()) {
-                String[] file = file(dir, "tests", entry.getValue().name);
-                System.out.println("copy changed " + Arrays.toString(file));
-                cloud.copy(fromInstance, toInstance, file);
-            }
-
-            try {
-                Thread.sleep(2000);
-            }
-            catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
         Server.CLIENT.set(restoreInstance);
     }
 
@@ -544,25 +361,25 @@ curl -X PUT -u $1 http://localhost:5984/$2-test/_design/test -d @design-test.jso
             InputStreamEntity entity;
 
             put = new HttpPut(url() + name + "-map");
-            try (CloseableHttpResponse ignored = httpClient.execute(put, context)){}
+            try (CloseableHttpResponse ignored = httpClient.execute(put, context)){ System.out.println("created " + name + "-map"); }
             put = new HttpPut(url() + name + "-test");
-            try (CloseableHttpResponse ignored = httpClient.execute(put, context)){}
+            try (CloseableHttpResponse ignored = httpClient.execute(put, context)){ System.out.println("created " + name + "-test"); }
             put = new HttpPut(url() + name + "-state");
-            try (CloseableHttpResponse ignored = httpClient.execute(put, context)){}
+            try (CloseableHttpResponse ignored = httpClient.execute(put, context)){ System.out.println("created " + name + "-state"); }
             put = new HttpPut(url() + name + "-feedback");
-            try (CloseableHttpResponse ignored = httpClient.execute(put, context)){}
+            try (CloseableHttpResponse ignored = httpClient.execute(put, context)){ System.out.println("created " + name + "-feedback"); }
 
             put = new HttpPut(url() + name + "-map/_design/net");
             entity = new InputStreamEntity(Files.newInputStream(Paths.get(getProperty("kmap.designDocs") + "design-map.json")));
             entity.setContentType("application/json");
             put.setEntity(entity);
-            try (CloseableHttpResponse ignored = httpClient.execute(put, context)){}
+            try (CloseableHttpResponse ignored = httpClient.execute(put, context)){ System.out.println("design " + name + "-map"); }
 
             put = new HttpPut(url() + name + "-test/_design/test");
             entity = new InputStreamEntity(Files.newInputStream(Paths.get(getProperty("kmap.designDocs") + "design-test.json")));
             entity.setContentType("application/json");
             put.setEntity(entity);
-            try (CloseableHttpResponse ignored = httpClient.execute(put, context)){}
+            try (CloseableHttpResponse ignored = httpClient.execute(put, context)){ System.out.println("design " + name + "-test"); }
 
             String current = Server.CLIENT.get();
             try {
@@ -600,11 +417,13 @@ curl -X DELETE -u $1 http://127.0.0.1:5984/$2-state
             InputStreamEntity entity;
 
             put = new HttpDelete(url() + name + "-map");
-            try (CloseableHttpResponse ignored = client.execute(put, context)){}
+            try (CloseableHttpResponse ignored = client.execute(put, context)){ System.out.println("dropped " + name + "-map"); }
             put = new HttpDelete(url() + name + "-test");
-            try (CloseableHttpResponse ignored = client.execute(put, context)){}
+            try (CloseableHttpResponse ignored = client.execute(put, context)){ System.out.println("dropped " + name + "-test"); }
             put = new HttpDelete(url() + name + "-state");
-            try (CloseableHttpResponse ignored = client.execute(put, context)){}
+            try (CloseableHttpResponse ignored = client.execute(put, context)){ System.out.println("dropped " + name + "-state"); }
+            put = new HttpDelete(url() + name + "-feedback");
+            try (CloseableHttpResponse ignored = client.execute(put, context)){ System.out.println("dropped " + name + "-feedback"); }
         }
         catch (IOException e) {
             throw new RuntimeException(e);
