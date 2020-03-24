@@ -11,6 +11,7 @@ import '@material/mwc-button';
 import '@material/mwc-drawer';
 import '@material/mwc-icon-button';
 import '@material/mwc-snackbar';
+import '@material/mwc-switch';
 import 'pwa-helper-components/pwa-install-button';
 import 'pwa-helper-components/pwa-update-available';
 
@@ -171,21 +172,11 @@ export class KmapMain extends connect(store, LitElement) {
     return this._messages.join("\n");
   }
 
-  _toggleLayer(layer) {
-    if (this._layers.includes(layer))
+  _switchLayer(layer, checked) {
+    if (!checked && this._layers.includes(layer))
       store.dispatch.shell.removeLayer(layer);
-    else {
-      if (layer === 'summaries' && this._layers.includes('averages'))
-        store.dispatch.shell.removeLayer('averages');
-      else if (layer === 'averages' && this._layers.includes('summaries'))
-        store.dispatch.shell.removeLayer('summaries');
-      else if (layer === 'averages' && this._layers.includes('editor'))
-        store.dispatch.shell.removeLayer('editor');
-      else if (layer === 'editor' && this._layers.includes('averages'))
-        store.dispatch.shell.removeLayer('averages');
-
+    else if (checked && !this._layers.includes(layer))
       store.dispatch.shell.addLayer(layer);
-    }
   }
 
   _showLogin() {
@@ -229,6 +220,9 @@ export class KmapMain extends connect(store, LitElement) {
       }
       .drawer-list > a[selected] {
         color: var(--app-drawer-selected-color);
+      }
+      .drawer-list > mwc-formfield {
+        margin: 12px 0px;
       }
       .main-content {
           width: 100% !important;
@@ -276,20 +270,28 @@ export class KmapMain extends connect(store, LitElement) {
         <pwa-install-button><mwc-button outlined style="--mdc-theme-primary: var(--color-secondary-dark);">App installieren</mwc-button></pwa-install-button>
         <pwa-update-available><mwc-button outlined style="--mdc-theme-primary: var(--color-secondary-dark);">App aktualisieren</mwc-button></pwa-update-available>
       </nav>
-      <hr/>
+      ${this._roles.includes("teacher") ? html`
       <!--googleoff: all-->
       <nav class="drawer-list">
-        <label section>Layer ein-/ausblenden</label><br/>
-        <mwc-button @click="${() => this._toggleLayer('summaries')}" icon="short_text" outlined ?raised="${this._layers.includes('summaries')}">Kurztexte</mwc-button>
-        <mwc-button @click="${() => this._toggleLayer('averages')}" icon="group_work" outlined ?raised="${this._layers.includes('averages')}" ?disabled="${!this._roles.includes("teacher")}" title="Erfordert die Rolle 'Lehrer'">Mittelwerte</mwc-button>
+        <hr/><br/>
+        <label section>Layer ein-/ausblenden</label>
+        <mwc-formfield label="Kurztexte">
+          <mwc-switch ?checked="${this._layers.includes('summaries')}" @change="${e => this._switchLayer('summaries', e.target.checked)}"></mwc-switch>
+        </mwc-formfield>
+        <mwc-formfield label="Mittelwerte">
+          <mwc-switch ?checked="${this._layers.includes('averages')}" @change="${e => this._switchLayer('averages', e.target.checked)}"></mwc-switch>
+        </mwc-formfield>
         ${this._layers.includes('averages') ? html`<kmap-course-selector></kmap-course-selector>` : ''}
-        <mwc-button @click="${() => this._toggleLayer('editor')}" icon="edit" outlined ?raised="${this._layers.includes('editor')}" ?disabled="${!this._roles.includes("teacher")}" title="Erfordert die Rolle 'Lehrer'">editor</mwc-button>
+        <mwc-formfield label="Editor">
+          <mwc-switch ?checked="${this._layers.includes('editor')}" @change="${e => this._switchLayer('editor', e.target.checked)}"></mwc-switch>
+        </mwc-formfield>
         ${this._layers.includes('editor') ? html`
           ${this._page === 'home' || this._page === 'browser' ? html`<kmap-module-selector></kmap-module-selector>` : ''}
           ${this._page === 'test' ? html`<kmap-set-selector></kmap-set-selector>` : ''}
         ` : ''}
       </nav>
       <!--googleon: all-->
+      ` : ''}
     </div>
 
     <div slot="appContent" class="main-content" role="main" @toggleDrawer="${() => this._drawerOpen = !this._drawerOpen}" @lclick="${this._showLogin}">

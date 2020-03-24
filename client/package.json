@@ -55,6 +55,7 @@
     "@material/mwc-select": "^0.13.0",
     "@material/mwc-slider": "^0.13.0",
     "@material/mwc-snackbar": "^0.13.0",
+    "@material/mwc-switch": "^0.13.0",
     "@material/mwc-textarea": "^0.13.0",
     "@material/mwc-textfield": "^0.13.0",
     "@material/mwc-top-app-bar": "^0.13.0",
