@@ -327,7 +327,7 @@ ${this._test ? html`
     <div class="field values">
       <label secondary>Werte (Checkboxen: true/false, Dezimalzahlen mit Punkt statt Komma)</label><br/>
 
-      ${this._values.map((value) => html`<input type="text" .value="${value}" @change="${e => value = e.target.value}"/>`)}
+      ${this._values.map((value, i) => html`<input type="text" .value="${value}" @change="${e => this._values[i] = e.target.value}"/>`)}
     </div>
 
     <div class="attachments">
