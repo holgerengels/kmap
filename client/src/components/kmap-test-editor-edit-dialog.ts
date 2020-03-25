@@ -123,7 +123,7 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
       this._answer   = this._test.answer || '';
       this._values   = this._test.values || [];
       this._oldValues = [...this._values];
-      this._attachments = this._test.attachments;
+      this._attachments = this._test.attachments || [];
 
       this._editDialog.show();
       this._editDialog.forceLayout();
@@ -342,7 +342,7 @@ ${this._test ? html`
       `)}
     </div>
     <div class="fields">
-      <file-drop id="file" required @filedrop="${e => this._attachmentFile = e.detail.file}" style="flex: 1 0 75%"></file-drop>
+      <file-drop id="file" @filedrop="${e => this._attachmentFile = e.detail.file}" style="flex: 1 0 75%"></file-drop>
       <mwc-icon-button class="add" icon="add_circle" @click="${this._addAttachment}" style="flex: 0 0 36px; --mdc-icon-button-size: 36px; align-self: center"></mwc-icon-button>
     </div>
   </form>` : ''}
