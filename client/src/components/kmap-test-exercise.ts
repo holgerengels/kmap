@@ -132,6 +132,7 @@ export class KmapTestExercise extends connect(store, LitElement) {
     ${this._currentTest ? html`
       <kmap-test-card id="test-card" @next="${this._next}"
         .subject="${this._currentTest.subject}"
+        .set="${this._currentTest.set}"
         .chapter="${this._currentTest.chapter}"
         .topic="${this._currentTest.topic}"
         .key="${this._currentTest.key}"
