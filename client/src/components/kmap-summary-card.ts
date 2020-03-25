@@ -149,10 +149,10 @@ export class KMapSummaryCard extends connect(store, LitElement) {
           min-height: 134px;
         }
         div.card[selected] {
-          filter: saturate(1.5) brightness(1);
+          filter: saturate(1.5) brightness(.8);
         }
         div.card[highlighted] {
-          filter: saturate(1.5) brightness(1);
+          filter: saturate(1.5) brightness(.8);
         }
         .card-header, .card-footer {
           transition: background-color .5s ease-in-out;
