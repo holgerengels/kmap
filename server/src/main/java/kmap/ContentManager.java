@@ -168,21 +168,24 @@ public class ContentManager extends Server
 
     public static void main(String[] args) throws IOException {
         ContentManager manager = new ContentManager(readProperties(args[0]));
-        /*
-        CLIENT.set("vu");
-        manager.exportSet("Mathematik", "Parabeln", Files.newOutputStream(Paths.get("/tmp/test.zip")));
-        CLIENT.set("lala");
-        manager.createInstance("lala");
-        manager.importSet(Files.newInputStream(Paths.get("/tmp/test.zip")));
-         */
-        //CLIENT.remove();
-        //manager.syncModule("vu", "root", "Hilfe", "Hilfe");
-        //manager.syncModule("vu", "root", "Mathematik", "Grundwissen");
-        manager.syncSet("vu", "root", "Mathematik", "Geraden");
-        manager.syncModule("vu", "root", "Mathematik", "Analysis");
-        manager.syncModule("vu", "root", "Mathematik", "Analysis Plus");
-        manager.syncModule("vu", "root", "Mathematik", "Lineare Algebra");
-        manager.syncModule("vu", "root", "Mathematik", "Stochastik");
+        String from = "lolo";
+        String to = "lala";
+        manager.syncModule(from, to, "Mathematik", "Grundwissen");
+        manager.syncModule(from, to, "Mathematik", "Analysis");
+        manager.syncModule(from, to, "Mathematik", "Analysis Plus");
+        manager.syncModule(from, to, "Mathematik", "Lineare Algebra");
+        manager.syncModule(from, to, "Mathematik", "Stochastik");
+        manager.syncModule(from, to, "Physik", "Eingangsklasse");
+        manager.syncSet(from, to, "Mathematik", "Grundwissen");
+        manager.syncSet(from, to, "Mathematik", "Terme");
+        manager.syncSet(from, to, "Mathematik", "Gleichungen");
+        manager.syncSet(from, to, "Mathematik", "Geraden");
+        manager.syncSet(from, to, "Mathematik", "Parabeln");
+        manager.syncSet(from, to, "Mathematik", "Funktionen");
+        manager.syncSet(from, to, "Mathematik", "Quadratische Funktionen");
+        manager.syncSet(from, to, "Mathematik", "Ganzrationale Funktionen");
+        manager.syncSet(from, to, "Mathematik", "Exponentialfunktionen");
+        manager.syncSet(from, to, "Mathematik", "Trigonometrische Funktionen");
     }
 
     void exportSet(String subject, String set, OutputStream outputStream) throws IOException {
@@ -300,39 +303,33 @@ public class ContentManager extends Server
     void syncModule(String fromInstance, String toInstance, String subject, String module) {
         String restoreInstance = Server.CLIENT.get();
         Server.CLIENT.set(fromInstance);
-        JsonArray array = couch.loadModule(subject, module);
-        for (JsonElement element : array) {
-            JsonObject object = (JsonObject)element;
-            object.remove("_id");
-            object.remove("_rev");
+        try {
+            Server.CLIENT.set(fromInstance);
+            File zip = File.createTempFile(subject + "-" + module, "zip");
+            exportModule(subject, module, new FileOutputStream(zip));
+            Server.CLIENT.set(toInstance);
+            importModule(new FileInputStream(zip));
+            Server.CLIENT.set(restoreInstance);
         }
-        JsonObject doc = new JsonObject();
-        doc.addProperty("subject", subject);
-        doc.addProperty("module", module);
-        doc.add("docs", array);
-
-        Server.CLIENT.set(toInstance);
-        couch.importModule(subject, module, doc.toString());
-        Server.CLIENT.set(restoreInstance);
+        catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     void syncSet(String fromInstance, String toInstance, String subject, String set) {
         String restoreInstance = Server.CLIENT.get();
         Server.CLIENT.set(fromInstance);
-        JsonArray array = tests.loadTestsBySet(subject, set);
-        for (JsonElement element : array) {
-            JsonObject object = (JsonObject)element;
-            object.remove("_id");
-            object.remove("_rev");
+        try {
+            Server.CLIENT.set(fromInstance);
+            File zip = File.createTempFile(subject + "-" + set + "-tests", "zip");
+            exportSet(subject, set, new FileOutputStream(zip));
+            Server.CLIENT.set(toInstance);
+            importSet(new FileInputStream(zip));
+            Server.CLIENT.set(restoreInstance);
         }
-        JsonObject doc = new JsonObject();
-        doc.addProperty("subject", subject);
-        doc.addProperty("set", set);
-        doc.add("docs", array);
-
-        Server.CLIENT.set(toInstance);
-        tests.importSet(subject, set, doc.toString());
-        Server.CLIENT.set(restoreInstance);
+        catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public JsonArray instances() {
