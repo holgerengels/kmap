@@ -5,19 +5,19 @@ export const fontStyles: CSSResult = css`
 h1, .font-title {
   font-family: Roboto, Noto, sans-serif;
   -webkit-font-smoothing: antialiased;
-  font-size: 1.30rem;
+  font-size: 1.15rem;
   font-weight: 500;
 }
 h2, .font-subtitle {
   font-family: Roboto,sans-serif;
   -webkit-font-smoothing: antialiased;
-  font-size: 1.20rem;
+  font-size: 1.10rem;
   font-weight: 500;
 }
 h3, .font-subsubtitle {
   font-family: Roboto,sans-serif;
   -webkit-font-smoothing: antialiased;
-  font-size: 1.10rem;
+  font-size: 1.05rem;
   font-weight: 500;
 }
 h4, label {
