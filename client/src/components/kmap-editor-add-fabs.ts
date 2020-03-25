@@ -8,7 +8,7 @@ import '@material/mwc-fab';
 import '@material/mwc-textfield';
 import {fontStyles, colorStyles, themeStyles} from "./kmap-styles";
 import {Dialog} from "@material/mwc-dialog/mwc-dialog";
-import {Card} from "../models/maps";
+import {Card} from "../models/types";
 
 @customElement('kmap-editor-add-fabs')
 export class KMapEditorAddFabs extends connect(store, LitElement) {
@@ -220,10 +220,10 @@ export class KMapEditorAddFabs extends connect(store, LitElement) {
         <form id="addForm" @keyup="${this._maybeEnter}">
           <label>${this._explanation()}</label>
           <br/>
-        <mwc-textfield label="Fach" type="text" .value="${this._subject}" @change="${e => {this._subject = e.target.value; this._chapter = this._subject}}" ?disabled="${this._mode !== 'subject'}"></mwc-textfield>
-        <mwc-textfield label="Modul" type="text" .value="${this._module}" @change="${e => this._module = e.target.value}" ?disabled="${this._mode !== 'module' && this._mode !== 'subject'}"></mwc-textfield>
-        <mwc-textfield label="Kapitel" type="text" .value="${this._chapter}" @change="${e => this._chapter = e.target.value}" ?disabled="${this._mode !== 'module' && this._mode !== 'chapter'}"></mwc-textfield>
-        <mwc-textfield label="Thema" type="text" .value="${this._topic}" @change="${e => this._topic = e.target.value}"></mwc-textfield>
+        <mwc-textfield label="Fach" type="text" .value="${this._subject}" @change="${e => {this._subject = e.target.value; this._chapter = this._subject}}" ?disabled="${this._mode !== 'subject'}" pattern="^([^/]*)$"></mwc-textfield>
+        <mwc-textfield label="Modul" type="text" .value="${this._module}" @change="${e => this._module = e.target.value}" ?disabled="${this._mode !== 'module' && this._mode !== 'subject'}" pattern="^([^/]*)$"></mwc-textfield>
+        <mwc-textfield label="Kapitel" type="text" .value="${this._chapter}" @change="${e => this._chapter = e.target.value}" ?disabled="${this._mode !== 'module' && this._mode !== 'chapter'}" pattern="^([^/]*)$"></mwc-textfield>
+        <mwc-textfield label="Thema" type="text" .value="${this._topic}" @change="${e => this._topic = e.target.value}" pattern="^([^/]*)$"></mwc-textfield>
         </form>
         <mwc-button slot="secondaryAction" dialogAction="cancel">Abbrechen</mwc-button>
         <mwc-button slot="primaryAction" @click="${this._ok}">Erstellen</mwc-button>

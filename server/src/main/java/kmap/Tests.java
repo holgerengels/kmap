@@ -10,8 +10,11 @@ import org.lightcouch.View;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import static kmap.JsonServlet.encode;
 import static kmap.JSON.*;
@@ -70,7 +73,7 @@ public class Tests {
         return array;
     }
 
-    public synchronized JsonArray loadSet(String subject, String set) {
+    public synchronized JsonArray loadTestsBySet(String subject, String set) {
         List<JsonObject> objects = loadSetAsList(subject, set);
         JsonArray array = new JsonArray();
         for (JsonObject object : objects) {
@@ -87,6 +90,11 @@ public class Tests {
                 .includeDocs(true);
             List<JsonObject> objects = view.query(JsonObject.class);
             objects.removeIf(o -> string(o, "chapter") == null || string(o, "topic") == null);
+            objects.forEach(o -> {
+                JsonObject _attachments = o.getAsJsonObject("_attachments");
+                o.add("attachments", amendAttachments(_attachments));
+                o.remove("_attachments");
+            });
             objects.sort(Comparator
                 .comparing((JsonObject o) -> o.getAsJsonPrimitive("chapter").getAsString())
                 .thenComparing((JsonObject o) -> o.getAsJsonPrimitive("topic").getAsString())
@@ -98,26 +106,66 @@ public class Tests {
         }
     }
 
-    public JsonArray loadChapter(String subject, String chapter) {
+    public JsonArray loadTestsByChapter(String subject, String chapter) {
         View view = getClient().view("test/byChapter")
             .key(subject, chapter)
             .reduce(false)
             .includeDocs(true);
         List<JsonObject> objects = view.query(JsonObject.class);
+        objects.forEach(o -> {
+            JsonObject _attachments = o.getAsJsonObject("_attachments");
+            o.add("attachments", amendAttachments(_attachments));
+        });
         JsonArray array = new JsonArray();
         objects.forEach(array::add);
         return array;
     }
 
-    public JsonArray loadTopic(String subject, String chapter, String topic) {
+    public JsonArray loadTestsByTopic(String subject, String chapter, String topic) {
         View view = getClient().view("test/byChapterTopic")
             .key(subject, chapter, topic)
             .reduce(false)
             .includeDocs(true);
         List<JsonObject> objects = view.query(JsonObject.class);
+        objects.forEach(o -> {
+            JsonObject _attachments = o.getAsJsonObject("_attachments");
+            o.add("attachments", amendAttachments(_attachments));
+        });
         JsonArray array = new JsonArray();
         objects.forEach(array::add);
         return array;
+    }
+
+    private JsonArray amendAttachments(JsonObject _attachments) {
+        JsonArray attachments = new JsonArray();
+
+        Set<String> existing = StreamSupport.stream(attachments.spliterator(), false)
+                .filter(a -> string((JsonObject) a, "file") != null)
+                .map(a -> string((JsonObject) a, "file"))
+                .collect(Collectors.toSet());
+
+        if (_attachments != null) {
+            for (Map.Entry<String, JsonElement> entry : _attachments.entrySet()) {
+                String file = entry.getKey();
+                JsonObject object = (JsonObject)entry.getValue();
+                if (existing.contains(file))
+                    continue;
+
+                String type = string(object, "content_type");
+                JsonObject attachment = attachmentFromAttachment(file, type);
+                attachments.add(attachment);
+            }
+        }
+        return attachments;
+    }
+
+    public JsonObject attachmentFromAttachment(String file, String type) {
+        JsonObject attachment = new JsonObject();
+        attachment.addProperty("type", "file");
+        attachment.addProperty("name", file);
+        attachment.addProperty("file", file);
+        attachment.addProperty("mime", type);
+        return attachment;
     }
 
     public boolean loadAttachment(Consumer<AttachmentInputStream> sender, String... dirs) throws IOException {
@@ -148,7 +196,7 @@ public class Tests {
         return false;
     }
 
-    public synchronized String storeTest(String subject, String set, String json) {
+    public synchronized String storeTest(String subject, String set, String json, Map<String, Upload> uploads) {
         CouchDbClient client = getClient();
         JsonObject object = client.getGson().fromJson(json, JsonObject.class);
         if (object.has("delete")) {                                 // delete
@@ -173,9 +221,7 @@ public class Tests {
         else {
             JsonObject changed = (JsonObject)object.get("changed");
 
-            String command;
             if (object.has("old")) {                                // update
-                command = "move:";
                 JsonObject old = (JsonObject)object.get("old");
                 String chapter = string(old, "chapter");
                 String topic = string(old, "topic");
@@ -183,75 +229,91 @@ public class Tests {
                 assert chapter != null;
                 assert topic != null;
                 assert key != null;
+
+                JsonObject existing = null;
                 List<JsonObject> array = loadSetAsList(subject, set);
                 for (JsonElement element : array) {
-                    JsonObject existing = (JsonObject)element;
-                    if (chapter.equals(string(existing, "chapter")) &&
-                        topic.equals(string(existing, "topic")) &&
-                        key.equals(string(existing, "key"))) {
-                        existing.addProperty("subject", subject);
-                        existing.add("chapter", changed.get("chapter"));
-                        existing.add("topic", changed.get("topic"));
-                        existing.add("key", changed.get("key"));
-                        existing.add("level", changed.get("level"));
-                        existing.add("question", changed.get("question"));
-                        existing.add("answer", changed.get("answer"));
-                        existing.add("values", changed.get("values"));
-                        existing.add("balance", changed.get("balance"));
-                        if (checks(changed))
-                            client.update(element);
-                        else
-                            return "error:set, subject, chapter, topic or key missing";
+                    if (chapter.equals(string((JsonObject)element, "chapter")) &&
+                            topic.equals(string((JsonObject)element, "topic")) &&
+                            key.equals(string((JsonObject)element, "key"))) {
+                        existing = (JsonObject)element;
                     }
+                }
+
+                if (existing != null) {
+                    existing.addProperty("subject", subject);
+                    existing.add("chapter", changed.get("chapter"));
+                    existing.add("topic", changed.get("topic"));
+                    existing.add("key", changed.get("key"));
+                    existing.add("level", changed.get("level"));
+                    existing.add("question", changed.get("question"));
+                    existing.add("answer", changed.get("answer"));
+                    existing.add("values", changed.get("values"));
+                    existing.add("balance", changed.get("balance"));
+                    if (checks(changed)) {
+                        existing.remove("attachments");
+                        Response response = client.update(existing);
+                        JsonArray attachments = changed.getAsJsonArray("attachments");
+                        response = saveFiles(client, response, uploads, attachments);
+                        JsonObject _attachments = existing.getAsJsonObject("_attachments");
+                        deleteFiles(client, response, attachments, _attachments);
+                    }
+                    else
+                        return "error:set, subject, chapter, topic or key missing";
                 }
             }
             else {
-                command = "add:";                                               // save
                 changed.addProperty("subject", subject);
                 changed.remove("added");
-                if (checks(changed))
-                    client.save(changed);
+                if (checks(changed)) {
+                    Response response = client.save(changed);
+                    JsonArray attachments = changed.getAsJsonArray("attachments");
+                    saveFiles(client, response, uploads, attachments);
+                }
                 else
                     return "error:set, subject, chapter, topic or key missing";
             }
 
-            // determine new position
-            String chapter = string(changed, "chapter");
-            String topic = string(changed, "topic");
-            String key = string(changed, "key");
-            assert chapter != null;
-            assert topic != null;
-            assert key != null;
-            List<JsonObject> array = loadSetAsList(subject, set);
-            int pos = -1;
-            for (JsonElement element : array) {
-                pos++;
-                if (chapter.equals(string((JsonObject)element, "chapter")) &&
-                    topic.equals(string((JsonObject)element, "topic")) &&
-                    key.equals(string((JsonObject)element, "key"))) {
-                    return command + pos;
-                }
-            }
             return "reload:";
         }
     }
 
-    public String[] importTestAttachment(String[] idrev, String file, String contentType , InputStream in) {
-        CouchDbClient client = getClient();
-        String[] dirs = file.split("/");
-        if (idrev == null) {
-            View view = client.view("test/byKey")
-                    .key(dirs[0], dirs[1], dirs[2])
-                    .reduce(false)
-                    .includeDocs(true);
-            List<JsonObject> objects = view.query(JsonObject.class);
-            JsonObject object = objects.get(0);
-            String id = string(object,"_id");
-            String rev = string(object,"_rev");
-            idrev = new String[] { id, rev };
+    private Response saveFiles(CouchDbClient client, Response response, Map<String, Upload> uploads, JsonArray attachments) {
+        for (JsonElement alement : attachments) {
+            String file = string((JsonObject)alement,"file");
+            if (file != null) {
+                Upload upload = uploads.get(file);
+                if (upload != null) {
+                    try {
+                        System.out.println("storing " + upload);
+                        response = client.saveAttachment(Files.newInputStream(upload.tmp), encode(upload.fileName), upload.contentType, response.getId(), response.getRev());
+                    }
+                    catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
         }
-        Response response = client.saveAttachment(in, encode(dirs[3]), contentType, idrev[0], idrev[1]);
-        return new String[] { response.getId(), response.getRev() };
+        return response;
+    }
+
+    private Response deleteFiles(CouchDbClient client, Response response, JsonArray attachments, JsonObject _attachments) {
+        if (_attachments == null)
+            return response;
+
+        Set<String> existingNames = _attachments.keySet();
+        for (JsonElement alement : attachments) {
+            String file = string((JsonObject)alement,"file");
+            if (file != null) {
+                System.out.println("keeping " + file);
+                existingNames.remove(file);
+            }
+        }
+        for (String name : existingNames) {
+            System.out.println("removing " + name);
+            response = client.removeAttachment(encode(name), response.getId(), response.getRev());
+        }
+        return response;
     }
 
     private boolean checks(JsonObject object) {
@@ -294,6 +356,24 @@ public class Tests {
         object.addProperty("set", set);
         object.addProperty("count", newTests.size());
         return object;
+    }
+
+    public String[] importTestAttachment(String[] idrev, String file, String contentType , InputStream in) {
+        CouchDbClient client = getClient();
+        String[] dirs = file.split("/");
+        if (idrev == null) {
+            View view = client.view("test/byKey")
+                    .key(dirs[0], dirs[1], dirs[2])
+                    .reduce(false)
+                    .includeDocs(true);
+            List<JsonObject> objects = view.query(JsonObject.class);
+            JsonObject object = objects.get(0);
+            String id = string(object,"_id");
+            String rev = string(object,"_rev");
+            idrev = new String[] { id, rev };
+        }
+        Response response = client.saveAttachment(in, encode(dirs[3]), contentType, idrev[0], idrev[1]);
+        return new String[] { response.getId(), response.getRev() };
     }
 
     public JsonObject deleteSet(String subject, String set) {

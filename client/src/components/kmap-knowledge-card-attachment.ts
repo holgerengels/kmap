@@ -2,7 +2,7 @@ import {css, customElement, html, LitElement, property} from 'lit-element';
 import {urls} from '../urls';
 
 import '@material/mwc-icon';
-import {Attachment} from "../models/maps";
+import {Attachment} from "../models/types";
 
 @customElement('kmap-knowledge-card-attachment')
 export class KMapKnowledgeCardAttachment extends LitElement {

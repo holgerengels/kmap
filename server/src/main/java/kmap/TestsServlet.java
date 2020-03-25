@@ -6,19 +6,34 @@ import com.google.gson.JsonPrimitive;
 import org.apache.commons.io.IOUtils;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Part;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by holger on 09.05.16.
  */
+
+@MultipartConfig(
+        fileSizeThreshold = 1024 * 1024,
+        maxFileSize = 1024 * 1024 * 5,
+        maxRequestSize = 1024 * 1024 * 5 * 5
+)
 public class TestsServlet
     extends JsonServlet
 {
     private Tests tests;
+
+    Map<String, Upload> uploads = Collections.synchronizedMap(new HashMap<>());
 
     @Override
     public void init() throws ServletException {
@@ -30,32 +45,53 @@ public class TestsServlet
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
         try {
             Server.CLIENT.set(extractClient(req));
+
             if (authentication.handle(req, resp)) {
                 String subject = req.getParameter("subject");
                 String save = req.getParameter("save");
-                String imp = req.getParameter("import");
                 String delete = req.getParameter("delete");
+                String imp = req.getParameter("import");
+                String upload = req.getParameter("upload");
                 if (save != null) {
+                    authentication.checkRole(req, "teacher");
                     log("save test = " + save);
                     String json = IOUtils.toString(new InputStreamReader(req.getInputStream(), StandardCharsets.UTF_8));
-                    String command = tests.storeTest(subject, save, json);
+                    String command = tests.storeTest(subject, save, json, uploads);
                     if (command.startsWith("error:"))
                         sendError(req, resp, HttpServletResponse.SC_PRECONDITION_FAILED, command.substring("error:".length()));
                     else
                         writeResponse(req, resp, new JsonPrimitive(command));
+
+                    uploads.clear();
                 }
                 else if (imp != null) {
+                    authentication.checkRole(req, "teacher");
                     log("import set = " + imp);
                     String json = IOUtils.toString(new InputStreamReader(req.getInputStream(), StandardCharsets.UTF_8));
                     JsonObject set = tests.importSet(subject, imp, json);
                     writeResponse(req, resp, set);
                 }
                 else if (delete != null) {
+                    authentication.checkRole(req, "teacher");
                     log("delete set = " + delete);
                     JsonObject set = tests.deleteSet(subject, delete);
                     writeResponse(req, resp, set);
                 }
+                else if (upload != null) {
+                    log("upload file = " + upload);
+                    for (Part part : req.getParts()) {
+                        String name = getFileName(part);
+                        String type = part.getHeader("content-type");
+                        Path path = Files.createTempFile("upload", name);
+                        IOUtils.copy(part.getInputStream(), Files.newOutputStream(path));
+                        uploads.put(name, new Upload(name, type, path));
+                        writeResponse(req, resp, new JsonPrimitive(upload));
+                    }
+                }
             }
+        }
+        catch (Authentication.AuthException e) {
+            sendError(req, resp, HttpServletResponse.SC_FORBIDDEN, e.getMissingRole());
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -69,6 +105,7 @@ public class TestsServlet
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
         try {
             Server.CLIENT.set(extractClient(req));
+
             req.setCharacterEncoding("UTF-8");
             String sets = req.getParameter("sets");
             String subject = req.getParameter("subject");
@@ -86,19 +123,19 @@ public class TestsServlet
             }
             else if (set != null) {
                 log("load set = " + set);
-                JsonArray array = tests.loadSet(subject, set);
+                JsonArray array = tests.loadTestsBySet(subject, set);
                 if (array != null)
                     writeResponse(req, resp, array);
             }
             else if (topic != null) { // uses chapter and topic !!!
                 log("load topic = " + chapter + " " + topic);
-                JsonArray array = tests.loadTopic(subject, chapter, topic);
+                JsonArray array = tests.loadTestsByTopic(subject, chapter, topic);
                 if (array != null)
                     writeResponse(req, resp, array);
             }
             else if (chapter != null) {
                 log("load chapter = " + chapter);
-                JsonArray array = tests.loadChapter(subject, chapter);
+                JsonArray array = tests.loadTestsByChapter(subject, chapter);
                 if (array != null)
                     writeResponse(req, resp, array);
             }
@@ -133,6 +170,14 @@ public class TestsServlet
         finally {
             Server.CLIENT.remove();
         }
+    }
+
+    private String getFileName(Part part) {
+        for (String content : part.getHeader("content-disposition").split(";")) {
+            if (content.trim().startsWith("filename"))
+                return content.substring(content.indexOf("=") + 2, content.length() - 1);
+        }
+        return "noname";
     }
 
     private void sendAttachment(HttpServletResponse resp, AttachmentInputStream attachment) {

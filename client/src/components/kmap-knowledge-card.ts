@@ -1,7 +1,6 @@
 import {LitElement, html, css, customElement, property, query} from 'lit-element';
 import { connect } from '@captaincodeman/rdx';
 import {State, store} from "../store";
-import {Attachment, Card} from "../models/maps";
 import {STATE_COLORS} from './state-colors';
 
 import {StyleInfo, styleMap} from 'lit-html/directives/style-map.js';
@@ -15,6 +14,7 @@ import './kmap-knowledge-card-attachment';
 import './kmap-feedback';
 import {fontStyles, colorStyles, themeStyles} from "./kmap-styles";
 import {KMapFeedback} from "./kmap-feedback";
+import {Attachment, Card} from "../models/types";
 
 @customElement('kmap-knowledge-card')
 export class KMapKnowledgeCard extends connect(store, LitElement) {

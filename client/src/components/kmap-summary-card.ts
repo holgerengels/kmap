@@ -10,12 +10,12 @@ import './kmap-summary-card-averages';
 import './kmap-summary-card-editor';
 import './kmap-summary-card-rating';
 import './kmap-summary-card-ratecolors';
-import {Card} from "../models/maps";
 import {STATE_COLORS} from './state-colors';
 import {fontStyles, colorStyles, themeStyles, elevationStyles} from "./kmap-styles";
 import {urls} from "../urls";
 import {ifDefined} from "lit-html/directives/if-defined";
 import {classMap} from "lit-html/directives/class-map";
+import {Card} from "../models/types";
 
 @customElement('kmap-summary-card')
 export class KMapSummaryCard extends connect(store, LitElement) {

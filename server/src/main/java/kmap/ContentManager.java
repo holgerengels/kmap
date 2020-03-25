@@ -23,6 +23,7 @@ import org.lightcouch.CouchDbClient;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.zip.ZipEntry;
@@ -71,7 +72,7 @@ public class ContentManager extends Server
                         continue;
 
                     String file = attachment.get("file").getAsString();
-                    zipFile(out, String.join("/", subject, chapter, topic, file));
+                    zipFile(out, new String[] { subject, chapter, topic, file });
                     added.add(file);
                 }
             }
@@ -88,8 +89,7 @@ public class ContentManager extends Server
         out.closeEntry();
     }
 
-    void zipFile(ZipOutputStream out, String file) throws IOException {
-        String[] dirs = file.split("/");
+    void zipFile(ZipOutputStream out, String[] dirs) throws IOException {
         couch.loadAttachment(attachment -> {
             doZipFile(dirs, attachment, out);
         }, dirs);
@@ -188,7 +188,7 @@ public class ContentManager extends Server
     void exportSet(String subject, String set, OutputStream outputStream) throws IOException {
         ZipOutputStream out = new ZipOutputStream(outputStream, StandardCharsets.UTF_8);
 
-        JsonArray array = tests.loadSet(subject, set);
+        JsonArray array = tests.loadTestsBySet(subject, set);
         for (JsonElement element : array) {
             JsonObject object = (JsonObject)element;
             object.remove("_id");
@@ -211,7 +211,7 @@ public class ContentManager extends Server
             JsonObject attachments = object.getAsJsonObject("_attachments");
             if (attachments != null) {
                 for (String file : attachments.keySet()) {
-                    zipFile(out, String.join("/", subject, set, key, file));
+                    zipFile(out, new String[] { subject, set, key, file });
                 }
             }
         }
@@ -319,7 +319,7 @@ public class ContentManager extends Server
     void syncSet(String fromInstance, String toInstance, String subject, String set) {
         String restoreInstance = Server.CLIENT.get();
         Server.CLIENT.set(fromInstance);
-        JsonArray array = tests.loadSet(subject, set);
+        JsonArray array = tests.loadTestsBySet(subject, set);
         for (JsonElement element : array) {
             JsonObject object = (JsonObject)element;
             object.remove("_id");

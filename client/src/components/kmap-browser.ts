@@ -10,9 +10,10 @@ import './kmap-login-button';
 import './kmap-summary-card';
 import './kmap-knowledge-card';
 import './kmap-browser-chapter-editor';
-import {Card, Line} from "../models/maps";
+import {Line} from "../models/maps";
 import {RoutingState} from "@captaincodeman/rdx-model";
 import {TopAppBar} from "@material/mwc-top-app-bar/mwc-top-app-bar";
+import {Card} from "../models/types";
 
 // @ts-ignore
 const _standalone = (window.matchMedia('(display-mode: standalone)').matches) || (window.navigator.standalone) || document.referrer.includes('android-app://');

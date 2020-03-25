@@ -222,7 +222,7 @@ export class KmapMain extends connect(store, LitElement) {
         color: var(--app-drawer-selected-color);
       }
       .drawer-list > mwc-formfield {
-        margin: 12px 0px;
+        margin: 16px 0px;
       }
       .main-content {
           width: 100% !important;

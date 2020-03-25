@@ -2,12 +2,10 @@ import {LitElement, html, css, customElement, property, query, queryAll} from 'l
 import {connect} from '@captaincodeman/rdx';
 import {State, store} from "../store";
 
-import {colorStyles, fontStyles, themeStyles} from "./kmap-styles";
-
 import '@material/mwc-button';
-import '@material/mwc-icon-button';
 import '@material/mwc-dialog';
 import '@material/mwc-formfield';
+import '@material/mwc-icon-button';
 import '@material/mwc-list/mwc-list-item';
 import '@material/mwc-select';
 import '@material/mwc-slider';
@@ -15,7 +13,11 @@ import '@material/mwc-textarea';
 import '@material/mwc-textfield';
 import './kmap-summary-card-summary';
 import './kmap-knowledge-card-description';
+import './file-drop';
+import {colorStyles, fontStyles, themeStyles} from "./kmap-styles";
+
 import {Test} from "../models/tests";
+import {Attachment, Upload} from "../models/types";
 import {Dialog} from "@material/mwc-dialog/mwc-dialog";
 import {TextArea} from "@material/mwc-textarea/mwc-textarea";
 import {throttle} from "../debounce";
@@ -57,10 +59,17 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
   private _values: string[] = [];
 
   @property()
-  private _valid: boolean = true;
+  private _attachmentFile?: File = undefined;
 
   @property()
-  private _cloudPath?: string = undefined;
+  private _attachments: Attachment[] = [];
+  @property()
+  private _uploads: Upload[] = [];
+  @property()
+  private _pendingUploads: boolean = false;
+
+  @property()
+  private _valid: boolean = true;
 
   @query('#editDialog')
   // @ts-ignore
@@ -79,7 +88,6 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
     return {
       _test: state.tests.testForEdit,
       _allTopics: state.maps.allTopics ? state.maps.allTopics.topics : undefined,
-      _cloudPath: state.cloud.path,
     };
   }
 
@@ -104,8 +112,7 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
     }
 
     if (changedProperties.has('_test') && this._test) {
-      this._editDialog.show();
-
+      this._attachmentFile = undefined;
       this._subject  = this._test.subject || '';
       this._chapter  = this._test.chapter || '';
       this._topic    = this._test.topic || '';
@@ -116,7 +123,9 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
       this._answer   = this._test.answer || '';
       this._values   = this._test.values || [];
       this._oldValues = [...this._values];
+      this._attachments = this._test.attachments;
 
+      this._editDialog.show();
       this._editDialog.forceLayout();
       this._checkValidity();
     }
@@ -136,12 +145,9 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
         this._values = newValues;
       }
     }
-    if (changedProperties.has("_cloudPath")) {
-      if (this._cloudPath) {
-        console.log(this._cloudPath);
-        window.open(this._cloudPath, '_blank');
-        store.dispatch.cloud.forgetPath();
-      }
+
+    if (changedProperties.has("_uploads")) {
+      this._pendingUploads = this._uploads.some(u => u.uploading);
     }
   }
 
@@ -169,15 +175,19 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
     this._test.question = this._question;
     this._test.answer = this._answer;
     this._test.values = this._values;
+    this._test.attachments = this._attachments;
 
     let test = this._test;
     console.log(test);
     store.dispatch.tests.saveTest(this._test);
+
+    store.dispatch.testUploads.clearUploads();
   }
 
   _cancel() {
     this._editDialog.close();
     store.dispatch.tests.unsetTestForEdit();
+    store.dispatch.testUploads.clearUploads();
   }
 
   _setQuestion() {
@@ -188,14 +198,36 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
     this._answer = this._answerTextArea.value;
   }
 
-  _createDirectory() {
+  _addAttachment() {
     if (!this._test) return;
 
-    store.dispatch.cloud.createDirectoryForTests({
-      subject: this._test.subject,
-      chapter: this._test.chapter,
-      topic: this._test.topic
-    });
+    if (!this._attachmentFile) {
+      store.dispatch.shell.showMessage("unvollständig!");
+      return;
+    }
+    else {
+      this._attachments = [...this._attachments, {
+        tag: '',
+        name: this._attachmentFile.name,
+        file: this._attachmentFile.name,
+        mime: this._attachmentFile.type,
+        type: "file",
+      }];
+      console.log("upload file");
+      store.dispatch.testUploads.upload(this._attachmentFile);
+    }
+
+    this._attachmentFile = undefined;
+    this.requestUpdate();
+  }
+
+  _deleteAttachment(attachment) {
+    if (!this._test) return;
+
+    let attachments = [...this._attachments];
+    attachments.splice(attachments.indexOf(attachment), 1);
+    this._attachments = attachments;
+    this.requestUpdate();
   }
 
   _checkValidity() {
@@ -225,7 +257,7 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
         mwc-icon-button, mwc-button {
           vertical-align: middle
         }
-        mwc-textfield, mwc-textarea {
+        mwc-textfield, mwc-textarea, file-drop {
           margin-bottom: 4px;
         }
         .preview-scroller {
@@ -251,7 +283,11 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
           0 1px 5px 0 rgba(0, 0, 0, 0.12),
           0 3px 1px -2px rgba(0, 0, 0, 0.2);
         }
-      `];
+        div.fields {
+          display: flex;
+          flex-flow: row wrap;
+        }
+    `];
   }
 
   render() {
@@ -278,7 +314,7 @@ ${this._test ? html`
         ${this._topics.map((topic) => html`<mwc-list-item value="${topic}" ?selected="${topic === this._topic}">${topic}</mwc-list-item>`)}
       </mwc-select>
     <br/><br/>
-    <mwc-textfield id="key" name="key" label="Titel" dense type="text" required .value="${this._key}" @change="${e => this._key = e.target.value}"></mwc-textfield>
+    <mwc-textfield id="key" name="key" label="Titel" dense type="text" required .value="${this._key}" @change="${e => this._key = e.target.value}" pattern="^([^/]*)$"></mwc-textfield>
     <mwc-textfield id="level" name="level" label="Level" dense type="number" inputmode="numeric" min="1" max="3" step="1" .value="${this._level}" @change="${e => this._level = e.target.value}"></mwc-textfield>
     <br/>
     <mwc-formfield alignend="" label="Layout Verhältnis Frage : Antwort = ${this._balance} : ${6 - this._balance}">&nbsp;&nbsp;
@@ -293,11 +329,26 @@ ${this._test ? html`
 
       ${this._values.map((value) => html`<input type="text" .value="${value}" @change="${e => value = e.target.value}"/>`)}
     </div>
+
+    <div class="attachments">
+      <label for="attachments">Materialien</label><br/>
+      ${this._attachments.map((attachment) => html`
+        <div class="fields">
+          <div style="flex: 1 0 auto">
+            <span>${attachment.file} (${attachment.mime})</span>
+          </div>
+          <mwc-icon-button icon="delete" @click="${() => this._deleteAttachment(attachment)}" style="flex: 0 0 36px; --mdc-icon-button-size: 36px"></mwc-icon-button>
+        </div>
+      `)}
+    </div>
+    <div class="fields">
+      <file-drop id="file" required @filedrop="${e => this._attachmentFile = e.detail.file}" style="flex: 1 0 75%"></file-drop>
+      <mwc-icon-button class="add" icon="add_circle" @click="${this._addAttachment}" style="flex: 0 0 36px; --mdc-icon-button-size: 36px; align-self: center"></mwc-icon-button>
+    </div>
   </form>` : ''}
 
-  <mwc-icon-button slot="secondaryAction" icon="folder_open" title="Cloud Verzeichnis öffnen" @click=${this._createDirectory}></mwc-icon-button>
   <mwc-button slot="secondaryAction" @click=${this._cancel}>Abbrechen</mwc-button>
-  <mwc-button slot="primaryAction" @click=${this._save} ?disabled="${!this._valid}">Speichern</mwc-button>
+  <mwc-button ?disabled="${this._pendingUploads || !this._valid}" slot="primaryAction" @click=${this._save}>Speichern</mwc-button>
 </mwc-dialog>
     `;
   }

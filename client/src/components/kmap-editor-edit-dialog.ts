@@ -17,11 +17,11 @@ import './kmap-knowledge-card-description';
 import './file-drop';
 import {colorStyles, fontStyles, themeStyles} from "./kmap-styles";
 
-import {Attachment, Card} from "../models/maps";
 import {Dialog} from "@material/mwc-dialog/mwc-dialog";
 import {TextArea} from "@material/mwc-textarea/mwc-textarea";
 import {throttle} from "../debounce";
-import {Upload} from "../models/uploads";
+import {Upload} from "../models/types";
+import {Attachment, Card} from "../models/types";
 
 
 @customElement('kmap-editor-edit-dialog')
@@ -44,6 +44,7 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
   private _links: string = '';
   @property()
   private _priority: string = '';
+
   @property()
   private _attachmentType: string = 'link';
   @property()
@@ -56,14 +57,14 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
   private _attachmentFile?: File = undefined;
 
   @property()
-  private _navigateAfterSave?: string = '';
-
-  @property()
   private _attachments: Attachment[] = [];
   @property()
   private _uploads: Upload[] = [];
   @property()
   private _pendingUploads: boolean = false;
+
+  @property()
+  private _navigateAfterSave?: string = '';
 
   @query('#editDialog')
   // @ts-ignore
@@ -90,7 +91,6 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
 
   updated(changedProperties) {
     if (changedProperties.has('_card') && this._card) {
-
       this._navigateAfterSave = store.state.maps.subject !== this._card.subject || store.state.maps.chapter !== this._card.chapter
         ? "/app/browser/" + this._card.subject + "/" + this._card.chapter
         : undefined;
@@ -108,6 +108,7 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
       this._attachments = this._card.attachments;
 
       this._editDialog.show();
+      this._editDialog.forceLayout();
     }
 
     if (changedProperties.has("_uploads")) {
@@ -151,6 +152,7 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
       else
         store.dispatch.maps.load({subject: subject, chapter: chapter});
     }.bind(undefined, card.subject, card.chapter, this._navigateAfterSave), 1000);
+
     store.dispatch.uploads.clearUploads();
   }
 

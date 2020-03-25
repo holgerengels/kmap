@@ -1,34 +1,9 @@
 import {createModel, RoutingState} from '@captaincodeman/rdx-model';
-import { Store } from '../store';
+import {Store} from '../store';
 import {endpoint, fetchjson} from "../endpoint";
 import {urls} from "../urls";
-import {Path} from "./types";
+import {Card, Path} from "./types";
 
-export interface Attachment {
-  name: string,
-  tag: string,
-  type: string,
-  href?: string,
-  file?: string,
-  mime?: string,
-}
-
-export interface Card {
-  subject: string,
-  module: string,
-  chapter: string,
-  topic: string,
-  row?: number,
-  col?: number,
-  summary: string,
-  description: string,
-  thumb?: string;
-  links?: string,
-  depends?: string[],
-  priority?: number,
-  attachments: Attachment[];
-  annotations?: string,
-}
 const defaults: object = {
   summary: '',
   description: '',
@@ -297,6 +272,15 @@ export default createModel({
         dispatch.maps.load({ subject: routing.params["subject"], chapter: routing.params["chapter"]});
       else
         dispatch.maps.forget();
+    },
+    'shell/removeLayer': async function() {
+      const dispatch = store.dispatch();
+      const state = store.getState();
+      if (!state.shell.layers.includes("editor")) {
+        dispatch.maps.unsetCardForDelete();
+        dispatch.maps.unsetCardForEdit();
+        dispatch.maps.unsetCardForRename();
+      }
     },
   })
 })

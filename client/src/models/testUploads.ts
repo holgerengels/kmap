@@ -4,13 +4,14 @@ import {endpoint, fetchjson} from "../endpoint";
 import {urls} from "../urls";
 import {Upload} from "./types";
 
-export interface UploadState {
+
+export interface TestUploadState {
   uploads: Upload[];
   error: string,
 }
 
 export default createModel({
-  state: <UploadState>{
+  state: <TestUploadState>{
     error: "",
     uploads: [],
   },
@@ -48,18 +49,18 @@ export default createModel({
       var formData: FormData = new FormData();
       formData.append('files', file);
 
-      dispatch.uploads.startUpload(file);
-      fetchjson(`${urls.server}edit?upload=${file.name}`, {... endpoint.postFormData(state), body: formData},
+      dispatch.testUploads.startUpload(file);
+      fetchjson(`${urls.server}tests?upload=${file.name}`, {... endpoint.postFormData(state), body: formData},
         () => {
-          dispatch.uploads.finishedUpload(file);
+          dispatch.testUploads.finishedUpload(file);
         },
         dispatch.app.handleError,
-        dispatch.uploads.error);
+        dispatch.testUploads.error);
     },
 
     'app/receivedLogout': async function() {
       const dispatch = store.dispatch();
-      dispatch.uploads.clearUploads();
+      dispatch.testUploads.clearUploads();
     },
   })
 })

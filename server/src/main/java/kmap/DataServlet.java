@@ -28,6 +28,7 @@ public class DataServlet
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
         try {
             Server.CLIENT.set(extractClient(req));
+
             req.setCharacterEncoding("UTF-8");
             String subjects = req.getParameter("subjects");
             String subject = req.getParameter("subject");

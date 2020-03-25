@@ -6,7 +6,7 @@ import '@material/mwc-button';
 import '@material/mwc-dialog';
 import {colorStyles, fontStyles, themeStyles} from "./kmap-styles";
 import {Dialog} from "@material/mwc-dialog/mwc-dialog";
-import {Card} from "../models/maps";
+import {Card} from "../models/types";
 
 @customElement('kmap-editor-delete-dialog')
 export class KMapEditorDeleteDialog extends connect(store, LitElement) {

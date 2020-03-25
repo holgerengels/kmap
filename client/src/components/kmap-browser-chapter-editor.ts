@@ -3,8 +3,8 @@ import {connect} from '@captaincodeman/rdx';
 import {State, store} from "../store";
 
 import '@material/mwc-button';
-import {Card} from "../models/maps";
 import {colorStyles, fontStyles, themeStyles} from "./kmap-styles";
+import {Card} from "../models/types";
 
 interface Module {
   subject: string,

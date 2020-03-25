@@ -2,8 +2,7 @@ import {createModel} from '@captaincodeman/rdx-model';
 import { Store } from '../store';
 import {endpoint, fetchjson} from "../endpoint";
 import {urls} from "../urls";
-import {Path} from "./types";
-import {Attachment} from "./maps";
+import {Attachment, Path} from "./types";
 
 export interface CloudState {
   attachments?: Attachment[],

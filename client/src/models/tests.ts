@@ -2,7 +2,7 @@ import {createModel, RoutingState} from '@captaincodeman/rdx-model';
 import { Store } from '../store';
 import {endpoint, fetchjson} from "../endpoint";
 import {urls} from "../urls";
-import {Path} from "./types";
+import {Attachment, Path} from "./types";
 
 export interface TestResult {
   subject: string;
@@ -25,6 +25,7 @@ export interface Test {
   values: string[],
   question: string,
   answer: string,
+  attachments: Attachment[];
 }
 
 export interface Topics {
@@ -328,6 +329,14 @@ export default createModel({
         dispatch.tests.loadTopics();
       else
         dispatch.tests.forget();
+    },
+    'shell/removeLayer': async function() {
+      const dispatch = store.dispatch();
+      const state = store.getState();
+      if (!state.shell.layers.includes("editor")) {
+        dispatch.tests.unsetTestForDelete();
+        dispatch.tests.unsetTestForEdit();
+      }
     },
   })
 })

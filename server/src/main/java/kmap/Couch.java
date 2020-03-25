@@ -64,6 +64,7 @@ public class Couch extends Server {
             JsonObject _attachments = o.getAsJsonObject("_attachments");
             o.add("attachments", amendAttachments(attachments, _attachments));
             fixAttachments(attachments, subject, string(o, "chapter"), string(o, "topic"));
+            o.remove("_attachments");
         });
         objects.sort(Comparator.comparing((JsonObject o) -> string(o, "chapter")).thenComparing(o -> string(o, "topic")));
         return objects;
@@ -108,7 +109,7 @@ public class Couch extends Server {
     public synchronized String storeTopic(String subject, String module, String json, Map<String, Upload> uploads) {
         CouchDbClient client = createClient("map");
         JsonObject object = client.getGson().fromJson(json, JsonObject.class);
-        if (object.has("delete")) {
+        if (object.has("delete")) {                                 // delete
             JsonObject old = (JsonObject)object.get("delete");
             String chapter = string(old, "chapter");
             String topic = string(old, "topic");
@@ -160,7 +161,7 @@ public class Couch extends Server {
                 changed.remove("priority");
 
             String command;
-            if (object.has("old")) {
+            if (object.has("old")) {                                // update
                 command = "move:";
                 JsonObject old = (JsonObject)object.get("old");
                 String chapter = string(old, "chapter");
@@ -197,11 +198,10 @@ public class Couch extends Server {
                     }
                     else
                         return "error:module, subject, chapter or topic missing";
-
                 }
             }
             else {
-                command = "add:";
+                command = "add:";                                               // save
                 changed.addProperty("subject", subject);
                 changed.remove("added");
                 if (checks(changed)) {
@@ -213,34 +213,8 @@ public class Couch extends Server {
                     return "error:module, subject, chapter or topic missing";
             }
 
-            String chapter = string(changed, "chapter");
-            String topic = string(changed, "topic");
-            assert chapter != null;
-            assert topic != null;
-            JsonArray array = loadModule(subject, module);
-            int pos = -1;
-            for (JsonElement element : array) {
-                pos++;
-                if (chapter.equals(string((JsonObject)element, "chapter")) &&
-                    topic.equals(string((JsonObject)element, "topic"))) {
-                    return command + pos;
-                }
-            }
             return "reload:";
         }
-    }
-
-    public String[] importAttachment(String[] idrev, String file, String contentType , InputStream in) {
-        CouchDbClient client = createClient("map");
-        String[] dirs = file.split("/");
-        if (idrev == null) {
-            JsonObject object = loadTopic(client, dirs);
-            String id = string(object,"_id");
-            String rev = string(object,"_rev");
-            idrev = new String[] { id, rev };
-        }
-        Response response = client.saveAttachment(in, encode(dirs[3]), contentType, idrev[0], idrev[1]);
-        return new String[] { response.getId(), response.getRev() };
     }
 
     private Response saveFiles(CouchDbClient client, Response response, Map<String, Upload> uploads, JsonArray attachments) {
@@ -276,6 +250,19 @@ public class Couch extends Server {
             response = client.removeAttachment(encode(name), response.getId(), response.getRev());
         }
         return response;
+    }
+
+    public String[] importAttachment(String[] idrev, String file, String contentType , InputStream in) {
+        CouchDbClient client = createClient("map");
+        String[] dirs = file.split("/");
+        if (idrev == null) {
+            JsonObject object = loadTopic(client, dirs);
+            String id = string(object,"_id");
+            String rev = string(object,"_rev");
+            idrev = new String[] { id, rev };
+        }
+        Response response = client.saveAttachment(in, encode(dirs[3]), contentType, idrev[0], idrev[1]);
+        return new String[] { response.getId(), response.getRev() };
     }
 
     private boolean checks(JsonObject object) {

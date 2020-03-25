@@ -7,7 +7,7 @@ import '@material/mwc-dialog';
 import '@material/mwc-textfield';
 import {colorStyles, fontStyles, themeStyles} from "./kmap-styles";
 import {Dialog} from "@material/mwc-dialog/mwc-dialog";
-import {Card} from "../models/maps";
+import {Card} from "../models/types";
 
 @customElement('kmap-editor-rename-dialog')
 export class KMapEditorRenameDialog extends connect(store, LitElement) {

@@ -3,9 +3,9 @@ import { connect } from '@captaincodeman/rdx';
 import {State, store} from "../store";
 
 import '@material/mwc-button';
-import {Card} from "../models/maps";
 import {colorStyles, fontStyles, themeStyles} from "./kmap-styles";
 import {Module} from "../models/contentMaps";
+import {Card} from "../models/types";
 
 @customElement('kmap-summary-card-editor')
 export class KMapSummaryCardEditor extends connect(store, LitElement) {
