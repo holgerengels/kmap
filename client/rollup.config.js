@@ -25,7 +25,7 @@ export default deepmerge(config, {
         customPolyfills: [
           {
             name: 'event-target',
-            test: "!('EventTarget' in window) || !('constructor' in window.EventTarget.prototype)",
+            test: "true || !('EventTarget' in window) || !('constructor' in window.EventTarget.prototype)",
             path: require.resolve('event-target/min.js'),
           },
           {
