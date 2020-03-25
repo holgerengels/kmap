@@ -341,6 +341,8 @@ export default createModel({
     'tests/setTestForEdit': async function() {
       const dispatch = store.dispatch();
       const state = store.getState();
+      if (state.tests.testForEdit === undefined)
+        return;
       if (state.contentSets.selected == undefined || state.tests.testForEdit.subject !== state.contentSets.selected.subject)
         dispatch.maps.loadAllTopics(state.tests.testForEdit.subject);
     },
