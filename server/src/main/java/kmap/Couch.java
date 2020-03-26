@@ -237,6 +237,9 @@ public class Couch extends Server {
     }
 
     private Response deleteFiles(CouchDbClient client, Response response, JsonArray attachments, JsonObject _attachments) {
+        if (_attachments == null)
+            return response;
+
         Set<String> existingNames = _attachments.keySet();
         for (JsonElement alement : attachments) {
             String file = string((JsonObject)alement,"file");
