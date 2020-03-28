@@ -64,7 +64,6 @@ export default createModel({
     selectCard(state, card: Card) {
       return { ...state, selected: card.topic, selectedDependencies: card.depends || [] }
     },
-
     unselectCard(state) {
       return { ...state, selected: "", selectedDependencies: [] }
     },

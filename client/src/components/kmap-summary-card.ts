@@ -111,7 +111,11 @@ export class KMapSummaryCard extends connect(store, LitElement) {
 
   _clicked() {
     if (this.card == undefined) return;
-    store.dispatch.maps.selectCard(this.card);
+
+    if (store.state.maps.selected === this.card.topic)
+      store.dispatch.maps.unselectCard();
+    else
+      store.dispatch.maps.selectCard(this.card);
   }
 
   static get styles() {
