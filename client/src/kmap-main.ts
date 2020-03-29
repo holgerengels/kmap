@@ -272,7 +272,6 @@ export class KmapMain extends connect(store, LitElement) {
         <pwa-install-button><mwc-button outlined style="--mdc-theme-primary: var(--color-secondary-dark);">App installieren</mwc-button></pwa-install-button>
         <pwa-update-available><mwc-button outlined style="--mdc-theme-primary: var(--color-secondary-dark);">App aktualisieren</mwc-button></pwa-update-available>
       </nav>
-      ${this._roles.includes("teacher") ? html`
       <!--googleoff: all-->
       <nav class="drawer-list">
         <hr/><br/>
@@ -280,20 +279,21 @@ export class KmapMain extends connect(store, LitElement) {
         <mwc-formfield label="Kurztexte">
           <mwc-switch ?checked="${this._layers.includes('summaries')}" @change="${e => this._switchLayer('summaries', e.target.checked)}"></mwc-switch>
         </mwc-formfield>
-        <mwc-formfield label="Mittelwerte">
-          <mwc-switch ?checked="${this._layers.includes('averages')}" @change="${e => this._switchLayer('averages', e.target.checked)}"></mwc-switch>
-        </mwc-formfield>
-        ${this._layers.includes('averages') ? html`<kmap-course-selector></kmap-course-selector>` : ''}
-        <mwc-formfield label="Editor">
-          <mwc-switch ?checked="${this._layers.includes('editor')}" @change="${e => this._switchLayer('editor', e.target.checked)}"></mwc-switch>
-        </mwc-formfield>
-        ${this._layers.includes('editor') ? html`
-          ${this._page === 'home' || this._page === 'browser' ? html`<kmap-module-selector></kmap-module-selector>` : ''}
-          ${this._page === 'test' ? html`<kmap-set-selector></kmap-set-selector>` : ''}
+        ${this._roles.includes("teacher") ? html`
+          <mwc-formfield label="Mittelwerte">
+            <mwc-switch ?checked="${this._layers.includes('averages')}" @change="${e => this._switchLayer('averages', e.target.checked)}"></mwc-switch>
+          </mwc-formfield>
+          ${this._layers.includes('averages') ? html`<kmap-course-selector></kmap-course-selector>` : ''}
+          <mwc-formfield label="Editor">
+            <mwc-switch ?checked="${this._layers.includes('editor')}" @change="${e => this._switchLayer('editor', e.target.checked)}"></mwc-switch>
+          </mwc-formfield>
+          ${this._layers.includes('editor') ? html`
+            ${this._page === 'home' || this._page === 'browser' ? html`<kmap-module-selector></kmap-module-selector>` : ''}
+            ${this._page === 'test' ? html`<kmap-set-selector></kmap-set-selector>` : ''}
+          ` : ''}
         ` : ''}
       </nav>
       <!--googleon: all-->
-      ` : ''}
     </div>
 
     <div slot="appContent" class="main-content" role="main" @toggleDrawer="${() => this._drawerOpen = !this._drawerOpen}" @lclick="${this._showLogin}">
