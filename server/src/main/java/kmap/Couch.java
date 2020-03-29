@@ -169,15 +169,7 @@ public class Couch extends Server {
                 assert chapter != null;
                 assert topic != null;
 
-                JsonObject existing = null;
-                JsonArray array = loadModule(subject, module);
-                for (JsonElement element : array) {
-                    if (chapter.equals(string((JsonObject)element, "chapter")) &&
-                        topic.equals(string((JsonObject)element, "topic"))) {
-                        existing = (JsonObject)element;
-                    }
-                }
-
+                JsonObject existing = loadTopic(client, new String[] { subject, chapter, topic });
                 if (existing != null) {
                     existing.addProperty("subject", subject);
                     existing.add("chapter", changed.get("chapter"));

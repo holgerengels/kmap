@@ -27,6 +27,9 @@ import {Attachment, Card} from "../models/types";
 @customElement('kmap-editor-edit-dialog')
 export class KMapEditorEditDialog extends connect(store, LitElement) {
   @property()
+  private _instance: string = '';
+
+  @property()
   private _card?: Card = undefined;
   @property()
   private _summary: string = '';
@@ -78,6 +81,7 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
 
   mapState(state: State) {
     return {
+      _instance: state.app.instance,
       _card: state.maps.cardForEdit,
       _uploads: state.uploads.uploads,
     };
@@ -312,7 +316,8 @@ ${this._card ? html`
     .subject="${this._card.subject}"
     .chapter="${this._card.chapter}"
     .topic="${this._card.topic}"
-    .description="${this._description}">
+    .description="${this._description}"
+    .instance="${this._instance}">
 </kmap-knowledge-card-description></div>` : ''}
   ` : ''}
 
