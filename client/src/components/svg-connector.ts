@@ -83,8 +83,14 @@ export class Connector extends LitElement {
             <path d="M 8 0 L 0 4 L 8 8 z"/>
         </marker>
       </defs-->
+      <!--defs>
+        <radialGradient id="gradient">
+          <stop offset="0%" stop-color="#fbc02d" stop-opacity=".9"/>
+          <stop offset="100%" stop-color="#fbc02d" stop-opacity=".3"/>
+        </radialGradient>
+      </defs-->
       ${this._connections.map(connection => svg`
-        <circle cx="${connection.fromx}" cy="${connection.fromy}" r="5" fill="#fbc02d" stroke="none" />
+        <circle cx="${connection.fromx}" cy="${connection.fromy}" r="7" fill="#fbc02d" stroke="none" />
         <circle cx="${connection.tox}" cy="${connection.toy}" r="5" fill="#fbc02d" stroke="none" />
         <path d="${this._path(connection)}" fill="none" stroke="#fbc02d" stroke-width="3" stroke-opacity=".9"/>
       `)}
