@@ -10,10 +10,12 @@ import './kmap-login-button';
 import './kmap-summary-card';
 import './kmap-knowledge-card';
 import './kmap-browser-chapter-editor';
+import './svg-connector';
 import {Line} from "../models/maps";
 import {RoutingState} from "@captaincodeman/rdx-model";
 import {TopAppBar} from "@material/mwc-top-app-bar/mwc-top-app-bar";
 import {Card} from "../models/types";
+import {Connector} from "./svg-connector";
 
 // @ts-ignore
 const _standalone = (window.matchMedia('(display-mode: standalone)').matches) || (window.navigator.standalone) || document.referrer.includes('android-app://');
@@ -59,6 +61,11 @@ export class KMapBrowser extends connect(store, LitElement) {
   // @ts-ignore
   private _bar: TopAppBar;
 
+  @property()
+  private _selected: string = '';
+  @property()
+  private _highlighted: string[] = [];
+
   set route(val: RoutingState) {
     if (val.page === "browser") {
       this._topic = val.params.topic ? decodeURIComponent(val.params.topic) : '';
@@ -76,6 +83,8 @@ export class KMapBrowser extends connect(store, LitElement) {
       _chapterCard: state.maps.chapterCard,
       _loading: state.maps.loading,
       _topics: state.tests.topics ? state.tests.topics.topics : [],
+      _selected: state.maps.selected,
+      _highlighted: state.maps.selectedDependencies,
     };
   }
 
@@ -168,6 +177,27 @@ export class KMapBrowser extends connect(store, LitElement) {
           that._animTo = undefined;
         });
       });
+
+    }
+
+    if (this._layers.includes("dependencies") && (changedProperties.has("_selected") || changedProperties.has("_highlighted"))) {
+      if (!this.shadowRoot)
+        return;
+
+      const connector: Connector | null = this.shadowRoot.getElementById("connector") as Connector;
+      connector.clear();
+
+      if (this._selected && this._highlighted) {
+        let selected = this._findCard(this._selected);
+        if (selected === undefined)
+          return;
+        for (const topic of this._highlighted) {
+          let highlighted = this._findCard(topic);
+          if (highlighted === undefined)
+            continue;
+          connector.add(highlighted, selected);
+        }
+      }
     }
 
     /*
@@ -184,6 +214,16 @@ export class KMapBrowser extends connect(store, LitElement) {
     if (changedProperties.has("_chapter"))
       this._hasTests = this._topics.filter(t => t.startsWith(this._chapter)).length > 1;
 
+  }
+
+  _findCard(topic: string) {
+    // @ts-ignore
+    const elements = this.shadowRoot.querySelectorAll("kmap-summary-card");
+    for (const element of elements) {
+      if (topic === element.getAttribute("key"))
+        return element as HTMLElement;
+    }
+    return undefined;
   }
 
   _rated(e) {
@@ -264,6 +304,9 @@ export class KMapBrowser extends connect(store, LitElement) {
         <kmap-login-button slot="actionItems" @lclick="${() => this._fire('login')}"></kmap-login-button>
       </mwc-top-app-bar>
         <div id="map" class="page map" ?active="${this._page === 'map'}" @rated="${this._rated}">
+          ${this._layers.includes('dependencies') ? html`
+            <svg-connector id="connector"></svg-connector>
+          ` : ''}
           ${this._chapterCard ? html`
             <div class="chapter-line">
               <a href="/app/browser/${this._subject}/${this._chapter}/_"><mwc-icon style="float: right">fullscreen</mwc-icon></a>
@@ -290,7 +333,7 @@ export class KMapBrowser extends connect(store, LitElement) {
           ${this._layers.includes('editor') ? html`
              <kmap-browser-chapter-editor .subject="${this._subject}" .chapter="${this._chapter}" .chapterCard="${this._chapterCard}"></kmap-browser-chapter-editor>
            ` : ''
-    }
+          }
           ${this._lines.map((line) => html`
             <div class="scrollpane">
               ${line.cards.map((card) => html`

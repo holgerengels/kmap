@@ -279,6 +279,9 @@ export class KmapMain extends connect(store, LitElement) {
         <mwc-formfield label="Kurztexte">
           <mwc-switch ?checked="${this._layers.includes('summaries')}" @change="${e => this._switchLayer('summaries', e.target.checked)}"></mwc-switch>
         </mwc-formfield>
+        <mwc-formfield label="Pfeile">
+          <mwc-switch ?checked="${this._layers.includes('dependencies')}" @change="${e => this._switchLayer('dependencies', e.target.checked)}"></mwc-switch>
+        </mwc-formfield>
         ${this._roles.includes("teacher") ? html`
           <mwc-formfield label="Mittelwerte">
             <mwc-switch ?checked="${this._layers.includes('averages')}" @change="${e => this._switchLayer('averages', e.target.checked)}"></mwc-switch>
