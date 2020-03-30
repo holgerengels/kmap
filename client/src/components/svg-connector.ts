@@ -16,6 +16,21 @@ export class Connector extends LitElement {
   private _connections: Connection[] = [];
 
   _findAbsolutePosition(element: HTMLElement) {
+    var x: number = 0;
+    var y: number = 0;
+    var el: HTMLElement | null = element;
+    for (; el != this.offsetParent; el = el.offsetParent as HTMLElement) {
+      x += el.offsetLeft;
+      y += el.offsetTop;
+    }
+    return {
+      "x": x,
+      "y": y
+    };
+  }
+
+  /*
+  _findAbsolutePosition(element: HTMLElement) {
     if (this.offsetParent === null)
       return undefined;
 
@@ -26,6 +41,7 @@ export class Connector extends LitElement {
       "y": rect.top - parent.top,
     };
   }
+   */
 
   add(from: HTMLElement, to: HTMLElement) {
     let frompos = this._findAbsolutePosition(from);
