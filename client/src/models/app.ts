@@ -122,15 +122,9 @@ export default createModel({
       }
     },
 
-    /*
-        'routing/change': async function(payload: RoutingState) {
-          switch (payload.page) {
-            case 'browser':
-              // @ts-ignore
-              dispatch.maps.load(payload.page["subject"], payload.page["chapter"]);
-              break;
-          }
-        }
-     */
+    'app/chooseInstance': async function() {
+      const dispatch = store.dispatch();
+      dispatch.app.logout();
+    },
   })
 })
