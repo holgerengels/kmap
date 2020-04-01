@@ -23,10 +23,26 @@ export class KMapKnowledgeCardAttachment extends LitElement {
 
   updated(changedProperties) {
     if (changedProperties.has("attachment") && this.attachment) {
-      this._handler = this.attachment.mime === "application/vnd.geogebra.file" ? "/geogebra.html?path=" + urls.server : "";
+      this._handler = this.getHandler(this.attachment.mime);
       this._mimeIcon = this.mimeIcon(this.attachment.mime);
-      this._isDownload = this.attachment.type === "file" && this.attachment.mime !== "text/html" && this._supportsDownload ? this.attachment.name : undefined;
+      this._isDownload = this.attachment.type === "file" && this.attachment.mime !== "text/html" && this._supportsDownload ? this.attachment.file : undefined;
       this._isTarget = this.attachment.type === "link" || this.attachment.mime === "text/html" || !this._supportsDownload ? "_blank" : undefined;
+    }
+  }
+
+  private getHandler(mime?: string) {
+    switch (mime) {
+      case "application/vnd.geogebra.file":
+      case "application/vnd.geogebra-classic.file":
+        return "/geogebra.html?path=" + urls.server;
+      case "application/vnd.geogebra-3d.file":
+        return "/geogebra.html?app=3d&path=" + urls.server;
+      case "application/vnd.geogebra-graphing.file":
+        return "/geogebra.html?app=graphing&path=" + urls.server;
+      case "application/vnd.geogebra-geometry.file":
+        return "/geogebra.html?app=geometry&path=" + urls.server;
+      default:
+        return "";
     }
   }
 
@@ -49,13 +65,6 @@ export class KMapKnowledgeCardAttachment extends LitElement {
     console.log("no icon for " + mimeType);
     return "scatter_plot";
   }
-
-  /*
-  mimeSrc(mimeType) {
-    if (!this.mimeIcon(mimeType))
-      return "icons/" + mimeType + ".png";
-  }
-  */
 
   static get styles() {
     // language=CSS
@@ -80,6 +89,7 @@ export class KMapKnowledgeCardAttachment extends LitElement {
   }
 
   render() {
+    // language=HTML
     return html`
             <p>
                 <mwc-icon>${this._mimeIcon}</mwc-icon>&nbsp;

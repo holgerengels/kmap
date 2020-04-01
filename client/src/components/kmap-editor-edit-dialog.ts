@@ -360,7 +360,7 @@ ${this._card ? html`
       <mwc-textfield id="name" type="text" required label="Name" .value="${this._attachmentName}" @change="${e => this._attachmentName = e.target.value}" style="flex: 1 0 25%"></mwc-textfield>
       <mwc-icon-button-toggle ?on="${this._attachmentType === 'file'}" onIcon="attachment" offIcon="link" @MDCIconButtonToggle:change="${e => this._attachmentType = e.detail.isOn ? 'file' : 'link'}" style="flex: 0 0 48px"></mwc-icon-button-toggle>
       <mwc-textfield ?hidden="${this._attachmentType === "file"}" id="href" type="url" required label="Link" .value="${this._attachmentHref}" @change="${e => this._attachmentHref = e.target.value}" style="flex: 1 0 35%"></mwc-textfield>
-      <file-drop ?hidden="${this._attachmentType === "link"}" id="file" required @filedrop="${e => this._attachmentFile = e.detail.file}" style="flex: 1 0 35%"></file-drop>
+      <file-drop ?hidden="${this._attachmentType === "link"}" id="file" required @filedrop="${this._fileDrop}" style="flex: 1 0 35%"></file-drop>
       <mwc-icon-button class="add" icon="add_circle" @click="${this._addAttachment}" style="flex: 0 0 48px"></mwc-icon-button>
     </div>
   </form>` : ''}
@@ -369,6 +369,13 @@ ${this._card ? html`
   <mwc-button ?disabled="${this._pendingUploads}" slot="primaryAction" @click=${this._save}>Speichern</mwc-button>
 </mwc-dialog>
     `;
+  }
+
+  private _fileDrop(e) {
+    this._attachmentFile = e.detail.file as File;
+    if (this._attachmentName === "") {
+      this._attachmentName = this._attachmentFile.name.includes(".") ? this._attachmentFile.name.substr(0, this._attachmentFile.name.lastIndexOf(".")) : this._attachmentFile.name;
+    }
   }
 }
 
