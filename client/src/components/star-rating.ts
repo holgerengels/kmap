@@ -8,6 +8,7 @@ export class StarRating extends LitElement {
   private rate: number = 0;
 
   _clicked(event) {
+    event.cancelBubble = true;
     this.rate = event.srcElement.getAttribute("value");
     this.dispatchEvent(new CustomEvent('clicked', {bubbles: true, composed: true, detail: {rate: this.rate}}));
   }

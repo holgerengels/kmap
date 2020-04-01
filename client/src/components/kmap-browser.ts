@@ -184,7 +184,7 @@ export class KMapBrowser extends connect(store, LitElement) {
       if (!this.shadowRoot)
         return;
 
-      const connector: Connector | null = this.shadowRoot.getElementById("connector") as Connector;
+      const connector: Connector = this.shadowRoot.getElementById("connector") as Connector;
       connector.clear();
 
       if (this._selected && this._highlighted) {
@@ -211,9 +211,12 @@ export class KMapBrowser extends connect(store, LitElement) {
       setTimeout(function () { that._faded = that._loading; }, 100);
     }
 
-    if (changedProperties.has("_chapter"))
+    if (changedProperties.has("_chapter")) {
       this._hasTests = this._topics.filter(t => t.startsWith(this._chapter)).length > 1;
-
+      // @ts-ignore
+      const connector: Connector = this.shadowRoot.getElementById("connector") as Connector;
+      connector.clear();
+    }
   }
 
   _findCard(topic: string) {

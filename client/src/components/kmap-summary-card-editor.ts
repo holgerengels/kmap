@@ -35,17 +35,20 @@ export class KMapSummaryCardEditor extends connect(store, LitElement) {
     }
   }
 
-  _showEdit() {
+  _showEdit(e) {
+    e.cancelBubble = true;
     if (this.card !== undefined)
       store.dispatch.maps.setCardForEdit(this.card);
   }
 
-  _showRename() {
+  _showRename(e) {
+    e.cancelBubble = true;
     if (this.card !== undefined)
       store.dispatch.maps.setCardForRename(this.card);
   }
 
-  _showDelete() {
+  _showDelete(e) {
+    e.cancelBubble = true;
     if (this.card !== undefined)
       store.dispatch.maps.setCardForDelete(this.card);
   }
