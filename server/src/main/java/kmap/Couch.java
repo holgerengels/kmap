@@ -89,7 +89,6 @@ public class Couch extends Server {
         );
         JsonArray array = new JsonArray();
         modules.forEach(array::add);
-        System.out.println("modules = " + array);
         return array;
     }
 
@@ -102,7 +101,6 @@ public class Couch extends Server {
         objects.forEach(object -> modules.add(object.getAsJsonArray("key").get(0).getAsString()));
         JsonArray array = new JsonArray();
         modules.stream().filter(m -> !"Hilfe".equals(m)).sorted().distinct().forEach(array::add);
-        System.out.println("subjects = " + array);
         return array;
     }
 
@@ -328,12 +326,12 @@ public class Couch extends Server {
                     Connection connection = connections.computeIfAbsent(dependsOn + ":" + topicName, s -> {
                         Node source = nodes.get(dependsOn);
                         if (source == null) {
-                            System.out.println("source node " + dependsOn + " missing");
+                            System.out.println("WARNING: source node " + dependsOn + " missing");
                             return null;
                         }
                         Node target = nodes.get(topicName);
                         if (target == null) {
-                            System.out.println("target node" + topicName + " missing");
+                            System.out.println("WARNING: target node" + topicName + " missing");
                             return null;
                         }
                         return new Connection(source, target);
@@ -534,7 +532,7 @@ public class Couch extends Server {
                 type = string(attachment, "content_type");
                 length = integer(attachment, "length");
                 in = client.find(id + "/" + encode(dirs[3]));
-                System.out.println("Load " + id + "/" + dirs[3] + " from couch");
+                //System.out.println("Load " + id + "/" + dirs[3] + " from couch");
                 sender.accept(new AttachmentInputStream(in, dirs[3], type, length));
                 in.close();
                 return true;
@@ -645,7 +643,7 @@ public class Couch extends Server {
             paths.add(path.substring(subject.length() + 1));
         }
         Collections.sort(paths);
-        System.out.println("paths = " + paths);
+        //System.out.println("paths = " + paths);
         JsonArray array = new JsonArray();
         paths.forEach(array::add);
         return array;

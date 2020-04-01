@@ -49,7 +49,7 @@ public class Tests {
         );
         JsonArray array = new JsonArray();
         sets.forEach(array::add);
-        System.out.println("sets = " + array);
+        //System.out.println("sets = " + array);
         return array;
     }
 
@@ -187,7 +187,7 @@ public class Tests {
                 type = string(attachment, "content_type");
                 length = integer(attachment, "length");
                 in = client.find(id + "/" + encode(dirs[3]));
-                System.out.println("Load " + id + "/" + dirs[3] + " from couch");
+                //System.out.println("Load " + id + "/" + dirs[3] + " from couch");
                 sender.accept(new AttachmentInputStream(in, dirs[3], type, length));
                 in.close();
                 return true;

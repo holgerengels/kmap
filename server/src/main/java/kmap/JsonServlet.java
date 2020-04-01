@@ -129,7 +129,7 @@ public class JsonServlet extends HttpServlet {
         String client;
 
         if ((client = getHeader(request, "X-Instance")) != null) {
-            System.out.println("instance from header = " + client);
+            //System.out.println("instance from header = " + client);
             return client;
         }
 
@@ -138,16 +138,16 @@ public class JsonServlet extends HttpServlet {
             int end = client.indexOf("/", start + 1);
             if (end != -1) {
                 client = client.substring(start + 1, end);
-                System.out.println("instance from referer = " + client);
+                //System.out.println("instance from referer = " + client);
             }
         }
 
         if ((client = request.getParameter("instance")) != null) {
-            System.out.println("instance from parameter = " + client);
+            //System.out.println("instance from parameter = " + client);
             return client;
         }
 
-        System.out.println("instance not specified = lala");
+        System.out.println("WARNING: instance not specified = lala");
         return "lala";
     }
 

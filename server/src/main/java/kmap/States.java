@@ -126,7 +126,7 @@ public class States {
             return object.getAsJsonArray(name);
         }
         catch (NoDocumentException e) {
-            System.out.println("there should be a document = " + e);
+            System.out.println("WARNING: there should be a document = " + e);
             throw new RuntimeException(e);
         }
     }
@@ -148,7 +148,7 @@ public class States {
             client.update(object);
         }
         catch (NoDocumentException e) {
-            System.out.println("there should be a document = " + e);
+            System.out.println("WARNING: there should be a document = " + e);
             throw new RuntimeException(e);
         }
     }
@@ -165,7 +165,7 @@ public class States {
             client.update(object);
         }
         catch (NoDocumentException e) {
-            System.out.println("there should be a document = " + e);
+            System.out.println("WARNING: there should be a document = " + e);
             throw new RuntimeException(e);
         }
     }

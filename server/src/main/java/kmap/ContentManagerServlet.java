@@ -51,7 +51,6 @@ public class ContentManagerServlet
                     log("import module " + importModule);
                     for (Part part : req.getParts()) {
                         String name = getFileName(part);
-                        System.out.println("name = " + name);
                         String[] strings;
                         strings = contentManager.importModule(part.getInputStream());
                         System.out.println("imported " + String.join(" - ", strings));
@@ -65,7 +64,6 @@ public class ContentManagerServlet
                     log("import set " + importSet);
                     for (Part part : req.getParts()) {
                         String name = getFileName(part);
-                        System.out.println("name = " + name);
                         String[] strings;
                         strings = contentManager.importSet(part.getInputStream());
                         System.out.println("imported " + String.join(" - ", strings));

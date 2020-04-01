@@ -36,7 +36,7 @@ public class Test {
                 }
             }
 
-            System.out.println("nodes = " + nodes.size());
+            //System.out.println("nodes = " + nodes.size());
             List<Node> list = layout(nodes, connections);
             print(chapter.getAsJsonPrimitive("chapter").getAsString(), list);
         }
@@ -70,6 +70,7 @@ public class Test {
             System.out.print(node.topic);
         }
         System.out.println();
+
         System.out.println();
     }
 
