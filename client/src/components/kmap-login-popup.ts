@@ -72,11 +72,7 @@ export class KMapLoginPopup extends connect(store, LitElement) {
   }
 
   _login() {
-    let instance: string = this._loginInstance.value;
-    if (this._instances.find(i => i.name === instance) === undefined) {
-      store.dispatch.shell.showMessage("Ungültige Instanz!");
-    }
-    else {
+    if (this._valid) {
       store.dispatch.app.login({userid: this._loginId.value, password: this._loginPassword.value});
     }
   }
