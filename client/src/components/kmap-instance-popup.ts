@@ -31,6 +31,8 @@ export class KMapInstancePopup extends connect(store, LitElement) {
 
   @property()
   private _radio: string = 'root';
+  @property()
+  private _valid: boolean = true;
 
   mapState(state: State) {
     return {
@@ -79,6 +81,10 @@ export class KMapInstancePopup extends connect(store, LitElement) {
     }
   }
 
+  _checkValidity(event) {
+    console.log(event);
+  }
+
   static get styles() {
     // language=CSS
     return [
@@ -108,7 +114,7 @@ export class KMapInstancePopup extends connect(store, LitElement) {
     // language=HTML
     return html`
   <!--googleoff: all-->
-  <mwc-dialog id="instanceDialog" title="Instanz wählen">
+  <mwc-dialog id="instanceDialog" title="Instanz wählen" @change="${this._checkValidity}">
     <div>
         <h3>Instanzen</h3>
         <p>Wenn Deine Schule eine eigene KMap Instanz eingerichtet hat, stehen Dir für die Zusammenarbeit in Deiner
@@ -117,9 +123,10 @@ export class KMapInstancePopup extends connect(store, LitElement) {
     <mwc-formfield label="Ich möchte die Instanz meiner Schule nutzen ..."><mwc-radio name="group" value="dedicated" ?checked="${this._radio === 'dedicated'}" @change="${() => this._radio = 'dedicated'}" dialogitialFocus></mwc-radio></mwc-formfield>
     </div>
     <datalist-textfield id="instance" name="instance" label="Instanz" type="text" ?required="${this._radio === 'dedicated'}" ?disabled="${this._radio !== 'dedicated'}"
-      .datalist="${this._instances.map(instance => {return {value: instance.name, label: instance.description}}).filter(instance => instance.value !== 'root')}">
+      .datalist="${this._instances.map(instance => {return {value: instance.name, label: instance.description}}).filter(instance => instance.value !== 'root')}"
+      pattern="[a-z-]*">
     </datalist-textfield>
-    <mwc-button slot="primaryAction" @click=${this._chooseInstance}>Auswählen</mwc-button>
+    <mwc-button slot="primaryAction" @click=${this._chooseInstance} ?disabled="${!this._valid}">Auswählen</mwc-button>
   </mwc-dialog>
   <!--googleon: all-->
     `;

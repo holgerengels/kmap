@@ -11,6 +11,7 @@ import {Dialog} from "@material/mwc-dialog/mwc-dialog";
 import {TextField} from "@material/mwc-textfield/mwc-textfield";
 import {colorStyles, fontStyles, themeStyles} from "./kmap-styles";
 import {Instance} from "../models/instances";
+import {DatalistTextField} from "./datalist-textfield";
 
 @customElement('kmap-login-popup')
 export class KMapLoginPopup extends connect(store, LitElement) {
@@ -26,9 +27,15 @@ export class KMapLoginPopup extends connect(store, LitElement) {
   @property()
   private _message: string = '';
 
+  @property()
+  private _valid: boolean = true;
+
   @query('#loginDialog')
   // @ts-ignore
   private _loginDialog: Dialog;
+  @query('#instance')
+  // @ts-ignore
+  private _loginInstance: DatalistTextField;
   @query('#loginId')
   // @ts-ignore
   private _loginId: TextField;
@@ -65,7 +72,13 @@ export class KMapLoginPopup extends connect(store, LitElement) {
   }
 
   _login() {
-    store.dispatch.app.login({ userid: this._loginId.value, password: this._loginPassword.value });
+    let instance: string = this._loginInstance.value;
+    if (this._instances.find(i => i.name === instance) === undefined) {
+      store.dispatch.shell.showMessage("Ungültige Instanz!");
+    }
+    else {
+      store.dispatch.app.login({userid: this._loginId.value, password: this._loginPassword.value});
+    }
   }
 
   _logout() {
@@ -89,9 +102,11 @@ export class KMapLoginPopup extends connect(store, LitElement) {
 
     if (this._instances.find(i => i.name === instance) === undefined) {
       store.dispatch.shell.showMessage("Ungültige Instanz!");
+      this._valid = false;
     }
     else {
       store.dispatch.app.chooseInstance(instance);
+      this._valid = true;
     }
   }
 
@@ -137,7 +152,8 @@ export class KMapLoginPopup extends connect(store, LitElement) {
         </span>
       ` : html`
         <datalist-textfield id="instance" name="instance" label="Instanz" type="text" required @change="${this._chooseInstance}"
-          .datalist="${this._instances.map(instance => {return {value: instance.name, label: instance.description}})}">
+          .datalist="${this._instances.map(instance => {return {value: instance.name, label: instance.description}})}"
+          pattern="[a-z-]*">
         </datalist-textfield>
       `}
       <br/><br/>
@@ -153,7 +169,7 @@ export class KMapLoginPopup extends connect(store, LitElement) {
     </div>
     <pwa-install-button slot="secondaryAction"><mwc-button outlined style="--mdc-theme-primary: var(--color-secondary-dark);">App installieren</mwc-button></pwa-install-button>
     <pwa-update-available slot="secondaryAction"><mwc-button outlined style="--mdc-theme-primary: var(--color-secondary-dark);">App aktualisieren</mwc-button></pwa-update-available>
-    <mwc-button slot="primaryAction" ?hidden="${this._userid}" @click=${this._login}>Anmelden</mwc-button>
+    <mwc-button slot="primaryAction" ?hidden="${this._userid}" @click=${this._login} ?disabled="${!this._valid}">Anmelden</mwc-button>
     <mwc-button slot="secondaryAction" ?hidden="${!this._userid}" @click=${this._logout}>Abmelden</mwc-button>
   </mwc-dialog>
   <!--googleon: all-->

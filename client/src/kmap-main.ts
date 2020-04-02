@@ -127,7 +127,7 @@ export class KmapMain extends connect(store, LitElement) {
       }
     }
     else if (!store.state.app.instance)
-      store.dispatch.app.chooseInstance("lala");
+      store.dispatch.app.chooseInstance("root");
 
     installOfflineWatcher((offline) => store.dispatch.app.updateOffline(offline));
     installMediaQueryWatcher(`(max-width: 500px)`, (matches) => store.dispatch.shell.updateNarrow(matches));
