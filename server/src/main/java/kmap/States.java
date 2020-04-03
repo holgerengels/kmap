@@ -10,6 +10,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.*;
 
+import static kmap.JSON.string;
+
 /**
  * Created by holger on 04.04.17.
  */
@@ -209,19 +211,56 @@ public class States {
         return statesAndProgress(user, subject);
     }
 
+    private static Properties readProperties(String fileName) throws IOException {
+        Properties properties = new Properties();
+        properties.load(new FileInputStream(fileName));
+        return properties;
+    }
+
+    private void fixStates() {
+        CouchDbClient client = getClient();
+        View view = client.view("_all_docs")
+                .reduce(false)
+                .includeDocs(true);
+        List<JsonObject> list = view.query(JsonObject.class);
+        List<JsonObject> deleted = new ArrayList<>();
+        List<JsonObject> added = new ArrayList<>();
+        for (JsonObject object : list) {
+            String id = string(object, "_id");
+            int pos = id.lastIndexOf(".");
+            String subject = id.substring(pos+1);
+            id = id.substring(0, pos);
+            if (!id.equals(id.toLowerCase())) {
+                System.out.println("id = " + id);
+                JsonObject delete = new JsonObject();
+                delete.addProperty("_id", id + "." + subject);
+                delete.add("_rev", object.get("_rev"));
+                delete.addProperty("_deleted", true);
+                deleted.add(delete);
+
+                object.remove("_rev");
+                object.addProperty("_id", id.toLowerCase() + "." + subject);
+                added.add(object);
+            }
+        }
+        System.out.println("added = " + added);
+        System.out.println("deleted = " + deleted);
+
+        if (!deleted.isEmpty())
+            client.bulk(deleted, true);
+        if (!added.isEmpty())
+            client.bulk(added, true);
+    }
+
     public static void main(String[] args) throws IOException {
+        Server.CLIENT.set("lala");
         States couch = new States(new Couch(readProperties(args[0])));
         //JsonObject object = couch.chapter("mathe", "Mathematik");
         //System.out.println("object = " + object);
         //JsonObject states = couch.statesAndProgress("h.engels", "Mathematik");
         //System.out.println("states = " + states);
-        JsonObject states = couch.courseStates("lala", "test", "Mathematik");
-        System.out.println("states = " + states);
-    }
-
-    private static Properties readProperties(String fileName) throws IOException {
-        Properties properties = new Properties();
-        properties.load(new FileInputStream(fileName));
-        return properties;
+        //JsonObject states = couch.courseStates("lala", "test", "Mathematik");
+        //System.out.println("states = " + states);
+        couch.fixStates();
     }
 }
