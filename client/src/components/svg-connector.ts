@@ -89,9 +89,10 @@ export class Connector extends LitElement {
   }
 
   render() {
+    const parent = this.parentElement as HTMLElement;
     //language=SVG
     return svg`
-      <svg style="position:absolute;left:0px;top:0px" width="${document.body.clientWidth}" height="${document.body.clientHeight}">
+      <svg style="position:absolute;left:0px;top:0px" width="${parent.clientWidth}" height="${parent.clientHeight}">
       <!--defs>
         <marker id="arrow" viewBox="0 0 8 8" refX="4" refY="4"
             markerUnits="strokeWidth" markerWidth="8"
