@@ -149,11 +149,11 @@ export class KMapLoginPopup extends connect(store, LitElement) {
       ` : html`
         <datalist-textfield id="instance" name="instance" label="Instanz" type="text" required @change="${this._chooseInstance}"
           .datalist="${this._instances.map(instance => {return {value: instance.name, label: instance.description}})}"
-          pattern="[a-z-]*">
+          pattern="[a-z-]*" helper="Nur kleine Buchstaben">
         </datalist-textfield>
       `}
       <br/><br/>
-      <mwc-textfield id="loginId" name="user" label="Benutzerkennung" type="text" dialogInitialFocus></mwc-textfield>
+      <mwc-textfield id="loginId" name="user" label="Benutzerkennung" type="text" dialogInitialFocus pattern="[a-z0-9.]*" helper="Nur kleine Buchstaben, Ziffern und Punkt"></mwc-textfield>
       <br/><br/>
       <mwc-textfield id="loginPassword" name="password" label="Passwort" type="password"></mwc-textfield>
     </form>

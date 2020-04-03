@@ -124,7 +124,7 @@ export class KMapInstancePopup extends connect(store, LitElement) {
     </div>
     <datalist-textfield id="instance" name="instance" label="Instanz" type="text" ?required="${this._radio === 'dedicated'}" ?disabled="${this._radio !== 'dedicated'}"
       .datalist="${this._instances.map(instance => {return {value: instance.name, label: instance.description}}).filter(instance => instance.value !== 'root')}"
-      pattern="[a-z-]*">
+      pattern="[a-z-]*" helper="Nur kleine Buchstaben">
     </datalist-textfield>
     <mwc-button slot="primaryAction" @click=${this._chooseInstance} ?disabled="${!this._valid}">Auswählen</mwc-button>
   </mwc-dialog>
