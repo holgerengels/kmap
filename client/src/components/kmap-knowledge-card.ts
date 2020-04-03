@@ -50,6 +50,7 @@ export class KMapKnowledgeCard extends connect(store, LitElement) {
   @property()
   private _topics: string[] = [];
 
+  @property()
   private _rates: object = {};
 
   @query('#feedbackDialog')
@@ -72,7 +73,7 @@ export class KMapKnowledgeCard extends connect(store, LitElement) {
 
   updated(changedProperties) {
     if (changedProperties.has("card") || changedProperties.has("_rates"))
-      this._rating(this._rates);
+      this._rating();
 
     if (changedProperties.has("card"))
       this.divideAttachments(this.card ? this.card.attachments : []);
@@ -97,12 +98,12 @@ export class KMapKnowledgeCard extends connect(store, LitElement) {
     this.dispatchEvent(new CustomEvent('rated', { bubbles: true, composed: true, detail: {key: key, rate: e.detail.rate}}));
   }
 
-  _rating(state) {
-    if (this.card !== undefined && state.states && state.states.state) {
+  _rating() {
+    if (this.card !== undefined && this._rates) {
       let key = this.chapter + "." + this.card.topic;
-      this.state = this._getStateValue(state, key);
-      this.progressNum = this._getStateValue(state, key + "*");
-      this.progressOf = this._getStateValue(state, key + "#");
+      this.state = this._getStateValue(key);
+      this.progressNum = this._getStateValue(key + "*");
+      this.progressOf = this._getStateValue(key + "#");
     }
     else {
       this.state = 0;
@@ -113,8 +114,8 @@ export class KMapKnowledgeCard extends connect(store, LitElement) {
     this._colorize(this.state);
   }
 
-  _getStateValue(state, key) {
-    var value = state.states.state[key];
+  _getStateValue(key) {
+    var value = this._rates[key];
     return value !== undefined ? value : 0;
   }
 

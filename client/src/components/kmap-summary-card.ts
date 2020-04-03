@@ -109,7 +109,9 @@ export class KMapSummaryCard extends connect(store, LitElement) {
     this._colorize(source ? source.getState() : 0);
   }
 
-  _clicked() {
+  _clicked(e) {
+    e.cancelBubble = true;
+
     if (this.card == undefined) return;
 
     if (store.state.maps.selected === this.card.topic)
