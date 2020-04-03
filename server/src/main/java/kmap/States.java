@@ -253,7 +253,7 @@ public class States {
     }
 
     public static void main(String[] args) throws IOException {
-        Server.CLIENT.set("lala");
+        Server.CLIENT.set(args[1]);
         States couch = new States(new Couch(readProperties(args[0])));
         //JsonObject object = couch.chapter("mathe", "Mathematik");
         //System.out.println("object = " + object);
