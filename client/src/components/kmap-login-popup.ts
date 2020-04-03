@@ -73,7 +73,12 @@ export class KMapLoginPopup extends connect(store, LitElement) {
 
   _login() {
     if (this._valid) {
-      store.dispatch.app.login({userid: this._loginId.value, password: this._loginPassword.value});
+      if (!/^[a-z0-9.]*$/.test(this._loginId.value)) {
+        this._loginId.value = this._loginId.value.toLowerCase();
+      }
+      if (/^[a-z0-9.]*$/.test(this._loginId.value)) {
+        store.dispatch.app.login({userid: this._loginId.value, password: this._loginPassword.value});
+      }
     }
   }
 
