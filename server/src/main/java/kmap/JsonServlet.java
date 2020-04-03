@@ -147,8 +147,8 @@ public class JsonServlet extends HttpServlet {
             return client;
         }
 
-        System.out.println("WARNING: instance not specified = lala");
-        return "lala";
+        System.out.println("WARNING: instance not specified = root");
+        return "root";
     }
 
     private static String getHeader(HttpServletRequest request, String name) {
