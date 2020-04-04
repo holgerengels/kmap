@@ -76,7 +76,7 @@ export class Connector extends LitElement {
     // language=CSS
     return css`
         :host {
-          z-index: 10;
+          z-index: 1;
           display: block;
           position: absolute;
           top: 0;
