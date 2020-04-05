@@ -48,8 +48,11 @@ export class KMapContentManagerFeedback extends connect(store, LitElement) {
   }
 
   _resolve() {
+    if (this._selected === undefined)
+      return;
+
     console.log("resolve issue");
-    //store.dispatch.feedback.resolve();
+    store.dispatch.feedback.resolve(this._selected);
   }
 
   static get styles() {
@@ -117,11 +120,19 @@ export class KMapContentManagerFeedback extends connect(store, LitElement) {
           <div class="scroll">
           <mwc-list>
             ${this._issues.map((issue, i) => html`
-              <mwc-list-item ?activated="${this._selectedIndex === i}" @click="${() => this._select(i)}" graphic="icon" twoline>
-                <span>${issue.title}</span>
-                <span slot="secondary"><span style="display: inline-block; overflow: hidden; max-width: 230px; text-overflow: ellipsis">${issue.subject + " " + issue.chapter + " " + issue.topic}</span></span>
-                <mwc-icon slot="graphic">${issue.type === 'bug' ? 'error_outline' : 'add_circle_outline'}</mwc-icon>
-              </mwc-list-item>
+              ${issue.type === 'error' ? html`
+                <mwc-list-item ?activated="${this._selectedIndex === i}" @click="${() => this._select(i)}" graphic="icon" twoline>
+                  <span>${issue.title}</span>
+                  <span slot="secondary"><span style="display: inline-block; overflow: hidden; max-width: 230px; text-overflow: ellipsis">${issue.text.substr(0, 20)} …</span></span>
+                  <mwc-icon slot="graphic">error</mwc-icon>
+                </mwc-list-item>
+              ` : html`
+                <mwc-list-item ?activated="${this._selectedIndex === i}" @click="${() => this._select(i)}" graphic="icon" twoline>
+                  <span>${issue.title}</span>
+                  <span slot="secondary"><span style="display: inline-block; overflow: hidden; max-width: 230px; text-overflow: ellipsis">${issue.subject + " " + issue.chapter + " " + issue.topic}</span></span>
+                  <mwc-icon slot="graphic">${issue.type === 'bug' ? 'error_outline' : 'add_circle_outline'}</mwc-icon>
+                </mwc-list-item>
+              `}
             `)}
           </mwc-list>
           </div>
@@ -130,7 +141,9 @@ export class KMapContentManagerFeedback extends connect(store, LitElement) {
           <div class="page" ?active="${this._page === 'resolve'}">
             <label>Feedback bearbeiten</label>
             ${this._selected !== undefined ? html`
-              <p>${this._selected.topic !== undefined ? this._selected.subject + " → " + this._selected.chapter + " → " + this._selected.topic : this._selected.subject + " → " + this._selected.chapter}</p>
+              ${this._selected.type !== 'error' ? html`
+                <p>${this._selected.topic !== undefined ? this._selected.subject + " → " + this._selected.chapter + " → " + this._selected.topic : this._selected.subject + " → " + this._selected.chapter}</p>
+              ` : ''}
               <label secondary>${this._selected.title}</label>
               <div style="max-height: 100px; max-width: 300px; overflow-y: auto">
                 <label class="font-body">${this._selected.text}</label>

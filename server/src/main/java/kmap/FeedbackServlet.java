@@ -43,11 +43,25 @@ public class FeedbackServlet
 
             //if (authentication.handle(req, resp)) {
                 String submit = req.getParameter("submit");
+                String error = req.getParameter("error");
+                String resolve = req.getParameter("resolve");
 
                 if (submit != null) {
                     String json = IOUtils.toString(new InputStreamReader(req.getInputStream(), StandardCharsets.UTF_8));
                     feedback.submit(json);
                     writeResponse(req, resp, new JsonPrimitive(submit));
+                }
+                else if (error != null) {
+                    String json = IOUtils.toString(new InputStreamReader(req.getInputStream(), StandardCharsets.UTF_8));
+                    feedback.error(json);
+                    writeResponse(req, resp, new JsonPrimitive(error));
+                }
+                else if (resolve != null) {
+                    if (authentication.handle(req, resp)) {
+                        String json = IOUtils.toString(new InputStreamReader(req.getInputStream(), StandardCharsets.UTF_8));
+                        feedback.resolve(json);
+                        writeResponse(req, resp, new JsonPrimitive(resolve));
+                    }
                 }
             //}
         }

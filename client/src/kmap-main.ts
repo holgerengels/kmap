@@ -131,6 +131,7 @@ export class KmapMain extends connect(store, LitElement) {
 
     installOfflineWatcher((offline) => store.dispatch.app.updateOffline(offline));
     installMediaQueryWatcher(`(max-width: 500px)`, (matches) => store.dispatch.shell.updateNarrow(matches));
+    this.installOnErrorHandler();
   }
 
   updated(changedProps) {
@@ -150,6 +151,17 @@ export class KmapMain extends connect(store, LitElement) {
         console.log(this._messages);
       }
     }
+  }
+
+  private installOnErrorHandler() {
+    window.onerror = function (message, source, lineno, colno, error) {
+      if (error !== undefined)
+        store.dispatch.feedback.submitError({message: error.name + ": " + error.message, detail: error.stack as string});
+      else {
+        store.dispatch.feedback.submitError({message: message as string, detail: source + " (" + lineno + ":" + colno + ")"});
+      }
+      return false;
+    };
   }
 
   _renderPage() {

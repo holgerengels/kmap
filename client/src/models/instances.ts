@@ -146,6 +146,7 @@ export default createModel({
         {... endpoint.post(state), body: JSON.stringify(sync)},
         () => {
           dispatch.instances.receivedSync();
+          dispatch.shell.addMessage("Sync von " + sync.from + " nach " + sync.to + " abgeschlossen");
         },
         dispatch.app.handleError,
         dispatch.instances.error);

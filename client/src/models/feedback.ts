@@ -3,9 +3,13 @@ import { Store } from '../store';
 import {endpoint, fetchjson} from "../endpoint";
 import {urls} from "../urls";
 
+export interface ErrorReport {
+  message: string,
+  detail: string,
+}
 export interface Feedback {
-  subject: string,
-  chapter: string,
+  subject?: string,
+  chapter?: string,
   topic?: string,
   type: string,
   title: string,
@@ -17,6 +21,7 @@ export interface FeedbackState {
   issues?: Feedback[],
   timestamp: number,
   submitting: boolean,
+  resolving: boolean,
   error: string,
 }
 
@@ -24,6 +29,7 @@ export default createModel({
   state: <FeedbackState>{
     timestamp: -1,
     submitting: false,
+    resolving: false,
     error: "",
   },
   reducers: {
@@ -48,6 +54,20 @@ export default createModel({
     },
     receivedSubmit(state) {
       return { ...state, submiting: false };
+    },
+    requestSubmitError(state) {
+      return { ...state, submiting: true, error: "" };
+    },
+    receivedSubmitError(state) {
+      return { ...state, submiting: false };
+    },
+    requestResolve(state) {
+      return { ...state, resolving: true, error: "" };
+    },
+    receivedResolve(state, feedback: Feedback) {
+      return { ...state, resolving: false,
+        issues: state.issues ? state.issues.filter(i => i !== feedback) : undefined
+      };
     },
 
     error(state, message) {
@@ -82,6 +102,34 @@ export default createModel({
       fetchjson(`${urls.server}feedback?submit=${feedback.type}`, {... endpoint.post(state), body: JSON.stringify(feedback)},
         () => {
           dispatch.feedback.receivedSubmit();
+        },
+        dispatch.app.handleError,
+        dispatch.feedback.error);
+    },
+    async submitError(error: ErrorReport) {
+      const dispatch = store.dispatch();
+      const state = store.getState();
+      dispatch.feedback.requestSubmitError();
+
+      if (error.detail.startsWith(error.message))
+        error.detail = error.detail.substr((error.message).length + 1);
+
+      const feedback: Feedback = {type: 'error', title: error.message, text: error.detail };
+      fetchjson(`${urls.server}feedback?error=${error.message}`, {... endpoint.post(state), body: JSON.stringify(feedback)},
+        () => {
+          dispatch.feedback.receivedSubmitError();
+        },
+        dispatch.app.handleError,
+        dispatch.feedback.error);
+    },
+    async resolve(feedback: Feedback) {
+      const dispatch = store.dispatch();
+      const state = store.getState();
+
+      dispatch.feedback.requestResolve();
+      fetchjson(`${urls.server}feedback?resolve=${feedback.type}`, {... endpoint.post(state), body: JSON.stringify(feedback)},
+        () => {
+          dispatch.feedback.receivedResolve(feedback);
         },
         dispatch.app.handleError,
         dispatch.feedback.error);

@@ -210,6 +210,7 @@ export default createModel({
       fetchjson(`${urls.server}content?import-set=${names.join(",")}`, {... endpoint.postFormData(state), body: formData},
         () => {
           dispatch.contentSets.receivedImport();
+          dispatch.shell.addMessage("Import von " + names.join(", ") + " abgeschlossen");
         },
         dispatch.app.handleError,
         dispatch.contentSets.error);

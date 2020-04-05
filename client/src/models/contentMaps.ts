@@ -114,6 +114,7 @@ export default createModel({
       fetchjson(`${urls.server}content?import-module=${names.join(",")}`, {... endpoint.postFormData(state), body: formData},
         () => {
           dispatch.contentMaps.receivedImport();
+          dispatch.shell.addMessage("Import von " + names.join(", ") + " abgeschlossen");
         },
         dispatch.app.handleError,
         dispatch.contentMaps.error);

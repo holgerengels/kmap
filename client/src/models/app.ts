@@ -87,7 +87,7 @@ export default createModel({
     async login(payload: Credentials) {
       const dispatch = store.dispatch();
       const state = store.getState();
-      // @ts-ignore
+
       dispatch.app.requestLogin();
       fetchjson(`${urls.server}state?login=${payload.userid}`, {... endpoint.post(state), body: JSON.stringify(payload)},
         (json) => {
@@ -99,7 +99,7 @@ export default createModel({
     async logout() {
       const dispatch = store.dispatch();
       const state = store.getState();
-      // @ts-ignore
+
       dispatch.app.requestLogout();
       fetchjson(`${urls.server}state?logout=${state.app.userid}`, {... endpoint.post(state), body: JSON.stringify({userid: state.app.userid})},
         () => {

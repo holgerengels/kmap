@@ -7,6 +7,7 @@ import org.lightcouch.View;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static kmap.JSON.isNull;
 import static kmap.JSON.string;
@@ -37,15 +38,41 @@ public class Feedback {
 
     private boolean checks(JsonObject object) {
         return !isNull(object, "subject") && string(object, "subject") != null
-            && !isNull(object, "chapter") && string(object, "chapter") != null
-            && !isNull(object, "type") && string(object, "type") != null
-            && !isNull(object, "title") && string(object, "title") != null
-            && !isNull(object, "text") && string(object, "text") != null;
+                && !isNull(object, "chapter") && string(object, "chapter") != null
+                && !isNull(object, "type") && string(object, "type") != null
+                && !isNull(object, "title") && string(object, "title") != null
+                && !isNull(object, "text") && string(object, "text") != null;
+    }
+
+    public synchronized void error(String json) {
+        CouchDbClient client = getClient();
+        JsonObject object = client.getGson().fromJson(json, JsonObject.class);
+        if (errorChecks(object)) {
+            object.addProperty("type", "error");
+            object.addProperty("state", "open");
+            object.addProperty("timestamp", System.currentTimeMillis());
+            client.save(object);
+        }
+        else {
+            throw new RuntimeException("property missing");
+        }
+    }
+
+    private boolean errorChecks(JsonObject object) {
+        return !isNull(object, "title") && string(object, "title") != null
+                && !isNull(object, "text") && string(object, "text") != null;
+    }
+
+    public synchronized void resolve(String json) {
+        CouchDbClient client = getClient();
+        JsonObject object = client.getGson().fromJson(json, JsonObject.class);
+        object.addProperty("state", "resolved");
+        client.update(object);
     }
 
     List<JsonObject> load(String state) {
         View view = getClient().view("_all_docs").includeDocs(true);
-        List<JsonObject> objects = view.query(JsonObject.class);
+        List<JsonObject> objects = view.query(JsonObject.class).stream().filter(o -> "open".equals(string(o, "state"))).collect(Collectors.toList());
         return objects;
     }
 
