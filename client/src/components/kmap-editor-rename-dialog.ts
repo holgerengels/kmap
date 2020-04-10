@@ -5,6 +5,7 @@ import {State, store} from "../store";
 import '@material/mwc-button';
 import '@material/mwc-dialog';
 import '@material/mwc-textfield';
+import './validating-form';
 import {colorStyles, fontStyles, themeStyles} from "./kmap-styles";
 import {Dialog} from "@material/mwc-dialog/mwc-dialog";
 import {Card} from "../models/types";
@@ -19,6 +20,9 @@ export class KMapEditorRenameDialog extends connect(store, LitElement) {
   @query('#renameDialog')
   // @ts-ignore
   private _renameDialog: Dialog;
+
+  @property()
+  private _valid: boolean = false;
 
   mapState(state: State) {
     return {
@@ -35,6 +39,7 @@ export class KMapEditorRenameDialog extends connect(store, LitElement) {
 
       this._newName = '';
       this._renameDialog.show();
+
     }
   }
 
@@ -57,6 +62,13 @@ export class KMapEditorRenameDialog extends connect(store, LitElement) {
     store.dispatch.maps.unsetCardForRename();
   }
 
+  _maybeEnter(event) {
+    if (event.keyCode === 13 && this._valid) {
+      event.preventDefault();
+      this._rename();
+    }
+  }
+
   static get styles() {
     // language=CSS
     return [
@@ -75,16 +87,16 @@ export class KMapEditorRenameDialog extends connect(store, LitElement) {
     return html`
         <mwc-dialog id="renameDialog" title="Umbenennen">
         ${this._card ? html`
-          <form>
+        <validating-form @keyup="${this._maybeEnter}" @validity="${e => this._valid = e.target.valid}">
             <div class="field">
               <label for="topic">Thema</label>
               <span id="topic">${this._card.topic}</span>
             </div>
-            <mwc-textfield label="Umbenennen in ..." type="text" .value="${this._newName}" @change="${e => this._newName = e.target.value}"></mwc-textfield>
-          </form>
+            <mwc-textfield label="Umbenennen in ..." type="text" .value="${this._newName}" @change="${e => this._newName = e.target.value}" pattern="[^/]*" required></mwc-textfield>
+          </validating-form>
           ` : '' }
           <mwc-button slot="secondaryAction" @click=${this._cancel}>Abbrechen</mwc-button>
-          <mwc-button slot="primaryAction" @click=${this._rename}>Umbenennen</mwc-button>
+          <mwc-button slot="primaryAction" @click=${this._rename} ?disabled="${!this._valid}">Umbenennen</mwc-button>
         </mwc-dialog>
     `;
   }

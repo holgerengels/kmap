@@ -129,7 +129,8 @@ export class KMapSummaryCard extends connect(store, LitElement) {
       elevationStyles,
       css`
         :host {
-          display: block;
+          display: flex;
+          flex-direction: column;
           --color-opaque: #f5f5f5;
           --color-light: #e0e0e0;
           --color-lightest: #9e9e9e;
@@ -145,7 +146,8 @@ export class KMapSummaryCard extends connect(store, LitElement) {
           vertical-align: top;
           margin: 6px;
           margin-top: 0px;
-          display: inline-block;
+          display: flex;
+          flex-direction: column;
           box-sizing: border-box;
           width: 300px;
           border-radius: 4px;

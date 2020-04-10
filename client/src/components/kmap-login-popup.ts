@@ -7,6 +7,7 @@ import '@material/mwc-dialog';
 import '@material/mwc-textfield';
 import 'pwa-helper-components/pwa-install-button';
 import 'pwa-helper-components/pwa-update-available';
+import './validating-form';
 import {Dialog} from "@material/mwc-dialog/mwc-dialog";
 import {TextField} from "@material/mwc-textfield/mwc-textfield";
 import {colorStyles, fontStyles, themeStyles} from "./kmap-styles";
@@ -28,7 +29,11 @@ export class KMapLoginPopup extends connect(store, LitElement) {
   private _message: string = '';
 
   @property()
-  private _valid: boolean = true;
+  private _valid: boolean = false;
+  @property()
+  private _instanceValid: boolean = true;
+  @property()
+  private _formValid: boolean = false;
 
   @query('#loginDialog')
   // @ts-ignore
@@ -63,6 +68,8 @@ export class KMapLoginPopup extends connect(store, LitElement) {
         store.dispatch.shell.showMessage("Du bist jetzt abgemeldet!");
       }
     }
+    if (changedProps.has("_formValid") || changedProps.has("_instanceValid"))
+      this._valid = this._formValid && this._instanceValid;
   }
 
   show() {
@@ -72,7 +79,7 @@ export class KMapLoginPopup extends connect(store, LitElement) {
   }
 
   _login() {
-    if (this._valid) {
+    if (this._instanceValid) {
       if (!/^[a-z0-9.]*$/.test(this._loginId.value)) {
         this._loginId.value = this._loginId.value.toLowerCase();
       }
@@ -87,7 +94,7 @@ export class KMapLoginPopup extends connect(store, LitElement) {
   }
 
   _maybeEnter(event) {
-    if (event.keyCode === 13) {
+    if (event.keyCode === 13 && this._valid) {
       event.preventDefault();
       this._login();
     }
@@ -103,11 +110,11 @@ export class KMapLoginPopup extends connect(store, LitElement) {
 
     if (this._instances.find(i => i.name === instance) === undefined) {
       store.dispatch.shell.showMessage("Ungültige Instanz!");
-      this._valid = false;
+      this._instanceValid = false;
     }
     else {
       store.dispatch.app.chooseInstance(instance);
-      this._valid = true;
+      this._instanceValid = true;
     }
   }
 
@@ -146,7 +153,7 @@ export class KMapLoginPopup extends connect(store, LitElement) {
     return html`
   <!--googleoff: all-->
   <mwc-dialog id="loginDialog" heading="Anmelden">
-    <form id="loginForm" ?hidden="${this._userid}" @keyup="${this._maybeEnter}">
+    <validating-form id="loginForm" ?hidden="${this._userid}" @keyup="${this._maybeEnter}" @validity="${e => this._formValid = e.target.valid}">
       ${!this._showInstanceChooser ? html`
         <span secondary>Anmelden an Instanz: ${this._instance}&nbsp;
           <mwc-icon-button icon="polymer" class="secondary" @click="${this._showChooseInstance}" title="Instanz wechseln"></mwc-icon-button>
@@ -158,10 +165,10 @@ export class KMapLoginPopup extends connect(store, LitElement) {
         </datalist-textfield>
       `}
       <br/><br/>
-      <mwc-textfield id="loginId" name="user" label="Benutzerkennung" type="text" dialogInitialFocus pattern="[a-z0-9.]*" helper="Nur kleine Buchstaben, Ziffern und Punkt"></mwc-textfield>
+      <mwc-textfield id="loginId" name="user" label="Benutzerkennung" type="text" dialogInitialFocus required pattern="[a-z0-9.]*" helper="Nur kleine Buchstaben, Ziffern und Punkt"></mwc-textfield>
       <br/><br/>
-      <mwc-textfield id="loginPassword" name="password" label="Passwort" type="password"></mwc-textfield>
-    </form>
+      <mwc-textfield id="loginPassword" name="password" label="Passwort" type="password" required></mwc-textfield>
+    </validating-form>
     <form id="logoutForm" ?hidden="${!this._userid}">
       Angemeldet als ${this._userid} ..
     </form>

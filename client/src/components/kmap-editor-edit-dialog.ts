@@ -15,6 +15,7 @@ import '@material/mwc-textfield';
 import './kmap-summary-card-summary';
 import './kmap-knowledge-card-description';
 import './file-drop';
+import './validating-form';
 import {colorStyles, fontStyles, themeStyles} from "./kmap-styles";
 
 import {Dialog} from "@material/mwc-dialog/mwc-dialog";
@@ -22,6 +23,7 @@ import {TextArea} from "@material/mwc-textarea/mwc-textarea";
 import {throttle} from "../debounce";
 import {Upload} from "../models/types";
 import {Attachment, Card} from "../models/types";
+import {FileDrop} from "./file-drop";
 
 
 @customElement('kmap-editor-edit-dialog')
@@ -58,6 +60,9 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
   private _attachmentHref: string = '';
   @property()
   private _attachmentFile?: File = undefined;
+  @property()
+  // @ts-ignore
+  private _attachmentValid: boolean = false;
 
   @property()
   private _attachments: Attachment[] = [];
@@ -78,6 +83,17 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
   @query('#description')
   // @ts-ignore
   private _descriptionTextArea: TextArea;
+
+  @property()
+  private _valid: boolean = false;
+
+  @query('#attachmentForm')
+  // @ts-ignore
+  private _attachmentForm: HTMLFormElement;
+  @query('#file')
+  // @ts-ignore
+  private _file: FileDrop;
+
 
   mapState(state: State) {
     return {
@@ -106,7 +122,7 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
       this._summary = this._card.summary;
       this._description = this._card.description;
       this._thumb = this._card.thumb || '';
-      this._depends = this._card.depends ? this._card.depends.join(", ") : '';
+      this._depends = this._card.depends ? this._card.depends.join(" / ") : '';
       this._links = this._card.links || '';
       this._priority = this._card.priority !== undefined ? this._card.priority + '' : '';
       this._attachments = this._card.attachments;
@@ -142,7 +158,7 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
     card.summary = this._summary;
     card.description = this._description;
     card.thumb = this._thumb;
-    card.depends = this._depends.split(",").map(d => d.trim()).filter(d => d.length > 0);
+    card.depends = this._depends.split("/").map(d => d.trim()).filter(d => d.length > 0);
     card.links = this._links;
     card.priority = this._priority !== '' ? parseInt(this._priority) : undefined;
     card.attachments = this._attachments;
@@ -205,6 +221,8 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
     this._attachmentName = '';
     this._attachmentHref = '';
     this._attachmentFile = undefined;
+    this._attachmentForm.reset();
+    this._file.clear();
     this.requestUpdate();
   }
 
@@ -323,23 +341,24 @@ ${this._card ? html`
 
 <mwc-dialog id="editDialog" heading="Editor">
 ${this._card ? html`
-  <form @focus="${this._focus}" @keydown="${this._captureEnter}">
+  <validating-form @focus="${this._focus}" @keydown="${this._captureEnter}" @validity="${e => this._valid = e.target.valid}">
   <div class="fields">
     <mwc-textfield s1 id="topic" name="topic" disabled label="Thema" dense type="text" .value="${this._card.topic !== '_' ? this._card.topic : "Allgemeines zu " + this._card.chapter}"></mwc-textfield>
-    <mwc-textfield s1 ?hidden="${this._card.topic === '_'}" id="links" name="links" label="Verweist auf ..." dense type="text" .value="${this._links}" @change="${e => this._links = e.target.value}"></mwc-textfield>
+    <mwc-textfield s1 ?hidden="${this._card.topic === '_'}" id="links" name="links" label="Verweist auf ..." dense type="text" .value="${this._links}" @change="${e => this._links = e.target.value}" pattern="[^/]*"></mwc-textfield>
     <mwc-textfield s1 ?hidden="${this._card.topic === '_'}" id="priority" name="priority" label="Priorität" dense type="number" inputmode="numeric" min="0" step="1" .value="${this._priority}" @change="${e => this._priority = e.target.value}"></mwc-textfield>
     <mwc-textfield s2 ?hidden="${this._card.topic === '_'}" ?dialogInitialFocus="${this._card.topic !== '_'}" id="depends" label="Basiert auf ..." dense .value=${this._depends} @change="${e => this._depends = e.target.value}"></mwc-textfield>
     <mwc-textfield s1 ?hidden="${this._card.topic === '_'}" id="thumb" label="Thumbnail" dense .value=${this._thumb} @change="${e => this._thumb = e.target.value}"></mwc-textfield>
     <mwc-textarea s3 id="summary" placeholder="Kurztext" ?dialogInitialFocus="${this._card.topic === '_'}" dense fullwidth rows="2" .value=${this._card.summary} @keyup="${this._setSummary}" @focus="${this._focus}" @blur="${this._focus}"></mwc-textarea>
     <mwc-textarea s3 id="description" placeholder="Langtext" dense fullwidth rows="9" .value=${this._card.description} @keyup="${this._setDescription}" @focus="${this._focus}" @blur="${this._focus}"></mwc-textarea>
 </div>
+  </validating-form>
 
     <div class="attachments">
       <label for="attachments">Materialien</label><br/>
       ${this._attachments.map((attachment) => html`
         <div class="fields">
           <div style="flex: 1 0 auto">
-            <span>[${_tags.get(attachment.tag)}] ${attachment.name}</span><br/>
+            <span>[${this._tag(attachment.tag)}] ${attachment.name}</span><br/>
             ${attachment.type === 'link' ? html`
               <span slot="secondary">${attachment.href}</span>
             ` : html`
@@ -357,16 +376,18 @@ ${this._card ? html`
           <mwc-list-item value="${key}">${value}</mwc-list-item>
         `)}
       </mwc-select>
-      <mwc-textfield id="name" type="text" required label="Name" .value="${this._attachmentName}" @change="${e => this._attachmentName = e.target.value}" style="flex: 1 0 25%"></mwc-textfield>
-      <mwc-icon-button-toggle ?on="${this._attachmentType === 'file'}" onIcon="attachment" offIcon="link" @MDCIconButtonToggle:change="${e => this._attachmentType = e.detail.isOn ? 'file' : 'link'}" style="flex: 0 0 48px"></mwc-icon-button-toggle>
-      <mwc-textfield ?hidden="${this._attachmentType === "file"}" id="href" type="url" required label="Link" .value="${this._attachmentHref}" @change="${e => this._attachmentHref = e.target.value}" style="flex: 1 0 35%"></mwc-textfield>
-      <file-drop ?hidden="${this._attachmentType === "link"}" id="file" required @filedrop="${this._fileDrop}" style="flex: 1 0 35%"></file-drop>
-      <mwc-icon-button class="add" icon="add_circle" @click="${this._addAttachment}" style="flex: 0 0 48px"></mwc-icon-button>
+      <validating-form id="attachmentForm" @validity="${e => this._attachmentValid = e.target.valid}">
+        <mwc-textfield id="name" type="text" label="Name" .value="${this._attachmentName}" @change="${e => this._attachmentName = e.target.value}" style="flex: 1 0 25%"></mwc-textfield>
+        <mwc-icon-button-toggle ?on="${this._attachmentType === 'file'}" onIcon="attachment" offIcon="link" @MDCIconButtonToggle:change="${e => this._attachmentType = e.detail.isOn ? 'file' : 'link'}" style="flex: 0 0 48px"></mwc-icon-button-toggle>
+        <mwc-textfield ?hidden="${this._attachmentType === "file"}" id="href" type="url" label="Link" .value="${this._attachmentHref}" @change="${e => this._attachmentHref = e.target.value}" style="flex: 1 0 35%"></mwc-textfield>
+        <file-drop ?hidden="${this._attachmentType === "link"}" id="file" @filedrop="${this._fileDrop}" style="flex: 1 0 35%"></file-drop>
+        <mwc-icon-button class="add" icon="add_circle" @click="${this._addAttachment}" style="flex: 0 0 48px"></mwc-icon-button>
+      </validating-form>
     </div>
-  </form>` : ''}
+` : ''}
 
   <mwc-button slot="secondaryAction" @click=${this._cancel}>Abbrechen</mwc-button>
-  <mwc-button ?disabled="${this._pendingUploads}" slot="primaryAction" @click=${this._save}>Speichern</mwc-button>
+  <mwc-button ?disabled="${this._pendingUploads || !this._valid}" slot="primaryAction" @click=${this._save}>Speichern</mwc-button>
 </mwc-dialog>
     `;
   }
@@ -377,11 +398,13 @@ ${this._card ? html`
       this._attachmentName = this._attachmentFile.name.includes(".") ? this._attachmentFile.name.substr(0, this._attachmentFile.name.lastIndexOf(".")) : this._attachmentFile.name;
     }
   }
+
+  private _tag(tag: string) {
+    return !tag ? "---" : _tags.get(tag);
+  }
 }
 
 const _tags = new Map([
-  [undefined, "---"],
-  ["", "---"],
   ["explanation", "Erklärung"],
   ["example",     "Beispiel"],
   ["usage",       "Anwendung"],

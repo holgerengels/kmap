@@ -316,6 +316,18 @@ public class ContentManager extends Server
         }
     }
 
+    /*
+    void migrateModule(String instance, String subject, String module) {
+        String restoreInstance = Server.CLIENT.get();
+        Server.CLIENT.set(instance);
+        JsonArray array = couch.loadModule(subject, module);
+        for (JsonElement element : array) {
+            JsonObject object = (JsonObject)element;
+        }
+        Server.CLIENT.set(restoreInstance);
+    }
+     */
+
     void syncSet(String fromInstance, String toInstance, String subject, String set) {
         String restoreInstance = Server.CLIENT.get();
         Server.CLIENT.set(fromInstance);

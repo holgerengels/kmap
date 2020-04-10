@@ -6,8 +6,11 @@ import '@material/mwc-button';
 import '@material/mwc-dialog';
 import '@material/mwc-fab';
 import '@material/mwc-textfield';
+import './validating-form';
+
 import {fontStyles, colorStyles, themeStyles} from "./kmap-styles";
 import {Test} from "../models/tests";
+import {Dialog} from "@material/mwc-dialog/mwc-dialog";
 
 @customElement('kmap-test-editor-add-fabs')
 export class KMapTestEditorAddFabs extends connect(store, LitElement) {
@@ -36,6 +39,9 @@ export class KMapTestEditorAddFabs extends connect(store, LitElement) {
   @query('#addDialog')
   // @ts-ignore
   private _addDialog: Dialog;
+
+  @property()
+  private _valid: boolean = false;
 
   mapState(state: State) {
     return {
@@ -109,7 +115,7 @@ export class KMapTestEditorAddFabs extends connect(store, LitElement) {
   }
 
   _maybeEnter(event) {
-    if (event.keyCode === 13) {
+    if (event.keyCode === 13 && this._valid) {
       event.preventDefault();
       this._ok();
     }
@@ -172,15 +178,15 @@ export class KMapTestEditorAddFabs extends connect(store, LitElement) {
       <mwc-fab icon="add" label="Test"   extended mini class="secondary two"  ?exited="${!this._opened || !this._currentSet}" @click="${this._addTest}"></mwc-fab>
 
       <mwc-dialog id="addDialog" title="${this._header()}">
-        <form id="addForm" @keyup="${this._maybeEnter}">
+        <validating-form id="addForm" @keyup="${this._maybeEnter}" @validity="${e => this._valid = e.target.valid}">
           <label>${this._explanation()}</label>
           <br/>
-        <mwc-textfield label="Fach" type="text" .value="${this._subject}" @change="${e => this._subject = e.target.value }" ?disabled="${this._mode !== 'set'}"></mwc-textfield>
-        <mwc-textfield label="Set" type="text" .value="${this._set}" @change="${e => this._set = e.target.value}" ?disabled="${this._mode !== 'set'}"></mwc-textfield>
-        <mwc-textfield label="Titel" type="text" .value="${this._key}" @change="${e => this._key = e.target.value}"></mwc-textfield>
-        </form>
+        <mwc-textfield label="Fach" type="text" .value="${this._subject}" @change="${e => this._subject = e.target.value }" ?disabled="${this._mode !== 'set'}" pattern="[^/]*" required validate></mwc-textfield>
+        <mwc-textfield label="Set" type="text" .value="${this._set}" @change="${e => this._set = e.target.value}" ?disabled="${this._mode !== 'set'}" pattern="[^/]*" required validate></mwc-textfield>
+        <mwc-textfield label="Titel" type="text" .value="${this._key}" @change="${e => this._key = e.target.value}" pattern="[^/]*" required validate></mwc-textfield>
+        </validating-form>
         <mwc-button slot="secondaryAction" dialogAction="cancel">Abbrechen</mwc-button>
-        <mwc-button slot="primaryAction" @click="${this._ok}">Erstellen</mwc-button>
+        <mwc-button slot="primaryAction" @click="${this._ok}" ?disabled="${!this._valid}">Erstellen</mwc-button>
       </mwc-dialog>
     `;
   }

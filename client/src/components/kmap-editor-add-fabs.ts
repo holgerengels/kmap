@@ -6,6 +6,8 @@ import '@material/mwc-button';
 import '@material/mwc-dialog';
 import '@material/mwc-fab';
 import '@material/mwc-textfield';
+import './validating-form';
+
 import {fontStyles, colorStyles, themeStyles} from "./kmap-styles";
 import {Dialog} from "@material/mwc-dialog/mwc-dialog";
 import {Card} from "../models/types";
@@ -41,6 +43,9 @@ export class KMapEditorAddFabs extends connect(store, LitElement) {
   @query('#addDialog')
   // @ts-ignore
   private _addDialog: Dialog;
+
+  @property()
+  private _valid: boolean = false;
 
   mapState(state: State) {
     return {
@@ -152,7 +157,7 @@ export class KMapEditorAddFabs extends connect(store, LitElement) {
   }
 
   _maybeEnter(event) {
-    if (event.keyCode === 13) {
+    if (event.keyCode === 13 && this._valid) {
       event.preventDefault();
       this._ok();
     }
@@ -217,18 +222,17 @@ export class KMapEditorAddFabs extends connect(store, LitElement) {
       <mwc-fab icon="add" label="Thema"   extended mini class="secondary four"  ?exited="${!this._opened || !this._currentModule || !this._currentChapter}" @click="${this._addTopic}"></mwc-fab>
 
       <mwc-dialog id="addDialog" title="${this._header()}">
-        <form id="addForm" @keyup="${this._maybeEnter}">
+        <validating-form id="addForm" @keyup="${this._maybeEnter}" @validity="${e => this._valid = e.target.valid}">
           <label>${this._explanation()}</label>
           <br/>
-        <mwc-textfield label="Fach" type="text" .value="${this._subject}" @change="${e => {this._subject = e.target.value; this._chapter = this._subject}}" ?disabled="${this._mode !== 'subject'}" pattern="^([^/]*)$"></mwc-textfield>
-        <mwc-textfield label="Modul" type="text" .value="${this._module}" @change="${e => this._module = e.target.value}" ?disabled="${this._mode !== 'module' && this._mode !== 'subject'}" pattern="^([^/]*)$"></mwc-textfield>
-        <mwc-textfield label="Kapitel" type="text" .value="${this._chapter}" @change="${e => this._chapter = e.target.value}" ?disabled="${this._mode !== 'module' && this._mode !== 'chapter'}" pattern="^([^/]*)$"></mwc-textfield>
+        <mwc-textfield label="Fach" type="text" .value="${this._subject}" @change="${e => {this._subject = e.target.value; this._chapter = this._subject}}" ?disabled="${this._mode !== 'subject'}" required pattern="^([^/]*)$"></mwc-textfield>
+        <mwc-textfield label="Modul" type="text" .value="${this._module}" @change="${e => this._module = e.target.value}" ?disabled="${this._mode !== 'module' && this._mode !== 'subject'}" required pattern="^([^/]*)$"></mwc-textfield>
+        <mwc-textfield label="Kapitel" type="text" .value="${this._chapter}" @change="${e => this._chapter = e.target.value}" ?disabled="${this._mode !== 'module' && this._mode !== 'chapter'}" required pattern="^([^/]*)$"></mwc-textfield>
         <mwc-textfield label="Thema" type="text" .value="${this._topic}" @change="${e => this._topic = e.target.value}" pattern="^([^/]*)$"></mwc-textfield>
-        </form>
+        </validating-form>
         <mwc-button slot="secondaryAction" dialogAction="cancel">Abbrechen</mwc-button>
         <mwc-button slot="primaryAction" @click="${this._ok}">Erstellen</mwc-button>
       </mwc-dialog>
     `;
   }
 }
-

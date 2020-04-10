@@ -10,6 +10,8 @@ export class FileDrop extends LitElement {
   @property({type: String, reflect: true})
   private over: boolean = false;
 
+  public validity: ValidityState = this.valid(false);
+
   _dropHandler(event) {
     event.preventDefault();
 
@@ -34,8 +36,31 @@ export class FileDrop extends LitElement {
     }
     this._file = files[0];
 
+    this.validity = this.valid(true);
+
     this.dispatchEvent(new CustomEvent('filedrop', {bubbles: true, composed: true, detail: {file: this._file}}));
     this.over = false;
+  }
+
+  private valid(valid: boolean) {
+    return {
+      badInput: false,
+      customError: false,
+      patternMismatch: false,
+      rangeOverflow: false,
+      rangeUnderflow: false,
+      stepMismatch: false,
+      tooLong: false,
+      tooShort: false,
+      typeMismatch: false,
+      valueMissing: false,
+      valid: valid,
+    };
+  }
+
+  clear() {
+    this._file = undefined;
+    this.validity = this.valid(false);
   }
 
   _dragEnterHandler(event) {

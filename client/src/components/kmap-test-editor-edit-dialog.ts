@@ -1,4 +1,4 @@
-import {LitElement, html, css, customElement, property, query, queryAll} from 'lit-element';
+import {LitElement, html, css, customElement, property, query} from 'lit-element';
 import {connect} from '@captaincodeman/rdx';
 import {State, store} from "../store";
 
@@ -14,6 +14,7 @@ import '@material/mwc-textfield';
 import './kmap-summary-card-summary';
 import './kmap-knowledge-card-description';
 import './file-drop';
+import './validating-form';
 import {colorStyles, fontStyles, themeStyles} from "./kmap-styles";
 
 import {Test} from "../models/tests";
@@ -68,9 +69,6 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
   @property()
   private _pendingUploads: boolean = false;
 
-  @property()
-  private _valid: boolean = true;
-
   @query('#editDialog')
   // @ts-ignore
   private _editDialog: Dialog;
@@ -80,9 +78,9 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
   @query('#answer')
   // @ts-ignore
   private _answerTextArea: TextArea;
-  @queryAll('[required]')
-  // @ts-ignore
-  private _requiredFields: HTMLElement[];
+
+  @property()
+  private _valid: boolean = false;
 
   mapState(state: State) {
     return {
@@ -127,7 +125,6 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
 
       this._editDialog.show();
       this._editDialog.forceLayout();
-      this._checkValidity();
     }
 
     if (changedProperties.has('_answer')) {
@@ -230,15 +227,6 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
     this.requestUpdate();
   }
 
-  _checkValidity() {
-    let valid = true;
-    for (const element of this._requiredFields) {
-      // @ts-ignore
-      valid = valid && element.checkValidity();
-    }
-    this._valid = valid;
-  }
-
   _captureEnter(e) {
     if (!e.metaKey && e.key === "Enter")
       e.cancelBubble = true;
@@ -306,7 +294,7 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
 
 <mwc-dialog id="editDialog" heading="Test Editor">
 ${this._test ? html`
-  <form @focus="${this._focus}" @keydown="${this._captureEnter}" @input="${this._checkValidity}">
+  <validating-form @focus="${this._focus}" @keydown="${this._captureEnter}" @validity="${e => this._valid = e.target.valid}">
       <mwc-select required label="Kapitel" @change="${e => this._chapter = e.target.value}">
         ${this._chapters.map((chapter) => html`<mwc-list-item value="${chapter}" ?selected="${chapter === this._chapter}">${chapter}</mwc-list-item>`)}
       </mwc-select>
@@ -345,7 +333,7 @@ ${this._test ? html`
       <file-drop id="file" @filedrop="${e => this._attachmentFile = e.detail.file}" style="flex: 1 0 75%"></file-drop>
       <mwc-icon-button class="add" icon="add_circle" @click="${this._addAttachment}" style="flex: 0 0 36px; --mdc-icon-button-size: 36px; align-self: center"></mwc-icon-button>
     </div>
-  </form>` : ''}
+  </validating-form>` : ''}
 
   <mwc-button slot="secondaryAction" @click=${this._cancel}>Abbrechen</mwc-button>
   <mwc-button ?disabled="${this._pendingUploads || !this._valid}" slot="primaryAction" @click=${this._save}>Speichern</mwc-button>
