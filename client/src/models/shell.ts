@@ -39,6 +39,9 @@ export default createModel({
     removeMessage(state, message: string) {
       return { ...state, messages: state.messages.filter(m => m !== message) }
     },
+    clearMessages(state) {
+      return { ...state, messages: [] }
+    },
     addLayer(state, layer: string) {
       return { ...state, layers: [...state.layers, layer] }
     },

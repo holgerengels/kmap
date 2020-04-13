@@ -107,6 +107,7 @@ export class KmapMain extends connect(store, LitElement) {
 
   // @ts-ignore
   firstUpdated(changedProperties) {
+    store.dispatch.shell.clearMessages();
     if (!window.location.host.includes("localhost")) {
       let pathComponent = window.location.pathname.split('/')[1];
       let cookie: string | null = this._getCookie("instance");
