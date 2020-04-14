@@ -186,6 +186,7 @@ export class KMapBrowser extends connect(store, LitElement) {
 
       const connector: Connector = this.shadowRoot.getElementById("connector") as Connector;
       connector.clear();
+      connector.setAttribute("faded", "true");
 
       if (this._selected && this._highlighted) {
         let selected = this._findCard(this._selected);
@@ -197,9 +198,11 @@ export class KMapBrowser extends connect(store, LitElement) {
             continue;
           connector.add(highlighted, selected);
         }
+        setTimeout(function () {
+          connector.removeAttribute("faded");
+        });
       }
     }
-
     /*
         this._chapterCard = this._map.chapterCard;
         let lines = this._map.lines;
@@ -216,6 +219,7 @@ export class KMapBrowser extends connect(store, LitElement) {
       // @ts-ignore
       const connector: Connector = this.shadowRoot.getElementById("connector") as Connector;
       connector.clear();
+      connector.setAttribute("faded", "true");
     }
   }
 
@@ -293,6 +297,13 @@ export class KMapBrowser extends connect(store, LitElement) {
         }
         [hidden] {
           display: none !important;
+        }
+        svg-connector {
+          opacity: 1;
+          transition: opacity ease-in-out .3s;
+        }
+        svg-connector[faded] {
+          opacity: 0;
         }
       `];
   }
