@@ -352,9 +352,10 @@ public class Couch extends Server {
             transitiveDepends.add(links.containsKey(depend) ? links.get(depend) : dependChapter + "/" + dependTopic);
         });
 
+        if (chapterNode == null)
+            chapterNode = new Node("_");
+
         if (!transitiveDepends.isEmpty()) {
-            if (chapterNode == null)
-                chapterNode = new Node("_");
             chapterNode.getDepends().addAll(transitiveDepends);
         }
 

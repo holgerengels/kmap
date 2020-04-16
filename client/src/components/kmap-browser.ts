@@ -16,6 +16,7 @@ import {RoutingState} from "@captaincodeman/rdx-model";
 import {TopAppBar} from "@material/mwc-top-app-bar/mwc-top-app-bar";
 import {Card} from "../models/types";
 import {Connector} from "./svg-connector";
+import {iconTest} from "./icons";
 
 // @ts-ignore
 const _standalone = (window.matchMedia('(display-mode: standalone)').matches) || (window.navigator.standalone) || document.referrer.includes('android-app://');
@@ -339,7 +340,7 @@ export class KMapBrowser extends connect(store, LitElement) {
               ${this._hasTests && this._page === "map" ? html`
                 <div>
                   <b>Aufgaben zum Kapitel</b>
-                  <a href="/app/test/${this._subject}/${this._chapter}" class="tests"><mwc-ripple></mwc-ripple><mwc-icon>help_outline</mwc-icon></a>
+                  <a href="/app/test/${this._subject}/${this._chapter}" class="tests"><mwc-ripple></mwc-ripple>${iconTest}</a>
                 </div>
               ` : ''}
             </div>

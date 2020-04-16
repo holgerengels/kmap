@@ -108,7 +108,9 @@ export class KMapKnowledgeCardDescription extends LitElement {
   render() {
     // language=HTML
     return html`
-        ${this._description ? html`${unsafeHTML(this._description)}` : ''}
+        ${this._description ? html`${unsafeHTML(this._description)}` : html`
+          Zu dieser Karte gibt es noch keinen Inhalt. Nutze die Feedbackfunktion, um Inhalt oder Links vorzuschlagen!
+        `}
     `;
   }
 }

@@ -15,6 +15,7 @@ import './kmap-feedback';
 import {fontStyles, colorStyles, themeStyles} from "./kmap-styles";
 import {KMapFeedback} from "./kmap-feedback";
 import {Attachment, Card} from "../models/types";
+import {iconTest} from "./icons";
 
 @customElement('kmap-knowledge-card')
 export class KMapKnowledgeCard extends connect(store, LitElement) {
@@ -309,7 +310,7 @@ export class KMapKnowledgeCard extends connect(store, LitElement) {
     }
       <div style="flex: 1 0 auto; height: 24px"></div>
       ${this._hasTests ? html`
-        <a href="/app/test/${this.subject}/${this.chapter}/${this.card.topic}" title="Aufgaben"><mwc-ripple></mwc-ripple><mwc-icon>help_outline</mwc-icon></a>&nbsp;
+        <a href="/app/test/${this.subject}/${this.chapter}/${this.card.topic}" title="Aufgaben" style="display: flex; flex-flow: column; justify-content: space-around"><mwc-ripple></mwc-ripple>${iconTest}</a>&nbsp;
       ` : ''}
       <mwc-icon-button icon="feedback" title="Feedback" @click="${this._feedback}"></mwc-icon-button>
   </div>

@@ -16,6 +16,7 @@ import {urls} from "../urls";
 import {ifDefined} from "lit-html/directives/if-defined";
 import {classMap} from "lit-html/directives/class-map";
 import {Card} from "../models/types";
+import {iconTest} from "./icons";
 
 @customElement('kmap-summary-card')
 export class KMapSummaryCard extends connect(store, LitElement) {
@@ -236,7 +237,7 @@ export class KMapSummaryCard extends connect(store, LitElement) {
 
       <div style="flex: 1 0 auto; height: 24px"></div>
       ${this._hasTests ? html`
-        <a href="/app/test/${this.subject}/${this.chapter}/${this.card.topic}" title="Aufgaben zum Thema ${this.card.topic}"><mwc-ripple></mwc-ripple><mwc-icon style="--mdc-icon-size: 20px; margin:3px 0px">help_outline</mwc-icon></a>
+        <a href="/app/test/${this.subject}/${this.chapter}/${this.card.topic}" title="Aufgaben zum Thema ${this.card.topic}" style="display: flex; flex-flow: column; justify-content: space-around"><mwc-ripple></mwc-ripple>${iconTest}</a>
       ` : ''}
   </div>
     </div>
