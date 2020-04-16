@@ -30,7 +30,7 @@ export class StarRating extends LitElement {
           position: relative;
           width: 24px;
           transition: color 0.4s;
-          color: var(--color-unrated);
+          color: whitesmoke;
         }
         :host > mwc-icon:hover,
         :host > mwc-icon:hover ~ mwc-icon {
