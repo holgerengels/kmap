@@ -168,7 +168,7 @@ export default createModel({
     maybeNewSet(set: Set) {
       const dispatch = store.dispatch();
       const state = store.getState();
-      if (!state.contentSets.sets.includes(set)) {
+      if (state.contentSets.sets.filter(s => s.subject === set.subject && s.set === set.set).length === 0) {
         // @ts-ignore
         dispatch.contentSets.receivedLoad([...new Set(state.contentSets.sets).add(set)].sort((a, b) => a.set.localeCompare(b.set)));
         dispatch.contentSets.selectSet(set);

@@ -233,9 +233,7 @@ public class Tests {
                 JsonObject existing = null;
                 List<JsonObject> array = loadSetAsList(subject, set);
                 for (JsonElement element : array) {
-                    if (chapter.equals(string((JsonObject)element, "chapter")) &&
-                            topic.equals(string((JsonObject)element, "topic")) &&
-                            key.equals(string((JsonObject)element, "key"))) {
+                    if (key.equals(string((JsonObject)element, "key"))) {
                         existing = (JsonObject)element;
                     }
                 }
