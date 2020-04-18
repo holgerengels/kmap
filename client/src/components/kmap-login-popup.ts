@@ -78,6 +78,10 @@ export class KMapLoginPopup extends connect(store, LitElement) {
     this._loginDialog.show();
   }
 
+  _signIn(event) {
+    store.dispatch.auth.signinProvider(event.target.id);
+  }
+
   _login() {
     if (this._instanceValid) {
       if (!/^[a-z0-9.]*$/.test(this._loginId.value)) {
@@ -145,6 +149,20 @@ export class KMapLoginPopup extends connect(store, LitElement) {
         span:hover mwc-icon-button[icon="polymer"] {
           color: var(--color-primary-dark);
         }
+        .auth {
+          min-width: 240px;
+          margin: 8px 0;
+          width: 100%;
+        }
+        .auth img {
+          margin-right: 0.5em;
+        }
+        .auth img, auth svg {
+          width: 24px;
+          height: 24px;
+          vertical-align: middle;
+          margin-right: 10px;
+        }
       `];
   }
 
@@ -165,9 +183,13 @@ export class KMapLoginPopup extends connect(store, LitElement) {
         </datalist-textfield>
       `}
       <br/><br/>
+      ${this._instance !== 'root' ? html`
       <mwc-textfield id="loginId" name="user" label="Benutzerkennung" type="text" dialogInitialFocus required pattern="[a-z0-9.]*" helper="Nur kleine Buchstaben, Ziffern und Punkt"></mwc-textfield>
-      <br/><br/>
+      <br/>
       <mwc-textfield id="loginPassword" name="password" label="Passwort" type="password" required></mwc-textfield>
+      ` : html`
+        <mwc-button class="auth" raised @click=${this._signIn} id="google"><img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg">Anmelden mit Google</mwc-button>
+      `}
     </validating-form>
     <form id="logoutForm" ?hidden="${!this._userid}">
       Angemeldet als ${this._userid} ..

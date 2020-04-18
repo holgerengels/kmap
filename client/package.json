@@ -43,6 +43,8 @@
     "@captaincodeman/rdx": "^1.0.0-rc.2",
     "@captaincodeman/rdx-model": "^1.0.0-rc.5",
     "@captaincodeman/router": "^1.0.1",
+    "firebase": "^7.13.2",
+    "reselect": "^4.0.0",
     "@material/mwc-button": "^0.14.1",
     "@material/mwc-dialog": "^0.14.1",
     "@material/mwc-drawer": "^0.14.1",
