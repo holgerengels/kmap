@@ -278,7 +278,7 @@ export class KmapMain extends connect(store, LitElement) {
           <a ?selected="${this._page === 'test'}" href="/app/test">Test</a>
         ` : ''}
         <a ?selected="${this._page === 'courses'}" ?disabled="${!this._roles.includes("teacher")}" href="/app/courses">Kurse</a>
-        <a ?selected="${this._page === 'content-mananer'}" ?disabled="${!this._roles.includes("teacher")}" href="/app/content-manager">Content Manager</a>
+        <a ?selected="${this._page === 'content-manager'}" ?disabled="${!this._roles.includes("teacher")}" href="/app/content-manager">Content Manager</a>
         <a href="/app/browser/Hilfe/Hilfe">Hilfe</a>
         <a href="/app/browser/Hilfe/Hilfe/Impressum">Impressum</a>
 
