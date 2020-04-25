@@ -148,7 +148,7 @@ export class KmapTest extends connect(store, LitElement) {
         <kmap-login-button slot="actionItems" @lclick="${() => this._fire('login')}"></kmap-login-button>
       </mwc-top-app-bar>
 
-      <div class="modules">
+      <div class="modules" @end="${this._goResults}">
         ${!this._layers.includes('editor') ? html`
             ${this._page === 'chooser' ? html`<kmap-test-chooser id="chooser" class="page"></kmap-test-chooser>` : ''}
             ${this._page === 'exercise' ? html`<kmap-test-exercise id="exercise" class="page"></kmap-test-exercise>` : ''}
