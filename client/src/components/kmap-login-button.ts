@@ -15,7 +15,7 @@ export class KMapLoginButton extends connect(store, LitElement) {
   mapState(state: State) {
     return {
       _userid: state.app.userid,
-      _initials: state.app.userid ? this._buildInitials(state.app.userid) : '',
+      _initials: state.app.username ? this._buildInitials(state.app.username) : '',
     };
   }
 

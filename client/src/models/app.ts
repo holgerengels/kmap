@@ -10,6 +10,7 @@ export interface Error {
 
 export interface Login {
   userid: string,
+  username: string,
   roles: string[],
 }
 
@@ -21,6 +22,7 @@ export interface Credentials {
 export interface AppState {
   instance: string,
   userid: string,
+  username?: string,
   roles: string[],
   offline: boolean,
   authenticating: boolean,
@@ -51,6 +53,7 @@ export default createModel({
     receivedLogin(state, payload: Login) {
       return { ...state,
         userid: payload.userid,
+        username: payload.username,
         roles: payload.roles,
         authenticating: false,
       };
@@ -91,7 +94,9 @@ export default createModel({
       dispatch.app.requestLogin();
       fetchjson(`${urls.server}state?login=${payload.userid}`, {... endpoint.post(state), body: JSON.stringify(payload)},
         (json) => {
-          dispatch.app.receivedLogin({ userid: payload.userid, roles: json});
+          const roles = json.filter(r => !r.startsWith("displayName:"));
+          const username = roles.length != json.length ? json.filter(r => r.startsWith("displayName:"))[0].substr("displayName:".length) : payload.userid;
+          dispatch.app.receivedLogin({ userid: payload.userid, roles: roles, username: username});
         },
         dispatch.app.handleError,
         dispatch.app.loginResponse);

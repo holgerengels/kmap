@@ -23,6 +23,7 @@ const loadModule = (module: string) => loadScript(`https://www.gstatic.com/fireb
 const loadAndInitialize = async () => {
   await loadModule('app')
 
+  // @ts-ignore
   window.firebase.initializeApp(config)
 
   return window.firebase

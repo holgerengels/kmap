@@ -1,13 +1,14 @@
 {
   "compilerOptions": {
     "sourceMap": true,
-    "target": "ESNext",
-    "module": "ESNext",
+    "module": "esnext",
+    "target": "esnext",
     "moduleResolution": "node",
     "strict": true,
     "noUnusedParameters": true,
     "noUnusedLocals": true,
     "noImplicitReturns": true,
+    "strictPropertyInitialization": false,
     "noImplicitAny": false,
     "importHelpers": true,
     "noEmitHelpers": true,

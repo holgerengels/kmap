@@ -3,7 +3,9 @@ import { State, Store } from '../store'
 import { createSelector } from 'reselect'
 import { authLoader } from '../firebase'
 
+// @ts-ignore
 export type User = import('firebase').UserInfo
+// @ts-ignore
 export type Credential = import('firebase').OAuthCredential
 
 export interface AuthState {
@@ -23,12 +25,15 @@ export default createModel({
     signedIn(state, user: User) {
       return { ...state, user, statusKnown: true }
     },
+    signedOut(state) {
+      return { ...state, user: null, statusKnown: true, token: null }
+    },
+
     receivedIdToken(state, token: Credential) {
       return { ...state, token }
     },
-
-    signedOut(state) {
-      return { ...state, user: null, statusKnown: true, token: null }
+    forgetIdToken(state) {
+      return { ...state, token: null }
     },
   },
 
@@ -50,7 +55,10 @@ export default createModel({
       const dispatch = store.dispatch()
 
       auth.onAuthStateChanged(async user => {
+        console.log("onAuthStateChanged");
+        console.log(user);
         if (user) {
+          console.log(user);
           dispatch.auth.signedIn(user)
         }
         else {
@@ -58,10 +66,16 @@ export default createModel({
         }
       })
       auth.onIdTokenChanged(async user => {
+        console.log("onIdTokenChanged");
         console.log(user);
-        const token = await auth.currentUser().getIdToken();
-        console.log(token);
-        dispatch.auth.receivedIdToken(token);
+        if (auth.currentUser !== null) {
+          const token = await auth.currentUser.getIdToken();
+          console.log(token);
+          dispatch.app.login({userid: user.uid, password: token});
+        }
+        else {
+          dispatch.app.logout();
+        }
       })
     },
   })
@@ -69,10 +83,12 @@ export default createModel({
 
 function providerFromName(name: string) {
   switch (name) {
-    case 'google': return new window.firebase.auth.GoogleAuthProvider();
-    // TODO: add whatever firebase auth providers are supported by the app
-    // case 'facebook': return new window.firebase.auth.FacebookAuthProvider();
-    // case 'twitter': return new window.firebase.auth.TwitterAuthProvider();
+    case 'google':
+      // @ts-ignore
+      return new window.firebase.auth.GoogleAuthProvider();
+    case 'facebook':
+      // @ts-ignore
+      return new window.firebase.auth.FacebookAuthProvider();
     default: throw `unknown provider ${name}`
   }
 }

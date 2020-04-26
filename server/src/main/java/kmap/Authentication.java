@@ -1,5 +1,11 @@
 package kmap;
 
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.FirebaseToken;
 import com.google.gson.*;
 import com.opencsv.CSVReader;
 import org.apache.commons.io.IOUtils;
@@ -10,6 +16,8 @@ import javax.naming.directory.Attributes;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.*;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -76,7 +84,6 @@ public class Authentication {
         String login = request.getParameter("login");
         String logout = request.getParameter("logout");
         if (login != null) {
-            login = login.toLowerCase();
             if ("POST".equals(request.getMethod())) {
                 String json = IOUtils.toString(new InputStreamReader(request.getInputStream(), StandardCharsets.UTF_8));
                 Gson gson = new GsonBuilder().create();
@@ -89,7 +96,8 @@ public class Authentication {
                         request.getSession().setAttribute("user", login);
                         request.getSession().setAttribute("roles", roles);
                         writeRoles(request, response, roles);
-                    } else
+                    }
+                    else
                         JsonServlet.sendError(request, response, HttpServletResponse.SC_NOT_ACCEPTABLE, "invalid credentials");
                 }
                 catch (Exception e) {
@@ -140,16 +148,40 @@ public class Authentication {
             }
             return roles;
         }
-        Set<String> roles = doauthenticate(user, password);
-        Map<String, Account> csv = getCSV();
-        if (roles == null && csv != null) {
+        if ("root".equals(Server.CLIENT.get())) {
+            Set<String> roles = verifyIdToken(user, password);
+            Map<String, Account> csv = getCSV();
             Account account = csv.get(user);
-            roles = account != null && account.match(password) ? account.roles : null;
-
-            if (roles == null)
-                System.out.println("csv auth failed");
+            if (roles != null)
+                roles.addAll(account.roles);
+            return roles;
         }
-        return roles;
+        else {
+            Set<String> roles = doauthenticate(user, password);
+            Map<String, Account> csv = getCSV();
+            if (roles == null && csv != null) {
+                Account account = csv.get(user);
+                roles = account != null && account.match(password) ? account.roles : null;
+
+                if (roles == null)
+                    System.out.println("csv auth failed");
+            }
+            return roles;
+        }
+    }
+
+    private Set<String> verifyIdToken(String user, String token) {
+        try {
+            FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(token);
+            System.out.println("uid = " + decodedToken.getUid());
+            Set<String> roles = new HashSet<>(2);
+            roles.add("student");
+            roles.add("displayName:" + decodedToken.getName());
+            return roles;
+        }
+        catch (FirebaseAuthException e) {
+            return null;
+        }
     }
 
     private Set<String> doauthenticate(String user, String password) {
@@ -170,7 +202,7 @@ public class Authentication {
             if (!groupConfig.isEmpty()) {
                 String searchFilter = "(&(objectClass=User)(cn=" + user + "))";
                 SearchControls searchControls = new SearchControls();
-                searchControls.setReturningAttributes(new String[] { "memberof" });
+                searchControls.setReturningAttributes(new String[] { "memberof", "displayName" });
                 searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
                 searchControls.setCountLimit(2000);
                 NamingEnumeration results = context.search(getProperty("ldap.userbase"), searchFilter, searchControls);
@@ -183,6 +215,8 @@ public class Authentication {
                         if (r != null)
                             roles.addAll(r);
                     }
+                    roles.add("displayName:" + name(attributes));
+
                     //System.out.println("groups = " + groups);
                     //System.out.println("roles = " + roles);
                 }
@@ -209,6 +243,11 @@ public class Authentication {
             groups.add(value.substring("CN=".length(), index));
         }
         return groups;
+    }
+
+    private String name(Attributes attributes) throws NamingException {
+        Attribute attribute = attributes.get("displayName");
+        return (String)attribute.get();
     }
 
     void checkRole(HttpServletRequest request, String role) throws AuthException {
