@@ -23,10 +23,11 @@ public class Feedback {
         return couch.createClient("feedback");
     }
 
-    public synchronized void submit(String json) {
+    public synchronized void submit(String userid, String json) {
         CouchDbClient client = getClient();
         JsonObject object = client.getGson().fromJson(json, JsonObject.class);
         if (checks(object)) {
+            object.addProperty("userid", userid);
             object.addProperty("state", "open");
             object.addProperty("timestamp", System.currentTimeMillis());
             client.save(object);
@@ -44,11 +45,11 @@ public class Feedback {
                 && !isNull(object, "text") && string(object, "text") != null;
     }
 
-    public synchronized void error(String json) {
+    public synchronized void bug(String json) {
         CouchDbClient client = getClient();
         JsonObject object = client.getGson().fromJson(json, JsonObject.class);
         if (errorChecks(object)) {
-            object.addProperty("type", "error");
+            object.addProperty("type", "bug");
             object.addProperty("state", "open");
             object.addProperty("timestamp", System.currentTimeMillis());
             client.save(object);
@@ -86,7 +87,7 @@ public class Feedback {
         object.addProperty("type", "bug");
         object.addProperty("title", "Test");
         object.addProperty("text", "Hallo");
-        feedback.submit(object.toString());
+        feedback.submit("test", object.toString());
         System.out.println(feedback.load(""));
     }
 

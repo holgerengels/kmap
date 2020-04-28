@@ -31,7 +31,7 @@ public class StateServlet
             Server.CLIENT.set(extractClient(req));
 
             if (authentication.handle(req, resp)) {
-                String userid = req.getParameter("userid");
+                String userid = (String)req.getSession().getAttribute("user");
                 String save = req.getParameter("save");
                 String subject = req.getParameter("subject");
                 String storeCourses = req.getParameter("storeCourses");

@@ -258,7 +258,7 @@ public class Authentication {
             throw new AuthException("teacher");
     }
 
-    class Account {
+    static class Account {
         String userid;
         String password;
         Set<String> roles;
@@ -278,7 +278,7 @@ public class Authentication {
         }
     }
 
-    class AuthException extends Exception {
+    static class AuthException extends Exception {
         public AuthException(String role) {
             super(role);
         }

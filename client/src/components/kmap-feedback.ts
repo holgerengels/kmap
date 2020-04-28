@@ -71,7 +71,7 @@ export class KMapFeedback extends LitElement {
   }
   _send() {
     this._dialog.close();
-    store.dispatch.feedback.submit({subject: this.subject, chapter: this.chapter, topic: this.topic, type: this._type, title: this._title, text: this._text});
+    store.dispatch.feedback.submit({subject: this.subject, chapter: this.chapter, topic: this.topic, test: this.test, type: this._type, title: this._title, text: this._text});
     store.dispatch.shell.showMessage("Vielen Dank für Dein Feedback!")
   }
 
@@ -85,7 +85,7 @@ export class KMapFeedback extends LitElement {
         <br/><label secondary>Aufgabe '${this.test}'</label>
       ` : ''}
       <div>
-        <mwc-formfield label="Fehler"><mwc-radio id="bug" name="type" value="bug" dialogInitialFocus @change="${() => this._type = 'bug'}"></mwc-radio></mwc-formfield>
+        <mwc-formfield label="Fehler"><mwc-radio id="error" name="type" value="error" dialogInitialFocus @change="${() => this._type = 'error'}"></mwc-radio></mwc-formfield>
         <mwc-formfield label="Verbesserungsvorschlag"><mwc-radio id="proposal" name="type" value="proposal" @change="${() => this._type = 'proposal'}"></mwc-radio></mwc-formfield>
       </div>
       <mwc-textfield id="title" label="Titel" dense .value=${this._title} @input="${e => this._title = e.target.value}"></mwc-textfield>

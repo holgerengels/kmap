@@ -10,8 +10,6 @@ import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Part;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -41,29 +39,36 @@ public class FeedbackServlet
         try {
             Server.CLIENT.set(extractClient(req));
 
-            //if (authentication.handle(req, resp)) {
+            if (authentication.handle(req, resp)) {
+                String userid = (String)req.getSession().getAttribute("user");
                 String submit = req.getParameter("submit");
-                String error = req.getParameter("error");
                 String resolve = req.getParameter("resolve");
 
                 if (submit != null) {
                     String json = IOUtils.toString(new InputStreamReader(req.getInputStream(), StandardCharsets.UTF_8));
-                    feedback.submit(json);
+                    feedback.submit(userid, json);
                     writeResponse(req, resp, new JsonPrimitive(submit));
                 }
-                else if (error != null) {
-                    String json = IOUtils.toString(new InputStreamReader(req.getInputStream(), StandardCharsets.UTF_8));
-                    feedback.error(json);
-                    writeResponse(req, resp, new JsonPrimitive(error));
-                }
                 else if (resolve != null) {
+                    authentication.checkRole(req, "teacher");
                     if (authentication.handle(req, resp)) {
                         String json = IOUtils.toString(new InputStreamReader(req.getInputStream(), StandardCharsets.UTF_8));
                         feedback.resolve(json);
                         writeResponse(req, resp, new JsonPrimitive(resolve));
                     }
                 }
-            //}
+            }
+            else {
+                String error = req.getParameter("bug");
+                if (error != null) {
+                    String json = IOUtils.toString(new InputStreamReader(req.getInputStream(), StandardCharsets.UTF_8));
+                    feedback.bug(json);
+                    writeResponse(req, resp, new JsonPrimitive(error));
+                }
+            }
+        }
+        catch (Authentication.AuthException e) {
+            sendError(req, resp, HttpServletResponse.SC_FORBIDDEN, e.getMissingRole());
         }
         catch (Exception e) {
             e.printStackTrace();

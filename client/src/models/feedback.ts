@@ -11,10 +11,12 @@ export interface Feedback {
   subject?: string,
   chapter?: string,
   topic?: string,
+  test?: string,
   type: string,
   title: string,
   text: string,
   state?: 'open' | 'closed',
+  userid?: string,
 }
 
 export interface FeedbackState {
@@ -97,7 +99,12 @@ export default createModel({
     async submit(feedback: Feedback) {
       const dispatch = store.dispatch();
       const state = store.getState();
+      const userid = state.app.userid;
+      if (!userid)
+        return;
+
       feedback.state = 'open';
+      feedback.userid = userid;
       dispatch.feedback.requestSubmit();
       fetchjson(`${urls.server}feedback?submit=${feedback.type}`, {... endpoint.post(state), body: JSON.stringify(feedback)},
         () => {
@@ -106,16 +113,18 @@ export default createModel({
         dispatch.app.handleError,
         dispatch.feedback.error);
     },
-    async submitError(error: ErrorReport) {
+    async bug(error: ErrorReport) {
       const dispatch = store.dispatch();
       const state = store.getState();
+      const userid = state.app.userid;
+
       dispatch.feedback.requestSubmitError();
 
       if (error.detail.startsWith(error.message))
         error.detail = error.detail.substr((error.message).length + 1);
 
-      const feedback: Feedback = {type: 'error', title: error.message, text: error.detail };
-      fetchjson(`${urls.server}feedback?error=${error.message}`, {... endpoint.post(state), body: JSON.stringify(feedback)},
+      const feedback: Feedback = {type: 'bug', title: error.message, text: error.detail, userid: userid };
+      fetchjson(`${urls.server}feedback?bug=${error.message}`, {... endpoint.post(state), body: JSON.stringify(feedback)},
         () => {
           dispatch.feedback.receivedSubmitError();
         },

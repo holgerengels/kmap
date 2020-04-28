@@ -157,9 +157,9 @@ export class KmapMain extends connect(store, LitElement) {
   private installOnErrorHandler() {
     window.onerror = function (message, source, lineno, colno, error) {
       if (error !== undefined)
-        store.dispatch.feedback.submitError({message: error.name + ": " + error.message, detail: error.stack as string});
+        store.dispatch.feedback.bug({message: error.name + ": " + error.message, detail: error.stack as string});
       else {
-        store.dispatch.feedback.submitError({message: message as string, detail: source + " (" + lineno + ":" + colno + ")"});
+        store.dispatch.feedback.bug({message: message as string, detail: source + " (" + lineno + ":" + colno + ")"});
       }
       return false;
     };

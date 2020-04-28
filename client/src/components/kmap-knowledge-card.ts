@@ -22,6 +22,8 @@ export class KMapKnowledgeCard extends connect(store, LitElement) {
 
   @property()
   private _instance: string = '';
+  @property()
+  private _userid: string = '';
   @property({type: String})
   private subject: string = '';
   @property({type: String})
@@ -67,6 +69,7 @@ export class KMapKnowledgeCard extends connect(store, LitElement) {
   mapState(state: State) {
     return {
       _instance: state.app.instance,
+      _userid: state.app.userid,
       _topics: state.tests.topics ? state.tests.topics.topics : [],
       _rates: state.rates.rates,
     };
@@ -148,7 +151,10 @@ export class KMapKnowledgeCard extends connect(store, LitElement) {
   }
 
   _feedback() {
-    this._feedbackDialog.show();
+    if (this._userid)
+      this._feedbackDialog.show();
+    else
+      store.dispatch.shell.showMessage("Bitte melde Dich an, um die Feedbackfunktion zu nutzen!")
   }
 
   static get styles() {
