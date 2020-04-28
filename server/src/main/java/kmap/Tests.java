@@ -93,7 +93,7 @@ public class Tests {
             objects.forEach(o -> {
                 JsonObject _attachments = o.getAsJsonObject("_attachments");
                 o.add("attachments", amendAttachments(_attachments));
-                o.remove("_attachments");
+                //o.remove("_attachments");
             });
             objects.sort(Comparator
                 .comparing((JsonObject o) -> o.getAsJsonPrimitive("chapter").getAsString())
@@ -250,8 +250,8 @@ public class Tests {
                     existing.add("answer", changed.get("answer"));
                     existing.add("values", changed.get("values"));
                     existing.add("balance", changed.get("balance"));
+                    existing.add("attachments", changed.get("attachments"));
                     if (checks(changed)) {
-                        existing.remove("attachments");
                         Response response = client.update(existing);
                         JsonArray attachments = changed.getAsJsonArray("attachments");
                         response = saveFiles(client, response, uploads, attachments);
