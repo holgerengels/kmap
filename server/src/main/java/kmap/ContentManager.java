@@ -214,7 +214,7 @@ public class ContentManager extends Server
             JsonObject attachments = object.getAsJsonObject("_attachments");
             if (attachments != null) {
                 for (String file : attachments.keySet()) {
-                    zipFile(out, new String[] { subject, set, key, file });
+                    zipTestFile(out, new String[] { subject, set, key, file });
                 }
             }
         }
@@ -230,11 +230,10 @@ public class ContentManager extends Server
         out.closeEntry();
     }
 
-    void zipTestFile(ZipOutputStream out, String zipPath) throws IOException {
-        String[] zipDirs = zipPath.split("/");
-        couch.loadAttachment(attachment -> {
-            doZipFile(zipDirs, attachment, out);
-        }, zipDirs);
+    void zipTestFile(ZipOutputStream out, String[] dirs) throws IOException {
+        tests.loadAttachment(attachment -> {
+            doZipFile(dirs, attachment, out);
+        }, dirs);
     }
 
     String[] importSet(InputStream inputStream) throws IOException {

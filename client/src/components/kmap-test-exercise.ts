@@ -110,6 +110,8 @@ export class KmapTestExercise extends connect(store, LitElement) {
       this._currentTest = this._tests[this._currentIndex];
       this._testCard.clear();
     }
+    else
+      this.dispatchEvent(new CustomEvent('end', {bubbles: true, composed: true}));
   }
 
   static get styles() {

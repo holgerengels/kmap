@@ -1,52 +1,73 @@
-import { createDefaultConfig } from '@open-wc/building-rollup';
-import cpy from 'rollup-plugin-cpy';
-const indexHTML = require('rollup-plugin-index-html');
+import { createSpaConfig } from '@open-wc/building-rollup';
+import copy from 'rollup-plugin-copy';
 const { generateSW } = require('rollup-plugin-workbox');
-import deepmerge from 'deepmerge';
+import merge from 'deepmerge';
 
-// if you need to support IE11 use "modern-and-legacy-config" instead.
-// import { createCompatibilityConfig } from '@open-wc/building-rollup';
-// export default createCompatibilityConfig({ input: './index.html' });
+// use createBasicConfig to do regular JS to JS bundling
+// import { createBasicConfig } from '@open-wc/building-rollup';
 
-const config = createDefaultConfig({
-  input: './index.html',
-  extensions: ['.js', '.mjs', '.ts'],
-  plugins: {
-    workbox: false,
-    indexHTML: false,
+const baseConfig = createSpaConfig({
+
+  developmentMode: process.env.ROLLUP_WATCH === 'true',
+  injectServiceWorker: false,
+
+  /*
+  babel: {
+    plugins: [
+      [
+        require.resolve('babel-plugin-template-html-minifier'),
+        {
+          modules: {
+            'cool-html': ['html'],
+          },
+          htmlMinifier: {
+            removeComments: false,
+          },
+        },
+      ],
+    ],
+  },
+   */
+
+  polyfillsLoader: {
+    polyfills: {
+      dynamicImport: true,
+      resizeObserver: true,
+      custom: [
+        {
+          name: 'event-target',
+          test: "true || !('EventTarget' in window) || !('constructor' in window.EventTarget.prototype)",
+          path: require.resolve('event-target/min.js'),
+          minify: true,
+        },
+      ],
+    },
   },
 });
 
-export default deepmerge(config, {
+export default merge(baseConfig, {
+  input: './index.html',
+  /*
+  output: {
+    sourcemap: true,
+  },
+   */
   plugins: [
-    indexHTML({
-      polyfills: {
-        dynamicImport: true,
-        customPolyfills: [
-          {
-            name: 'event-target',
-            test: "true || !('EventTarget' in window) || !('constructor' in window.EventTarget.prototype)",
-            path: require.resolve('event-target/min.js'),
-          },
-          {
-            name: 'resize-observer',
-            test: "!('ResizeObserver' in window)",
-            path: require.resolve('resize-observer-polyfill/dist/ResizeObserver.js'),
-          },
-        ],
-      },
+    copy({
+      targets: [
+        {src: 'favicon.ico', dest: 'dist'},
+        {src: '*.png', dest: 'dist'},
+        {src: '*.svg', dest: 'dist'},
+        {src: 'manifest.json', dest: 'dist'},
+        {src: 'browserconfig.xml', dest: 'dist'},
+        {src: 'geogebra.html', dest: 'dist'},
+      ],
+      flatten: false
     }),
-    cpy([
-      { files: 'favicon.ico', dest: 'dist' },
-      { files: '*.png', dest: 'dist' },
-      { files: 'manifest.json', dest: 'dist' },
-      { files: 'browserconfig.xml', dest: 'dist' },
-      { files: 'geogebra.html', dest: 'dist' },
-    ]),
     generateSW({
       swDest: 'dist/sw.js',
       globDirectory: 'dist/',
-      globPatterns: ['**/*.{html,js,css,png}'],
+      globPatterns: ['**/*.{html,js,css,png,svg}'],
       navigateFallback: '/',
       navigateFallbackDenylist: [/geogebra.html/],
     }),

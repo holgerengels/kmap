@@ -26,6 +26,8 @@ export class KMapLoginPopup extends connect(store, LitElement) {
   @property()
   private _userid: string = '';
   @property()
+  private _username: string = '';
+  @property()
   private _message: string = '';
 
   @property()
@@ -53,6 +55,7 @@ export class KMapLoginPopup extends connect(store, LitElement) {
       _instances: state.instances.instances,
       _instance: state.app.instance,
       _userid: state.app.userid,
+      _username: state.app.username,
       _message: state.app.loginResponse,
     };
   }
@@ -76,6 +79,14 @@ export class KMapLoginPopup extends connect(store, LitElement) {
     store.dispatch.app.clearLoginResponse();
     this._showInstanceChooser = false;
     this._loginDialog.show();
+  }
+
+  _signIn(event) {
+    store.dispatch.auth.signinProvider(event.target.id);
+  }
+
+  _signOut() {
+    store.dispatch.auth.signout();
   }
 
   _login() {
@@ -145,6 +156,20 @@ export class KMapLoginPopup extends connect(store, LitElement) {
         span:hover mwc-icon-button[icon="polymer"] {
           color: var(--color-primary-dark);
         }
+        .auth {
+          min-width: 240px;
+          margin: 8px 0;
+          width: 100%;
+        }
+        .auth img {
+          margin-right: 0.5em;
+        }
+        .auth img, auth svg {
+          width: 24px;
+          height: 24px;
+          vertical-align: middle;
+          margin-right: 10px;
+        }
       `];
   }
 
@@ -165,12 +190,18 @@ export class KMapLoginPopup extends connect(store, LitElement) {
         </datalist-textfield>
       `}
       <br/><br/>
+      ${this._instance !== 'root' ? html`
       <mwc-textfield id="loginId" name="user" label="Benutzerkennung" type="text" dialogInitialFocus required pattern="[a-z0-9.]*" helper="Nur kleine Buchstaben, Ziffern und Punkt"></mwc-textfield>
-      <br/><br/>
+      <br/>
       <mwc-textfield id="loginPassword" name="password" label="Passwort" type="password" required></mwc-textfield>
+      ` : html`
+        <mwc-button class="auth" outlined @click=${this._signIn} id="google"><img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg">Anmelden mit Google</mwc-button>
+        <br/><span class="secondary">(Die Google-Anmeldung ist noch experimentell)</span>
+        <!--mwc-button class="auth" raised style="--mdc-theme-primary: #4267B2" @click="signIn" id="facebook"><img src="/facebook.svg">Anmelden mit Facebook</mwc-button-->
+      `}
     </validating-form>
     <form id="logoutForm" ?hidden="${!this._userid}">
-      Angemeldet als ${this._userid} ..
+      Angemeldet als ${this._username} ..
     </form>
     <div class="layout horizontal">
       <div id="message" style="height: 32px; padding-top: 10px">${this._message}</div>
@@ -178,7 +209,11 @@ export class KMapLoginPopup extends connect(store, LitElement) {
     <pwa-install-button slot="secondaryAction"><mwc-button outlined style="--mdc-theme-primary: var(--color-secondary-dark);">App installieren</mwc-button></pwa-install-button>
     <pwa-update-available slot="secondaryAction"><mwc-button outlined style="--mdc-theme-primary: var(--color-secondary-dark);">App aktualisieren</mwc-button></pwa-update-available>
     <mwc-button slot="primaryAction" ?hidden="${this._userid}" @click=${this._login} ?disabled="${!this._valid}">Anmelden</mwc-button>
-    <mwc-button slot="secondaryAction" ?hidden="${!this._userid}" @click=${this._logout}>Abmelden</mwc-button>
+    ${this._instance !== 'root' ? html`
+      <mwc-button slot="secondaryAction" ?hidden="${!this._userid}" @click=${this._logout}>Abmelden</mwc-button>
+    ` : html`
+      <mwc-button slot="secondaryAction" ?hidden="${!this._userid}" @click=${this._signOut}>Abmelden</mwc-button>
+    `}
   </mwc-dialog>
   <!--googleon: all-->
     `;

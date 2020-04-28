@@ -1,3 +1,4 @@
+export { default as auth } from './auth';
 export { default as app } from './app';
 export { default as shell } from './shell';
 export { default as instances } from './instances';
