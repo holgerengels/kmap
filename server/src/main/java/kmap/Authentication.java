@@ -152,7 +152,7 @@ public class Authentication {
             Set<String> roles = verifyIdToken(user, password);
             Map<String, Account> csv = getCSV();
             Account account = csv.get(user);
-            if (roles != null)
+            if (account != null)
                 roles.addAll(account.roles);
             return roles;
         }

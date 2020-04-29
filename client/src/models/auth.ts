@@ -44,10 +44,14 @@ export default createModel({
     },
 
     async signinProvider(name: string) {
-      const auth = await authLoader
+      const dispatch = store.dispatch();
+      const auth = await authLoader;
 
-      const provider = providerFromName(name)
-      auth.signInWithPopup(provider)
+      const provider = providerFromName(name);
+      auth.signInWithPopup(provider).catch(error => {
+        dispatch.shell.showMessage(_errorCodes.get(error.code) || error.code);
+        console.log(error);
+      });
     },
 
     async init() {
@@ -93,7 +97,7 @@ function providerFromName(name: string) {
   }
 }
 
-const getState = (state: State) => state.auth
+const getState = (state: State) => state.auth;
 
 export namespace AuthSelectors {
   export const user = createSelector(
@@ -116,3 +120,7 @@ export namespace AuthSelectors {
     (user) => user !== null
   )
 }
+
+const _errorCodes = new Map([
+  ["auth/account-exists-with-different-credential", "Es existiert bereits ein Konto mit der gleichen E-Mail-Adresse!"],
+]);
