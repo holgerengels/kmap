@@ -237,7 +237,7 @@ export class KMapSummaryCard extends connect(store, LitElement) {
 
       <div style="flex: 1 0 auto; height: 24px"></div>
       ${this._hasTests ? html`
-        <a href="/app/test/${this.subject}/${this.chapter}/${this.card.topic}" title="Aufgaben zum Thema ${this.card.topic}" style="display: flex; flex-flow: column; justify-content: space-around"></mwc-ripple>${iconTest}</a>
+        <a href="/app/test/${this.subject}/${this.chapter}/${this.card.topic}" title="Aufgaben zum Thema ${this.card.topic}" style="display: flex; flex-flow: column; justify-content: space-around">${iconTest}</a>
       ` : ''}
   </div>
     </div>
