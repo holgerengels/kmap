@@ -16,18 +16,20 @@ export class DatalistTextField extends TextField {
     const maxOrUndef = this.maxLength === -1 ? undefined : this.maxLength;
     return html`
       <input
-          id="text-field"
+          aria-labelledby="label"
           class="mdc-text-field__input"
           type="${this.type}"
           .value="${this.value}"
           ?disabled="${this.disabled}"
           placeholder="${this.placeholder}"
           ?required="${this.required}"
+          ?readonly="${this.readOnly}"
           maxlength="${ifDefined(maxOrUndef)}"
           pattern="${ifDefined(this.pattern ? this.pattern : undefined)}"
           min="${ifDefined(this.min === '' ? undefined : this.min as number)}"
           max="${ifDefined(this.max === '' ? undefined : this.max as number)}"
           step="${ifDefined(this.step === null ? undefined : this.step)}"
+          inputmode="${ifDefined(this.inputMode)}"
           @input="${this.handleInputChange}"
           @blur="${this.onInputBlur}"
           list="datalist">
