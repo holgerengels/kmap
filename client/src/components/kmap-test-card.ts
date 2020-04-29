@@ -133,10 +133,10 @@ export class KMapTestCard extends connect(store, LitElement) {
       replace = replace.replace(/<check\/>/g, "<input type='checkbox'/>");
       replace = replace.replace(/<text\/>/g, "<input type='text' inputmode='text'/>");
       replace = replace.replace(/<text ([0-9]+)\/>/g, "<input type='text' inputmode='text' maxlength='$1' style='width: $1em'/>");
-      replace = replace.replace(/<integer\/>/g, "<input type='number' inputmode='numeric'/>");
-      replace = replace.replace(/<integer ([0-9]+)\/>/g, "<input type='number' inputmode='numeric' maxlength='$1' style='width: $1em'/>");
-      replace = replace.replace(/<decimal\/>/g, "<input type='number' inputmode='decimal' step='any'/>");
-      replace = replace.replace(/<decimal ([0-9]+)\/>/g, "<input type='number' inputmode='decimal' step='any' maxlength='$1' style='width: $1em'/>");
+      replace = replace.replace(/<integer\/>/g, "<input type='text' inputmode='numeric'/>");
+      replace = replace.replace(/<integer ([0-9]+)\/>/g, "<input type='text' inputmode='numeric' maxlength='$1' style='width: $1em'/>");
+      replace = replace.replace(/<decimal\/>/g, "<input type='text' inputmode='decimal'/>");
+      replace = replace.replace(/<decimal ([0-9]+)\/>/g, "<input type='text' inputmode='decimal' maxlength='$1' style='width: $1em'/>");
 
       // @ts-ignore
       window.MathJaxLoader
