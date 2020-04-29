@@ -1,4 +1,5 @@
 import { createSpaConfig } from '@open-wc/building-rollup';
+import replace from '@rollup/plugin-replace'
 import copy from 'rollup-plugin-copy';
 const { generateSW } = require('rollup-plugin-workbox');
 import merge from 'deepmerge';
@@ -11,7 +12,6 @@ const baseConfig = createSpaConfig({
   developmentMode: process.env.ROLLUP_WATCH === 'true',
   injectServiceWorker: false,
 
-  /*
   babel: {
     plugins: [
       [
@@ -27,7 +27,6 @@ const baseConfig = createSpaConfig({
       ],
     ],
   },
-   */
 
   polyfillsLoader: {
     polyfills: {
@@ -47,12 +46,11 @@ const baseConfig = createSpaConfig({
 
 export default merge(baseConfig, {
   input: './index.html',
-  /*
-  output: {
-    sourcemap: true,
-  },
-   */
   plugins: [
+    replace({
+      'process.env.DEPLOY_SERVER': JSON.stringify(process.env.DEPLOY_SERVER || 'http://127.0.0.1:8081/server/'),
+      'process.env.DEPLOY_CLIENT': JSON.stringify(process.env.DEPLOY_CLIENT || 'http://127.0.0.1:8080/app/'),
+    }),
     copy({
       targets: [
         {src: 'favicon.ico', dest: 'dist'},
