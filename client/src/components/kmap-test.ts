@@ -1,4 +1,4 @@
-import {css, customElement, html, LitElement, property, query} from 'lit-element';
+import {css, customElement, html, LitElement, property} from 'lit-element';
 import {connect} from '@captaincodeman/rdx';
 import {State, store} from "../store";
 import {RoutingState} from "@captaincodeman/rdx-model";
@@ -14,7 +14,6 @@ import './kmap-test-exercise';
 import './kmap-test-results';
 import './kmap-test-editor-scroller';
 import {colorStyles, fontStyles, themeStyles} from "./kmap-styles";
-import {TopAppBar} from "@material/mwc-top-app-bar/mwc-top-app-bar";
 
 @customElement('kmap-test')
 export class KmapTest extends connect(store, LitElement) {
@@ -36,10 +35,6 @@ export class KmapTest extends connect(store, LitElement) {
    */
   @property()
   private _results: string[] = [];
-
-  @query('#bar')
-  // @ts-ignore
-  private _bar: TopAppBar;
 
   set route(val: RoutingState) {
     if (val.page === "test") {
@@ -75,9 +70,6 @@ export class KmapTest extends connect(store, LitElement) {
     }
 
     if (changedProperties.has("_page")) {
-      // @ts-ignore
-      this._bar.scrollTarget = this.shadowRoot.getElementById(this._page);
-
       switch (this._page) {
         case 'chooser':
           this._title = "Test - Aufgabenbereich wählen";
@@ -89,6 +81,8 @@ export class KmapTest extends connect(store, LitElement) {
           this._title = "Test - Auswertung";
           break;
       }
+      // TODO: Aufgaben zum Thema ...
+      store.dispatch.shell.updateMeta({title: this._title, description: ""});
     }
   }
 
@@ -98,10 +92,6 @@ export class KmapTest extends connect(store, LitElement) {
 
   _goResults() {
     store.dispatch.routing.replace('/app/test/results');
-  }
-
-  _fire(name) {
-    this.dispatchEvent(new CustomEvent(name, {bubbles: true, composed: true}));
   }
 
   static get styles() {
@@ -142,12 +132,6 @@ export class KmapTest extends connect(store, LitElement) {
   render() {
     // language=HTML
     return html`
-      <mwc-top-app-bar id="bar" dense>
-        <mwc-icon-button icon="menu" slot="navigationIcon" @click="${() => this._fire('toggleDrawer')}"></mwc-icon-button>
-        <div slot="title">${this._title}</div>
-        <kmap-login-button slot="actionItems" @lclick="${() => this._fire('login')}"></kmap-login-button>
-      </mwc-top-app-bar>
-
       <div class="modules" @end="${this._goResults}">
         ${!this._layers.includes('editor') ? html`
             ${this._page === 'chooser' ? html`<kmap-test-chooser id="chooser" class="page"></kmap-test-chooser>` : ''}

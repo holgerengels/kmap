@@ -1,4 +1,4 @@
-import {LitElement, html, css, customElement, property, query} from 'lit-element';
+import {LitElement, html, css, customElement, property} from 'lit-element';
 import { connect } from '@captaincodeman/rdx';
 import {State, store} from "../store";
 
@@ -13,13 +13,9 @@ import './kmap-browser-chapter-editor';
 import './svg-connector';
 import {Line} from "../models/maps";
 import {RoutingState} from "@captaincodeman/rdx-model";
-import {TopAppBar} from "@material/mwc-top-app-bar/mwc-top-app-bar";
 import {Card} from "../models/types";
 import {Connector} from "./svg-connector";
 import {iconTest} from "./icons";
-
-// @ts-ignore
-const _standalone = (window.matchMedia('(display-mode: standalone)').matches) || (window.navigator.standalone) || document.referrer.includes('android-app://');
 
 @customElement('kmap-browser')
 export class KMapBrowser extends connect(store, LitElement) {
@@ -58,10 +54,6 @@ export class KMapBrowser extends connect(store, LitElement) {
   @property()
   private _animTo?: DOMRect = undefined;
 
-  @query('#bar')
-  // @ts-ignore
-  private _bar: TopAppBar;
-
   @property()
   private _selected: string = '';
   @property()
@@ -90,11 +82,6 @@ export class KMapBrowser extends connect(store, LitElement) {
   }
 
   updated(changedProperties) {
-    if (changedProperties.has('_page')) {
-      // @ts-ignore
-      let page = this.shadowRoot.getElementById(this._page);
-      this._bar.scrollTarget = page ? page : window;
-    }
 
     if (changedProperties.has('_topic') || changedProperties.has("_lines")) {
       if (!this._topic) {
@@ -246,10 +233,6 @@ export class KMapBrowser extends connect(store, LitElement) {
     }
   }
 
-  _fire(name) {
-    this.dispatchEvent(new CustomEvent(name, {bubbles: true, composed: true}));
-  }
-
   static get styles() {
     // language=CSS
     return [
@@ -312,13 +295,7 @@ export class KMapBrowser extends connect(store, LitElement) {
   render() {
     // language=HTML
     return html`
-      <mwc-top-app-bar id="bar" dense>
-        <mwc-icon-button icon="menu" slot="navigationIcon" @click="${() => this._fire('toggleDrawer')}"></mwc-icon-button>
-        <mwc-icon-button icon="arrow_back" slot="navigationIcon" @click="${() => history.back()}" ?hidden="${!_standalone}"></mwc-icon-button>
-        <div slot="title">${this._chapter}</div>
-        <kmap-login-button slot="actionItems" @lclick="${() => this._fire('login')}"></kmap-login-button>
-      </mwc-top-app-bar>
-        <div id="map" class="page map" ?active="${this._page === 'map'}" @rated="${this._rated}">
+        <main id="map" class="page map" ?active="${this._page === 'map'}" @rated="${this._rated}">
           ${this._layers.includes('dependencies') ? html`
             <svg-connector id="connector"></svg-connector>
           ` : ''}
@@ -340,7 +317,7 @@ export class KMapBrowser extends connect(store, LitElement) {
               ${this._hasTests && this._page === "map" ? html`
                 <div>
                   <b>Aufgaben zum Kapitel</b>
-                  <a href="/app/test/${this._subject}/${this._chapter}" class="tests"><mwc-ripple></mwc-ripple>${iconTest}</a>
+                  <a href="/app/test/${this._subject}/${this._chapter}" class="tests">${iconTest}</a>
                 </div>
               ` : ''}
             </div>
@@ -356,13 +333,13 @@ export class KMapBrowser extends connect(store, LitElement) {
               `)}
             </div>
           `)}
-        </div>
-        <div id="topic" class="page topic" ?active="${this._page === 'topic'}" @rated="${this._rated}">
+        </main>
+        <main id="topic" class="page topic" ?active="${this._page === 'topic'}" @rated="${this._rated}">
             ${this._topicCard ? html`<kmap-knowledge-card .subject="${this._subject}" .chapter="${this._chapter}" .card="${this._topicCard}"></kmap-knowledge-card>` : ''}
-        </div>
-        <div id="search" class="page search" ?active="${this._page === 'search'}">
+        </main>
+        <main id="search" class="page search" ?active="${this._page === 'search'}">
             search
-        </div>
+        </main>
     `;
   }
 }

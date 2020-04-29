@@ -37,6 +37,10 @@ import {fontStyles, colorStyles} from "./components/kmap-styles";
 import {Snackbar} from "@material/mwc-snackbar/mwc-snackbar";
 import {KMapLoginPopup} from "./components/kmap-login-popup";
 import {KMapInstancePopup} from "./components/kmap-instance-popup";
+import {TopAppBar} from "@material/mwc-top-app-bar/mwc-top-app-bar";
+
+// @ts-ignore
+const _standalone = (window.matchMedia('(display-mode: standalone)').matches) || (window.navigator.standalone) || document.referrer.includes('android-app://');
 
 @customElement('kmap-main')
 export class KmapMain extends connect(store, LitElement) {
@@ -107,6 +111,13 @@ export class KmapMain extends connect(store, LitElement) {
 
   // @ts-ignore
   firstUpdated(changedProperties) {
+    if (this.shadowRoot) {
+      const bar: TopAppBar | null = this.shadowRoot.querySelector("mwc-top-app-bar");
+      const main: HTMLElement | null = this.shadowRoot.querySelector(".main-content");
+      if (bar && main)
+        bar.scrollTarget = main;
+    }
+
     store.dispatch.shell.clearMessages();
     if (!window.location.host.includes("localhost")) {
       let pathComponent = window.location.pathname.split('/')[1];
@@ -238,7 +249,9 @@ export class KmapMain extends connect(store, LitElement) {
         margin: 16px 0px;
       }
       .main-content {
-          width: 100% !important;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
       }
       [hidden] {
         display: none !important;
@@ -312,8 +325,15 @@ export class KmapMain extends connect(store, LitElement) {
       <!--googleon: all-->
     </div>
 
-    <div slot="appContent" class="main-content" role="main" @toggleDrawer="${() => this._drawerOpen = !this._drawerOpen}" @lclick="${this._showLogin}">
+    <div slot="appContent" class="main-content" role="main">
     ${this._instance ? html`
+      <mwc-top-app-bar id="bar" dense>
+        <mwc-icon-button icon="menu" slot="navigationIcon" @click="${() => this._drawerOpen = !this._drawerOpen}"></mwc-icon-button>
+        <mwc-icon-button icon="arrow_back" slot="navigationIcon" @click="${() => history.back()}" ?hidden="${!_standalone}"></mwc-icon-button>
+        <div slot="title">${this._metaTitle}</div>
+        <kmap-login-button slot="actionItems" @click="${this._showLogin}"></kmap-login-button>
+      </mwc-top-app-bar>
+
       ${this._renderPage()}
 
       ${this._page === 'home' || this._page === 'browser' ? html`

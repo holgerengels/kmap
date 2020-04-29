@@ -1,4 +1,4 @@
-import {LitElement, html, css, customElement, property, query} from 'lit-element';
+import {LitElement, html, css, customElement, property} from 'lit-element';
 import {connect} from '@captaincodeman/rdx';
 import {State, store} from "../store";
 
@@ -11,7 +11,6 @@ import '@material/mwc-list/mwc-list-item';
 import '@material/mwc-textarea';
 import '@material/mwc-textfield';
 import '@material/mwc-top-app-bar';
-import {TopAppBar} from "@material/mwc-top-app-bar/mwc-top-app-bar";
 
 @customElement('kmap-courses')
 export class KCourses extends connect(store, LitElement) {
@@ -34,17 +33,6 @@ export class KCourses extends connect(store, LitElement) {
   private _editName: string = '';
   @property()
   private _editStudents: string = '';
-
-  @query('#bar')
-  // @ts-ignore
-  private _bar: TopAppBar;
-  @query('#content')
-  // @ts-ignore
-  private _content: HTMLElement;
-
-  firstUpdated() {
-    this._bar.scrollTarget = this._content;
-  }
 
   mapState(state: State) {
     return {
@@ -126,10 +114,6 @@ export class KCourses extends connect(store, LitElement) {
     this._page = '';
   }
 
-  _fire(name) {
-    this.dispatchEvent(new CustomEvent(name, {bubbles: true, composed: true}));
-  }
-
   static get styles() {
     // language=CSS
     return [
@@ -190,12 +174,7 @@ export class KCourses extends connect(store, LitElement) {
   render() {
     // language=HTML
     return html`
-      <mwc-top-app-bar id="bar" dense scrollTarget="board">
-        <mwc-icon-button icon="menu" slot="navigationIcon" @click="${() => this._fire('toggleDrawer')}"></mwc-icon-button>
-        <div slot="title">Kurse</div>
-        <kmap-login-button slot="actionItems" @lclick="${() => this._fire('login')}"></kmap-login-button>
-      </mwc-top-app-bar>
-      <div id="content" class="board">
+      <main id="content" class="board">
         <div class="form">
           <label>Kurse</label>
           <span style="float: right">
@@ -244,7 +223,7 @@ export class KCourses extends connect(store, LitElement) {
           </div>
         </div>
         <div class="space"></div>
-      </div>
+      </main>
     `;
   }
 }
