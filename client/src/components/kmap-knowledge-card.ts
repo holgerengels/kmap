@@ -5,7 +5,6 @@ import {STATE_COLORS} from './state-colors';
 
 import {StyleInfo, styleMap} from 'lit-html/directives/style-map.js';
 import '@material/mwc-icon';
-import '@material/mwc-ripple';
 import './star-rating';
 import './kmap-knowledge-card-depends';
 import './kmap-knowledge-card-progress';
@@ -231,7 +230,7 @@ export class KMapKnowledgeCard extends connect(store, LitElement) {
   <div class="card-header font-body">
       <span>${this.card.topic !== "_" ? this.card.topic : this.chapter}</span>
       <div style="flex: 1 0 auto"></div>
-      <a href="/app/browser/${this.subject}/${this.chapter}" title="Wissenslandkarte"><mwc-ripple></mwc-ripple><mwc-icon>fullscreen_exit</mwc-icon></a>
+      <a href="/app/browser/${this.subject}/${this.chapter}" title="Wissenslandkarte"><mwc-icon>fullscreen_exit</mwc-icon></a>
   </div>
   <kmap-knowledge-card-depends ?chapterDepends="${this.card.topic === '_'}"
       .subject="${this.subject}"
@@ -316,7 +315,7 @@ export class KMapKnowledgeCard extends connect(store, LitElement) {
     }
       <div style="flex: 1 0 auto; height: 24px"></div>
       ${this._hasTests ? html`
-        <a href="/app/test/${this.subject}/${this.chapter}/${this.card.topic}" title="Aufgaben" style="display: flex; flex-flow: column; justify-content: space-around"><mwc-ripple></mwc-ripple>${iconTest}</a>&nbsp;
+        <a href="/app/test/${this.subject}/${this.chapter}/${this.card.topic}" title="Aufgaben" style="display: flex; flex-flow: column; justify-content: space-around">${iconTest}</a>&nbsp;
       ` : ''}
       <mwc-icon-button icon="feedback" title="Feedback" @click="${this._feedback}"></mwc-icon-button>
   </div>
