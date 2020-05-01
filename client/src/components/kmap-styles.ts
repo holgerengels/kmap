@@ -32,6 +32,12 @@ h5, th, b, label[secondary] {
   font-size: 0.95rem;
   font-weight: 500;
 }
+h6 {
+  font-family: Roboto,sans-serif;
+  -webkit-font-smoothing: antialiased;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
 p, .font-body, td, div, span {
   font-family: Roboto,sans-serif;
   -webkit-font-smoothing: antialiased;

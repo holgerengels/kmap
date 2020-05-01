@@ -121,12 +121,12 @@ export class KMapBrowser extends connect(store, LitElement) {
       this._page = this._topicCard ? "topic" : "map";
 
       if (this._topicCard) {
-        store.dispatch.shell.updateMeta({title: this._topicCard.topic, description: this._topicCard.summary});
+        store.dispatch.shell.updateMeta({title: this._topicCard.chapter + " - " + this._topicCard.topic, description: this._topicCard.summary});
       }
       else {
         store.dispatch.shell.updateMeta({
           title: this._chapter,
-          description: this._chapterCard && this._chapterCard.summary ? this._chapterCard.summary : "Wissenslandkarte zum Kapitel " + this._chapter
+          description: this._chapterCard && this._chapterCard.summary ? this._chapterCard.summary : "Wissenslandkarte zum Kapitel " + this._chapter,
         });
       }
     }

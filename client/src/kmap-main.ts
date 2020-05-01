@@ -32,6 +32,7 @@ import './components/kmap-editor-add-fabs';
 import './components/kmap-test-editor-add-fabs';
 import './components/kmap-test-editor-edit-dialog';
 import './components/kmap-test-editor-delete-dialog';
+import './components/share-facebook';
 
 import {fontStyles, colorStyles} from "./components/kmap-styles";
 import {Snackbar} from "@material/mwc-snackbar/mwc-snackbar";
@@ -111,6 +112,11 @@ export class KmapMain extends connect(store, LitElement) {
 
   // @ts-ignore
   firstUpdated(changedProperties) {
+    updateMetadata({
+      title: "KMap",
+      description: "KMap kartographiert Wissen mit Zusammenhang",
+    });
+
     if (this.shadowRoot) {
       const bar: TopAppBar | null = this.shadowRoot.querySelector("mwc-top-app-bar");
       const main: HTMLElement | null = this.shadowRoot.querySelector(".main-content");
@@ -239,7 +245,7 @@ export class KmapMain extends connect(store, LitElement) {
           margin: 4px 0px;
       }
       .drawer-list > a {
-        line-height: 32px;
+        line-height: 30px;
         color: var(--app-drawer-text-color);
       }
       .drawer-list > a[selected] {
@@ -271,6 +277,9 @@ export class KmapMain extends connect(store, LitElement) {
       span:hover mwc-icon-button[icon="polymer"] {
         color: var(--color-primary-dark);
       }
+        share-facebook {
+          padding-left: 16px;
+        }
       `,
     ];
   }
@@ -294,11 +303,11 @@ export class KmapMain extends connect(store, LitElement) {
         <a ?selected="${this._page === 'content-manager'}" ?disabled="${!this._roles.includes("teacher")}" href="/app/content-manager">Content Manager</a>
         <a href="/app/browser/Hilfe/Hilfe">Hilfe</a>
         <a href="/app/browser/Hilfe/Hilfe/Impressum">Impressum</a>
-
         <pwa-install-button><mwc-button outlined style="--mdc-theme-primary: var(--color-secondary-dark);">App installieren</mwc-button></pwa-install-button>
         <pwa-update-available><mwc-button outlined style="--mdc-theme-primary: var(--color-secondary-dark);">App aktualisieren</mwc-button></pwa-update-available>
       </nav>
       <!--googleoff: all-->
+        <share-facebook></share-facebook>
       <nav class="drawer-list">
         <hr/><br/>
         <label section>Layer ein-/ausblenden</label>
