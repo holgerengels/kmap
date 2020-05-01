@@ -194,12 +194,15 @@ export class KMapTestCard extends connect(store, LitElement) {
         value = value.replace(/ /g, "");
         value = value.replace(/²/g, "^2");
         value = value.replace(/³/g, "^3");
+        value = value.replace(/·/g, "*");
       }
 
       var expected = this.values[i];
       if (expected) {
+        expected = expected.replace(/ /g, "");
         expected = expected.replace(/²/g, "^2");
         expected = expected.replace(/³/g, "^3");
+        expected = expected.replace(/·/g, "*");
       }
       var correct = value == expected;
       everythingCorrect = everythingCorrect && correct;
