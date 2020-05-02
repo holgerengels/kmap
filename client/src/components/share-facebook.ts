@@ -16,24 +16,26 @@ export class ShareFacebook extends LitElement {
           display: flex;
           justify-content: right;
         }
-        div {
+        a {
           display: flex;
           width: fit-content;
           background-color: #4267b2;
           color: white;
           border-radius: 2px;
+          cursor: pointer;
         }
-        div:hover {
+        a:hover {
           background-color: #365899;
           transition: 200ms ease-in-out background-color, 200ms ease-in-out box-shadow;
+          text-decoration: none;
         }
-        div:active {
+        a:active {
           background-color: #29487d;
         }
-        div:focus {
+        a:focus {
           box-shadow: 0 0 1px 2px rgba(88, 144, 255, .75), 0 1px 1px rgba(0, 0, 0, .15);
         }
-        div > * {
+        a > * {
           margin: 2px 3px;
         }
       `];
@@ -47,7 +49,7 @@ export class ShareFacebook extends LitElement {
   render() {
     //language=HTML
     return html`
-      <div @click="${this._share}" title="Auf Facebook teilen"><img src="/facebook.svg" width="16" alt="f"/><h6>teilen</h6></div>
+      <a @click="${this._share}" title="Auf Facebook teilen"><img src="/facebook.svg" width="16" alt="f"/><h6>teilen</h6></a>
       <a style="display:none"/>
     `;
   }
