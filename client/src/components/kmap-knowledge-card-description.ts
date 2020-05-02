@@ -90,12 +90,11 @@ export class KMapKnowledgeCardDescription extends LitElement {
           margin: -8px;
         }
         box {
-          flex: none;
+          flex: 0 1 auto;
           margin: 8px;
         }
         growbox {
-          flex: 1;
-          flex-basis: 0.000000001px;
+          flex: 1 1 400px;
           margin: 8px;
         }
         box img {

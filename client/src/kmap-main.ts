@@ -292,7 +292,7 @@ export class KmapMain extends connect(store, LitElement) {
     ]</span>
     <div class="drawer-content">
       <nav class="drawer-list">
-        <a ?selected="${this._page === 'home'}" href="/app/">Fächer</a>
+        <a ?selected="${this._page === 'home'}" href="/app/">Start</a>
         <a ?selected="${this._page === 'browser'}" href="/app/browser/${this._path}" ?disabled="${!this._path}">Browser</a>
         ${this._roles.includes("teacher") ? html`
           <a ?selected="${this._page === 'test'}" href="/app/test">Test</a>
@@ -369,7 +369,7 @@ export class KmapMain extends connect(store, LitElement) {
 }
 
 const _title = new Map([
-  ['home', "Fächer"],
+  ['home', "Start"],
   ['browser', "Browser"],
   ['test', "Test"],
   ['courses', "Kurse"],
