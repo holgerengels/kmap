@@ -1,7 +1,6 @@
 import {LitElement, html, css, customElement, property, query} from 'lit-element';
 import {installMediaQueryWatcher} from 'pwa-helpers/media-query.js';
 import {installOfflineWatcher} from 'pwa-helpers/network.js';
-import {setMetaTag} from 'pwa-helpers/metadata.js';
 import "web-animations-js/web-animations.min";
 import { connect } from '@captaincodeman/rdx'
 import { RoutingState } from '@captaincodeman/rdx-model'
@@ -390,3 +389,13 @@ const updateMetadata = ({ title, description, image }) => {
   }
   setMetaTag('property', 'og:url', window.location.href);
 };
+
+function setMetaTag(attrName, attrValue, content) {
+  let element = document.head.querySelector(`meta[${attrName}="${attrValue}"]`);
+  if (!element) {
+    element = document.createElement('meta');
+    element.setAttribute(attrName, attrValue);
+    document.head.appendChild(element);
+  }
+  element.setAttribute('content', content || '');
+}

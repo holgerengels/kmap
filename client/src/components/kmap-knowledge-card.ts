@@ -156,6 +156,16 @@ export class KMapKnowledgeCard extends connect(store, LitElement) {
       store.dispatch.shell.showMessage("Bitte melde Dich an, um die Feedbackfunktion zu nutzen!")
   }
 
+  _share() {
+    if (this.card === undefined)
+      return;
+    // @ts-ignore
+    navigator.share({
+      title: "KMap",
+      text: this.card.chapter + " - " + this.card.topic,
+      url: document.location.href,
+    })  }
+
   static get styles() {
     // language=CSS
     return [
@@ -210,10 +220,14 @@ export class KMapKnowledgeCard extends connect(store, LitElement) {
           align-content: start;
           margin: 12px;
         }
-        mwc-icon-button {
-          --mdc-icon-button-size: 24px;
-          --mdc-icon-size: 22px;
+        .button {
+          margin-left: 6px;
+          --mdc-icon-button-size: 22px;
+          --mdc-icon-size: 20px;
           color: var(--color-darkgray);
+          display: flex;
+          flex-flow: column;
+          justify-content: space-around;
         }
         [hidden] {
           display: none;
@@ -314,10 +328,11 @@ export class KMapKnowledgeCard extends connect(store, LitElement) {
       : html`<star-rating .rate="${this.state}" @clicked="${this._rated}" style=${styleMap(this._colorStyles)}></star-rating>`
     }
       <div style="flex: 1 0 auto; height: 24px"></div>
+      <mwc-icon-button class="button" icon="share" title="Teilen..." ?hidden="${typeof navigator['share'] !== 'function'}" @click="${this._share}"></mwc-icon-button>
       ${this._hasTests ? html`
-        <a href="/app/test/${this.subject}/${this.chapter}/${this.card.topic}" title="Aufgaben" style="display: flex; flex-flow: column; justify-content: space-around">${iconTest}</a>&nbsp;
+        <a class="button" href="/app/test/${this.subject}/${this.chapter}/${this.card.topic}" title="Aufgaben" style="display: flex">${iconTest}</a>
       ` : ''}
-      <mwc-icon-button icon="feedback" title="Feedback" @click="${this._feedback}"></mwc-icon-button>
+      <mwc-icon-button class="button" icon="feedback" title="Feedback" @click="${this._feedback}"></mwc-icon-button>
   </div>
   <kmap-feedback id="feedbackDialog" .subject="${this.subject}" .chapter="${this.chapter}" .topic="${this.card.topic}"></kmap-feedback>
     `;
