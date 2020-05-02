@@ -162,7 +162,7 @@ export class KMapKnowledgeCard extends connect(store, LitElement) {
     // @ts-ignore
     navigator.share({
       title: "KMap",
-      text: this.card.chapter + " - " + this.card.topic,
+      text: this.chapter + " - " + this.card.topic,
       url: document.location.href,
     })  }
 
