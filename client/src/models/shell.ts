@@ -3,11 +3,11 @@ import { Store } from '../store';
 
 export interface Meta {
   title?: string,
+  detail?: string,
   description?: string,
 }
 export interface ShellState {
-  title: string,
-  description: string,
+  meta: Meta,
   narrow: boolean,
   drawerOpen: boolean,
   messages: string[],
@@ -16,8 +16,7 @@ export interface ShellState {
 
 export default createModel({
   state: <ShellState>{
-    title: "KMap",
-    description: "KMap kartographiert Wissen mit Zusammenhang",
+    meta: {},
     narrow: false,
     drawerOpen: false,
     messages: [],
@@ -25,7 +24,7 @@ export default createModel({
   },
   reducers: {
     updateMeta(state, meta: Meta) {
-      return { ...state, title: meta.title || "KMap", description: meta.description || "KMap kartographiert Wissen mit Zusammenhang"}
+      return { ...state, meta}
     },
     updateNarrow(state, narrow: boolean) {
       return { ...state, narrow: narrow }

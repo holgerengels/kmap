@@ -1,7 +1,7 @@
 import {LitElement, html, css, customElement, property, query} from 'lit-element';
 import {installMediaQueryWatcher} from 'pwa-helpers/media-query.js';
 import {installOfflineWatcher} from 'pwa-helpers/network.js';
-import {updateMetadata} from 'pwa-helpers/metadata.js';
+import {setMetaTag} from 'pwa-helpers/metadata.js';
 import "web-animations-js/web-animations.min";
 import { connect } from '@captaincodeman/rdx'
 import { RoutingState } from '@captaincodeman/rdx-model'
@@ -39,6 +39,7 @@ import {Snackbar} from "@material/mwc-snackbar/mwc-snackbar";
 import {KMapLoginPopup} from "./components/kmap-login-popup";
 import {KMapInstancePopup} from "./components/kmap-instance-popup";
 import {TopAppBar} from "@material/mwc-top-app-bar/mwc-top-app-bar";
+import {Meta} from "./models/shell";
 
 // @ts-ignore
 const _standalone = (window.matchMedia('(display-mode: standalone)').matches) || (window.navigator.standalone) || document.referrer.includes('android-app://');
@@ -49,9 +50,9 @@ export class KmapMain extends connect(store, LitElement) {
   @property()
   private _page: string = '';
   @property()
-  private _metaTitle: string = '';
+  private _meta: Meta = {};
   @property()
-  private _metaDescription: string = '';
+  private _barTitle: string = '';
   @property()
   private _instance: string = '';
   @property()
@@ -102,9 +103,7 @@ export class KmapMain extends connect(store, LitElement) {
       _userid: state.app.userid,
       _roles: state.app.roles,
       _layers: state.shell.layers,
-      _metaTitle: state.shell.title,
-      _metaDescription: state.shell.description,
-      //_drawerOpen: state.shell.drawerOpen,
+      _meta: state.shell.meta,
       _narrow: state.shell.narrow,
       _messages: state.shell.messages,
     };
@@ -112,10 +111,7 @@ export class KmapMain extends connect(store, LitElement) {
 
   // @ts-ignore
   firstUpdated(changedProperties) {
-    updateMetadata({
-      title: "KMap",
-      description: "KMap kartographiert Wissen mit Zusammenhang",
-    });
+    updateMetadata({ title: "KMap", description: "KMap kartographiert Wissen mit Zusammenhang", image: undefined });
 
     if (this.shadowRoot) {
       const bar: TopAppBar | null = this.shadowRoot.querySelector("mwc-top-app-bar");
@@ -153,11 +149,14 @@ export class KmapMain extends connect(store, LitElement) {
   }
 
   updated(changedProps) {
-    if (changedProps.has('_metaTitle')) {
-      updateMetadata({
-        title: this._metaTitle,
-        description: this._metaDescription,
-      });
+    if (changedProps.has('_meta')) {
+      const barTitle = this._meta.title || _title.get(this._page);
+      const docTitle = this._meta.detail || this._meta.title || _title.get(this._page);
+      const title = this._meta.detail ? this._meta.title  + " - " + this._meta.detail : this._meta.title;
+      const description = this._meta.description || "KMap kartographiert Wissen mit Zusammenhang";
+      this._barTitle = barTitle || "KMap";
+      document.title = docTitle || "KMap";
+      updateMetadata({ title: title, description: description, image: undefined });
     }
 
     if (changedProps.has('_page') && !this._layers.includes('editor'))
@@ -294,7 +293,7 @@ export class KmapMain extends connect(store, LitElement) {
     ]</span>
     <div class="drawer-content">
       <nav class="drawer-list">
-        <a ?selected="${this._page === 'home'}" href="/app/">Home</a>
+        <a ?selected="${this._page === 'home'}" href="/app/">Fächer</a>
         <a ?selected="${this._page === 'browser'}" href="/app/browser/${this._path}" ?disabled="${!this._path}">Browser</a>
         ${this._roles.includes("teacher") ? html`
           <a ?selected="${this._page === 'test'}" href="/app/test">Test</a>
@@ -339,7 +338,7 @@ export class KmapMain extends connect(store, LitElement) {
       <mwc-top-app-bar id="bar" dense>
         <mwc-icon-button icon="menu" slot="navigationIcon" @click="${() => this._drawerOpen = !this._drawerOpen}"></mwc-icon-button>
         <mwc-icon-button icon="arrow_back" slot="navigationIcon" @click="${() => history.back()}" ?hidden="${!_standalone}"></mwc-icon-button>
-        <div slot="title">${this._metaTitle}</div>
+        <div slot="title">${this._barTitle}</div>
         <kmap-login-button slot="actionItems" @click="${this._showLogin}"></kmap-login-button>
       </mwc-top-app-bar>
 
@@ -369,3 +368,25 @@ export class KmapMain extends connect(store, LitElement) {
 `;
   }
 }
+
+const _title = new Map([
+  ['home', "Fächer"],
+  ['browser', "Browser"],
+  ['test', "Test"],
+  ['courses', "Kurse"],
+  ['content-manager', "Content Manager"],
+]);
+
+const updateMetadata = ({ title, description, image }) => {
+  if (title) {
+    setMetaTag('property', 'og:title', title);
+  }
+  if (description) {
+    setMetaTag('name', 'description', description);
+    setMetaTag('property', 'og:description', description);
+  }
+  if (image) {
+    setMetaTag('property', 'og:image', image);
+  }
+  setMetaTag('property', 'og:url', window.location.href);
+};
