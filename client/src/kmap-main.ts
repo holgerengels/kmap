@@ -111,7 +111,7 @@ export class KmapMain extends connect(store, LitElement) {
 
   // @ts-ignore
   firstUpdated(changedProperties) {
-    updateMetadata({ title: "KMap", description: "KMap kartographiert Wissen mit Zusammenhang", image: undefined });
+    updateMetadata({ title: "KMap", description: "KMap kartographiert Wissen mit Zusammenhang", image: window.location.origin + "/app/KMap-Logo.png" });
 
     if (this.shadowRoot) {
       const bar: TopAppBar | null = this.shadowRoot.querySelector("mwc-top-app-bar");
