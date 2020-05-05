@@ -15,6 +15,7 @@ import {fontStyles, colorStyles, themeStyles} from "./kmap-styles";
 import {KMapFeedback} from "./kmap-feedback";
 import {Attachment, Card} from "../models/types";
 import {iconTest} from "./icons";
+import {encode} from "../urls";
 
 @customElement('kmap-knowledge-card')
 export class KMapKnowledgeCard extends connect(store, LitElement) {
@@ -244,7 +245,7 @@ export class KMapKnowledgeCard extends connect(store, LitElement) {
   <div class="card-header font-body">
       <span>${this.card.topic !== "_" ? this.card.topic : this.chapter}</span>
       <div style="flex: 1 0 auto"></div>
-      <a href="/app/browser/${this.subject}/${this.chapter}" title="Wissenslandkarte"><mwc-icon>fullscreen_exit</mwc-icon></a>
+      <a href="/app/browser/${encode(this.subject, this.chapter)}" title="Wissenslandkarte"><mwc-icon>fullscreen_exit</mwc-icon></a>
   </div>
   <kmap-knowledge-card-depends ?chapterDepends="${this.card.topic === '_'}"
       .subject="${this.subject}"
@@ -324,13 +325,13 @@ export class KMapKnowledgeCard extends connect(store, LitElement) {
   </div>
   <div class="card-footer">
     ${this.card.links
-      ? html`<a slot="footer" href="/app/browser/${this.subject}/${this.card.links}"><mwc-icon>open_in_new</mwc-icon></a>`
+      ? html`<a slot="footer" href="/app/browser/${encode(this.subject, this.card.links)}"><mwc-icon>open_in_new</mwc-icon></a>`
       : html`<star-rating .rate="${this.state}" @clicked="${this._rated}" style=${styleMap(this._colorStyles)}></star-rating>`
     }
       <div style="flex: 1 0 auto; height: 24px"></div>
       <mwc-icon-button class="button" icon="share" title="Teilen..." ?hidden="${typeof navigator['share'] !== 'function'}" @click="${this._share}"></mwc-icon-button>
       ${this._hasTests ? html`
-        <a class="button" href="/app/test/${this.subject}/${this.chapter}/${this.card.topic}" title="Aufgaben" style="display: flex">${iconTest}</a>
+        <a class="button" href="/app/test/${encode(this.subject, this.chapter, this.card.topic)}" title="Aufgaben" style="display: flex">${iconTest}</a>
       ` : ''}
       <mwc-icon-button class="button" icon="feedback" title="Feedback" @click="${this._feedback}"></mwc-icon-button>
   </div>

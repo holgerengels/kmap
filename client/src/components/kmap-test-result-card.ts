@@ -9,6 +9,7 @@ import '@material/mwc-icon';
 import './star-rating';
 import {colorStyles, fontStyles, themeStyles} from "./kmap-styles";
 import {TestResult} from "../models/tests";
+import {encode} from "../urls";
 
 @customElement('kmap-test-result-card')
 export class KMapTestResultCard extends connect(store, LitElement) {
@@ -164,7 +165,7 @@ export class KMapTestResultCard extends connect(store, LitElement) {
         <div class="card-footer">
             <star-rating .rate="${this._state}" @clicked="${this._rated}" style=${styleMap(this._colorStyles)}></star-rating>
             <div slot="footer" style="flex: 1 0 auto"></div>
-            <a slot="footer" href="/app/browser/${this.card.subject}/${this.card.chapter}/${this.card.topic}"><mwc-icon>open_in_new</mwc-icon></a>
+            <a slot="footer" href="/app/browser/${encode(this.card.subject, this.card.chapter, this.card.topic)}"><mwc-icon>open_in_new</mwc-icon></a>
         </div>
     ` : html``;
   }

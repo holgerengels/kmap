@@ -2,7 +2,7 @@ import {LitElement, html, css, customElement, property, query} from 'lit-element
 import {connect} from '@captaincodeman/rdx';
 import {State, store} from "../store";
 
-import {urls} from '../urls';
+import {encode, urls} from '../urls';
 import {STATE_COLORS} from './state-colors';
 import {fontStyles, colorStyles, themeStyles} from "./kmap-styles";
 import './star-rating';
@@ -371,7 +371,7 @@ export class KMapTestCard extends connect(store, LitElement) {
   <div class="card-header" ?hidden="${this.hideHeader}">
       <span>Aufgabe ${this.num + 1} von ${this.of} (${this._levelText(this.level)})</span>
       <div style="flex: 1 0 auto"></div>
-      <a href="/app/browser/${this.subject}/${this.chapter}/${this.topic}" target="_blank" id="blinky">Wissenskarte ansehen <mwc-icon>open_in_new</mwc-icon></a>&nbsp;
+      <a href="/app/browser/${encode(this.subject, this.chapter, this.topic)}" target="_blank" id="blinky">Wissenskarte ansehen <mwc-icon>open_in_new</mwc-icon></a>&nbsp;
       <mwc-icon-button icon="feedback" title="Feedback" @click="${this._feedback}"></mwc-icon-button>
   </div>
   <div class="card-content">

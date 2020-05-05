@@ -196,8 +196,8 @@ export class KMapLoginPopup extends connect(store, LitElement) {
       <mwc-textfield id="loginPassword" name="password" label="Passwort" type="password" required></mwc-textfield>
       ` : html`
         <mwc-button class="auth" outlined @click=${this._signIn} id="google"><img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg">Anmelden mit Google</mwc-button><br/>
-        <mwc-button class="auth" raised style="--mdc-theme-primary: #4267B2" @click=${this._signIn} id="facebook"><img src="/facebook.svg">Anmelden mit Facebook</mwc-button><br/>
-        <span class="secondary">(Die Facebook-Anmeldung ist noch experimentell)</span>
+        <mwc-button class="auth" raised style="--mdc-theme-primary: #4267B2" @click=${this._signIn} id="facebook"><img src="/facebook.svg">Anmelden mit Facebook</mwc-button>
+        <!--br/><span class="secondary">(Die Facebook-Anmeldung ist noch experimentell)</span-->
       `}
     </validating-form>
     <form id="logoutForm" ?hidden="${!this._userid}">
