@@ -31,10 +31,10 @@
       "map": "function(doc) {\n    if (!doc.links)\n        emit([doc.subject, doc.chapter], doc.chapter + \".\" + doc.topic);\n}"
     }
   },
-  "fulltext": {
-    "search": {
-      "index": "function(doc) { var res = new Document(); if ('_' === doc.topic) return null; res.add(doc.chapter, {'field':'chapter', 'store':'yes'}); res.add(doc.topic, {'field':'topic', 'store':'yes'}); res.add(doc.topic, {'field':'content'}); res.add(doc.summary, {'field':'summary', 'store':'yes'}); res.add(doc.summary, {'field':'content'}); res.add(doc.description, {'field':'content'}); return res; }",
-      "analyzer": "german"
+  "indexes": {
+    "topics": {
+      "index": "function(doc) {\n    if ('_' === doc.topic) return;\n    index(\"chapter\", doc.chapter, {'store': true});\n    index(\"topic\", doc.topic, {'store': true, 'boost': 2});\n    if (doc.summary)\n        index(\"summary\", doc.summary, {'store': true, 'boost': 2});\n    if (doc.description)\n        index(\"description\", doc.description, {'store': true});\n    if (doc.thumb)\n        index(\"thumb\", doc.thumb, {'store': true, 'index': false});\n}",
+      "analyzer": { "name": "german"}
     }
   },
   "language": "javascript"
