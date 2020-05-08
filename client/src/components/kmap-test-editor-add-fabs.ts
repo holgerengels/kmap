@@ -11,6 +11,7 @@ import './validating-form';
 import {fontStyles, colorStyles, themeStyles} from "./kmap-styles";
 import {Test} from "../models/tests";
 import {Dialog} from "@material/mwc-dialog/mwc-dialog";
+import {ValidatingForm} from "./validating-form";
 
 @customElement('kmap-test-editor-add-fabs')
 export class KMapTestEditorAddFabs extends connect(store, LitElement) {
@@ -39,6 +40,8 @@ export class KMapTestEditorAddFabs extends connect(store, LitElement) {
   @query('#addDialog')
   // @ts-ignore
   private _addDialog: Dialog;
+  @query('#addForm')
+  private _addForm: ValidatingForm;
 
   @property()
   private _valid: boolean = false;
@@ -85,6 +88,7 @@ export class KMapTestEditorAddFabs extends connect(store, LitElement) {
   }
 
   _addTest() {
+    this._addForm.reset();
     this._opened = false;
     this._mode = 'test';
     this._subject = this._currentSubject;
@@ -94,6 +98,7 @@ export class KMapTestEditorAddFabs extends connect(store, LitElement) {
   }
 
   _addSet() {
+    this._addForm.reset();
     this._opened = false;
     this._mode = 'set';
     this._subject = this._currentSubject;

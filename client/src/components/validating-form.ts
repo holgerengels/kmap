@@ -22,15 +22,9 @@ export class ValidatingForm extends LitElement {
 
     /*
     for (const validate of this._validates) {
-      let required = validate.required;
-      if (validate.checkValidity) {
-        validate.required = false;
-        validate.checkValidity();
-        validate.mdcFoundation?.setValid(true);
-        validate.required = required;
-      }
+      validate.valid = true;
     }
-     */
+    */
   }
 
   _checkValidity() {

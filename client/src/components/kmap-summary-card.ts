@@ -1,10 +1,12 @@
-import {LitElement, html, css, customElement, property} from 'lit-element';
+import {LitElement, html, css, customElement, property, queryAsync} from 'lit-element';
 import { connect } from '@captaincodeman/rdx';
 import {State, store} from "../store";
 
 import {StyleInfo, styleMap} from "lit-html/directives/style-map";
 import '@material/mwc-icon';
-import '@material/mwc-ripple';
+import '@material/mwc-ripple/mwc-ripple';
+import {Ripple} from '@material/mwc-ripple/mwc-ripple.js';
+//import {RippleHandlers} from '@material/mwc-ripple/ripple-handlers.js';
 import './kmap-summary-card-summary';
 import './kmap-summary-card-averages';
 import './kmap-summary-card-editor';
@@ -47,6 +49,8 @@ export class KMapSummaryCard extends connect(store, LitElement) {
   private _hasTests: boolean = false;
   @property()
   private _topics: string[] = [];
+
+  @queryAsync('mwc-ripple') ripple!: Promise<Ripple|null>;
 
   constructor() {
     super();
@@ -199,8 +203,9 @@ export class KMapSummaryCard extends connect(store, LitElement) {
     class="${classMap({"card": true, "elevation-02": !this.selected && !this.highlighted, "elevation-05": this.selected || this.highlighted})}"
     style=${ifDefined(this._thumbStyles ? styleMap(this._thumbStyles) : undefined)}
     ?thumb="${this.card.thumb}"
-    @click="${this._clicked}" ?selected="${this.selected}" ?highlighted="${this.highlighted}">
-  <mwc-ripple id="ripple"></mwc-ripple>
+    @click="${this._clicked}" ?selected="${this.selected}" ?highlighted="${this.highlighted}"
+          >
+  <mwc-ripple></mwc-ripple>
   <div class="card-header font-body">
     <span>${this.card.topic}</span>
     <div style="flex: 1 0 auto"></div>
@@ -241,4 +246,35 @@ export class KMapSummaryCard extends connect(store, LitElement) {
     </div>
     `;
   }
+
+  /*
+  protected rippleHandlers: RippleHandlers = new RippleHandlers(() => {
+    return this.ripple;
+  });
+
+  @eventOptions({passive: true})
+  private handleRippleActivate(evt?: Event) {
+    this.rippleHandlers.startPress(evt);
+  }
+
+  private handleRippleDeactivate() {
+    this.rippleHandlers.endPress();
+  }
+
+  private handleRippleMouseEnter() {
+    this.rippleHandlers.startHover();
+  }
+
+  private handleRippleMouseLeave() {
+    this.rippleHandlers.endHover();
+  }
+
+  private handleRippleFocus() {
+    this.rippleHandlers.startFocus();
+  }
+
+  private handleRippleBlur() {
+    this.rippleHandlers.endFocus();
+  }
+   */
 }
