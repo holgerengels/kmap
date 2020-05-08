@@ -23,7 +23,6 @@ import org.lightcouch.CouchDbClient;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.zip.ZipEntry;
@@ -487,6 +486,10 @@ curl -X DELETE -u $1 http://127.0.0.1:5984/$2-state
             System.out.println("sync set " + subject + " " + set);
             syncSet(from, to, subject, set);
         }
+    }
+
+    public JsonObject deleteModule(String subject, String module) {
+        return couch.deleteModule(subject, module);
     }
 
     private static class KeepOpenInputStream extends InputStream {

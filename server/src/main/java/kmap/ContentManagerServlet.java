@@ -2,6 +2,7 @@ package kmap;
 
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import org.apache.commons.io.IOUtils;
 
@@ -44,6 +45,9 @@ public class ContentManagerServlet
                 String sync = req.getParameter("sync");
                 String importModule = req.getParameter("import-module");
                 String importSet = req.getParameter("import-set");
+                String subject = req.getParameter("subject");
+                String deleteModule = req.getParameter("delete-module");
+                String deleteSet = req.getParameter("delete-set");
 
                 if (importModule != null) {
                     authentication.checkRole(req, "teacher");
@@ -70,6 +74,13 @@ public class ContentManagerServlet
                         sets.add(String.join(" - ", strings));
                     }
                     writeResponse(req, resp, sets);
+                }
+                else if (deleteModule != null) {
+                    authentication.checkRole(req, "teacher");
+                    JsonArray sets = new JsonArray();
+                    log("delete module " + deleteModule);
+                    JsonObject object = contentManager.deleteModule(subject, deleteModule);
+                    writeResponse(req, resp, object);
                 }
                 else if (create != null) {
                     authentication.checkRole(req, "admin");

@@ -145,7 +145,7 @@ export default createModel({
       const state = store.getState();
 
       dispatch.contentMaps.requestDelete();
-      fetchjson(`${urls.server}edit?subject=${payload.subject}&delete=${payload.module}`, endpoint.get(state),
+      fetchjson(`${urls.server}content?subject=${payload.subject}&delete-module=${payload.module}`, endpoint.post(state),
         () => {
           dispatch.contentMaps.receivedDelete();
         },

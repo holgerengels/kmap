@@ -381,7 +381,7 @@ public class Tests {
             object.addProperty("_deleted", true);
         }
         System.out.println("oldTests = " + oldTests);
-        List<Response> responses = client.bulk(oldTests, false);
+        List<Response> responses = client.bulk(oldTests, true);
         System.out.println("responses = " + responses);
 
         JsonObject object = new JsonObject();

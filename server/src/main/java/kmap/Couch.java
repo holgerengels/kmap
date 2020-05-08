@@ -798,7 +798,7 @@ public class Couch extends Server {
             object.addProperty("_deleted", true);
         }
         System.out.println("oldTopics = " + oldTopics);
-        List<Response> responses = client.bulk(oldTopics, false);
+        List<Response> responses = client.bulk(oldTopics, true);
         System.out.println("responses = " + responses);
 
         JsonObject object = new JsonObject();
