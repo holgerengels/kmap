@@ -33,14 +33,12 @@ export class KMapSubjects extends connect(store, LitElement) {
         .board {
           height: auto;
           outline: none;
-          padding: 8px;
+          padding: 16px 8px 8px 8px;
           padding-bottom: 36px;
         }
         kmap-subject-card {
           display: inline-block;
           margin-bottom: 16px;
-          margin-left: 6px;
-          margin-right: 6px;
           vertical-align: top;
         }
       `];
