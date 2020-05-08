@@ -154,7 +154,7 @@ export class KmapMain extends connect(store, LitElement) {
       const title = this._meta.detail ? this._meta.title  + " - " + this._meta.detail : this._meta.title;
       const description = this._meta.description || "KMap kartographiert Wissen mit Zusammenhang";
       this._barTitle = barTitle || "KMap";
-      document.title = docTitle || "KMap";
+      document.title = docTitle ? docTitle + " - KMap" : "KMap";
       updateMetadata({ title: title, description: description, image: undefined });
     }
 
