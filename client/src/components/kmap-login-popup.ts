@@ -9,7 +9,6 @@ import 'pwa-helper-components/pwa-install-button';
 import 'pwa-helper-components/pwa-update-available';
 import './validating-form';
 import {Dialog} from "@material/mwc-dialog/mwc-dialog";
-import {TextField} from "@material/mwc-textfield/mwc-textfield";
 import {colorStyles, fontStyles, themeStyles} from "./kmap-styles";
 import {Instance} from "../models/instances";
 import {DatalistTextField} from "./datalist-textfield";
@@ -43,12 +42,6 @@ export class KMapLoginPopup extends connect(store, LitElement) {
   @query('#instance')
   // @ts-ignore
   private _loginInstance: DatalistTextField;
-  @query('#loginId')
-  // @ts-ignore
-  private _loginId: TextField;
-  @query('#loginPassword')
-  // @ts-ignore
-  private _loginPassword: TextField;
 
   mapState(state: State) {
     return {
@@ -90,12 +83,17 @@ export class KMapLoginPopup extends connect(store, LitElement) {
   }
 
   _login() {
-    if (this._instanceValid) {
-      if (!/^[a-z0-9.]*$/.test(this._loginId.value)) {
-        this._loginId.value = this._loginId.value.toLowerCase();
+    if (!this.shadowRoot)
+      return;
+    const loginId = this.shadowRoot.getElementById("loginId") as HTMLInputElement;
+    const loginPassword = this.shadowRoot.getElementById("loginPassword") as HTMLInputElement;
+
+    if (this._instanceValid && loginId && loginPassword) {
+      if (!/^[a-z0-9.]*$/.test(loginId.value)) {
+        loginId.value = loginId.value.toLowerCase();
       }
-      if (/^[a-z0-9.]*$/.test(this._loginId.value)) {
-        store.dispatch.app.login({userid: this._loginId.value, password: this._loginPassword.value});
+      if (/^[a-z0-9.]*$/.test(loginId.value)) {
+        store.dispatch.app.login({userid: loginId.value, password: loginPassword.value});
       }
     }
   }
