@@ -317,6 +317,9 @@ export default createModel({
         case 'browser':
           dispatch.tests.loadTopics();
           break;
+        case 'home':
+          //dispatch.tests.loadRandomTests();
+          break;
       }
     },
     'app/chooseInstance': async function() {
@@ -348,4 +351,3 @@ export default createModel({
     },
   })
 })
-
