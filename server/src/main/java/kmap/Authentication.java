@@ -89,7 +89,7 @@ public class Authentication {
                 Gson gson = new GsonBuilder().create();
                 JsonObject object = gson.fromJson(json, JsonObject.class);
                 String password = object.getAsJsonPrimitive("password").getAsString();
-                System.out.println("login = " + login + "/" + password);
+                System.out.println("login = " + login);
                 try {
                     Set<String> roles = authenticate(login, password);
                     if (roles != null) {
@@ -173,7 +173,7 @@ public class Authentication {
     private Set<String> verifyIdToken(String user, String token) {
         try {
             FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(token);
-            System.out.println("uid = " + decodedToken.getUid());
+            //System.out.println("uid = " + decodedToken.getUid());
             Set<String> roles = new HashSet<>(2);
             roles.add("student");
             roles.add("displayName:" + decodedToken.getName());
