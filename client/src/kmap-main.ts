@@ -330,6 +330,7 @@ export class KmapMain extends connect(store, LitElement) {
         ` : ''}
       </nav>
       <!--googleon: all-->
+      <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/deed.de"><img src="//i.creativecommons.org/l/by-sa/4.0/88x31.png" alt="CC BY-SA 4.0"></a>
     </div>
 
     <div slot="appContent" class="main-content" role="main">
