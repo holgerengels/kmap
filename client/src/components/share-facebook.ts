@@ -49,7 +49,7 @@ export class ShareFacebook extends LitElement {
   render() {
     //language=HTML
     return html`
-      <a @click="${this._share}" title="Auf Facebook teilen"><img src="/facebook.svg" width="16" alt="f"/><h6>teilen</h6></a>
+      <a @click="${this._share}" title="Auf Facebook teilen"><img src="/facebook.svg" width="16" height="16" alt="f"/><h6>teilen</h6></a>
       <a style="display:none"/>
     `;
   }
