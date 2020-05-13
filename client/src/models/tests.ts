@@ -291,14 +291,16 @@ export default createModel({
       const dispatch = store.dispatch();
       const state = store.getState();
 
-      dispatch.tests.requestRandomTests();
+      if (Date.now() - state.tests.randomTimestamp > 60*1000) {
+        dispatch.tests.requestRandomTests();
 
-      fetchjson(`${urls.server}tests?random=${subject}`, endpoint.get(state),
-        (json) => {
-          dispatch.tests.receivedRandomTests({subject: subject, tests: json});
-        },
-        dispatch.app.handleError,
-        dispatch.tests.error);
+        fetchjson(`${urls.server}tests?random=${subject}`, endpoint.get(state),
+          (json) => {
+            dispatch.tests.receivedRandomTests({subject: subject, tests: json});
+          },
+          dispatch.app.handleError,
+          dispatch.tests.error);
+      }
     },
 
     async deleteTest(test: Test) {
