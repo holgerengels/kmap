@@ -114,6 +114,7 @@ public class TestsServlet
             String topic = req.getParameter("topic");
             String chapters = req.getParameter("chapters");
             String topics = req.getParameter("topics");
+            String random = req.getParameter("random");
             String file = req.getPathInfo();
             if (sets != null) {
                 log("sets = " + sets);
@@ -148,6 +149,12 @@ public class TestsServlet
             else if (topics != null) {
                 log("available topics = " + subject);
                 JsonArray array = tests.loadTopics(subject);
+                if (array != null)
+                    writeResponse(req, resp, array);
+            }
+            else if (random != null) {
+                log("load random = " + random);
+                JsonArray array = tests.loadRandomTests(random);
                 if (array != null)
                     writeResponse(req, resp, array);
             }

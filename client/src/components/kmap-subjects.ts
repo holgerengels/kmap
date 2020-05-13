@@ -7,17 +7,41 @@ import '@material/mwc-icon-button';
 import '@material/mwc-top-app-bar';
 import './kmap-login-button';
 import './kmap-subject-card';
+import './kmap-randomtest-card';
+import {Random, Test} from "../models/tests";
 
 
 @customElement('kmap-subjects')
 export class KMapSubjects extends connect(store, LitElement) {
   @property()
   private _subjects: string[] = [];
+  @property()
+  private _random?: Random = undefined;
+
+  @property()
+  private _current?: Test;
+  @property()
+  private _index: number = 0;
 
   mapState(state: State) {
     return {
       _subjects: state.subjects.subjects,
+      _random: state.tests.random,
     };
+  }
+
+  updated(changedProperties) {
+    if (changedProperties.has("_random")) {
+      this._index = 0;
+      this._current = this._random !== undefined ? this._random.tests[0] : undefined;
+    }
+    if (changedProperties.has("_index")) {
+      this._current = this._random !== undefined ? this._random.tests[this._index] : undefined;
+    }
+  }
+
+  _next() {
+    this._index++;
   }
 
   static get styles() {
@@ -33,13 +57,23 @@ export class KMapSubjects extends connect(store, LitElement) {
         .board {
           height: auto;
           outline: none;
-          padding: 16px 8px 8px 8px;
+          padding: 8px;
           padding-bottom: 36px;
+        }
+        .title {
+          margin: 0px 0px 8px 6px;
+          padding: 4px 0px;
+          color: var(--color-darkgray);
         }
         kmap-subject-card {
           display: inline-block;
           margin-bottom: 16px;
           vertical-align: top;
+        }
+        kmap-randomtest-card {
+          margin-left: 6px;
+          display: block;
+          margin-bottom: 16px;
         }
       `];
   }
@@ -48,9 +82,32 @@ export class KMapSubjects extends connect(store, LitElement) {
     // language=HTML
     return html`
       <main id="content" class="board" tabindex="0">
-          ${this._subjects.map((subject) => html`
-              <kmap-subject-card .subject="${subject}"></kmap-subject-card>
-          `)}
+        <div class="title">
+            <label>Wähle ein Fach!</label>
+        </div>
+        ${this._subjects.map((subject) => html`
+            <kmap-subject-card .subject="${subject}"></kmap-subject-card>
+        `)}
+
+        ${this._current ? html`
+          <div class="title">
+            <label style="line-height: 200%">Teste Dein Wissen!</label><br/>
+            <span>.. anhand dreier zufällig ausgewählter Aufgaben ..</label>
+          </div>
+
+          <kmap-randomtest-card @next="${this._next}"
+            .subject="${this._current.subject}"
+            .set="${this._current.set}"
+            .chapter="${this._current.chapter}"
+            .topic="${this._current.topic}"
+            .key="${this._current.key}"
+            .level="${this._current.level}"
+            .question="${this._current.question}"
+            .answer="${this._current.answer}"
+            .values="${this._current.values}"
+            .balance="${this._current.balance}"
+            .last="${this._index === 2}"></kmap-randomtest-card>
+        ` : ''}
       </main>
 `;}
 }

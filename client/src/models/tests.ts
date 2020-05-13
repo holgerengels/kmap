@@ -42,6 +42,10 @@ interface Tests {
   topic?: string,
   tests: object[],
 }
+export interface Random {
+  subject?: string,
+  tests: Test[],
+}
 
 export interface TestsState {
   topics?: Topics,
@@ -61,6 +65,8 @@ export interface TestsState {
   error: string,
   testForEdit?: Test,
   testForDelete?: Test,
+  random?: Random,
+  randomTimestamp: number,
 }
 
 export default createModel({
@@ -79,6 +85,9 @@ export default createModel({
     error: "",
     testForEdit: undefined,
     testForDelete: undefined,
+    random: undefined,
+    loadingRandomTests: false,
+    randomTimestamp: -1,
   },
   reducers: {
     requestTopics(state) {
@@ -183,6 +192,20 @@ export default createModel({
       return { ...state, testForDelete: undefined }
     },
 
+    requestRandomTests(state) {
+      return { ...state, loadingRandomTests: true,
+        randomTimestamp: Date.now(),
+        random: undefined,
+        error: "",
+      };
+    },
+    receivedRandomTests(state, payload: Random) {
+      return { ...state,
+        random: payload,
+        loadingRandomTests: false,
+      };
+    },
+
     error(state, message) {
       return { ...state,
         loading: false,
@@ -264,6 +287,20 @@ export default createModel({
       }
     },
 
+    async loadRandomTests(subject: string) {
+      const dispatch = store.dispatch();
+      const state = store.getState();
+
+      dispatch.tests.requestRandomTests();
+
+      fetchjson(`${urls.server}tests?random=${subject}`, endpoint.get(state),
+        (json) => {
+          dispatch.tests.receivedRandomTests({subject: subject, tests: json});
+        },
+        dispatch.app.handleError,
+        dispatch.tests.error);
+    },
+
     async deleteTest(test: Test) {
       const dispatch = store.dispatch();
       const state = store.getState();
@@ -318,7 +355,7 @@ export default createModel({
           dispatch.tests.loadTopics();
           break;
         case 'home':
-          //dispatch.tests.loadRandomTests();
+          dispatch.tests.loadRandomTests("Mathematik");
           break;
       }
     },

@@ -9,15 +9,12 @@ import '@material/mwc-icon';
 import '@material/mwc-button';
 import "./kmap-test-card-content";
 import "./kmap-feedback";
-import {KMapFeedback} from "./kmap-feedback";
 import {KMapTestCardContent} from "./kmap-test-card-content";
 
-@customElement('kmap-test-card')
-export class KMapTestCard extends connect(store, LitElement) {
+@customElement('kmap-randomtest-card')
+export class KMapRandomTestCard extends connect(store, LitElement) {
   @property({type: String})
   private _instance: string = '';
-  @property({type: String})
-  private _userid: string = '';
   @property()
   private _narrow: boolean = false;
 
@@ -32,10 +29,6 @@ export class KMapTestCard extends connect(store, LitElement) {
   @property({type: String})
   private topic: string = '';
   @property({type: Number})
-  private num: number = 0;
-  @property({type: Number})
-  private of: number = 0;
-  @property({type: Number})
   private level: number = 0;
   @property({type: String})
   private question: string = '';
@@ -43,31 +36,18 @@ export class KMapTestCard extends connect(store, LitElement) {
   private answer: string = '';
   @property({type: Number})
   private balance: number = 4;
+  @property()
+  private last: boolean = false;
 
   @property({type: String})
   private values: string[] = [];
-  @property({type: Boolean})
-  private sent: boolean = false;
-  @property({type: Boolean})
-  private correct: boolean = false;
-  @property({type: Number})
-  private attempts: number = 0;
-
-  @property({type: Boolean})
-  private hideHeader: boolean = false;
-  @property({type: Boolean})
-  private hideActions: boolean = false;
-
-  @query('#blinky')
-  // @ts-ignore
-  private _blinky: HTMLElement;
-
-  @query('#feedbackDialog')
-  // @ts-ignore
-  private _feedbackDialog: KMapFeedback;
 
   @query('kmap-test-card-content')
   private _content: KMapTestCardContent;
+
+  @query('#tests')
+  private _tests: HTMLAnchorElement;
+
 
   constructor() {
     super();
@@ -77,7 +57,6 @@ export class KMapTestCard extends connect(store, LitElement) {
   mapState(state: State) {
     return {
       _instance: state.app.instance,
-      _userid: state.app.userid,
       _narrow: state.shell.narrow,
     };
   }
@@ -104,50 +83,20 @@ export class KMapTestCard extends connect(store, LitElement) {
     }
   }
 
-  clear() {
-    this._content.clear();
-    this.correct = false;
-    this.sent = false;
-    this.attempts = 0;
-  }
-
   sendAnswer() {
-    var everythingCorrect = this._content.checkValues();
-    this.correct = everythingCorrect;
-    this.sent = this.sent || this.correct;
-    this.attempts++;
-    if (!everythingCorrect) {
-      this._blinky.addEventListener("animationend", () => {
-        this._blinky.className = '';
-      });
-      this._blinky.className = "blink";
-    }
+    this._content.checkValues();
   }
 
   showAnswer() {
     this._content.showAnswer();
-    this.correct = true;
-    this.sent = true;
-    this.attempts = -1;
   }
 
-  next() {
-    this.dispatchEvent(new CustomEvent('next', {
-      bubbles: true, composed: true, detail: {
-        "subject": this.subject,
-        "chapter": this.chapter,
-        "topic": this.topic,
-        "key": this.key,
-        "attempts": this.attempts,
-      }
-    }));
+  _next() {
+    this.dispatchEvent(new CustomEvent('next', {bubbles: true, composed: true}));
   }
 
-  _feedback() {
-    if (this._userid)
-      this._feedbackDialog.show();
-    else
-      store.dispatch.shell.showMessage("Bitte melde Dich an, um die Feedbackfunktion zu nutzen!")
+  _more() {
+    this._tests.click();
   }
 
   static get styles() {
@@ -183,13 +132,7 @@ export class KMapTestCard extends connect(store, LitElement) {
           border-top-right-radius: 4px;
         }
         .card-header a {
-          color: white;
-        }
-        .card-header mwc-icon-button {
-          color: white;
-          vertical-align: middle;
-          --mdc-icon-button-size: 20px;
-          --mdc-icon-size: 20px;
+          color: black;
         }
         .card-header mwc-icon {
           vertical-align: middle;
@@ -211,9 +154,6 @@ export class KMapTestCard extends connect(store, LitElement) {
         .card-footer[stacked] {
           flex-wrap: wrap;
         }
-        .card-footer a {
-          color: black;
-        }
 
         [hidden] {
           display: none !important;
@@ -232,11 +172,9 @@ export class KMapTestCard extends connect(store, LitElement) {
 
   render() {
     return html`
-  <div class="card-header" ?hidden="${this.hideHeader}">
-      <span>Aufgabe ${this.num + 1} von ${this.of} (${this._levelText(this.level)})</span>
-      <div style="flex: 1 0 auto"></div>
-      <a href="/app/browser/${encode(this.subject, this.chapter, this.topic)}" id="blinky">Wissenskarte ansehen <mwc-icon>open_in_new</mwc-icon></a>&nbsp;
-      <mwc-icon-button icon="feedback" title="Feedback" @click="${this._feedback}"></mwc-icon-button>
+  <div class="card-header">
+      <span>${this.chapter} → ${this.topic} (${this._levelText(this.level)})
+      <a id="link" href="/app/browser/${encode(this.subject, this.chapter, this.topic)}"><mwc-icon>open_in_new</mwc-icon></a></span>
   </div>
 
   <kmap-test-card-content
@@ -250,15 +188,16 @@ export class KMapTestCard extends connect(store, LitElement) {
     .values="${this.values}">
   </kmap-test-card-content>
 
-  ${!this.hideActions ? html`
-    <div class="card-footer" ?stacked="${this._narrow}">
-        <mwc-button @click="${this.showAnswer}">Richtige Antwort zeigen</mwc-button>
-        <div style="flex: 1 0 auto"></div>
-        <mwc-button @click="${this.sendAnswer}" ?hidden="${this.sent}">Antwort abschicken</mwc-button>
-        <mwc-button @click="${this.next}" ?hidden="${!this.correct}">Weiter</mwc-button>
-    </div>`
-      : ''}
-  <kmap-feedback id="feedbackDialog" .subject="${this.subject}" .chapter="${this.chapter}" .topic="${this.topic}" .test="${this.key}"></kmap-feedback>
+  <div class="card-footer" ?stacked="${this._narrow}">
+      <mwc-button @click="${this.showAnswer}">Richtige Antwort zeigen</mwc-button>
+      <div style="flex: 1 0 auto"></div>
+      <mwc-button @click="${this.sendAnswer}">Antwort Abschicken</mwc-button>
+      <div style="flex: 1 0 auto"></div>
+      <mwc-button @click="${this._next}" ?hidden="${this.last}">Nächste Aufgabe</mwc-button>
+      <mwc-button @click="${this._more}" ?hidden="${!this.last}">Mehr Aufgaben</mwc-button>
+  </div>
+
+  <a hidden id="tests" href="/app/test/${encode(this.subject, this.chapter, this.topic)}"></a>
     `;
   }
 }

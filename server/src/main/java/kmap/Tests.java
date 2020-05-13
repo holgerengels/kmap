@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.StreamSupport;
 
 import static kmap.JsonServlet.encode;
@@ -134,6 +135,17 @@ public class Tests {
         JsonArray array = new JsonArray();
         objects.forEach(array::add);
         return array;
+    }
+
+    public JsonArray loadRandomTests(String subject) {
+        JsonArray topics = loadTopics(subject);
+        String topic = topics.get(new Random().nextInt(topics.size())).getAsString();
+        String[] split = topic.split("\\.");
+        JsonArray array = loadTestsByTopic(subject, split[0], split[1]);
+        JsonArray three = new JsonArray();
+        Random random = new Random();
+        IntStream.range(0, 3).mapToObj(i -> array.remove(random.nextInt(array.size()))).forEach(three::add);
+        return three;
     }
 
     private JsonArray amendAttachments(JsonObject _attachments) {
@@ -394,8 +406,8 @@ public class Tests {
     public static void main(String[] args) throws IOException {
         Server.CLIENT.set("lala");
         Tests tests = new Tests(new Couch(readProperties(args[0])));
-        JsonArray topics = tests.loadTopics("Mathematik");
-        System.out.println("topics = " + topics);
+        JsonArray array = tests.loadRandomTests("Mathematik");
+        System.out.println("array = " + array.size());
     }
 
     private static Properties readProperties(String fileName) throws IOException {
