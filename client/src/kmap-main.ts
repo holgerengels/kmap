@@ -267,6 +267,9 @@ export class KmapMain extends connect(store, LitElement) {
         span[slot=subtitle] > * {
           margin-right: 8px;
         }
+        h1 {
+          margin: unset; color: unset;
+        }
       mwc-icon-button[icon="polymer"] {
         --mdc-icon-size: 18px;
         --mdc-icon-button-size: 18px;
@@ -338,7 +341,7 @@ export class KmapMain extends connect(store, LitElement) {
       <mwc-top-app-bar id="bar" dense>
         <mwc-icon-button icon="menu" slot="navigationIcon" @click="${() => this._drawerOpen = !this._drawerOpen}"></mwc-icon-button>
         <mwc-icon-button icon="arrow_back" slot="navigationIcon" @click="${() => history.back()}" ?hidden="${!_standalone}"></mwc-icon-button>
-        <div slot="title">${this._barTitle}</div>
+        <h1 slot="title">${this._barTitle}</h1>
         <kmap-login-button slot="actionItems" @click="${this._showLogin}"></kmap-login-button>
       </mwc-top-app-bar>
 

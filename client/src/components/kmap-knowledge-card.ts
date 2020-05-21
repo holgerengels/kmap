@@ -207,7 +207,10 @@ export class KMapKnowledgeCard extends connect(store, LitElement) {
           border-bottom-left-radius: 4px;
           border-bottom-right-radius: 4px;
         }
-        .card-header span, .card-footer span { align-self: center; }
+        h2 {
+          margin: unset; color: unset; font-size: 0.95rem; font-weight: 400;
+        }
+        .card-header h2, .card-footer span { align-self: center; }
         .card-header a, .card-footer a { height: 24px; color: black; display: block }
         .card-footer a { color: var(--color-darkgray); }
         .attachments {
@@ -243,7 +246,7 @@ export class KMapKnowledgeCard extends connect(store, LitElement) {
     else
       return html`
   <div class="card-header font-body">
-      <span>${this.card.topic !== "_" ? this.card.topic : this.chapter}</span>
+      <h2>${this.card.topic !== "_" ? this.card.topic : this.chapter}</h2>
       <div style="flex: 1 0 auto"></div>
       <a href="/app/browser/${encode(this.subject, this.chapter)}" title="Wissenslandkarte"><mwc-icon>fullscreen_exit</mwc-icon></a>
   </div>
