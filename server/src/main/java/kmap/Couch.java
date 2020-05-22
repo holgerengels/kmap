@@ -9,6 +9,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -68,6 +70,26 @@ public class Couch extends Server {
         });
         objects.sort(Comparator.comparing((JsonObject o) -> string(o, "chapter")).thenComparing(o -> string(o, "topic")));
         return objects;
+    }
+
+    public JsonArray latest(String subject) {
+        View view = createClient("map").view("net/byModified")
+                .startKey("[\"" + subject + "\",\"\ufff0\"]")
+                .endKey("[\"" + subject + "\"]")
+                .reduce(false)
+                .includeDocs(true);
+        List<JsonObject> objects = view.query(JsonObject.class);
+        objects.removeIf(o -> string(o, "chapter") == null || string(o,"topic") == null);
+        objects.forEach(o -> {
+            JsonArray attachments = o.getAsJsonArray("attachments");
+            JsonObject _attachments = o.getAsJsonObject("_attachments");
+            o.add("attachments", amendAttachments(attachments, _attachments));
+            fixAttachments(attachments, subject, string(o, "chapter"), string(o, "topic"));
+            o.remove("_attachments");
+        });
+        JsonArray array = new JsonArray();
+        objects.forEach(array::add);
+        return array;
     }
 
     public synchronized JsonArray loadModules() {
@@ -170,6 +192,7 @@ public class Couch extends Server {
                 JsonObject existing = loadTopic(client, new String[] { subject, chapter, topic });
                 if (existing != null) {
                     existing.addProperty("subject", subject);
+                    existing.addProperty("modified", System.currentTimeMillis());
                     existing.add("chapter", changed.get("chapter"));
                     existing.add("topic", changed.get("topic"));
                     existing.add("links", changed.get("links"));
@@ -192,8 +215,9 @@ public class Couch extends Server {
             }
             else {
                 command = "add:";                                               // save
-                changed.addProperty("subject", subject);
                 changed.remove("added");
+                changed.addProperty("subject", subject);
+                changed.addProperty("modified", System.currentTimeMillis());
                 if (checks(changed)) {
                     Response response = client.save(changed);
                     JsonArray attachments = changed.getAsJsonArray("attachments");
@@ -285,9 +309,9 @@ public class Couch extends Server {
         board.addProperty("chapter", name);
         Map<String, Set<String>> aggregates = new HashMap<>();
         Map<String, String> links = links(subject);
-        debugLinks(subject, links);
+        //debugLinks(subject, links);
         MultiMap<String, String> deps = deps(subject);
-        debugDeps(subject, deps);
+        //debugDeps(subject, deps);
         JsonArray lines = new JsonArray();
         board.add("lines", lines);
 
@@ -298,6 +322,7 @@ public class Couch extends Server {
             if ("_".equals(topicName)) {
                 chapterNode = new Node("_");
                 chapterNode.setModule(string(topic, "module"));
+                chapterNode.setModified(integer(topic, "modified"));
                 chapterNode.setDescription(string(topic, "description"));
                 chapterNode.setSummary(string(topic, "summary"));
                 chapterNode.setAttachments(amendAttachments(topic.getAsJsonArray("attachments"), topic.getAsJsonObject("_attachments")));
@@ -306,6 +331,7 @@ public class Couch extends Server {
             else {
                 Node node = new Node(topicName);
                 node.setModule(string(topic, "module"));
+                node.setModified(integer(topic, "modified"));
                 node.setDescription(string(topic, "description"));
                 node.setSummary(string(topic, "summary"));
                 node.setThumb(string(topic, "thumb"));
@@ -375,6 +401,7 @@ public class Couch extends Server {
             }
             fixAttachments(node.getAttachments(), subject, name, node.getTopic());
             JsonObject card = new JsonObject();
+            card.addProperty("modified", node.getModified());
             card.addProperty("module", node.getModule());
             card.addProperty("topic", node.getTopic());
             card.addProperty("row", node.getRow());
@@ -554,13 +581,18 @@ public class Couch extends Server {
         client.update(object);
     }
 
+    public JsonObject loadTopic(String... dirs) {
+        CouchDbClient client = createClient("map");
+        return loadTopic(client, dirs);
+    }
+
     private JsonObject loadTopic(CouchDbClient client, String[] dirs) {
         View view = client.view("net/byTopic")
                 .key(dirs[0], dirs[1], dirs[2])
                 .reduce(false)
                 .includeDocs(true);
         List<JsonObject> objects = view.query(JsonObject.class);
-        return objects.get(0);
+        return objects.size() == 1 ? objects.get(0) : null;
     }
 
     public synchronized JsonArray search(String filter) {
@@ -770,6 +802,7 @@ public class Couch extends Server {
             JsonObject object = (JsonObject)element;
             object.addProperty("subject", subject);
             object.addProperty("module", module);
+            object.addProperty("modified", System.currentTimeMillis());
             object.remove("_id");
             object.remove("_rev");
             newTopics.add(object);
@@ -810,10 +843,10 @@ public class Couch extends Server {
 
     public static void main(String[] args) throws IOException {
         Couch couch = new Couch(readProperties(args[0]));
-        Server.CLIENT.set("lala");
+        Server.CLIENT.set("root");
 
-        couch.walk("Mathematik");
-
+        JsonArray latest = couch.latest("Mathematik");
+        System.out.println("latest = " + latest);
         /*
         JsonObject object = couch.chapter("mathe", "Mathematik");
         System.out.println("object = " + object);

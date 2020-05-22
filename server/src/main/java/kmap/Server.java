@@ -9,7 +9,7 @@ import java.util.*;
  */
 public abstract class Server
 {
-    static ThreadLocal<String> CLIENT = new ThreadLocal<>();
+    public static ThreadLocal<String> CLIENT = new ThreadLocal<>();
 
     protected Properties properties;
 

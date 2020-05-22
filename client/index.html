@@ -4,13 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <base href="/app/">
-
   <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#5eb8ff">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="KMap">
-  <meta property="og:title" content="KMap">
-  <meta property="og:description" content="KMap kartographiert Wissen mit Zusammenhang">
+  <meta ogtitle>
+  <meta ogdescription>
   <meta property="fb:app_id" content="3514005508685218">
   <!-- Performance tip: hint to the browser to start the handshake for the fonts site -->
   <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
@@ -18,9 +17,6 @@
   <link href="https://fonts.googleapis.com/css?family=Material+Icons&display=block" rel="stylesheet">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/" />
-
-  <!--script src="https://unpkg.com/event-target@latest/min.js"></script>
-  <script src="https://unpkg.com/resize-observer-polyfill@1.5.0/dist/ResizeObserver.global.js"></script-->
 
   <script>
       if (!window.location.host.includes("localhost") && 'serviceWorker' in navigator) {
@@ -62,7 +58,6 @@
         .then(() => MathJax.config.promise)
       ;
   </script>
-  <!--script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/startup.js"></script-->
 
   <style>
     html, body {
@@ -107,6 +102,13 @@
 
   <script type="module" src="src/kmap-main.js"></script>
   <noscript>JavaScript wird benötigt!</noscript>
+  <scraper id="scraper" style="position: absolute; color: #ededed">
+    <ogtext/>
+  </scraper>
+  <script>
+    const element = document.getElementById('scraper');
+    //element.parentElement.removeChild(element);
+  </script>
 </body>
 
 </html>

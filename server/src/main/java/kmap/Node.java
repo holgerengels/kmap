@@ -11,6 +11,7 @@ import java.util.List;
 public class Node {
     String module;
     String topic;
+    Integer modified;
     Integer row;
     Integer column;
     private List<String> depends = new ArrayList<>();
@@ -72,6 +73,14 @@ public class Node {
 
     public void setModule(String module) {
         this.module = module;
+    }
+
+    public Integer getModified() {
+        return modified;
+    }
+
+    public void setModified(Integer modified) {
+        this.modified = modified;
     }
 
     public List<String> getDepends() {
