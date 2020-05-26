@@ -9,6 +9,7 @@ import './kmap-login-button';
 import './kmap-subject-card';
 import './kmap-randomtest-card';
 import {Random, Test} from "../models/tests";
+import {Card} from "../models/types";
 
 
 @customElement('kmap-subjects')
@@ -17,7 +18,8 @@ export class KMapSubjects extends connect(store, LitElement) {
   private _subjects: string[] = [];
   @property()
   private _randomTests?: Random = undefined;
-
+  @property()
+  private _latestCards: Card[] = [];
   @property()
   private _currentTest?: Test;
   @property()
