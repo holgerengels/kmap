@@ -6,6 +6,7 @@ import {STATE_COLORS} from './state-colors';
 import {StyleInfo, styleMap} from 'lit-html/directives/style-map.js';
 import '@material/mwc-icon';
 import './star-rating';
+import './kmap-knowledge-card-summary';
 import './kmap-knowledge-card-depends';
 import './kmap-knowledge-card-progress';
 import './kmap-knowledge-card-description';
@@ -261,6 +262,9 @@ export class KMapKnowledgeCard extends connect(store, LitElement) {
       .progressNum="${this.progressNum}"
       .progressOf="${this.progressOf}">
   </kmap-knowledge-card-progress>
+    ` : ''}
+    ${this.card.summary ? html`
+      <kmap-knowledge-card-summary summary="${this.card.summary}"></kmap-knowledge-card-summary>
     ` : ''}
   <kmap-knowledge-card-description
       .instance="${this._instance}"

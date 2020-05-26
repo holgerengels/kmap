@@ -162,7 +162,12 @@ export class KmapMain extends connect(store, LitElement) {
         "name": title,
         "description": description,
         "image": this._meta.image ? [this._meta.image] : undefined,
-        "dateModified": this._meta.modified ? new Date(this._meta.modified) : undefined
+        "dateModified": this._meta.modified ? new Date(this._meta.modified) : undefined,
+        "provider": {
+          "@type": "Organization",
+          "name": "KMap",
+          "email": "hengels@gmail.com",
+        }
       })
     }
 
