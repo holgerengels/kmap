@@ -17,6 +17,9 @@
     "byTopic": {
       "map": "function(doc) {\n    if (doc.subject && doc.chapter && doc.topic)\n      emit([doc.subject, doc.chapter, doc.topic]);\n}"
     },
+    "byModified": {
+      "map": "function(doc) {\n    if (doc.subject && doc.modified)\n      emit([doc.subject, doc.modified]);\n}"
+    },
     "availableModules": {
       "map": "function(doc) {\n    if (doc.subject && doc.module)\n      emit([doc.subject, doc.module], 1);\n    else if (doc.module)\n      emit([\"Mathematik\", doc.module], 1);\n}",
       "reduce": "_sum"
