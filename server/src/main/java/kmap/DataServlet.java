@@ -38,6 +38,7 @@ public class DataServlet
             String tree = req.getParameter("tree");
             String chapters = req.getParameter("chapters");
             String topics = req.getParameter("topics");
+            String latest = req.getParameter("latest");
             String file = req.getPathInfo();
             if (subjects != null) {
                 log("subjects");
@@ -78,6 +79,12 @@ public class DataServlet
             else if (topics != null) {
                 log("topics = " + topics);
                 JsonArray result = "all".equals(topics) ? couch.topics(subject) : couch.topics(subject, topics);
+                if (result != null)
+                    writeResponse(req, resp, result);
+            }
+            else if (latest != null) {
+                log("latest = " + latest);
+                JsonArray result = couch.latest(subject);
                 if (result != null)
                     writeResponse(req, resp, result);
             }

@@ -72,7 +72,7 @@ export class KMapSummaryCard extends connect(store, LitElement) {
     if (changedProperties.has("card") && this.card !== undefined) {
       this._key = this.card.links ? this.card.links : this.chapter + "." + this.card.topic;
       this._thumbStyles = this.card.thumb !== undefined ? {
-        "background-image": `url('${urls.server}/data/${this.subject}/${this.chapter}/${this.card.topic}/${this.card.thumb}?instance=${this._instance}')`,
+        "background-image": `url('${urls.server}${encode("data", this.subject, this.chapter, this.card.topic, this.card.thumb)}?instance=${this._instance}')`,
         "background-position": "center",
         "background-size": "contain",
         "background-repeat": "no-repeat",

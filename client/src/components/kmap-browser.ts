@@ -16,11 +16,13 @@ import {RoutingState} from "@captaincodeman/rdx-model";
 import {Card} from "../models/types";
 import {Connector} from "./svg-connector";
 import {iconTest} from "./icons";
-import {encode} from "../urls";
+import {encode, urls} from "../urls";
 
 @customElement('kmap-browser')
 export class KMapBrowser extends connect(store, LitElement) {
 
+  @property()
+  private _instance: string = '';
   @property()
   private _userid: string = '';
   @property()
@@ -69,6 +71,7 @@ export class KMapBrowser extends connect(store, LitElement) {
   mapState(state: State) {
     return {
       route: state.routing,
+      _instance: state.app.instance,
       _userid: state.app.userid,
       _layers: state.shell.layers,
       _subject: state.maps.subject,
@@ -122,7 +125,12 @@ export class KMapBrowser extends connect(store, LitElement) {
       this._page = this._topicCard ? "topic" : "map";
 
       if (this._topicCard) {
-        store.dispatch.shell.updateMeta({title: this._chapter, detail: this._topicCard.topic, description: this._topicCard.summary});
+        store.dispatch.shell.updateMeta({title: this._chapter, detail: this._topicCard.topic, description: this._topicCard.summary,
+          image: this._topicCard.thumb ?
+            `${urls.server}${encode("data", this._subject, this._chapter, this._topic, this._topicCard.thumb)}?instance=${this._instance}`
+            : undefined,
+          modified: this._topicCard.modified
+        });
       }
       else {
         store.dispatch.shell.updateMeta({

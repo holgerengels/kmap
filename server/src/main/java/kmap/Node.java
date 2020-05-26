@@ -11,7 +11,7 @@ import java.util.List;
 public class Node {
     String module;
     String topic;
-    Integer modified;
+    Long modified;
     Integer row;
     Integer column;
     private List<String> depends = new ArrayList<>();
@@ -75,11 +75,11 @@ public class Node {
         this.module = module;
     }
 
-    public Integer getModified() {
+    public Long getModified() {
         return modified;
     }
 
-    public void setModified(Integer modified) {
+    public void setModified(Long modified) {
         this.modified = modified;
     }
 

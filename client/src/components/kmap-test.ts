@@ -25,14 +25,12 @@ export class KmapTest extends connect(store, LitElement) {
   private _title: string = 'Test - Aufgabenbereich wählen';
   @property()
   private _noRoute?: string = 'chooser';
-  /*
   @property()
   private _subject: string = '';
   @property()
   private _chapter: string = '';
   @property()
   private _topic: string = '';
-   */
   @property()
   private _results: string[] = [];
 
@@ -44,11 +42,9 @@ export class KmapTest extends connect(store, LitElement) {
         this._noRoute = 'chooser';
       else {
         this._noRoute = undefined;
-        /*
         this._subject = val.params.subject;
         this._chapter = val.params.chapter ? decodeURIComponent(val.params.chapter) : '';
         this._topic = val.params.topic ? decodeURIComponent(val.params.topic) : '';
-         */
       }
     }
   }
@@ -81,8 +77,18 @@ export class KmapTest extends connect(store, LitElement) {
           this._title = "Test - Auswertung";
           break;
       }
-      // TODO: Aufgaben zum Thema ...
-      store.dispatch.shell.updateMeta({title: this._title, description: ""});
+      let title = this._title;
+      let description: string | undefined = undefined;
+      if (this._subject && this._chapter) {
+        if (this._topic) {
+          title = "Aufgaben zum Thema " + this._chapter + " - " + this._topic;
+        }
+        else {
+          title = "Aufgaben zum Thema " + this._chapter;
+        }
+        description = "Ermittle Deinen Wissensstand mit Hilfe von interaktiven Aufgaben!";
+      }
+      store.dispatch.shell.updateMeta({title: title, description: description});
     }
   }
 

@@ -322,7 +322,7 @@ public class Couch extends Server {
             if ("_".equals(topicName)) {
                 chapterNode = new Node("_");
                 chapterNode.setModule(string(topic, "module"));
-                chapterNode.setModified(integer(topic, "modified"));
+                chapterNode.setModified(loong(topic, "modified"));
                 chapterNode.setDescription(string(topic, "description"));
                 chapterNode.setSummary(string(topic, "summary"));
                 chapterNode.setAttachments(amendAttachments(topic.getAsJsonArray("attachments"), topic.getAsJsonObject("_attachments")));
@@ -331,7 +331,7 @@ public class Couch extends Server {
             else {
                 Node node = new Node(topicName);
                 node.setModule(string(topic, "module"));
-                node.setModified(integer(topic, "modified"));
+                node.setModified(loong(topic, "modified"));
                 node.setDescription(string(topic, "description"));
                 node.setSummary(string(topic, "summary"));
                 node.setThumb(string(topic, "thumb"));
@@ -401,7 +401,8 @@ public class Couch extends Server {
             }
             fixAttachments(node.getAttachments(), subject, name, node.getTopic());
             JsonObject card = new JsonObject();
-            card.addProperty("modified", node.getModified());
+            if (node.getModified() != null)
+                card.addProperty("modified", node.getModified());
             card.addProperty("module", node.getModule());
             card.addProperty("topic", node.getTopic());
             card.addProperty("row", node.getRow());

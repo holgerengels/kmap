@@ -156,6 +156,14 @@ export class KmapMain extends connect(store, LitElement) {
       this._barTitle = barTitle || "KMap";
       document.title = docTitle ? docTitle + " - KMap" : "KMap";
       updateMetadata({ title: title, description: description, image: undefined });
+      updateLd({
+        "@context": "https://schema.org",
+        "@type": "Course",
+        "name": title,
+        "description": description,
+        "image": this._meta.image ? [this._meta.image] : undefined,
+        "dateModified": this._meta.modified ? new Date(this._meta.modified) : undefined
+      })
     }
 
     if (changedProps.has('_page') && !this._layers.includes('editor'))
@@ -403,3 +411,8 @@ function setMetaTag(attrName, attrValue, content) {
   }
   element.setAttribute('content', content || '');
 }
+
+const updateLd = (ld) => {
+  const element: HTMLScriptElement = document.getElementById("ld") as HTMLScriptElement;
+  element.innerText = JSON.stringify(ld);
+};

@@ -33,4 +33,5 @@ export interface Card {
   priority?: number,
   attachments: Attachment[];
   annotations?: string,
+  modified?: number,
 }

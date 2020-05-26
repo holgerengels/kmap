@@ -5,6 +5,8 @@ export interface Meta {
   title?: string,
   detail?: string,
   description?: string,
+  image?: string,
+  modified?: number
 }
 export interface ShellState {
   meta: Meta,

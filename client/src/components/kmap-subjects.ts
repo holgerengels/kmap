@@ -16,10 +16,10 @@ export class KMapSubjects extends connect(store, LitElement) {
   @property()
   private _subjects: string[] = [];
   @property()
-  private _random?: Random = undefined;
+  private _randomTests?: Random = undefined;
 
   @property()
-  private _current?: Test;
+  private _currentTest?: Test;
   @property()
   private _index: number = 0;
 
@@ -27,16 +27,17 @@ export class KMapSubjects extends connect(store, LitElement) {
     return {
       _subjects: state.subjects.subjects,
       _random: state.tests.random,
+      _latestCards: state.maps.latest,
     };
   }
 
   updated(changedProperties) {
-    if (changedProperties.has("_random")) {
+    if (changedProperties.has("_randomTests")) {
       this._index = 0;
-      this._current = this._random !== undefined ? this._random.tests[0] : undefined;
+      this._currentTest = this._randomTests !== undefined ? this._randomTests.tests[0] : undefined;
     }
     if (changedProperties.has("_index")) {
-      this._current = this._random !== undefined ? this._random.tests[this._index] : undefined;
+      this._currentTest = this._randomTests !== undefined ? this._randomTests.tests[this._index] : undefined;
     }
   }
 
@@ -89,25 +90,28 @@ export class KMapSubjects extends connect(store, LitElement) {
             <kmap-subject-card .subject="${subject}"></kmap-subject-card>
         `)}
 
-        ${this._current ? html`
+        ${this._currentTest ? html`
           <div class="title">
             <label style="line-height: 200%">Teste Dein Wissen!</label><br/>
             <span>.. anhand dreier zufällig ausgewählter Aufgaben ..</label>
           </div>
 
           <kmap-randomtest-card @next="${this._next}"
-            .subject="${this._current.subject}"
-            .set="${this._current.set}"
-            .chapter="${this._current.chapter}"
-            .topic="${this._current.topic}"
-            .key="${this._current.key}"
-            .level="${this._current.level}"
-            .question="${this._current.question}"
-            .answer="${this._current.answer}"
-            .values="${this._current.values}"
-            .balance="${this._current.balance}"
+            .subject="${this._currentTest.subject}"
+            .set="${this._currentTest.set}"
+            .chapter="${this._currentTest.chapter}"
+            .topic="${this._currentTest.topic}"
+            .key="${this._currentTest.key}"
+            .level="${this._currentTest.level}"
+            .question="${this._currentTest.question}"
+            .answer="${this._currentTest.answer}"
+            .values="${this._currentTest.values}"
+            .balance="${this._currentTest.balance}"
             .last="${this._index === 2}"></kmap-randomtest-card>
         ` : ''}
+
+        ${ this._latestCards ? html`
+        `: ''}
       </main>
 `;}
 }
