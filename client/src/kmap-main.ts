@@ -162,7 +162,8 @@ export class KmapMain extends connect(store, LitElement) {
         "headline": title,
         "name": title,
         "description": description,
-        "image": this._meta.image ? [this._meta.image] : undefined,
+        "image": this._meta.image ? [this._meta.image] : "https://kmap.eu/app/KMap-Logo%20small.png",
+        "datePublished": this._meta.modified ? new Date(this._meta.modified) : new Date(),
         "dateModified": this._meta.modified ? new Date(this._meta.modified) : undefined,
         "author": this._meta.author ? {
           "@type": "Person",
@@ -171,7 +172,7 @@ export class KmapMain extends connect(store, LitElement) {
           "@type": "Organization",
           "name": "KMap Team"
         },
-        "provider": {
+        "publisher": {
           "@type": "Organization",
           "name": "KMap Team",
           "email": "hengels@gmail.com",
