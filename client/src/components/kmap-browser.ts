@@ -182,6 +182,8 @@ export class KMapBrowser extends connect(store, LitElement) {
         return;
 
       const connector: Connector = this.shadowRoot.getElementById("connector") as Connector;
+      if (!connector) return;
+
       connector.clear();
       connector.setAttribute("faded", "true");
 
