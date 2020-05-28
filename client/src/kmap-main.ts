@@ -158,15 +158,27 @@ export class KmapMain extends connect(store, LitElement) {
       updateMetadata({ title: title, description: description, image: undefined });
       updateLd({
         "@context": "https://schema.org",
-        "@type": "Course",
+        "@type": "Article",
+        "headline": title,
         "name": title,
         "description": description,
         "image": this._meta.image ? [this._meta.image] : undefined,
         "dateModified": this._meta.modified ? new Date(this._meta.modified) : undefined,
+        "author": this._meta.author ? {
+          "@type": "Person",
+          "name": this._meta.author
+        } : {
+          "@type": "Organization",
+          "name": "KMap Team"
+        },
         "provider": {
           "@type": "Organization",
-          "name": "KMap",
+          "name": "KMap Team",
           "email": "hengels@gmail.com",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://kmap.eu/app/KMap-Logo.png"
+          }
         }
       })
     }
