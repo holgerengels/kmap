@@ -177,7 +177,7 @@ export class KmapMain extends connect(store, LitElement) {
           "email": "hengels@gmail.com",
           "logo": {
             "@type": "ImageObject",
-            "url": "https://kmap.eu/app/KMap-Logo.png"
+            "url": "https://kmap.eu/app/KMap-Logo%20small.png"
           }
         }
       })
