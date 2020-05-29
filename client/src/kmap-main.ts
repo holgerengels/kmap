@@ -150,8 +150,8 @@ export class KmapMain extends connect(store, LitElement) {
   updated(changedProps) {
     if (changedProps.has('_meta')) {
       const barTitle = this._meta.title || _title.get(this._page);
-      const docTitle = this._meta.detail || this._meta.title || _title.get(this._page);
       const title = this._meta.detail ? this._meta.title  + " - " + this._meta.detail : this._meta.title;
+      const docTitle = title || _title.get(this._page);
       const description = this._meta.description || "KMap kartographiert Wissen mit Zusammenhang";
       this._barTitle = barTitle || "KMap";
       document.title = docTitle ? docTitle + " - KMap" : "KMap";
