@@ -20,13 +20,16 @@ interface AllTopics {
   subject: string,
   topics: string[],
 }
+export interface Latest {
+  subject?: string,
+  cards: Card[],
+}
 
 export interface MapState {
   subject: string,
   chapter: string,
   lines: Line[],
   chapterCard?: Card,
-  latest: Card[],
   timestamp: number,
   loading: boolean,
   error: string,
@@ -40,6 +43,8 @@ export interface MapState {
   cardForEdit?: Card,
   cardForRename?: Partial<Card>,
   cardForDelete?: Partial<Card>,
+  latest?: Latest,
+  latestTimestamp: number,
 }
 
 export default createModel({
@@ -48,7 +53,6 @@ export default createModel({
     chapter: "",
     lines: [],
     chapterCard: undefined,
-    latest: [],
     timestamp: -1,
     loading: false,
     error: "",
@@ -61,6 +65,9 @@ export default createModel({
     cardForEdit: undefined,
     cardForRename: undefined,
     cardForDelete: undefined,
+    latest: undefined,
+    loadingLatest: false,
+    latestTimestamp: -1,
   },
   reducers: {
     selectCard(state, card: Card) {
@@ -129,6 +136,20 @@ export default createModel({
       };
     },
 
+    requestLatest(state) {
+      return { ...state, loadingLatest: true,
+        latestTimestamp: Date.now(),
+        latest: undefined,
+        error: "",
+      };
+    },
+    receivedLatest(state, payload: Latest) {
+      return { ...state,
+        latest: payload,
+        loadingLatest: false,
+      };
+    },
+
     setCardForEdit(state, cardForEdit: Card) {
       return {
         ...state, cardForEdit: {
@@ -186,6 +207,23 @@ export default createModel({
         dispatch.app.handleError,
         dispatch.maps.error);
     },
+
+    async loadLatest(subject: string) {
+      const dispatch = store.dispatch();
+      const state = store.getState();
+
+      if (Date.now() - state.maps.latestTimestamp > 60*1000) {
+        dispatch.maps.requestLatest();
+
+        fetchjson(`${urls.server}data?latest=${subject}`, endpoint.get(state),
+          (json) => {
+            dispatch.maps.receivedLatest({subject: subject, cards: json});
+          },
+          dispatch.app.handleError,
+          dispatch.maps.error);
+      }
+    },
+
     async deleteTopic(card: Card) {
       const dispatch = store.dispatch();
       const state = store.getState();
@@ -258,11 +296,9 @@ export default createModel({
           dispatch.maps.load({ subject: routing.params["subject"], chapter: routing.params["chapter"]});
           document.title = "KMap - " + (routing.params["topic"] ? decodeURIComponent(routing.params["topic"]) : decodeURIComponent(routing.params["chapter"]));
           break;
-          /*
         case 'home':
-          dispatch.maps.unsetSubject();
+          dispatch.maps.loadLatest("Mathematik");
           break;
-           */
       }
     },
     'app/chooseInstance': async function() {

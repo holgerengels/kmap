@@ -9,8 +9,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -74,12 +72,15 @@ public class Couch extends Server {
 
     public JsonArray latest(String subject) {
         View view = createClient("map").view("net/byModified")
-                .startKey("[\"" + subject + "\",\"\ufff0\"]")
-                .endKey("[\"" + subject + "\"]")
+                .startKey(subject, Long.MAX_VALUE)
+                .endKey(subject, Long.MIN_VALUE)
                 .reduce(false)
+                .descending(true)
                 .includeDocs(true);
         List<JsonObject> objects = view.query(JsonObject.class);
-        objects.removeIf(o -> string(o, "chapter") == null || string(o,"topic") == null);
+        objects.removeIf(o -> string(o, "chapter") == null || string(o,"topic") == null || "_".equals(string(o, "topic")));
+        objects = objects.subList(0, 3);
+        objects.forEach(o -> o.entrySet().removeIf(entry -> entry.getValue().isJsonPrimitive() && "".equals(entry.getValue().getAsString())));
         objects.forEach(o -> {
             JsonArray attachments = o.getAsJsonArray("attachments");
             JsonObject _attachments = o.getAsJsonObject("_attachments");

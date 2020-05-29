@@ -9,7 +9,7 @@ import './kmap-login-button';
 import './kmap-subject-card';
 import './kmap-randomtest-card';
 import {Random, Test} from "../models/tests";
-import {Card} from "../models/types";
+import {Latest} from "../models/maps";
 
 
 @customElement('kmap-subjects')
@@ -19,7 +19,7 @@ export class KMapSubjects extends connect(store, LitElement) {
   @property()
   private _randomTests?: Random = undefined;
   @property()
-  private _latestCards: Card[] = [];
+  private _latestCards?: Latest = undefined;
   @property()
   private _currentTest?: Test;
   @property()
@@ -78,6 +78,24 @@ export class KMapSubjects extends connect(store, LitElement) {
           display: block;
           margin-bottom: 16px;
         }
+        .scrollpane {
+          display: flex;
+          -webkit-overflow-scrolling: touch;
+          outline: none;
+          overflow-x: scroll;
+          margin-top: 2px;
+        }
+        .scrollpane:hover::-webkit-scrollbar-thumb {
+          background-color: var(--color-mediumgray);
+        }
+        .scrollpane::-webkit-scrollbar {
+          width: 8px;
+          height: 8px;
+        }
+        .scrollpane::-webkit-scrollbar-thumb {
+          transition: background-color;
+          border-radius: 10px;
+        }
       `];
   }
 
@@ -113,6 +131,11 @@ export class KMapSubjects extends connect(store, LitElement) {
         ` : ''}
 
         ${ this._latestCards ? html`
+          <div class="scrollpane">
+            ${this._latestCards.cards.map((card) => html`
+              <kmap-summary-card .subject="${card.subject}" .chapter="${card.chapter}" .card="${card}" key="${card.topic}"></kmap-summary-card>
+            `)}
+          </div>
         `: ''}
       </main>
 `;}
