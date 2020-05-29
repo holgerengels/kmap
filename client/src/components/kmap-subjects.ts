@@ -28,7 +28,7 @@ export class KMapSubjects extends connect(store, LitElement) {
   mapState(state: State) {
     return {
       _subjects: state.subjects.subjects,
-      _random: state.tests.random,
+      _randomTests: state.tests.random,
       _latestCards: state.maps.latest,
     };
   }
