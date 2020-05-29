@@ -249,7 +249,7 @@ export class KMapKnowledgeCard extends connect(store, LitElement) {
   <div class="card-header font-body">
       <h2>${this.card.topic !== "_" ? this.card.topic : this.chapter}</h2>
       <div style="flex: 1 0 auto"></div>
-      <a href="/app/browser/${encode(this.subject, this.chapter)}" title="Wissenslandkarte"><mwc-icon>fullscreen_exit</mwc-icon></a>
+      <a href="/app/browser/${encode(this.subject, this.chapter)}" title="Wissenslandkarte ${this.chapter}" alt="Wissenslandkarte ${this.chapter}"><mwc-icon>fullscreen_exit</mwc-icon></a>
   </div>
   <kmap-knowledge-card-depends ?chapterDepends="${this.card.topic === '_'}"
       .subject="${this.subject}"

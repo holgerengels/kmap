@@ -312,7 +312,7 @@ export class KMapBrowser extends connect(store, LitElement) {
           ` : ''}
           ${this._chapterCard ? html`
             <div class="chapter-line">
-              <a href="/app/browser/${encode(this._subject, this._chapter, '_')}"><mwc-icon style="float: right">fullscreen</mwc-icon></a>
+              <a href="/app/browser/${encode(this._subject, this._chapter, '_')}" title="Wissenskarte ${this._chapter}" alt="Wissenskarte ${this._chapter}"><mwc-icon style="float: right">fullscreen</mwc-icon></a>
               ${this._chapterCard.depends ? html`
                 <div>
                   <b>Voraussetzung für das Kapitel ${this._chapter}:</b> ${this._chapterCard.depends.map((depend) => html`
@@ -328,7 +328,7 @@ export class KMapBrowser extends connect(store, LitElement) {
               ${this._hasTests && this._page === "map" ? html`
                 <div>
                   <b>Aufgaben zum Kapitel</b>
-                  <a href="/app/test/${encode(this._subject, this._chapter)}" class="tests">${iconTest}</a>
+                  <a href="/app/test/${encode(this._subject, this._chapter)}" class="tests" title="Aufgaben zum Kapitel ${this._chapter}" alt="Aufgaben zum Kapitel ${this._chapter}">${iconTest}</a>
                 </div>
               ` : ''}
             </div>

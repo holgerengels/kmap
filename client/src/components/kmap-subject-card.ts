@@ -129,7 +129,7 @@ export class KMapSubjectCard extends LitElement {
   <div class="card-header font-body">
     <span>${this.subject}</span>
     <div style="flex: 1 0 auto"></div>
-    <a href="/app/browser/${this.subject}/${this.subject}" title="Wissenslandkarte"><mwc-icon style="--mdc-icon-size: 20px; margin:2px 0px">open_in_new</mwc-icon></a>
+    <a href="/app/browser/${this.subject}/${this.subject}" title="Wissenslandkarte ${this.subject}" alt="Wissenslandkarte ${this.subject}"><mwc-icon style="--mdc-icon-size: 20px; margin:2px 0px">open_in_new</mwc-icon></a>
   </div>
   <div class="card-footer font-body">
       <div style="flex: 1 0 auto; height: 24px"></div>
