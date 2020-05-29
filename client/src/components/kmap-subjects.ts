@@ -130,7 +130,7 @@ export class KMapSubjects extends connect(store, LitElement) {
             .last="${this._index === 2}"></kmap-randomtest-card>
         ` : ''}
 
-        ${ this._latestCards ? html`
+        ${ this._latestCards && this._latestCards.cards ? html`
         <div class="title">
             <label>Neueste Änderungen</label>
         </div>
