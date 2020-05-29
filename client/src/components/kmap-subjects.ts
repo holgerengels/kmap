@@ -131,6 +131,9 @@ export class KMapSubjects extends connect(store, LitElement) {
         ` : ''}
 
         ${ this._latestCards ? html`
+        <div class="title">
+            <label>Neueste Änderungen</label>
+        </div>
           <div class="scrollpane">
             ${this._latestCards.cards.map((card) => html`
               <kmap-summary-card .subject="${card.subject}" .chapter="${card.chapter}" .card="${card}" key="${card.topic}"></kmap-summary-card>
