@@ -29,39 +29,6 @@
               navigator.serviceWorker.register('./sw.js');
           });
       }
-
-      function loadScript(id, url) {
-        return new Promise(function(resolve, reject) {
-          const script = document.createElement('script');
-
-          script.type = "text/javascript";
-          script.id = id;
-          script.async = true;
-          script.src = url;
-
-          script.onload = resolve;
-          script.onerror = reject;
-
-          document.head.appendChild(script);
-        })
-      }
-
-      // @ts-ignore
-      MathJax = {
-        loader: {load: ['input/asciimath', 'input/tex', 'output/svg']},
-      };
-      MathJax.promise = new Promise(function (resolve, reject) {
-        MathJax.startup = {
-          ready() {
-            MathJax.startup.defaultReady();
-            MathJax.startup.promise.then(() => resolve());
-          }
-        };
-      });
-
-      MathJaxLoader = loadScript("MathJax-script", "https://cdn.jsdelivr.net/npm/mathjax@3/es5/startup.js")
-        .then(() => MathJax.config.promise)
-      ;
   </script>
   <script id="ld" type="application/ld+json">{}</script>
 

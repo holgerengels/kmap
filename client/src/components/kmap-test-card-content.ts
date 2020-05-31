@@ -2,6 +2,8 @@ import {LitElement, html, css, customElement, property, query} from 'lit-element
 
 import {urls} from '../urls';
 import {fontStyles, colorStyles, themeStyles} from "./kmap-styles";
+import {unsafeHTML} from "lit-html/directives/unsafe-html";
+import {math} from "../math";
 
 @customElement('kmap-test-card-content')
 export class KMapTestCardContent extends LitElement {
@@ -28,18 +30,27 @@ export class KMapTestCardContent extends LitElement {
   @property({type: String})
   private _answerFlex: string = '';
 
+  @property()
+  private _question: string = '';
+  @property()
+  private _answer: string = '';
+
   @query('#question')
   // @ts-ignore
-  private _question: HTMLElement;
+  private _questionElement: HTMLElement;
   @query('#answer')
   // @ts-ignore
-  private _answer: HTMLElement;
+  private _answerElement: HTMLElement;
 
   updated(changedProperties) {
-    if (changedProperties.has("question"))
-      this._mathQuestion(this.question);
-    if (changedProperties.has("answer"))
-      this._mathAnswer(this.answer);
+    if (changedProperties.has("question")) {
+      let set = (value:string):void => { this._question = value };
+      this._math(this.question, set);
+    }
+    if (changedProperties.has("answer")) {
+      let set = (value:string):void => { this._answer = value };
+      this._math(this.answer, set);
+    }
     if (changedProperties.has("balance"))
       this._flexes(this.balance);
   }
@@ -51,47 +62,24 @@ export class KMapTestCardContent extends LitElement {
     this._answerFlex = "flex: " + (6 - balance);
   }
 
-  math(text, element) {
-    if (text) {
-      let replace = text.replace(/inline:([^"]*)/g, urls.server + "tests/" + this.subject + "/" + this.set + "/" + this.key + "/$1?instance=" + this.instance);
-      replace = replace.replace(/<check\/>/g, "<input type='checkbox'/>");
-      replace = replace.replace(/<text\/>/g, "<input type='text' inputmode='text'/>");
-      replace = replace.replace(/<text ([0-9]+)\/>/g, "<input type='text' inputmode='text' maxlength='$1' style='width: $1em'/>");
-      replace = replace.replace(/<integer\/>/g, "<input type='text' inputmode='numeric'/>");
-      replace = replace.replace(/<integer ([0-9]+)\/>/g, "<input type='text' inputmode='numeric' maxlength='$1' style='width: $1em'/>");
-      replace = replace.replace(/<decimal\/>/g, "<input type='text' inputmode='decimal'/>");
-      replace = replace.replace(/<decimal ([0-9]+)\/>/g, "<input type='text' inputmode='decimal' maxlength='$1' style='width: $1em'/>");
-
-      // @ts-ignore
-      window.MathJaxLoader
-        .then(() => {
-          let buffer = "";
-          let t = false;
-          replace.split("`").reverse().forEach(function (element) {
-            if (t) {
-              // @ts-ignore
-              buffer = " " + window.MathJax.asciimath2svg(element).getElementsByTagName("svg")[0].outerHTML + " " + buffer;
-            } else
-              buffer = element + buffer;
-            t = !t;
-          });
-          element.innerHTML = buffer;
-        });
+  _math(code, setter) {
+    if (code) {
+      code = code.replace(/inline:([^"]*)/g, urls.server + "tests/" + this.subject + "/" + this.set + "/" + this.key + "/$1?instance=" + this.instance);
+      code = code.replace(/<check\/>/g, "<input type='checkbox'/>");
+      code = code.replace(/<text\/>/g, "<input type='text' inputmode='text'/>");
+      code = code.replace(/<text ([0-9]+)\/>/g, "<input type='text' inputmode='text' maxlength='$1' style='width: $1em'/>");
+      code = code.replace(/<integer\/>/g, "<input type='text' inputmode='numeric'/>");
+      code = code.replace(/<integer ([0-9]+)\/>/g, "<input type='text' inputmode='numeric' maxlength='$1' style='width: $1em'/>");
+      code = code.replace(/<decimal\/>/g, "<input type='text' inputmode='decimal'/>");
+      code = code.replace(/<decimal ([0-9]+)\/>/g, "<input type='text' inputmode='decimal' maxlength='$1' style='width: $1em'/>");
+      math(code, setter);
     }
     else
-      element.innerHTML = "";
-  }
-
-  _mathQuestion(text) {
-    this.math(text, this._question);
-  }
-
-  _mathAnswer(text) {
-    this.math(text, this._answer);
+      setter("");
   }
 
   clear() {
-    var element = this._answer;
+    var element = this._answerElement;
     var inputs = element.getElementsByTagName("input");
     for (var i = 0; i < inputs.length; i++) {
       var input: HTMLInputElement = inputs[i];
@@ -104,7 +92,7 @@ export class KMapTestCardContent extends LitElement {
   }
 
   checkValues(): boolean {
-    var element = this._answer;
+    var element = this._answerElement;
     var inputs = element.getElementsByTagName("input");
     var everythingCorrect = true;
 
@@ -127,7 +115,7 @@ export class KMapTestCardContent extends LitElement {
   }
 
   showAnswer() {
-    var element = this._answer;
+    var element = this._answerElement;
     var inputs = element.getElementsByTagName("input");
 
     for (var i = 0; i < inputs.length; i++) {
@@ -160,7 +148,7 @@ export class KMapTestCardContent extends LitElement {
       css`
         :host {
           padding: 12px;
-          backgroundsssssss-color: var(--color-lightest);
+          background-color: var(--color-lightest);
           transition: background-color .5s ease-in-out;
           display: flex;
           flex-direction: row;
@@ -192,8 +180,8 @@ export class KMapTestCardContent extends LitElement {
 
   render() {
     return html`
-      <div id="question" style="${this._questionFlex}"></div>
-      <div id="answer" style="${this._answerFlex}"></div>
+      <div id="question" style="${this._questionFlex}">${unsafeHTML(this._question)}</div>
+      <div id="answer" style="${this._answerFlex}">${unsafeHTML(this._answer)}</div>
     `;
   }
 }
