@@ -11,7 +11,9 @@ import java.util.List;
 public class Node {
     String module;
     String topic;
+    Long created;
     Long modified;
+    String author;
     Integer row;
     Integer column;
     private List<String> depends = new ArrayList<>();
@@ -75,12 +77,28 @@ public class Node {
         this.module = module;
     }
 
+    public Long getCreated() {
+        return created;
+    }
+
+    public void setCreated(Long created) {
+        this.created = created;
+    }
+
     public Long getModified() {
         return modified;
     }
 
     public void setModified(Long modified) {
         this.modified = modified;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
     }
 
     public List<String> getDepends() {

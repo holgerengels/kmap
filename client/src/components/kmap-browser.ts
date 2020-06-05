@@ -129,7 +129,9 @@ export class KMapBrowser extends connect(store, LitElement) {
           image: this._topicCard.thumb ?
             `${urls.server}${encode("data", this._subject, this._chapter, this._topic, this._topicCard.thumb)}?instance=${this._instance}`
             : undefined,
-          modified: this._topicCard.modified
+          created: this._topicCard.created,
+          modified: this._topicCard.modified,
+          author: this._topicCard.author,
         });
       }
       else {

@@ -7,6 +7,7 @@ export interface Meta {
   description?: string,
   image?: string,
   author?: string;
+  created?: number
   modified?: number
 }
 export interface ShellState {

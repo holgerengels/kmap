@@ -194,6 +194,7 @@ public class Couch extends Server {
                 if (existing != null) {
                     existing.addProperty("subject", subject);
                     existing.addProperty("modified", System.currentTimeMillis());
+                    existing.add("author", changed.get("author"));
                     existing.add("chapter", changed.get("chapter"));
                     existing.add("topic", changed.get("topic"));
                     existing.add("links", changed.get("links"));
@@ -218,7 +219,9 @@ public class Couch extends Server {
                 command = "add:";                                               // save
                 changed.remove("added");
                 changed.addProperty("subject", subject);
-                changed.addProperty("modified", System.currentTimeMillis());
+                long millis = System.currentTimeMillis();
+                changed.addProperty("created", millis);
+                changed.addProperty("modified", millis);
                 if (checks(changed)) {
                     Response response = client.save(changed);
                     JsonArray attachments = changed.getAsJsonArray("attachments");
@@ -323,7 +326,9 @@ public class Couch extends Server {
             if ("_".equals(topicName)) {
                 chapterNode = new Node("_");
                 chapterNode.setModule(string(topic, "module"));
+                chapterNode.setCreated(loong(topic, "created"));
                 chapterNode.setModified(loong(topic, "modified"));
+                chapterNode.setAuthor(string(topic, "author"));
                 chapterNode.setDescription(string(topic, "description"));
                 chapterNode.setSummary(string(topic, "summary"));
                 chapterNode.setAttachments(amendAttachments(topic.getAsJsonArray("attachments"), topic.getAsJsonObject("_attachments")));
@@ -332,7 +337,9 @@ public class Couch extends Server {
             else {
                 Node node = new Node(topicName);
                 node.setModule(string(topic, "module"));
+                node.setCreated(loong(topic, "created"));
                 node.setModified(loong(topic, "modified"));
+                node.setAuthor(string(topic, "author"));
                 node.setDescription(string(topic, "description"));
                 node.setSummary(string(topic, "summary"));
                 node.setThumb(string(topic, "thumb"));
@@ -402,8 +409,12 @@ public class Couch extends Server {
             }
             fixAttachments(node.getAttachments(), subject, name, node.getTopic());
             JsonObject card = new JsonObject();
+            if (node.getCreated() != null)
+                card.addProperty("created", node.getCreated());
             if (node.getModified() != null)
                 card.addProperty("modified", node.getModified());
+            if (node.getAuthor() != null)
+                card.addProperty("author", node.getAuthor());
             card.addProperty("module", node.getModule());
             card.addProperty("topic", node.getTopic());
             card.addProperty("row", node.getRow());
@@ -804,7 +815,11 @@ public class Couch extends Server {
             JsonObject object = (JsonObject)element;
             object.addProperty("subject", subject);
             object.addProperty("module", module);
-            object.addProperty("modified", System.currentTimeMillis());
+            long millis = System.currentTimeMillis();
+            if (loong(object, "created") == null)
+                object.addProperty("created", millis);
+            if (loong(object, "modified") == null)
+                object.addProperty("modified", millis);
             object.remove("_id");
             object.remove("_rev");
             newTopics.add(object);

@@ -162,6 +162,9 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
     card.links = this._links;
     card.priority = this._priority !== '' ? parseInt(this._priority) : undefined;
     card.attachments = this._attachments;
+    if (!card.author)
+      card.author = store.state.app.username;
+
     console.log(card);
 
     store.dispatch.maps.saveTopic(card);
