@@ -72,6 +72,7 @@ export class KMapKnowledgeCardDescription extends LitElement {
         box img {
           max-width: calc(100vw - 44px);
         }
+        figure { margin: 0px; }
       `
     ];
   }

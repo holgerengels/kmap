@@ -2,19 +2,19 @@ import {css, CSSResult} from 'lit-element';
 
 // language=CSS
 export const fontStyles: CSSResult = css`
-h1, .font-title {
+h1 {
   font-family: Roboto, Noto, sans-serif;
   -webkit-font-smoothing: antialiased;
   font-size: 1.15rem;
   font-weight: 500;
 }
-h2, .font-subtitle {
+h2 {
   font-family: Roboto,sans-serif;
   -webkit-font-smoothing: antialiased;
   font-size: 1.10rem;
   font-weight: 500;
 }
-h3, .font-subsubtitle {
+h3 {
   font-family: Roboto,sans-serif;
   -webkit-font-smoothing: antialiased;
   font-size: 1.05rem;
@@ -47,7 +47,7 @@ p, .font-body, td, dd, div, span {
 h1:first-child, h2:first-child, h3:first-child, h4:first-child, h5:first-child, p:first-child {
   margin-top: 0px;
 }
-.secondary {
+figcaption, .secondary {
   font-family: Roboto,sans-serif;
   -webkit-font-smoothing: antialiased;
   font-size: 0.85rem;
