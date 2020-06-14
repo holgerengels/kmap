@@ -110,6 +110,18 @@ export class KMapSubjects extends connect(store, LitElement) {
             <kmap-subject-card .subject="${subject}"></kmap-subject-card>
         `)}
 
+        ${ this._latestCards && this._latestCards.cards ? html`
+        <div class="title">
+            <label>Neueste Änderungen</label><br/>
+            <span>.. von Wissenskarten aus allen Bereichen ..</label>
+        </div>
+          <div class="scrollpane">
+            ${this._latestCards.cards.map((card) => html`
+              <kmap-summary-card .subject="${card.subject}" .chapter="${card.chapter}" .card="${card}" key="${card.topic}"></kmap-summary-card>
+            `)}
+          </div>
+        `: ''}
+
         ${this._currentTest ? html`
           <div class="title">
             <label style="line-height: 200%">Teste Dein Wissen!</label><br/>
@@ -129,17 +141,6 @@ export class KMapSubjects extends connect(store, LitElement) {
             .balance="${this._currentTest.balance}"
             .last="${this._index === 2}"></kmap-randomtest-card>
         ` : ''}
-
-        ${ this._latestCards && this._latestCards.cards ? html`
-        <div class="title">
-            <label>Neueste Änderungen</label>
-        </div>
-          <div class="scrollpane">
-            ${this._latestCards.cards.map((card) => html`
-              <kmap-summary-card .subject="${card.subject}" .chapter="${card.chapter}" .card="${card}" key="${card.topic}"></kmap-summary-card>
-            `)}
-          </div>
-        `: ''}
       </main>
 `;}
 }
