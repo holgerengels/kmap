@@ -44,6 +44,9 @@ p, .font-body, td, dd, div, span {
   font-size: 0.95rem;
   font-weight: 400;
 }
+p {
+  text-align: justify;
+}
 h1:first-child, h2:first-child, h3:first-child, h4:first-child, h5:first-child, p:first-child {
   margin-top: 0px;
 }
