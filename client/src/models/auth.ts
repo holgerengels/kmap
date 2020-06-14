@@ -10,14 +10,12 @@ export type Credential = import('firebase').OAuthCredential
 
 export interface AuthState {
   user: User | null
-  token: Credential | null,
   statusKnown: boolean
 }
 
 export default createModel({
   state: <AuthState>{
     user: null,
-    token: null,
     statusKnown: false,
   },
 
@@ -26,14 +24,7 @@ export default createModel({
       return { ...state, user, statusKnown: true }
     },
     signedOut(state) {
-      return { ...state, user: null, statusKnown: true, token: null }
-    },
-
-    receivedIdToken(state, token: Credential) {
-      return { ...state, token }
-    },
-    forgetIdToken(state) {
-      return { ...state, token: null }
+      return { ...state, user: null, statusKnown: true }
     },
   },
 
@@ -68,7 +59,7 @@ export default createModel({
         else {
           dispatch.auth.signedOut()
         }
-      })
+      });
       auth.onIdTokenChanged(async user => {
         console.log("onIdTokenChanged");
         console.log(user);
@@ -80,7 +71,7 @@ export default createModel({
         else {
           dispatch.app.logout();
         }
-      })
+      });
     },
   })
 })
