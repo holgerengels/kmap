@@ -9,7 +9,7 @@ import 'pwa-helper-components/pwa-install-button';
 import 'pwa-helper-components/pwa-update-available';
 import './validating-form';
 import {Dialog} from "@material/mwc-dialog/mwc-dialog";
-import {colorStyles, fontStyles, themeStyles} from "./kmap-styles";
+import {colorStyles, fontStyles} from "./kmap-styles";
 import {Instance} from "../models/instances";
 import {DatalistTextField} from "./datalist-textfield";
 
@@ -132,7 +132,6 @@ export class KMapLoginPopup extends connect(store, LitElement) {
     return [
       fontStyles,
       colorStyles,
-      themeStyles,
       css`
         form {
           width: 300px;
@@ -143,7 +142,6 @@ export class KMapLoginPopup extends connect(store, LitElement) {
         }
         mwc-textfield {
           width: 300px;
-          --mdc-text-field-filled-border-radius: 4px 16px 0 0;
         }
         mwc-icon-button[icon="polymer"] {
           vertical-align: middle;

@@ -15,7 +15,7 @@ import './kmap-summary-card-summary';
 import './kmap-knowledge-card-description';
 import './file-drop';
 import './validating-form';
-import {colorStyles, fontStyles, themeStyles} from "./kmap-styles";
+import {colorStyles, fontStyles} from "./kmap-styles";
 
 import {Test} from "../models/tests";
 import {Attachment, Upload} from "../models/types";
@@ -237,7 +237,6 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
     return [
       fontStyles,
       colorStyles,
-      themeStyles,
       css`
         mwc-dialog {
           --mdc-dialog-max-width: 810px;

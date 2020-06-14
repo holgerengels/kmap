@@ -2,7 +2,7 @@ import {LitElement, html, css, customElement, property} from 'lit-element';
 import { connect } from '@captaincodeman/rdx';
 import {State, store} from "../store";
 
-import {colorStyles, fontStyles, themeStyles} from "./kmap-styles";
+import {colorStyles, fontStyles} from "./kmap-styles";
 
 @customElement('kmap-summary-card-averages')
 export class KMapSummaryCardAverages extends connect(store, LitElement) {
@@ -65,7 +65,6 @@ export class KMapSummaryCardAverages extends connect(store, LitElement) {
     return [
       fontStyles,
       colorStyles,
-      themeStyles,
       css`
         :host {
           display: block;

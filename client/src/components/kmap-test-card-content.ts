@@ -1,7 +1,7 @@
 import {LitElement, html, css, customElement, property, query} from 'lit-element';
 
 import {urls} from '../urls';
-import {fontStyles, colorStyles, themeStyles} from "./kmap-styles";
+import {fontStyles, colorStyles} from "./kmap-styles";
 import {unsafeHTML} from "lit-html/directives/unsafe-html";
 import {math} from "../math";
 
@@ -144,7 +144,6 @@ export class KMapTestCardContent extends LitElement {
     return [
       fontStyles,
       colorStyles,
-      themeStyles,
       css`
         :host {
           padding: 12px;

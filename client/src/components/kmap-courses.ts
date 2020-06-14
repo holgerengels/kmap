@@ -2,7 +2,7 @@ import {LitElement, html, css, customElement, property} from 'lit-element';
 import {connect} from '@captaincodeman/rdx';
 import {State, store} from "../store";
 
-import {colorStyles, fontStyles, themeStyles} from "./kmap-styles";
+import {colorStyles, fontStyles} from "./kmap-styles";
 import '@material/mwc-button';
 import '@material/mwc-icon';
 import '@material/mwc-icon-button';
@@ -119,7 +119,6 @@ export class KCourses extends connect(store, LitElement) {
     return [
       fontStyles,
       colorStyles,
-      themeStyles,
       css`
         :host {
           display: contents;
@@ -165,7 +164,6 @@ export class KCourses extends connect(store, LitElement) {
         }
         mwc-textarea, mwc-textfield {
           width: 300px;
-          --mdc-text-field-filled-border-radius: 4px 16px 0 0;
           margin: 4px 0;
         }
       `];

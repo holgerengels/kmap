@@ -13,7 +13,7 @@ import './kmap-summary-card-editor';
 import './kmap-summary-card-rating';
 import './kmap-summary-card-ratecolors';
 import {STATE_COLORS} from './state-colors';
-import {fontStyles, colorStyles, themeStyles, elevationStyles} from "./kmap-styles";
+import {fontStyles, colorStyles, elevationStyles} from "./kmap-styles";
 import {encode, urls} from "../urls";
 import {ifDefined} from "lit-html/directives/if-defined";
 import {classMap} from "lit-html/directives/class-map";
@@ -128,7 +128,6 @@ export class KMapSummaryCard extends connect(store, LitElement) {
     return [
       fontStyles,
       colorStyles,
-      themeStyles,
       elevationStyles,
       css`
         :host {

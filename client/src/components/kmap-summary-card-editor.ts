@@ -3,7 +3,7 @@ import { connect } from '@captaincodeman/rdx';
 import {State, store} from "../store";
 
 import '@material/mwc-button';
-import {colorStyles, fontStyles, themeStyles} from "./kmap-styles";
+import {colorStyles, fontStyles} from "./kmap-styles";
 import {Module} from "../models/contentMaps";
 import {Card} from "../models/types";
 
@@ -60,7 +60,6 @@ export class KMapSummaryCardEditor extends connect(store, LitElement) {
     return [
       fontStyles,
       colorStyles,
-      themeStyles,
       css`
         :host {
           display: block;

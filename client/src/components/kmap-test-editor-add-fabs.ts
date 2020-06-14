@@ -8,7 +8,7 @@ import '@material/mwc-fab';
 import '@material/mwc-textfield';
 import './validating-form';
 
-import {fontStyles, colorStyles, themeStyles} from "./kmap-styles";
+import {fontStyles, colorStyles} from "./kmap-styles";
 import {Test} from "../models/tests";
 import {Dialog} from "@material/mwc-dialog/mwc-dialog";
 import {ValidatingForm} from "./validating-form";
@@ -131,7 +131,6 @@ export class KMapTestEditorAddFabs extends connect(store, LitElement) {
     return [
       fontStyles,
       colorStyles,
-      themeStyles,
       css`
         :host {
           display: contents;

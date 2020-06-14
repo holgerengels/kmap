@@ -13,7 +13,7 @@ import {Dialog} from "@material/mwc-dialog/mwc-dialog";
 import {TextField} from "@material/mwc-textfield/mwc-textfield";
 import {Instance} from "../models/instances";
 import {DatalistTextField} from "./datalist-textfield";
-import {colorStyles, fontStyles, themeStyles} from "./kmap-styles";
+import {colorStyles, fontStyles} from "./kmap-styles";
 
 @customElement('kmap-instance-popup')
 export class KMapInstancePopup extends connect(store, LitElement) {
@@ -90,7 +90,6 @@ export class KMapInstancePopup extends connect(store, LitElement) {
     return [
       fontStyles,
       colorStyles,
-      themeStyles,
       css`
         form {
           width: 300px;
@@ -101,7 +100,6 @@ export class KMapInstancePopup extends connect(store, LitElement) {
         }
         datalist-textfield {
           width: 300px;
-          --mdc-text-field-filled-border-radius: 4px 16px 0 0;
           margin-left: 42px;
         }
         mwc-formfield {

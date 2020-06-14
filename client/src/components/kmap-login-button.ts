@@ -3,7 +3,7 @@ import { connect } from '@captaincodeman/rdx';
 import {State, store} from "../store";
 
 import '@material/mwc-icon';
-import {fontStyles, colorStyles, themeStyles} from "./kmap-styles";
+import {fontStyles, colorStyles} from "./kmap-styles";
 
 @customElement('kmap-login-button')
 export class KMapLoginButton extends connect(store, LitElement) {
@@ -41,7 +41,6 @@ export class KMapLoginButton extends connect(store, LitElement) {
     return [
       fontStyles,
       colorStyles,
-      themeStyles,
       css`
         :host {
           display: inline-block;

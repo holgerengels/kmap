@@ -5,7 +5,7 @@ import {State, store} from "../store";
 import '@material/mwc-button';
 import '@material/mwc-icon-button';
 import './kmap-test-card';
-import {colorStyles, fontStyles, themeStyles} from "./kmap-styles";
+import {colorStyles, fontStyles} from "./kmap-styles";
 import {Test} from "../models/tests";
 import {KMapTestCard} from "./kmap-test-card";
 
@@ -119,7 +119,6 @@ export class KmapTestExercise extends connect(store, LitElement) {
     return [
       fontStyles,
       colorStyles,
-      themeStyles,
       css`
         :host {
           display: contents;

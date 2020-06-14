@@ -11,7 +11,7 @@ import './kmap-content-manager-feedback';
 import './kmap-content-manager-instances';
 import './kmap-content-manager-modules';
 import './kmap-content-manager-sets';
-import {colorStyles, fontStyles, themeStyles} from "./kmap-styles";
+import {colorStyles, fontStyles} from "./kmap-styles";
 
 @customElement('kmap-content-manager')
 export class KMapContentManager extends connect(store, LitElement) {
@@ -30,7 +30,6 @@ export class KMapContentManager extends connect(store, LitElement) {
     return [
       fontStyles,
       colorStyles,
-      themeStyles,
       css`
         :host {
           display: contents;

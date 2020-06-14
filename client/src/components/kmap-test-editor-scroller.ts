@@ -2,7 +2,7 @@ import {LitElement, html, css, customElement, property} from 'lit-element';
 import {connect} from '@captaincodeman/rdx';
 import {State, store} from "../store";
 
-import {fontStyles, colorStyles, elevationStyles, themeStyles} from "./kmap-styles";
+import {fontStyles, colorStyles, elevationStyles} from "./kmap-styles";
 import './kmap-test-card';
 import {Test} from "../models/tests";
 
@@ -47,7 +47,6 @@ export class KMapTestEditorScroller extends connect(store, LitElement) {
     return [
       fontStyles,
       colorStyles,
-      themeStyles,
       elevationStyles,
       css`
         .box {

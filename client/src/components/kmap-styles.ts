@@ -82,16 +82,6 @@ hr {
 `;
 
 // language=CSS
-export const themeStyles: CSSResult = css`
-  mwc-textfield {
-    --mdc-text-field-filled-border-radius: 4px 16px 0 0;
-  }
-  mwc-select {
-    --mdc-select-filled-border-radius: 4px 16px 0 0;
-  }
-`;
-
-// language=CSS
 export const elevationStyles: CSSResult = css`
 .elevation-00 { box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0.2),0px 0px 0px 0px rgba(0, 0, 0, 0.14),0px 0px 0px 0px rgba(0, 0, 0, 0.12); transition: box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1); }
 .elevation-01 { box-shadow: 0px 2px 1px -1px rgba(0, 0, 0, 0.2),0px 1px 1px 0px rgba(0, 0, 0, 0.14),0px 1px 3px 0px rgba(0, 0, 0, 0.12); transition: box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1); }

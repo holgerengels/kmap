@@ -3,7 +3,7 @@ import {connect} from '@captaincodeman/rdx';
 import {State, store} from "../store";
 
 import '@material/mwc-button';
-import {colorStyles, fontStyles, themeStyles} from "./kmap-styles";
+import {colorStyles, fontStyles} from "./kmap-styles";
 import {Card} from "../models/types";
 
 interface Module {
@@ -78,7 +78,6 @@ export class KMapBrowserChapterEditor extends connect(store, LitElement) {
     return [
       fontStyles,
       colorStyles,
-      themeStyles,
       css`
         mwc-button[disabled] {
           pointer-events: none;
