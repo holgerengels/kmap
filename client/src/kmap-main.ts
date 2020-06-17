@@ -162,6 +162,7 @@ export class KmapMain extends connect(store, LitElement) {
         "headline": title,
         "name": title,
         "description": description,
+        "mainEntityOfPage": window.location.href,
         "image": this._meta.image ? [this._meta.image] : "https://kmap.eu/app/KMap-Logo%20small.png",
         "datePublished": this._meta.modified ? new Date(this._meta.modified) : new Date(),
         "dateModified": this._meta.modified ? new Date(this._meta.modified) : undefined,
