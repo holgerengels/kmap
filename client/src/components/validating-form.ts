@@ -19,12 +19,14 @@ export class ValidatingForm extends LitElement {
 
   reset() {
     this._form.reset();
+    if (!this._validates)
+      return;
 
-    /*
     for (const validate of this._validates) {
+      validate.value = '';
+      // @ts-ignore
       validate.valid = true;
     }
-    */
   }
 
   _checkValidity() {
