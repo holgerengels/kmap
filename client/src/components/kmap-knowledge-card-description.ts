@@ -72,6 +72,18 @@ export class KMapKnowledgeCardDescription extends LitElement {
         box img {
           max-width: calc(100vw - 44px);
         }
+        calculation {
+          display: grid;
+          grid-gap: 16px;
+          grid-template-columns: max-content auto;
+        }
+        step {
+          grid-column: 1;
+        }
+        notes {
+          grid-column: 2;
+          font-size: 90%;
+        }
         figure { margin: 0px; }
       `
     ];
