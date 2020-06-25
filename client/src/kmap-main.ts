@@ -110,7 +110,7 @@ export class KmapMain extends connect(store, LitElement) {
 
   // @ts-ignore
   firstUpdated(changedProperties) {
-    updateMetadata({ title: "KMap", description: "KMap kartographiert Wissen mit Zusammenhang", image: window.location.origin + "/app/KMap-Logo.png" });
+    updateMetadata({ title: "KMap", description: "KMap kartographiert Wissen mit Zusammenhang", image: window.location.origin + "/app/KMap-Logo.png", keywords: undefined });
 
     if (this.shadowRoot) {
       const bar: TopAppBar | null = this.shadowRoot.querySelector("mwc-top-app-bar");
@@ -155,7 +155,7 @@ export class KmapMain extends connect(store, LitElement) {
       const description = this._meta.description || "KMap kartographiert Wissen mit Zusammenhang";
       this._barTitle = barTitle || "KMap";
       document.title = docTitle ? docTitle + " - KMap" : "KMap";
-      updateMetadata({ title: title, description: description, image: undefined });
+      updateMetadata({ title: title, description: description, image: this._meta.image, keywords: this._meta.keywords });
       updateLd({
         "@context": "https://schema.org",
         "@type": "Article",
@@ -407,17 +407,12 @@ const _title = new Map([
   ['content-manager', "Content Manager"],
 ]);
 
-const updateMetadata = ({ title, description, image }) => {
-  if (title) {
-    setMetaTag('property', 'og:title', title);
-  }
-  if (description) {
-    setMetaTag('name', 'description', description);
-    setMetaTag('property', 'og:description', description);
-  }
-  if (image) {
-    setMetaTag('property', 'og:image', image);
-  }
+const updateMetadata = ({ title, description, image, keywords }) => {
+  setMetaTag('property', 'og:title', title);
+  setMetaTag('name', 'description', description);
+  setMetaTag('property', 'og:description', description);
+  setMetaTag('property', 'og:image', image);
+  setMetaTag('name', 'keywords', keywords ? keywords.join(", ") : undefined);
   setMetaTag('property', 'og:url', window.location.href);
 };
 

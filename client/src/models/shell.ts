@@ -5,6 +5,7 @@ export interface Meta {
   title?: string,
   detail?: string,
   description?: string,
+  keywords?: string[],
   image?: string,
   author?: string;
   created?: number

@@ -40,9 +40,11 @@ export class KMapBrowser extends connect(store, LitElement) {
   @property()
   private _lines: Line[] = [];
   @property()
+  private _topics?: string[] = undefined;
+  @property()
   private _hasTests: boolean = false;
   @property()
-  private _topics: string[] = [];
+  private _testTopics: string[] = [];
 
   @property()
   private _page: string = 'map';
@@ -79,14 +81,22 @@ export class KMapBrowser extends connect(store, LitElement) {
       _lines: state.maps.lines,
       _chapterCard: state.maps.chapterCard,
       _loading: state.maps.loading,
-      _topics: state.tests.topics ? state.tests.topics.topics : [],
+      _testTopics: state.tests.topics ? state.tests.topics.topics : [],
       _selected: state.maps.selected,
       _highlighted: state.maps.selectedDependencies,
     };
   }
 
   updated(changedProperties) {
-
+    if (changedProperties.has("_lines")) {
+      var topics: string[] = [];
+      for (let line of this._lines) {
+        for (let card of line.cards) {
+          topics.push(card.topic);
+        }
+      }
+      this._topics = topics;
+    }
     if (changedProperties.has('_topic') || changedProperties.has("_lines")) {
       if (!this._topic) {
         this._topicCard = undefined;
@@ -132,12 +142,14 @@ export class KMapBrowser extends connect(store, LitElement) {
           created: this._topicCard.created,
           modified: this._topicCard.modified,
           author: this._topicCard.author,
+          keywords: [this._subject, this._chapter, this._topicCard.topic],
         });
       }
       else {
         store.dispatch.shell.updateMeta({
           title: this._chapter,
           description: this._chapterCard && this._chapterCard.summary ? this._chapterCard.summary : "Wissenslandkarte zum Kapitel " + this._chapter,
+          keywords: [this._subject, ...this._topics || []],
         });
       }
     }
@@ -216,7 +228,7 @@ export class KMapBrowser extends connect(store, LitElement) {
     }
 
     if (changedProperties.has("_chapter")) {
-      this._hasTests = this._topics.filter(t => t.startsWith(this._chapter)).length > 1;
+      this._hasTests = this._testTopics.filter(t => t.startsWith(this._chapter)).length > 1;
       // @ts-ignore
       const connector: Connector = this.shadowRoot.getElementById("connector") as Connector;
       connector.clear();
