@@ -40,6 +40,8 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
   @property()
   private _thumb: string = '';
   @property()
+  private _keywords: string = '';
+  @property()
   private _showSummaryPreview: boolean = false;
   @property()
   private _showDescriptionPreview: boolean = false;
@@ -122,6 +124,7 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
       this._summary = this._card.summary;
       this._description = this._card.description;
       this._thumb = this._card.thumb || '';
+      this._keywords = this._card.keywords || '';
       this._depends = this._card.depends ? this._card.depends.join(" / ") : '';
       this._links = this._card.links || '';
       this._priority = this._card.priority !== undefined ? this._card.priority + '' : '';
@@ -158,6 +161,7 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
     card.summary = this._summary;
     card.description = this._description;
     card.thumb = this._thumb;
+    card.keywords = this._keywords;
     card.depends = this._depends.split("/").map(d => d.trim()).filter(d => d.length > 0);
     card.links = this._links;
     card.priority = this._priority !== '' ? parseInt(this._priority) : undefined;
@@ -350,6 +354,7 @@ ${this._card ? html`
     <mwc-textfield s1 ?hidden="${this._card.topic === '_'}" id="priority" name="priority" label="Priorität" dense type="number" inputmode="numeric" min="0" step="1" .value="${this._priority}" @change="${e => this._priority = e.target.value}"></mwc-textfield>
     <mwc-textfield s2 ?hidden="${this._card.topic === '_'}" ?dialogInitialFocus="${this._card.topic !== '_'}" id="depends" label="Basiert auf ..." dense .value=${this._depends} @change="${e => this._depends = e.target.value}"></mwc-textfield>
     <mwc-textfield s1 ?hidden="${this._card.topic === '_'}" id="thumb" label="Thumbnail" dense .value=${this._thumb} @change="${e => this._thumb = e.target.value}"></mwc-textfield>
+    <mwc-textfield s3 ?hidden="${this._card.topic === '_'}" id="keywords" label="Keywords" dense .value=${this._keywords} @change="${e => this._keywords = e.target.value}"></mwc-textfield>
     <mwc-textarea s3 id="summary" placeholder="Kurztext" ?dialogInitialFocus="${this._card.topic === '_'}" dense fullwidth rows="2" .value=${this._card.summary} @keyup="${this._setSummary}" @focus="${this._focus}" @blur="${this._focus}"></mwc-textarea>
     <mwc-textarea s3 id="description" placeholder="Langtext" dense fullwidth rows="9" .value=${this._card.description} @keyup="${this._setDescription}" @focus="${this._focus}" @blur="${this._focus}"></mwc-textarea>
 </div>

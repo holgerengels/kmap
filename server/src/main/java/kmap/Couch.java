@@ -200,6 +200,7 @@ public class Couch extends Server {
                     existing.add("links", changed.get("links"));
                     existing.add("depends", changed.get("depends"));
                     existing.add("priority", changed.get("priority"));
+                    existing.add("keywords", changed.get("keywords"));
                     existing.add("description", changed.get("description"));
                     existing.add("thumb", changed.get("thumb"));
                     existing.add("summary", changed.get("summary"));
@@ -329,6 +330,7 @@ public class Couch extends Server {
                 chapterNode.setCreated(loong(topic, "created"));
                 chapterNode.setModified(loong(topic, "modified"));
                 chapterNode.setAuthor(string(topic, "author"));
+                chapterNode.setKeywords(string(topic, "keywords"));
                 chapterNode.setDescription(string(topic, "description"));
                 chapterNode.setSummary(string(topic, "summary"));
                 chapterNode.setAttachments(amendAttachments(topic.getAsJsonArray("attachments"), topic.getAsJsonObject("_attachments")));
@@ -340,6 +342,7 @@ public class Couch extends Server {
                 node.setCreated(loong(topic, "created"));
                 node.setModified(loong(topic, "modified"));
                 node.setAuthor(string(topic, "author"));
+                node.setKeywords(string(topic, "keywords"));
                 node.setDescription(string(topic, "description"));
                 node.setSummary(string(topic, "summary"));
                 node.setThumb(string(topic, "thumb"));
@@ -419,6 +422,7 @@ public class Couch extends Server {
             card.addProperty("topic", node.getTopic());
             card.addProperty("row", node.getRow());
             card.addProperty("col", node.getColumn());
+            addProperty(card, "keywords", node.getKeywords());
             addProperty(card, "description", node.getDescription());
             addProperty(card, "summary", node.getSummary());
             addProperty(card, "thumb", node.getThumb());
@@ -444,6 +448,7 @@ public class Couch extends Server {
                 chapterNode.getDepends().forEach(array::add);
                 add(card, "depends", array);
             }
+            addProperty(card, "keywords", chapterNode.getKeywords());
             addProperty(card, "description", chapterNode.getDescription());
             addProperty(card, "summary", chapterNode.getSummary());
             add(card, "attachments", chapterNode.getAttachments());

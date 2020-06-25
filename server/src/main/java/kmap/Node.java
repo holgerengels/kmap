@@ -19,6 +19,7 @@ public class Node {
     private List<String> depends = new ArrayList<>();
     Integer priority;
     private String links;
+    private String keywords;
     private String description;
     private String summary;
     private String thumb;
@@ -59,7 +60,7 @@ public class Node {
         if (this == o) return true;
         if (!(o instanceof Node)) return false;
 
-        Node node = (Node)o;
+        Node node = (Node) o;
 
         return topic.equals(node.topic);
     }
@@ -120,6 +121,10 @@ public class Node {
     public void setLinks(String links) {
         this.links = links;
     }
+
+    public String getKeywords() { return keywords; }
+
+    public void setKeywords(String keywords) { this.keywords = keywords; }
 
     public String getDescription() {
         return description;

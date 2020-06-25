@@ -142,14 +142,14 @@ export class KMapBrowser extends connect(store, LitElement) {
           created: this._topicCard.created,
           modified: this._topicCard.modified,
           author: this._topicCard.author,
-          keywords: [this._subject, this._chapter, this._topicCard.topic],
+          keywords: [this._subject, this._chapter, this._topicCard.topic, ...(this._topicCard.keywords ? this._topicCard.keywords.split(",").map(k => k.trim()) : [])],
         });
       }
       else {
         store.dispatch.shell.updateMeta({
           title: this._chapter,
           description: this._chapterCard && this._chapterCard.summary ? this._chapterCard.summary : "Wissenslandkarte zum Kapitel " + this._chapter,
-          keywords: [this._subject, ...this._topics || []],
+          keywords: [this._subject, this._chapter, ...this._topics || []],
         });
       }
     }

@@ -25,6 +25,7 @@ export interface Card {
   topic: string,
   row?: number,
   col?: number,
+  keywords: string,
   summary: string,
   description: string,
   thumb?: string;
