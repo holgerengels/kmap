@@ -44,7 +44,6 @@ export async function fetchjson(input: RequestInfo, init: RequestInit,
 {
   try {
     const resp = await fetch(input, init);
-    console.log(resp.headers);
     if (resp.ok) {
       const json = await resp.json();
       success(json);
