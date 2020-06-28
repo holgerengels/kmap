@@ -79,19 +79,8 @@ export class KmapMain extends connect(store, LitElement) {
   // @ts-ignore
   private _loginPopup: KMapLoginPopup;
 
-  @property()
-  private _path: string = '';
-
   set route(val: RoutingState) {
-    if (val.page !== this._page) {
-      this._page = val.page;
-      if (val.params.topic && val.params.chapter)
-        this._path = val.params.subject + "/" + val.params.chapter + "/" + val.params.topic;
-      else if (val.params.chapter)
-        this._path = val.params.subject + "/" + val.params.chapter;
-      else
-        this._path = '';
-    }
+    this._page = val.page;
   }
 
   mapState(state: State) {
@@ -323,7 +312,6 @@ export class KmapMain extends connect(store, LitElement) {
     <div class="drawer-content">
       <nav class="drawer-list">
         <a ?selected="${this._page === 'home'}" href="/app/">Start</a>
-        <a ?selected="${this._page === 'browser'}" href="/app/browser/${this._path}" ?disabled="${!this._path}">Browser</a>
         ${this._roles.includes("teacher") ? html`
           <a ?selected="${this._page === 'test'}" href="/app/test">Test</a>
         ` : ''}
