@@ -47,7 +47,7 @@ export class KMapBrowser extends connect(store, LitElement) {
   private _testTopics: string[] = [];
 
   @property()
-  private _page: string = 'map';
+  private _page: string = '';
 
   @property()
   private _loading: boolean = false;
@@ -114,24 +114,19 @@ export class KMapBrowser extends connect(store, LitElement) {
         }
         this._topicCard = lala;
       }
-      console.log("topic " + this._topic + " .. set topicCard " + this._topicCard);
+    }
 
-      if (this._topicCard) {
-        console.log('kmap-summary-card[key="' + this._topic + '"]');
+    if (changedProperties.has("_topicCard") || changedProperties.has("_chapterCard")) {
+      if (this._page === "map" && this._topicCard) {
         // @ts-ignore
         let nodes = this.shadowRoot.querySelectorAll('kmap-summary-card[key="' + this._topic + '"]');
-        console.log(nodes);
         if (nodes.length !== 0) {
           let scard = nodes[0];
           this._animFrom = scard.getBoundingClientRect();
           console.log("from");
           console.log(this._animFrom);
         }
-        console.log("topicCard " + this._topicCard + " .. set animFrom " + this._animFrom);
       }
-    }
-
-    if (changedProperties.has("_topicCard") || changedProperties.has("_chapterCard")) {
       this._page = this._topicCard ? "topic" : "map";
 
       if (this._topicCard) {
@@ -216,11 +211,6 @@ export class KMapBrowser extends connect(store, LitElement) {
         });
       }
     }
-    /*
-        this._chapterCard = this._map.chapterCard;
-        let lines = this._map.lines;
-        this._lines = lines[0].cards[0].row === -1 ? lines.slice(1) : lines;
-    */
 
     if (changedProperties.has("_loading")) {
       let that = this;
