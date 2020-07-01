@@ -70,7 +70,7 @@ public class Couch extends Server {
         return objects;
     }
 
-    public JsonArray latest(String subject) {
+    public JsonArray latest(String subject, int n) {
         View view = createClient("map").view("net/byModified")
                 .startKey(subject, Long.MAX_VALUE)
                 .endKey(subject, Long.MIN_VALUE)
@@ -79,7 +79,7 @@ public class Couch extends Server {
                 .includeDocs(true);
         List<JsonObject> objects = view.query(JsonObject.class);
         objects.removeIf(o -> string(o, "chapter") == null || string(o,"topic") == null || "_".equals(string(o, "topic")));
-        objects = objects.subList(0, 3);
+        objects = objects.subList(0, n);
         objects.forEach(o -> o.entrySet().removeIf(entry -> entry.getValue().isJsonPrimitive() && "".equals(entry.getValue().getAsString())));
         objects.forEach(o -> {
             JsonArray attachments = o.getAsJsonArray("attachments");
@@ -867,7 +867,7 @@ public class Couch extends Server {
         Couch couch = new Couch(readProperties(args[0]));
         Server.CLIENT.set("root");
 
-        JsonArray latest = couch.latest("Mathematik");
+        JsonArray latest = couch.latest("Mathematik", 3);
         System.out.println("latest = " + latest);
         /*
         JsonObject object = couch.chapter("mathe", "Mathematik");

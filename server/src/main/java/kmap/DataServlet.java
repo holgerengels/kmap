@@ -84,7 +84,7 @@ public class DataServlet
             }
             else if (latest != null) {
                 log("latest = " + latest);
-                JsonArray result = couch.latest(latest);
+                JsonArray result = couch.latest(latest, 3);
                 if (result != null)
                     writeResponse(req, resp, result);
             }

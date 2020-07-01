@@ -46,6 +46,11 @@
         <servlet-class>kmap.IndexServlet</servlet-class>
     </servlet>
 
+    <servlet>
+        <servlet-name>feed</servlet-name>
+        <servlet-class>kmap.RSSServlet</servlet-class>
+    </servlet>
+
     <servlet-mapping>
         <servlet-name>data</servlet-name>
         <url-pattern>/data</url-pattern>
@@ -89,6 +94,11 @@
     <servlet-mapping>
         <servlet-name>index</servlet-name>
         <url-pattern>/index/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>feed</servlet-name>
+        <url-pattern>/feed/*</url-pattern>
     </servlet-mapping>
 
     <welcome-file-list>
