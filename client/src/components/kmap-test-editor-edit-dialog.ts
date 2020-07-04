@@ -19,12 +19,12 @@ import './file-drop';
 import './validating-form';
 import {colorStyles, fontStyles} from "./kmap-styles";
 
-import {Test} from "../models/tests";
-import {Attachment, Upload} from "../models/types";
 import {Dialog} from "@material/mwc-dialog/mwc-dialog";
 import {TextArea} from "@material/mwc-textarea/mwc-textarea";
-import {throttle} from "../debounce";
 import {TabBar} from "@material/mwc-tab-bar/mwc-tab-bar";
+import {throttle} from "../debounce";
+import {Test} from "../models/tests";
+import {Attachment, Upload} from "../models/types";
 
 @customElement('kmap-test-editor-edit-dialog')
 export class KMapTestEditorEditDialog extends connect(store, LitElement) {
