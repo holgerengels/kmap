@@ -25,6 +25,8 @@ export interface Test {
   values: string[],
   question: string,
   answer: string,
+  hint: string,
+  solution: string,
   attachments: Attachment[];
 }
 

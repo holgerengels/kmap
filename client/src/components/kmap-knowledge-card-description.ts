@@ -19,6 +19,31 @@ export class KMapKnowledgeCardDescription extends LitElement {
   @property()
   private _description: string = '';
 
+  constructor() {
+    super();
+    // @ts-ignore
+    if (!window.mark) {
+      // @ts-ignore
+      window.mark = function (that, ids: string[]) {
+        for (const id of ids) {
+          // @ts-ignore
+          var el = that.getRootNode().getElementById(id);
+          if (el)
+            el.classList.add("marked");
+        }
+      }
+      // @ts-ignore
+      window.unmark = function (that, ids: string[]) {
+        for (const id of ids) {
+          // @ts-ignore
+          var el = that.getRootNode().getElementById(id);
+          if (el)
+            el.classList.remove("marked");
+        }
+      }
+    }
+  }
+
   updated(changedProperties) {
     if (changedProperties.has("description")) {
       let setter = (value:string):void => { this._description = value };

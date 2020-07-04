@@ -36,14 +36,18 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
   private _topics: string[] = [];
 
   @property()
+  private _tab: string = 'editor';
+
+  @property()
   private _test?: Test = undefined;
   @property()
   private _question: string = '';
   @property()
   private _answer: string = '';
   @property()
-  private _tab: string = 'editor';
-
+  private _hint: string = '';
+  @property()
+  private _solution: string = '';
   @property()
   private _subject: string = '';
   @property()
@@ -121,6 +125,8 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
       this._balance  = this._test.balance || 3;
       this._question = this._test.question || '';
       this._answer   = this._test.answer || '';
+      this._hint     = this._test.hint || '';
+      this._solution = this._test.solution || '';
       this._values   = this._test.values || [];
       this._oldValues = [...this._values];
       this._attachments = this._test.attachments || [];
@@ -163,6 +169,8 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
     this._test.balance = this._balance;
     this._test.question = this._question;
     this._test.answer = this._answer;
+    this._test.hint = this._hint;
+    this._test.solution = this._solution;
     this._test.values = this._values;
     this._test.attachments = this._attachments;
 
