@@ -18,7 +18,7 @@ import './kmap-summary-card-summary';
 import './kmap-knowledge-card-description';
 import './file-drop';
 import './validating-form';
-import {colorStyles, fontStyles} from "./kmap-styles";
+import {colorStyles, fontStyles, formStyles} from "./kmap-styles";
 
 import {Dialog} from "@material/mwc-dialog/mwc-dialog";
 import {TextArea} from "@material/mwc-textarea/mwc-textarea";
@@ -244,6 +244,7 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
     return [
       fontStyles,
       colorStyles,
+      formStyles,
       css`
         mwc-dialog {
           --mdc-dialog-max-width: 810px;
@@ -254,19 +255,7 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
         mwc-textfield, mwc-textarea, file-drop {
           margin-bottom: 4px;
         }
-        div.fields {
-          display: flex;
-          flex-flow: row wrap;
-        }
-        div.fields > [s1] {
-          flex: 1 1 33.3%;
-        }
-        div.fields > [s2] {
-          flex: 1 1 66.6%;
-        }
-        div.fields > [s3] {
-          flex: 1 1 100%;
-        }
+        mwc-select { width: 100% }
         .attachment {
           display: block;
         }
@@ -301,23 +290,23 @@ ${this._card ? html`
   </mwc-tab-bar>
   <div ?hidden="${this._tab === 'preview'}">
     <validating-form @keydown="${this._captureEnter}" @validity="${e => this._valid = e.target.valid}">
-      <div class="fields">
-        <mwc-textfield s1 id="topic" name="topic" disabled label="Thema" dense type="text" .value="${this._card.topic !== '_' ? this._card.topic : "Allgemeines zu " + this._card.chapter}"></mwc-textfield>
-        <mwc-textfield s1 ?hidden="${this._card.topic === '_'}" id="links" name="links" label="Verweist auf ..." dense type="text" .value="${this._links}" @change="${e => this._links = e.target.value}" pattern="[^/]*"></mwc-textfield>
-        <mwc-textfield s1 ?hidden="${this._card.topic === '_'}" id="priority" name="priority" label="Priorität" dense type="number" inputmode="numeric" min="0" step="1" .value="${this._priority}" @change="${e => this._priority = e.target.value}"></mwc-textfield>
-        <mwc-textfield s2 ?hidden="${this._card.topic === '_'}" ?dialogInitialFocus="${this._card.topic !== '_'}" id="depends" label="Basiert auf ..." dense .value=${this._depends} @change="${e => this._depends = e.target.value}"></mwc-textfield>
+      <div class="form">
+        <mwc-textfield s2 id="topic" name="topic" disabled label="Thema" dense type="text" .value="${this._card.topic !== '_' ? this._card.topic : "Allgemeines zu " + this._card.chapter}"></mwc-textfield>
+        <mwc-textfield s2 ?hidden="${this._card.topic === '_'}" id="links" name="links" label="Verweist auf ..." dense type="text" .value="${this._links}" @change="${e => this._links = e.target.value}" pattern="[^/]*"></mwc-textfield>
+        <mwc-textfield s2 ?hidden="${this._card.topic === '_'}" id="priority" name="priority" label="Priorität" dense type="number" inputmode="numeric" min="0" step="1" .value="${this._priority}" @change="${e => this._priority = e.target.value}"></mwc-textfield>
+        <mwc-textfield s5 ?hidden="${this._card.topic === '_'}" ?dialogInitialFocus="${this._card.topic !== '_'}" id="depends" label="Basiert auf ..." dense .value=${this._depends} @change="${e => this._depends = e.target.value}"></mwc-textfield>
         <mwc-textfield s1 ?hidden="${this._card.topic === '_'}" id="thumb" label="Thumbnail" dense .value=${this._thumb} @change="${e => this._thumb = e.target.value}"></mwc-textfield>
-        <mwc-textfield s3 ?hidden="${this._card.topic === '_'}" id="keywords" label="Keywords" dense .value=${this._keywords} @change="${e => this._keywords = e.target.value}"></mwc-textfield>
-        <mwc-textarea s3 id="summary" placeholder="Kurztext" ?dialogInitialFocus="${this._card.topic === '_'}" dense fullwidth rows="2" .value=${this._card.summary} @keyup="${this._setSummary}"></mwc-textarea>
-        <mwc-textarea s3 id="description" placeholder="Langtext" dense fullwidth rows="9" .value=${this._card.description} @keyup="${this._setDescription}"></mwc-textarea>
+        <mwc-textfield s6 ?hidden="${this._card.topic === '_'}" id="keywords" label="Keywords" dense .value=${this._keywords} @change="${e => this._keywords = e.target.value}"></mwc-textfield>
+        <mwc-textarea s6 id="summary" placeholder="Kurztext" ?dialogInitialFocus="${this._card.topic === '_'}" dense fullwidth rows="2" .value=${this._card.summary} @keyup="${this._setSummary}"></mwc-textarea>
+        <mwc-textarea s6 id="description" placeholder="Langtext" dense fullwidth rows="9" .value=${this._card.description} @keyup="${this._setDescription}"></mwc-textarea>
       </div>
     </validating-form>
 
     <div class="attachments">
       <label for="attachments">Materialien</label><br/>
       ${this._attachments.map((attachment) => html`
-        <div class="fields">
-          <div style="flex: 1 0 auto">
+        <div class="form" style="grid-template-columns: 1fr 36px">
+          <div>
             <span>[${this._tag(attachment.tag)}] ${attachment.name}</span><br/>
             ${attachment.type === 'link' ? html`
               <span slot="secondary">${attachment.href}</span>
@@ -325,26 +314,26 @@ ${this._card ? html`
               <span slot="secondary">${attachment.file} (${attachment.mime})</span>
             `}
           </div>
-          <mwc-icon-button icon="delete" @click="${() => this._deleteAttachment(attachment)}" style="flex: 0 0 48px"></mwc-icon-button>
+          <mwc-icon-button icon="delete" @click="${() => this._deleteAttachment(attachment)}"></mwc-icon-button>
         </div>
       `)}
     </div>
-    <div class="fields" @dragover="${() => this._attachmentType = 'file'}">
-      <mwc-select id="tag" label="Tag" .value="${this._attachmentTag}" @change="${e => this._attachmentTag = e.target.value}" style="flex: 1 0 15%">
-        <mwc-list-item value="">Kein Tag</mwc-list-item>
-        ${Array.from(_tags).map(([key, value]) => html`
-          <mwc-list-item value="${key}">${value}</mwc-list-item>
-        `)}
-      </mwc-select>
-      <validating-form id="attachmentForm" @validity="${e => this._attachmentValid = e.target.valid}">
-        <mwc-textfield id="name" type="text" label="Name" .value="${this._attachmentName}" @change="${e => this._attachmentName = e.target.value}" style="flex: 1 0 25%"></mwc-textfield>
-        <mwc-icon-button-toggle ?on="${this._attachmentType === 'file'}" onIcon="attachment" offIcon="link" @MDCIconButtonToggle:change="${e => this._attachmentType = e.detail.isOn ? 'file' : 'link'}" style="flex: 0 0 48px"></mwc-icon-button-toggle>
-        <mwc-textfield ?hidden="${this._attachmentType === "file"}" id="href" type="url" label="Link" .value="${this._attachmentHref}" @change="${e => this._attachmentHref = e.target.value}" style="flex: 1 0 35%"></mwc-textfield>
-        <file-drop ?hidden="${this._attachmentType === "link"}" id="file" @filedrop="${this._fileDrop}" style="flex: 1 0 35%"></file-drop>
-        <mwc-icon-button class="add" icon="add_circle" @click="${this._addAttachment}" style="flex: 0 0 48px"></mwc-icon-button>
-      </validating-form>
-    </div>
-    </div>
+    <validating-form id="attachmentForm" @validity="${e => this._attachmentValid = e.target.valid}">
+      <div class="form" style="grid-template-columns: 1fr 1fr 36px 1fr 36px" @dragover="${() => this._attachmentType = 'file'}">
+        <mwc-select id="tag" label="Tag" .value="${this._attachmentTag}" @change="${e => this._attachmentTag = e.target.value}">
+          <mwc-list-item value="">Kein Tag</mwc-list-item>
+          ${Array.from(_tags).map(([key, value]) => html`
+            <mwc-list-item value="${key}">${value}</mwc-list-item>
+          `)}
+        </mwc-select>
+        <mwc-textfield id="name" type="text" label="Name" .value="${this._attachmentName}" @change="${e => this._attachmentName = e.target.value}"></mwc-textfield>
+        <mwc-icon-button-toggle ?on="${this._attachmentType === 'file'}" onIcon="attachment" offIcon="link" @MDCIconButtonToggle:change="${e => this._attachmentType = e.detail.isOn ? 'file' : 'link'}"></mwc-icon-button-toggle>
+        <mwc-textfield ?hidden="${this._attachmentType === "file"}" id="href" type="url" label="Link" .value="${this._attachmentHref}" @change="${e => this._attachmentHref = e.target.value}"></mwc-textfield>
+        <file-drop ?hidden="${this._attachmentType === "link"}" id="file" @filedrop="${this._fileDrop}"></file-drop>
+        <mwc-icon-button class="add" icon="add_circle" @click="${this._addAttachment}"></mwc-icon-button>
+      </div>
+    </validating-form>
+  </div>
     <div ?hidden="${this._tab === 'editor'}">
       <kmap-summary-card-summary .summary="${this._summary}"></kmap-summary-card-summary>
       <hr/>

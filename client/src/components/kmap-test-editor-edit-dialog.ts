@@ -17,7 +17,7 @@ import './kmap-summary-card-summary';
 import './kmap-knowledge-card-description';
 import './file-drop';
 import './validating-form';
-import {colorStyles, fontStyles} from "./kmap-styles";
+import {colorStyles, fontStyles, formStyles} from "./kmap-styles";
 
 import {Dialog} from "@material/mwc-dialog/mwc-dialog";
 import {TextArea} from "@material/mwc-textarea/mwc-textarea";
@@ -236,6 +236,7 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
     return [
       fontStyles,
       colorStyles,
+      formStyles,
       css`
         mwc-dialog {
           --mdc-dialog-max-width: 810px;
@@ -275,9 +276,16 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
           grid-gap: 8px;
         }
         mwc-select { width: 100% }
-        div.fields {
-          display: flex;
-          flex-flow: row wrap;
+        input[type="text"] {
+          border: 1px solid var(--color-mediumgray);
+          background-color: var(--color-lightgray);
+          padding: 4px;
+          margin: 4px;
+          outline: none;
+        }
+        input[type="text"]:focus {
+          border-bottom: 2px solid var(--color-primary-dark);
+          margin-bottom: 3px;
         }
         [hidden] { display: none }
     `];
@@ -293,32 +301,32 @@ ${this._test ? html`
       <mwc-tab label="Editor"></mwc-tab>
       <mwc-tab label="Preview"></mwc-tab>
     </mwc-tab-bar>
-    <div class="grid" ?hidden="${this._tab === 'preview'}">
-      <mwc-select style="grid-column: span 3" required label="Kapitel" @change="${e => this._chapter = e.target.value}">
+    <div class="form" ?hidden="${this._tab === 'preview'}">
+      <mwc-select s3 required label="Kapitel" @change="${e => this._chapter = e.target.value}">
         ${this._chapters.map((chapter) => html`<mwc-list-item value="${chapter}" ?selected="${chapter === this._chapter}">${chapter}</mwc-list-item>`)}
       </mwc-select>
-      <mwc-select style="grid-column: span 3" required label="Thema" @change="${e => this._topic = e.target.value}">
+      <mwc-select s3 required label="Thema" @change="${e => this._topic = e.target.value}">
         ${this._topics.map((topic) => html`<mwc-list-item value="${topic}" ?selected="${topic === this._topic}">${topic}</mwc-list-item>`)}
       </mwc-select>
-    <mwc-textfield style="grid-column: span 4" id="key" name="key" label="Titel" dense type="text" required disabled .value="${this._key}" @change="${e => this._key = e.target.value}" pattern="^([^/]*)$"></mwc-textfield>
-    <mwc-textfield style="grid-column: span 2" id="level" name="level" label="Level" dense type="number" inputmode="numeric" min="1" max="3" step="1" .value="${this._level}" @change="${e => this._level = e.target.value}"></mwc-textfield>
-    <mwc-formfield style="grid-column: span 4" alignEnd spaceBetween label="Layout Verhältnis Frage : Antwort = ${this._balance} : ${6 - this._balance}">&nbsp;&nbsp;
+    <mwc-textfield s5 id="key" name="key" label="Titel" dense type="text" required disabled .value="${this._key}" @change="${e => this._key = e.target.value}" pattern="^([^/]*)$"></mwc-textfield>
+    <mwc-textfield s1 id="level" name="level" label="Level" dense type="number" inputmode="numeric" min="1" max="3" step="1" .value="${this._level}" @change="${e => this._level = e.target.value}"></mwc-textfield>
+    <mwc-formfield s4 alignEnd spaceBetween label="Layout Verhältnis Frage : Antwort = ${this._balance} : ${6 - this._balance}">&nbsp;&nbsp;
       <mwc-slider id="balance" style="vertical-align:middle" .value="${this._balance}" pin markers step="1" min="0" max="5" @change=${e => this._balance = e.target.value}></mwc-slider>
     </mwc-formfield>
-    <div style="grid-column: span 2"></div>
-    <mwc-textarea style="grid-column: span 6" id="question" placeholder="Frage" fullwidth rows="4" .value=${this._question} @keyup="${this._setQuestion}"></mwc-textarea>
-    <mwc-textarea style="grid-column: span 6" id="answer" placeholder="Antwort" required fullwidth rows="4" .value=${this._answer} @keyup="${this._setAnswer}"></mwc-textarea>
+    <div s2></div>
+    <mwc-textarea s6 id="question" placeholder="Frage" fullwidth rows="4" .value=${this._question} @keyup="${this._setQuestion}"></mwc-textarea>
+    <mwc-textarea s6 id="answer" placeholder="Antwort" required fullwidth rows="4" .value=${this._answer} @keyup="${this._setAnswer}"></mwc-textarea>
 
-    <div style="grid-column: span 6" class="field values">
+    <div s6 class="field values">
       <label secondary>Werte (Checkboxen: true/false, Dezimalzahlen mit Punkt statt Komma)</label><br/>
 
       ${this._values.map((value, i) => html`<input type="text" .value="${value}" @change="${e => this._values[i] = e.target.value}"/>`)}
     </div>
 
-    <div style="grid-column: span 6" class="attachments">
+    <div s6 class="attachments">
       <label for="attachments">Materialien</label><br/>
       ${this._attachments.map((attachment) => html`
-        <div class="fields">
+        <div class="form">
           <div style="flex: 1 0 auto">
             <span>${attachment.file} (${attachment.mime})</span>
           </div>
@@ -326,7 +334,7 @@ ${this._test ? html`
         </div>
       `)}
     </div>
-    <div style="grid-column: span 6" class="fields">
+    <div s6 class="form">
       <file-drop id="file" @filedrop="${e => this._attachmentFile = e.detail.file}" style="flex: 1 0 75%"></file-drop>
       <mwc-icon-button class="add" icon="add_circle" @click="${this._addAttachment}" style="flex: 0 0 36px; --mdc-icon-button-size: 36px; align-self: center"></mwc-icon-button>
     </div>

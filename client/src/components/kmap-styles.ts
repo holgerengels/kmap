@@ -85,6 +85,30 @@ hr {
 `;
 
 // language=CSS
+export const formStyles: CSSResult = css`
+        .form {
+          display: grid;
+          grid-template-columns: repeat(6, 1fr);
+          grid-gap: 8px;
+        }
+        .form > [s2] {
+          grid-column: span 2;
+        }
+        .form > [s3] {
+          grid-column: span 3;
+        }
+        .form > [s4] {
+          grid-column: span 4;
+        }
+        .form > [s5] {
+          grid-column: span 5;
+        }
+        .form > [s6] {
+          grid-column: span 6;
+        }
+`;
+
+// language=CSS
 export const elevationStyles: CSSResult = css`
 .elevation-00 { box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0.2),0px 0px 0px 0px rgba(0, 0, 0, 0.14),0px 0px 0px 0px rgba(0, 0, 0, 0.12); transition: box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1); }
 .elevation-01 { box-shadow: 0px 2px 1px -1px rgba(0, 0, 0, 0.2),0px 1px 1px 0px rgba(0, 0, 0, 0.14),0px 1px 3px 0px rgba(0, 0, 0, 0.12); transition: box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1); }
