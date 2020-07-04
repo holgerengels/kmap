@@ -78,7 +78,10 @@ public class Couch extends Server {
                 .descending(true)
                 .includeDocs(true);
         List<JsonObject> objects = view.query(JsonObject.class);
-        objects.removeIf(o -> string(o, "chapter") == null || string(o,"topic") == null || "_".equals(string(o, "topic")));
+        objects.removeIf(o -> string(o, "chapter") == null
+                || string(o,"topic") == null
+                || "_".equals(string(o, "topic"))
+                || string(o,"description") == null);
         objects = objects.subList(0, n);
         objects.forEach(o -> o.entrySet().removeIf(entry -> entry.getValue().isJsonPrimitive() && "".equals(entry.getValue().getAsString())));
         objects.forEach(o -> {
