@@ -41,21 +41,6 @@ export class KmapTestExercise extends connect(store, LitElement) {
     if (!this._allTests)
       return;
 
-    var topics: string[] = [];
-    for (var test of this._allTests) {
-      if (!topics.includes(test.chapter + "." + test.topic))
-        topics.push(test.chapter + "." + test.topic);
-    }
-    let number = this._allTests.length - this._allTests.length % 3;
-
-    if (topics.length === 0)
-      return;
-
-    topics.sort(function () {
-      return 0.5 - Math.random()
-    });
-    //topics = topics.slice(0, number / 3);
-
     var map = new Map();
     for (var test of this._allTests) {
       var key = test.chapter + "." + test.topic;
@@ -67,14 +52,33 @@ export class KmapTestExercise extends connect(store, LitElement) {
       list.push(test);
     }
 
+    map = new Map(
+      [...map]
+        .map(([k, v]) => [k, shuffleArray(v)])
+        .map(([k, v]) => [k, v.slice(0, v.length - v.length % 3)])
+    );
+    map = new Map(
+      [...map]
+        .filter(([, v]) => v.length >= 3)
+    );
+
+    let number = 0;
+    for (const list of map.values()) {
+      number += list.length;
+    }
+    var topics: string[] = [...map.keys()];
+
+    if (topics.length === 0)
+      return;
+
+    shuffleArray(topics);
+
     var tests: Test[] = [];
     for (var i = 0; i < number / 3 && topics.length > 0; i++) {
       var r = Math.floor(Math.random() * Math.floor(map.size));
       var key = topics[r];
       var list = map.get(key);
-      list.sort(function () {
-        return 0.5 - Math.random()
-      });
+      shuffleArray(list);
       tests.push(list.pop());
       tests.push(list.pop());
       tests.push(list.pop());
@@ -147,4 +151,12 @@ export class KmapTestExercise extends connect(store, LitElement) {
   </div>
     `;
   }
+}
+
+function shuffleArray(array): [] {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
 }
