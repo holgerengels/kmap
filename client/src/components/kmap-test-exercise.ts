@@ -145,6 +145,8 @@ export class KmapTestExercise extends connect(store, LitElement) {
         .level="${this._currentTest.level}"
         .question="${this._currentTest.question}"
         .answer="${this._currentTest.answer}"
+        .hint="${this._currentTest.hint}"
+        .solution="${this._currentTest.solution}"
         .values="${this._currentTest.values}"
         .balance="${this._currentTest.balance}"></kmap-test-card>`
       : ''}

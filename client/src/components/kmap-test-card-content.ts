@@ -156,9 +156,6 @@ export class KMapTestCardContent extends LitElement {
         .card-content img {
           max-width: calc(100vw - 44px);
         }
-        .card-footer a {
-          color: black;
-        }
         #question {
           margin-right: 16px;
         }

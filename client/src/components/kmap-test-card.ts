@@ -4,10 +4,12 @@ import {State, store} from "../store";
 
 import {encode} from '../urls';
 import {STATE_COLORS} from './state-colors';
-import {fontStyles, colorStyles} from "./kmap-styles";
+import {fontStyles, colorStyles, elevationStyles} from "./kmap-styles";
 import '@material/mwc-icon';
 import '@material/mwc-button';
 import "./kmap-test-card-content";
+import "./kmap-test-card-hint";
+import "./kmap-test-card-solution";
 import "./kmap-feedback";
 import {KMapFeedback} from "./kmap-feedback";
 import {KMapTestCardContent} from "./kmap-test-card-content";
@@ -41,6 +43,10 @@ export class KMapTestCard extends connect(store, LitElement) {
   private question: string = '';
   @property({type: String})
   private answer: string = '';
+  @property({type: String})
+  private hint: string = '';
+  @property({type: String})
+  private solution: string = '';
   @property({type: Number})
   private balance: number = 4;
 
@@ -68,6 +74,11 @@ export class KMapTestCard extends connect(store, LitElement) {
 
   @query('kmap-test-card-content')
   private _content: KMapTestCardContent;
+
+  @property()
+  private _hintVisible: boolean = false;
+  @property()
+  private _solutionVisible: boolean = false;
 
   constructor() {
     super();
@@ -111,7 +122,7 @@ export class KMapTestCard extends connect(store, LitElement) {
     this.attempts = 0;
   }
 
-  sendAnswer() {
+  _sendAnswer() {
     var everythingCorrect = this._content.checkValues();
     this.correct = everythingCorrect;
     this.sent = this.sent || this.correct;
@@ -124,14 +135,18 @@ export class KMapTestCard extends connect(store, LitElement) {
     }
   }
 
-  showAnswer() {
+  _showAnswer() {
     this._content.showAnswer();
     this.correct = true;
     this.sent = true;
     this.attempts = -1;
+
+    if (this.solution)
+      this._solutionVisible = true;
   }
 
-  next() {
+  _next() {
+    this._solutionVisible = false;
     this.dispatchEvent(new CustomEvent('next', {
       bubbles: true, composed: true, detail: {
         "subject": this.subject,
@@ -150,11 +165,19 @@ export class KMapTestCard extends connect(store, LitElement) {
       store.dispatch.shell.showMessage("Bitte melde Dich an, um die Feedbackfunktion zu nutzen!")
   }
 
+  _showHint() {
+    this._hintVisible = true;
+  }
+  _hideHint() {
+    this._hintVisible = false;
+  }
+
   static get styles() {
     // language=CSS
     return [
       fontStyles,
       colorStyles,
+      elevationStyles,
       css`
         :host {
           --color-opaque: #f5f5f5;
@@ -231,14 +254,18 @@ export class KMapTestCard extends connect(store, LitElement) {
 
   render() {
     return html`
-  <div class="card-header" ?hidden="${this.hideHeader}">
+  <div class="card-header elevation-04" ?hidden="${this.hideHeader}">
       <span>Aufgabe ${this.num + 1} von ${this.of} (${this._levelText(this.level)})</span>
       <div style="flex: 1 0 auto"></div>
       <a href="/app/browser/${encode(this.subject, this.chapter, this.topic)}" id="blinky">Wissenskarte ansehen <mwc-icon>open_in_new</mwc-icon></a>&nbsp;
       <mwc-icon-button icon="feedback" title="Feedback" @click="${this._feedback}"></mwc-icon-button>
   </div>
 
-  <kmap-test-card-content
+  <kmap-test-card-hint .hint="${this.hint}" ?hidden="${!this._hintVisible}">
+    <mwc-button @click="${this._hideHint}">Ok</mwc-button>
+  </kmap-test-card-hint>
+
+  <kmap-test-card-content class="elevation-01"
     .instance="${this._instance}"
     .subject="${this.subject}"
     .set="${this.set}"
@@ -249,12 +276,15 @@ export class KMapTestCard extends connect(store, LitElement) {
     .values="${this.values}">
   </kmap-test-card-content>
 
+  <kmap-test-card-solution .solution="${this.solution}" ?hidden="${!this._solutionVisible}" class="elevation-01"></kmap-test-card-solution>
+
   ${!this.hideActions ? html`
-    <div class="card-footer" ?stacked="${this._narrow}">
-        <mwc-button @click="${this.showAnswer}">Richtige Antwort zeigen</mwc-button>
+    <div class="card-footer elevation-02" ?stacked="${this._narrow}">
+        <mwc-button @click="${this._showAnswer}">Richtige Antwort zeigen</mwc-button>
+        <mwc-button @click="${this._showHint}" ?hidden="${!this.hint}">Tipp</mwc-button>
         <div style="flex: 1 0 auto"></div>
-        <mwc-button @click="${this.sendAnswer}" ?hidden="${this.sent}">Antwort abschicken</mwc-button>
-        <mwc-button @click="${this.next}" ?hidden="${!this.correct}">Weiter</mwc-button>
+        <mwc-button @click="${this._sendAnswer}" ?hidden="${this.sent}">Antwort abschicken</mwc-button>
+        <mwc-button @click="${this._next}" ?hidden="${!this.correct}">Weiter</mwc-button>
     </div>`
       : ''}
   <kmap-feedback id="feedbackDialog" .subject="${this.subject}" .chapter="${this.chapter}" .topic="${this.topic}" .test="${this.key}"></kmap-feedback>

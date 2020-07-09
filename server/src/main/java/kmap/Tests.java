@@ -258,6 +258,8 @@ public class Tests {
                     existing.add("level", changed.get("level"));
                     existing.add("question", changed.get("question"));
                     existing.add("answer", changed.get("answer"));
+                    existing.add("hint", changed.get("hint"));
+                    existing.add("solution", changed.get("solution"));
                     existing.add("values", changed.get("values"));
                     existing.add("balance", changed.get("balance"));
                     existing.add("attachments", changed.get("attachments"));

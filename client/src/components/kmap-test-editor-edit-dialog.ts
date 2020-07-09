@@ -82,6 +82,10 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
   private _questionTextArea: TextArea;
   @query('#answer')
   private _answerTextArea: TextArea;
+  @query('#hint')
+  private _hintTextArea: TextArea;
+  @query('#solution')
+  private _solutionTextArea: TextArea;
   @query('#tabBar')
   private _tabBar: TabBar;
 
@@ -193,6 +197,14 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
 
   _setAnswer() {
     this._answer = this._answerTextArea.value;
+  }
+
+  _setHint() {
+    this._hint = this._hintTextArea.value;
+  }
+
+  _setSolution() {
+    this._solution = this._solutionTextArea.value;
   }
 
   _addAttachment() {
@@ -322,8 +334,10 @@ ${this._test ? html`
       <mwc-slider id="balance" style="vertical-align:middle" .value="${this._balance}" pin markers step="1" min="0" max="5" @change=${e => this._balance = e.target.value}></mwc-slider>
     </mwc-formfield>
     <div s2></div>
-    <mwc-textarea s6 id="question" placeholder="Frage" fullwidth rows="4" .value=${this._question} @keyup="${this._setQuestion}"></mwc-textarea>
-    <mwc-textarea s6 id="answer" placeholder="Antwort" required fullwidth rows="4" .value=${this._answer} @keyup="${this._setAnswer}"></mwc-textarea>
+    <mwc-textarea s6 id="question" label="Frage" rows="4" .value=${this._question} @keyup="${this._setQuestion}"></mwc-textarea>
+    <mwc-textarea s6 id="answer" label="Antwort" required rows="4" .value=${this._answer} @keyup="${this._setAnswer}"></mwc-textarea>
+    <mwc-textarea s6 id="hint" label="Hinweis" rows="2" .value=${this._hint} @keyup="${this._setHint}"></mwc-textarea>
+    <mwc-textarea s6 id="solution" label="Lösungsweg" rows="4" .value=${this._solution} @keyup="${this._setSolution}"></mwc-textarea>
 
     <div s6 class="field values">
       <label secondary>Werte (Checkboxen: true/false, Dezimalzahlen mit Punkt statt Komma)</label><br/>
@@ -334,17 +348,17 @@ ${this._test ? html`
     <div s6 class="attachments">
       <label for="attachments">Materialien</label><br/>
       ${this._attachments.map((attachment) => html`
-        <div class="form">
-          <div style="flex: 1 0 auto">
+        <div class="form" style="grid-template-columns: 1fr 36px">
+          <div>
             <span>${attachment.file} (${attachment.mime})</span>
           </div>
-          <mwc-icon-button icon="delete" @click="${() => this._deleteAttachment(attachment)}" style="flex: 0 0 36px; --mdc-icon-button-size: 36px"></mwc-icon-button>
+          <mwc-icon-button icon="delete" @click="${() => this._deleteAttachment(attachment)}"></mwc-icon-button>
         </div>
       `)}
     </div>
-    <div s6 class="form">
-      <file-drop id="file" @filedrop="${e => this._attachmentFile = e.detail.file}" style="flex: 1 0 75%"></file-drop>
-      <mwc-icon-button class="add" icon="add_circle" @click="${this._addAttachment}" style="flex: 0 0 36px; --mdc-icon-button-size: 36px; align-self: center"></mwc-icon-button>
+    <div s6 class="form" style="grid-template-columns: 1fr 36px">
+      <file-drop id="file" @filedrop="${e => this._attachmentFile = e.detail.file}"></file-drop>
+      <mwc-icon-button class="add" icon="add_circle" @click="${this._addAttachment}"></mwc-icon-button>
     </div>
 </div>
   </validating-form>
@@ -356,6 +370,8 @@ ${this._test ? html`
     .balance="${this._balance}"
     .question="${this._question}"
     .answer="${this._answer}"
+    .hint="${this._hint}"
+    .solution="${this._solution}"
     .num="1" .of="1">
 </kmap-test-card>
 ` : ''}

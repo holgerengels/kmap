@@ -98,6 +98,8 @@ export class KMapTestEditorScroller extends connect(store, LitElement) {
                                 .balance="${this._selected.balance}"
                                 .question="${this._selected.question}"
                                 .answer="${this._selected.answer}"
+                                .hint="${this._selected.hint}"
+                                .solution="${this._selected.solution}"
                                 .num="1" .of="1"></kmap-test-card>` : ''}
     </div>
   </div>
