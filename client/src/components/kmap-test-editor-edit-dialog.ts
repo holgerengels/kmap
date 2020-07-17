@@ -51,6 +51,8 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
   @property()
   private _subject: string = '';
   @property()
+  private _set: string = '';
+  @property()
   private _chapter: string = '';
   @property()
   private _topic: string = '';
@@ -122,6 +124,7 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
     if (changedProperties.has('_test') && this._test) {
       this._attachmentFile = undefined;
       this._subject  = this._test.subject || '';
+      this._set      = this._test.set || '';
       this._chapter  = this._test.chapter || '';
       this._topic    = this._test.topic || '';
       this._key      = this._test.key || '';
@@ -364,8 +367,10 @@ ${this._test ? html`
   </validating-form>
 <kmap-test-card hideHeader hideActions ?hidden="${this._tab === 'editor'}"
     .subject="${this._subject}"
+    .set="${this._set}"
     .chapter="${this._chapter}"
     .topic="${this._topic}"
+    .key="${this._key}"
     .level="${this._level}"
     .balance="${this._balance}"
     .question="${this._question}"
