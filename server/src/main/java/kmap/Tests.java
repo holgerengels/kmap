@@ -234,6 +234,7 @@ public class Tests {
             JsonObject changed = (JsonObject)object.get("changed");
 
             if (object.has("old")) {                                // update
+                System.out.println("updating " + changed);
                 JsonObject old = (JsonObject)object.get("old");
                 String chapter = string(old, "chapter");
                 String topic = string(old, "topic");
@@ -263,7 +264,7 @@ public class Tests {
                     existing.add("values", changed.get("values"));
                     existing.add("balance", changed.get("balance"));
                     existing.add("attachments", changed.get("attachments"));
-                    if (checks(changed)) {
+                    if (checks(existing)) {
                         Response response = client.update(existing);
                         JsonArray attachments = changed.getAsJsonArray("attachments");
                         response = saveFiles(client, response, uploads, attachments);
@@ -275,6 +276,7 @@ public class Tests {
                 }
             }
             else {
+                System.out.println("adding " + changed);
                 changed.addProperty("subject", subject);
                 changed.remove("added");
                 if (checks(changed)) {
