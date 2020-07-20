@@ -20,9 +20,8 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" media="print" onload="this.media='all'">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Material+Icons&amp;display=block" media="print" onload="this.media='all'">
 
-  <script src="https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.js"></script>
   <script>
-    WebFont.load({
+    WebFontConfig = {
       classes: true,
       custom: {
         families: ['KaTeX_AMS', 'KaTeX_Caligraphic:n4,n7', 'KaTeX_Fraktur:n4,n7',
@@ -31,7 +30,19 @@
           'KaTeX_Size4', 'KaTeX_Typewriter'],
         urls: ['/app/katex-fonts.css'],
       },
-    });
+      loading: function () {
+        console.log("loading");
+      },
+      active: function () {
+        console.log("active");
+      }
+    };
+    (function(d) {
+      var wf = d.createElement('script'), s = d.scripts[0];
+      wf.src = 'https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.js';
+      wf.async = true;
+      s.parentNode.insertBefore(wf, s);
+    })(document);
   </script>
 
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">

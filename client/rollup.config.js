@@ -56,6 +56,7 @@ export default merge(baseConfig, {
         {src: 'favicon.ico', dest: 'dist'},
         {src: '*.png', dest: 'dist'},
         {src: '*.svg', dest: 'dist'},
+        {src: '*.css', dest: 'dist'},
         {src: 'manifest.json', dest: 'dist'},
         {src: 'browserconfig.xml', dest: 'dist'},
         {src: 'geogebra.html', dest: 'dist'},
