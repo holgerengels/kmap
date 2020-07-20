@@ -154,9 +154,9 @@ export default createModel({
       return {
         ...state, cardForEdit: {
           ...defaults,
-          //subject: state.subject,
-          //chapter: state.chapter,
-          ...cardForEdit
+          ...cardForEdit,
+          subject: state.subject,
+          chapter: state.chapter,
         }
       }
     },
