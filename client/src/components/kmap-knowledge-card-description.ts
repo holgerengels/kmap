@@ -2,6 +2,7 @@ import {LitElement, html, css, customElement, property} from 'lit-element';
 import {unsafeHTML} from 'lit-html/directives/unsafe-html';
 import {urls} from "../urls";
 import {colorStyles, fontStyles} from "./kmap-styles";
+import {katexStyles} from "../katex-css";
 import {math} from "../math";
 
 @customElement('kmap-knowledge-card-description')
@@ -63,11 +64,16 @@ export class KMapKnowledgeCardDescription extends LitElement {
     return [
       fontStyles,
       colorStyles,
+      katexStyles,
       css`
         :host {
           display: block;
           padding: 12px;
           transition: background-color .5s ease-in-out;
+          font-family: Roboto,sans-serif;
+          -webkit-font-smoothing: antialiased;
+          font-size: 0.95rem;
+          font-weight: 400;
         }
         img {
           max-width: calc(100vw - 44px);

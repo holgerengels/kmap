@@ -1,58 +1,22 @@
-function loadScript(id, url) {
-  return new Promise(function(resolve, reject) {
-    const script = document.createElement('script');
+import katex from 'katex/dist/katex';
+import AsciiMathParser from 'asciimath2tex';
 
-    script.type = "text/javascript";
-    script.id = id;
-    script.async = true;
-    script.src = url;
-
-    script.onload = resolve;
-    script.onerror = reject;
-
-    document.head.appendChild(script);
-  })
-}
-
-// @ts-ignore
-window.MathJax = {
-  loader: {load: ['input/asciimath', 'output/svg']},
-};
-// @ts-ignore
-window.MathJax.promise = new Promise(function (resolve, reject) {
-// @ts-ignore
-  window.MathJax.startup = {
-    ready() {
-// @ts-ignore
-      window.MathJax.startup.defaultReady();
-// @ts-ignore
-      window.MathJax.startup.promise.then(() => resolve());
-    }
-  };
-});
+const parser = new AsciiMathParser();
 
 export function math(code, setter) {
-  // @ts-ignore
-  if (!window.MathJaxLoader) {
-    // @ts-ignore
-    window.MathJaxLoader = loadScript("MathJax-script", "https://cdn.jsdelivr.net/npm/mathjax@3/es5/startup.js")
-      // @ts-ignore
-      .then(() => window.MathJax.config.promise)
-    ;
+  const segments = code.split('`');
+  if (segments.length % 2 === 1)
+    segments.push('');
+
+  let buffer = '';
+  for (let i=0; i < segments.length; i+=2) {
+    const text = segments[i];
+    const ascii = segments[i+1];
+    const tex = parser.parse(ascii);
+    const math = katex.renderToString(tex, { output: "html", throwOnError: false, trust: true });
+    buffer += text;
+    buffer += math;
+    //buffer += "<span style='display: none'>" + tex + "</span>" + math;
   }
-  // @ts-ignore
-  window.MathJaxLoader
-    .then(() => {
-      let buffer = "";
-      let t = false;
-      code.split("`").reverse().forEach(function (element) {
-        if (t) {
-          // @ts-ignore
-          buffer = " " + window.MathJax.asciimath2svg(element).getElementsByTagName("svg")[0].outerHTML + " " + buffer;
-        } else
-          buffer = element + buffer;
-        t = !t;
-      });
-      setter(buffer);
-    });
+  setter(buffer);
 }

@@ -80,7 +80,7 @@ export class KMapTestEditorScroller extends connect(store, LitElement) {
   <div class="box elevation-01">
     ${this._tests ? html`<div class="scroller">
           ${this._tests.map((test, i) => html`
-            <div class="item" ?activated="${this._selectedIndex === i}" @click="${() => this._select(i)}">${test.key}
+            <div class="item font-body" ?activated="${this._selectedIndex === i}" @click="${() => this._select(i)}">${test.key}
                 <span class="secondary">${test.chapter} - ${test.topic}</span>
                 <mwc-icon @click="${e => { e.stopPropagation(); this._deleteTest(test)}}">delete</mwc-icon>
                 <mwc-icon @click="${e => { e.stopPropagation(); this._editTest(test)}}">edit</mwc-icon>

@@ -16,6 +16,10 @@ export class KMapKnowledgeCardSummary extends LitElement {
         :host {
           display: block;
           padding: 12px;
+          font-family: Roboto,sans-serif;
+          -webkit-font-smoothing: antialiased;
+          font-size: 0.95rem;
+          font-weight: 400;
         }
       `
     ];

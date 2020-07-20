@@ -7,5 +7,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="min" level="application" />
     <orderEntry type="library" name="ResizeObserver.global" level="application" />
+    <orderEntry type="library" name="webfontloader" level="application" />
   </component>
 </module>

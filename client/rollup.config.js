@@ -59,13 +59,14 @@ export default merge(baseConfig, {
         {src: 'manifest.json', dest: 'dist'},
         {src: 'browserconfig.xml', dest: 'dist'},
         {src: 'geogebra.html', dest: 'dist'},
+        {src: 'fonts/*', dest: 'dist/fonts'},
       ],
       flatten: false
     }),
     generateSW({
       swDest: 'dist/sw.js',
       globDirectory: 'dist/',
-      globPatterns: ['**/*.{html,js,css,png,svg}'],
+      globPatterns: ['**/*.{html,js,css,png,svg}', 'fonts/*'],
       navigateFallback: '/index.html',
       navigateFallbackDenylist: [/geogebra.html/],
     }),

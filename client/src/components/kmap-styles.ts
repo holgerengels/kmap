@@ -38,7 +38,7 @@ h6 {
   font-size: 0.85rem;
   font-weight: 500;
 }
-p, .font-body, td, dd, div, span {
+p, .font-body, td, dd {
   font-family: Roboto,sans-serif;
   -webkit-font-smoothing: antialiased;
   font-size: 0.95rem;

@@ -21,7 +21,7 @@ export class KMapSummaryCardSummary extends LitElement {
           font-family: Roboto,sans-serif;
           -webkit-font-smoothing: antialiased;
           font-size: 0.95rem;
-          font-weight: 500;
+          font-weight: 400;
         }
         span {
           white-space: normal;

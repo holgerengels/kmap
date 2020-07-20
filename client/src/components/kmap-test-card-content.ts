@@ -4,6 +4,7 @@ import {urls} from '../urls';
 import {fontStyles, colorStyles} from "./kmap-styles";
 import {unsafeHTML} from "lit-html/directives/unsafe-html";
 import {math} from "../math";
+import {katexStyles} from "../katex-css";
 
 @customElement('kmap-test-card-content')
 export class KMapTestCardContent extends LitElement {
@@ -144,7 +145,9 @@ export class KMapTestCardContent extends LitElement {
     return [
       fontStyles,
       colorStyles,
+      katexStyles,
       css`
+        .katex { font-size: 1.2em; }
         :host {
           padding: 12px;
           background-color: var(--color-lightest);
@@ -152,6 +155,10 @@ export class KMapTestCardContent extends LitElement {
           display: flex;
           flex-direction: row;
           flex-wrap: wrap;
+          font-family: Roboto,sans-serif;
+          -webkit-font-smoothing: antialiased;
+          font-size: 0.95rem;
+          font-weight: 400;
         }
         .card-content img {
           max-width: calc(100vw - 44px);
