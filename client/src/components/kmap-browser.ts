@@ -314,7 +314,7 @@ export class KMapBrowser extends connect(store, LitElement) {
             <svg-connector id="connector"></svg-connector>
           ` : ''}
           ${this._chapterCard ? html`
-            <div class="chapter-line">
+            <div class="chapter-line font-body">
               <a href="/app/browser/${encode(this._subject, this._chapter, '_')}" title="Wissenskarte ${this._chapter}" alt="Wissenskarte ${this._chapter}"><mwc-icon style="float: right">fullscreen</mwc-icon></a>
               ${this._chapterCard.depends ? html`
                 <div>
