@@ -63,8 +63,8 @@ public class Instances
             instance.addProperty("name", name);
             try {
                 JsonObject meta = client.findAny(JsonObject.class, uri + "/" + name + "-map/meta");
-                instance.addProperty("description", meta.get("description").getAsString());
-                instance.addProperty("authconf", meta.get("authconf").getAsString());
+                instance.addProperty("description", string(meta, "description"));
+                instance.addProperty("authconf", string(meta, "authconf"));
             } catch (NoDocumentException ignored) {}
             array.add(instance);
         });
