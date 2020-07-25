@@ -73,7 +73,7 @@ export class KMapLoginButton extends connect(store, LitElement) {
   render() {
     // language=HTML
     return html`
-<div class="fab" @click="${this._click}" ?hidden="${!this._userid}"><span>${this._initials}</span></div>
+<div class="fab font-body" @click="${this._click}" ?hidden="${!this._userid}"><span>${this._initials}</span></div>
 <div class="fab" @click="${this._click}" ?hidden="${this._userid}"><mwc-icon>person_outline</mwc-icon></div>
     `;
   }
