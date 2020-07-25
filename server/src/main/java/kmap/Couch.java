@@ -434,6 +434,7 @@ public class Couch extends Server {
         }
 
         if (chapterNode != null) {
+            chapterNode.setLinks(String.join("/", backlinks(links, name)));
             fixAttachments(chapterNode.getAttachments(), subject, name, "_");
             JsonObject card = new JsonObject();
             card.addProperty("module", chapterNode.getModule());
@@ -446,10 +447,20 @@ public class Couch extends Server {
             addProperty(card, "keywords", chapterNode.getKeywords());
             addProperty(card, "description", chapterNode.getDescription());
             addProperty(card, "summary", chapterNode.getSummary());
+            addProperty(card, "links", chapterNode.getLinks());
             add(card, "attachments", chapterNode.getAttachments());
             board.add("chapterCard", card);
         }
         return board;
+    }
+
+    private List<String> backlinks(Map<String, String> links, String name) {
+        List<String> backlinks = new ArrayList<>();
+        for (Map.Entry<String, String> entry : links.entrySet()) {
+            if (name.equals(entry.getValue()))
+                backlinks.add(entry.getKey().split("\\.")[0]);
+        }
+        return backlinks;
     }
 
     private JsonArray amendAttachments(JsonArray attachments, JsonObject _attachments) {
@@ -862,8 +873,13 @@ public class Couch extends Server {
         Couch couch = new Couch(readProperties(args[0]));
         Server.CLIENT.set("root");
 
-        JsonArray latest = couch.latest("Mathematik", 3);
-        System.out.println("latest = " + latest);
+        JsonObject dependencies = couch.dependencies("Mathematik");
+        System.out.println("dependencies = " + dependencies);
+        MultiMap<String, String> deps = couch.deps("Mathematik");
+        System.out.println("deps = " + deps);
+        Map<String, String> links = couch.links("Mathematik");
+        System.out.println("links = " + links);
+
         /*
         JsonObject object = couch.chapter("mathe", "Mathematik");
         System.out.println("object = " + object);

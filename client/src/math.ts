@@ -3,6 +3,7 @@ import AsciiMathParser from 'asciimath2tex';
 
 const parser = new AsciiMathParser();
 
+// ″
 export function math(code, setter) {
   const segments = code.split('`');
   if (segments.length % 2 === 1)
