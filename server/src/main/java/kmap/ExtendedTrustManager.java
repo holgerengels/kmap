@@ -30,9 +30,9 @@ public class ExtendedTrustManager
                     }
                 }
 
-                FileInputStream myKeys = new FileInputStream(properties.getProperty("ldap.trustStore"));
+                FileInputStream myKeys = new FileInputStream(properties.getProperty("auth.trustStore"));
                 KeyStore myTrustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-                myTrustStore.load(myKeys, properties.getProperty("ldap.trustStorePassword").toCharArray());
+                myTrustStore.load(myKeys, properties.getProperty("auth.trustStorePassword").toCharArray());
                 myKeys.close();
 
                 tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());

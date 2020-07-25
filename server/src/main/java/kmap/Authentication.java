@@ -7,12 +7,6 @@ import com.google.gson.*;
 import com.opencsv.CSVReader;
 import org.apache.commons.io.IOUtils;
 
-import javax.naming.*;
-import javax.naming.directory.Attribute;
-import javax.naming.directory.Attributes;
-import javax.naming.directory.SearchControls;
-import javax.naming.directory.SearchResult;
-import javax.naming.ldap.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -26,31 +20,16 @@ import java.util.*;
 
 public class Authentication {
     private Properties properties;
-    private Map<String, List<String>> groupConfig = new HashMap<>();
     private Map<String, Map<String, Account>> csvs = new HashMap<>();
 
     public Authentication(Properties properties) {
         this.properties = properties;
         ExtendedTrustManager.getInstance(properties);
-
-        String json = properties.getProperty("ldap.groups");
-        if (json != null) {
-            Gson gson = new GsonBuilder().create();
-            JsonObject object = gson.fromJson(json, JsonObject.class);
-            for (Map.Entry<String, JsonElement> entry : object.entrySet()) {
-                String string = entry.getValue().getAsString();
-                String[] strings = string.split(",");
-                for (String group : strings) {
-                    groupConfig.computeIfAbsent(group, k -> new ArrayList<>()).add(entry.getKey());
-                }
-            }
-            System.out.println(groupConfig);
-        }
     }
 
     private Map<String, Account> getCSV() {
         if (!csvs.containsKey(Server.CLIENT.get())) {
-            Path path = Paths.get(properties.getProperty("ldap.csv") + Server.CLIENT.get() + "-users.csv");
+            Path path = Paths.get(properties.getProperty("auth.csv") + Server.CLIENT.get() + "-users.csv");
             if (Files.exists(path)) {
                 try {
                     CSVReader reader = new CSVReader(Files.newBufferedReader(path));
@@ -134,13 +113,12 @@ public class Authentication {
     }
 
     private Set<String> authenticate(String user, String password) {
-        boolean authenticate = Boolean.parseBoolean(getProperty("ldap.authenticate"));
+        boolean authenticate = Boolean.parseBoolean(getProperty("auth.authenticate"));
         if (!authenticate && "admin".equals(password)) {
             Set<String> roles = new HashSet<>();
             roles.add("admin");
-            for (List<String> list : groupConfig.values()) {
-                roles.addAll(list);
-            }
+            roles.add("teacher");
+            roles.add("student");
             return roles;
         }
         if ("root".equals(Server.CLIENT.get())) {
@@ -152,7 +130,8 @@ public class Authentication {
             return roles;
         }
         else {
-            Set<String> roles = doauthenticate(user, password);
+            AuthConnection connection = AuthConnection.get(properties);
+            Set<String> roles = connection.doauthenticate(user, password);
             Map<String, Account> csv = getCSV();
             if (roles == null && csv != null) {
                 Account account = csv.get(user);
@@ -177,72 +156,6 @@ public class Authentication {
         catch (FirebaseAuthException e) {
             return null;
         }
-    }
-
-    private Set<String> doauthenticate(String user, String password) {
-        Hashtable<String, String> env = new Hashtable<String, String>();
-        env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-        env.put("java.naming.ldap.version", "3");
-        env.put(Context.PROVIDER_URL, getProperty("ldap.url"));
-        env.put(Context.SECURITY_PRINCIPAL, user + "@" + getProperty("ldap.domain"));
-        env.put(Context.SECURITY_CREDENTIALS, password);
-        env.put(Context.SECURITY_AUTHENTICATION, "simple");
-
-        try {
-            InitialLdapContext context = new InitialLdapContext(env, null);
-
-            Set<String> roles = new HashSet<>();
-            roles.add("user");
-
-            if (!groupConfig.isEmpty()) {
-                String searchFilter = "(&(objectClass=User)(cn=" + user + "))";
-                SearchControls searchControls = new SearchControls();
-                searchControls.setReturningAttributes(new String[] { "memberof", "displayName" });
-                searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-                searchControls.setCountLimit(2000);
-                NamingEnumeration results = context.search(getProperty("ldap.userbase"), searchFilter, searchControls);
-                while (results.hasMoreElements()) {
-                    SearchResult searchResult = (SearchResult)results.nextElement();
-                    Attributes attributes = searchResult.getAttributes();
-                    List<String> groups = groups(attributes);
-                    for (String group : groups) {
-                        List<String> r = groupConfig.get(group);
-                        if (r != null)
-                            roles.addAll(r);
-                    }
-                    roles.add("displayName:" + name(attributes));
-
-                    //System.out.println("groups = " + groups);
-                    //System.out.println("roles = " + roles);
-                }
-            }
-            context.close();
-            return roles;
-        }
-        catch (AuthenticationException e) {
-            System.out.println("ldap auth failed");
-            return null;
-        }
-        catch (NamingException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private List<String> groups(Attributes attributes) throws NamingException {
-        List<String> groups = new ArrayList<String>();
-        Attribute attribute = attributes.get("memberof");
-        NamingEnumeration<?> enumeration = attribute.getAll();
-        while (enumeration.hasMoreElements()) {
-            String value = (String)enumeration.nextElement();
-            int index = value.indexOf(',');
-            groups.add(value.substring("CN=".length(), index));
-        }
-        return groups;
-    }
-
-    private String name(Attributes attributes) throws NamingException {
-        Attribute attribute = attributes.get("displayName");
-        return (String)attribute.get();
     }
 
     void checkRole(HttpServletRequest request, String role) throws AuthException {

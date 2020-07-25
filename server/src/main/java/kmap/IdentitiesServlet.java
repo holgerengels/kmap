@@ -4,16 +4,11 @@ package kmap;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import org.apache.commons.io.IOUtils;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.List;
-import java.util.Properties;
 
 /**
  * Created by holger on 09.05.16.
@@ -22,12 +17,9 @@ import java.util.Properties;
 public class IdentitiesServlet
     extends JsonServlet
 {
-    private Students students;
-
     @Override
     public void init() throws ServletException {
         super.init();
-        students = new Students(properties);
     }
 
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -41,19 +33,19 @@ public class IdentitiesServlet
                 String expand = req.getParameter("expand");
                 if (students != null) {
                     log("load students = " + students);
-                    writeResponse(req, resp, array(this.students.readStudents()));
+                    writeResponse(req, resp, array(AuthConnection.get(properties).readStudents()));
                 }
                 else if (classes != null) {
                     log("load classes = " + classes);
-                    writeResponse(req, resp, array(this.students.readClasses()));
+                    writeResponse(req, resp, array(AuthConnection.get(properties).readClasses()));
                 }
                 else if (match != null) {
                     log("match identities = " + match);
-                    writeResponse(req, resp, array(this.students.filterIdentities(match)));
+                    writeResponse(req, resp, array(AuthConnection.get(properties).filterIdentities(match)));
                 }
                 else if (expand != null) {
                     log("expand class = " + expand);
-                    writeResponse(req, resp, array(this.students.expandClass(expand)));
+                    writeResponse(req, resp, array(AuthConnection.get(properties).expandClass(expand)));
                 }
                 else
                     log("unknown request " + req.getParameterMap());

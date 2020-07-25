@@ -10,12 +10,14 @@ export interface Sync {
 export interface Instance {
   name: string,
   description?: string,
+  authconf?: string,
 }
 export interface InstancesState {
   instances: Instance[],
   timestamp: number,
   loading: boolean,
   creating: boolean,
+  editing: boolean,
   dropping: boolean,
   syncing: boolean,
   error: string,
@@ -27,6 +29,7 @@ export default createModel({
     timestamp: -1,
     loading: false,
     creating: false,
+    editing: false,
     dropping: false,
     syncing: false,
     error: "",
@@ -59,7 +62,19 @@ export default createModel({
     receivedCreate(state, payload: Instance) {
       return { ...state,
         creating: false,
-        instances: [...state.instances, payload].sort()
+        instances: [...state.instances, payload].sort((a, b) => a.name.localeCompare(b.name))
+      };
+    },
+
+    requestEdit(state) {
+      return { ...state, editing: true,
+        error: "",
+      };
+    },
+    receivedEdit(state, payload: Instance) {
+      return { ...state,
+        editing: false,
+        instances: [...state.instances.filter(i => i.name !== payload.name), payload].sort((a, b) => a.name.localeCompare(b.name))
       };
     },
 
@@ -116,9 +131,22 @@ export default createModel({
       // @ts-ignore
       dispatch.instances.requestCreate();
       fetchjson(`${urls.server}content?create=${instance.name}`,
-        {... endpoint.post(state), body: JSON.stringify({name: instance.name, description: instance.description})},
+        {... endpoint.post(state), body: JSON.stringify({name: instance.name, description: instance.description, authconf: instance.authconf})},
         () => {
           dispatch.instances.receivedCreate(instance);
+        },
+        dispatch.app.handleError,
+        dispatch.instances.error);
+    },
+    async edit(instance: Instance) {
+      const dispatch = store.dispatch();
+      const state = store.getState();
+      // @ts-ignore
+      dispatch.instances.requestEdit();
+      fetchjson(`${urls.server}content?edit=${instance.name}`,
+        {... endpoint.post(state), body: JSON.stringify({name: instance.name, description: instance.description, authconf: instance.authconf})},
+        () => {
+          dispatch.instances.receivedEdit(instance);
         },
         dispatch.app.handleError,
         dispatch.instances.error);

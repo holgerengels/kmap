@@ -1,6 +1,5 @@
 package kmap;
 
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
@@ -17,7 +16,6 @@ import java.nio.charset.StandardCharsets;
 /**
  * Created by holger on 09.05.16.
  */
-
 @MultipartConfig(
         fileSizeThreshold = 1024 * 1024,
         maxFileSize = 1024 * 1024 * 5,
@@ -27,11 +25,13 @@ public class ContentManagerServlet
     extends JsonServlet
 {
     private ContentManager contentManager;
+    private Instances instances;
 
     @Override
     public void init() throws ServletException {
         super.init();
         contentManager = new ContentManager(properties);
+        instances = Instances.get(properties);
     }
 
     @Override
@@ -41,6 +41,7 @@ public class ContentManagerServlet
 
             if (authentication.handle(req, resp)) {
                 String create = req.getParameter("create");
+                String edit = req.getParameter("edit");
                 String drop = req.getParameter("drop");
                 String sync = req.getParameter("sync");
                 String importModule = req.getParameter("import-module");
@@ -85,12 +86,18 @@ public class ContentManagerServlet
                 else if (create != null) {
                     authentication.checkRole(req, "admin");
                     String json = IOUtils.toString(new InputStreamReader(req.getInputStream(), StandardCharsets.UTF_8));
-                    contentManager.createInstance(json);
+                    instances.createInstance(json);
                     writeResponse(req, resp, new JsonPrimitive(create));
+                }
+                else if (edit != null) {
+                    authentication.checkRole(req, "admin");
+                    String json = IOUtils.toString(new InputStreamReader(req.getInputStream(), StandardCharsets.UTF_8));
+                    instances.editInstance(edit, json);
+                    writeResponse(req, resp, new JsonPrimitive(edit));
                 }
                 else if (drop != null) {
                     authentication.checkRole(req, "admin");
-                    contentManager.dropInstance(drop);
+                    instances.dropInstance(drop);
                     writeResponse(req, resp, new JsonPrimitive(drop));
                 }
                 else if (sync != null) {
@@ -131,7 +138,7 @@ public class ContentManagerServlet
             String exportModule = req.getParameter("export-module");
             String exportSet = req.getParameter("export-set");
             if (instances != null) {
-                JsonArray result = contentManager.instances();
+                JsonArray result = this.instances.instances();
                 if (result != null)
                     writeResponse(req, resp, result);
             }

@@ -35,6 +35,16 @@ export class KMapContentManagerInstances extends connect(store, LitElement) {
   @property()
   private _newDescription: string = '';
 
+  @property()
+  private _newAuthconf: string = '';
+
+  @property()
+  private _editDescription: string = '';
+
+  @property()
+  private _editAuthconf: string = '';
+
+
   mapState(state: State) {
     return {
       _instances: state.instances.instances,
@@ -43,8 +53,11 @@ export class KMapContentManagerInstances extends connect(store, LitElement) {
   }
 
   updated(changedProperties) {
-    if (changedProperties.has('_selectedIndex'))
+    if (changedProperties.has('_selectedIndex')) {
       this._selected = this._instances[this._selectedIndex];
+      this._editDescription = this._selected?.description || '';
+      this._editAuthconf = this._selected?.authconf || '';
+    }
 
     if (changedProperties.has("_working") && !this._working)
       this._page = '';
@@ -72,7 +85,14 @@ export class KMapContentManagerInstances extends connect(store, LitElement) {
 
   _create() {
     console.log("create new instance");
-    store.dispatch.instances.create({ name: this._newName, description: this._newDescription});
+    store.dispatch.instances.create({ name: this._newName, description: this._newDescription, authconf: this._newAuthconf});
+  }
+
+  _edit() {
+    if (this._selected === undefined) return;
+
+    console.log("edit instance");
+    store.dispatch.instances.edit({ name: this._selected.name, description: this._editDescription, authconf: this._editAuthconf});
   }
 
   _drop() {
@@ -140,6 +160,7 @@ export class KMapContentManagerInstances extends connect(store, LitElement) {
           <label>Instanzen</label>
           <span style="float: right">
           <mwc-icon @click="${() => this._showPage('sync')}">merge_type</mwc-icon>
+          <mwc-icon @click="${() => this._showPage('edit')}">edit</mwc-icon>
           <mwc-icon @click="${() => this._showPage('create')}">add</mwc-icon>
           <mwc-icon @click="${() => this._showPage('drop')}" ?disabled="${this._selectedIndex === -1}">delete</mwc-icon>
           </span>
@@ -173,9 +194,20 @@ export class KMapContentManagerInstances extends connect(store, LitElement) {
             <label>Instanz anlegen</label>
             <mwc-textfield label="ID" type="text" .value="${this._newName}" @change="${e => this._newName = e.target.value}" required></mwc-textfield>
             <mwc-textfield label="Name" type="text" .value="${this._newDescription}" @change="${e => this._newDescription = e.target.value}"></mwc-textfield>
+            <mwc-textarea label="Authconf" .value="${this._newAuthconf}" @change="${e => this._newAuthconf = e.target.value}"></mwc-textarea>
             <div>
               <mwc-button @click="${() => this._showPage('')}">Abbrechen</mwc-button>
               <mwc-button outlined @click="${this._create}">Anlegen</mwc-button>
+            </div>
+          </div>
+          <div class="page" ?active="${this._page === 'edit'}">
+            <label>Instanz editieren</label>
+            <mwc-textfield label="ID" type="text" .value="${this._selected ? this._selected.name : ''}" disabled></mwc-textfield>
+            <mwc-textfield label="Name" type="text" .value="${this._editDescription}" @change="${e => this._editDescription = e.target.value}"></mwc-textfield>
+            <mwc-textarea label="Authconf" .value="${this._editAuthconf}" @change="${e => this._editAuthconf = e.target.value}"></mwc-textarea>
+            <div>
+              <mwc-button @click="${() => this._showPage('')}">Abbrechen</mwc-button>
+              <mwc-button outlined @click="${this._edit}">Speichern</mwc-button>
             </div>
           </div>
           <div class="page" ?active="${this._page === 'drop'}">

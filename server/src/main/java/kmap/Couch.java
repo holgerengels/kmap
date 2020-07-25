@@ -21,23 +21,15 @@ import static kmap.JSON.*;
  */
 public class Couch extends Server {
 
+    private final CouchConnection connection;
+
     public Couch(Properties properties) {
         super(properties);
+        connection = new CouchConnection(properties);
     }
 
-
     protected CouchDbClient createClient(String name) {
-        CouchDbProperties couchProperties = new CouchDbProperties()
-            .setDbName(Server.CLIENT.get() + "-" + name)
-            .setCreateDbIfNotExist(false)
-            .setProtocol("http")
-            .setHost(getProperty("kmap.host"))
-            .setPort(Integer.parseInt(getProperty("kmap.port")))
-            .setUsername(getProperty("kmap.user"))
-            .setPassword(getProperty("kmap.password"))
-            .setMaxConnections(10)
-            .setConnectionTimeout(0);
-        return new CouchDbClient(couchProperties);
+        return connection.createClient(name);
     }
 
     Gson getGson() {
@@ -879,29 +871,6 @@ public class Couch extends Server {
         JsonObject snp = states.statesAndProgress("h.engels", "Mathematik");
         System.out.println("states = " + snp);
          */
-    }
-
-    public JsonArray instances() {
-        CouchDbClient client = createClient("lala");
-        String uri = client.getBaseUri().toString();
-        JsonArray result = client.findAny(JsonArray.class, uri + "/_all_dbs");
-        List<String> list = new ArrayList<>();
-        result.forEach(element -> {
-            String name = element.getAsString();
-            if (name.endsWith("-map"))
-                list.add(name.substring(0, name.length() - "-map".length()));
-        });
-        JsonArray array = new JsonArray();
-        list.forEach(name -> {
-            JsonObject instance = new JsonObject();
-            instance.addProperty("name", name);
-            try {
-                JsonObject meta = client.findAny(JsonObject.class, uri + "/" + name + "-map/meta");
-                instance.addProperty("description", meta.get("description").getAsString());
-            } catch (NoDocumentException ignored) {}
-            array.add(instance);
-        });
-        return array;
     }
 
     static class WeightedSum {
