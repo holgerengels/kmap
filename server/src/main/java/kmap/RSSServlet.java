@@ -59,7 +59,7 @@ public class RSSServlet extends JsonServlet {
             eventWriter.add(eventFactory.createStartElement("", "", "channel"));
             eventWriter.add(end);
 
-            createNode(eventWriter, "title", "KMap");
+            createNode(eventWriter, "title", "KMap - " + subject);
             createNode(eventWriter, "link", "https://kmap.eu");
             createNode(eventWriter, "description", "KMap kartographiert Wissen mit Zusammenhang");
             createNode(eventWriter, "language", Locale.GERMANY.toLanguageTag());

@@ -48,11 +48,11 @@ public class IndexServlet extends JsonServlet {
                         JsonObject card;
                         if (path.length == 4) {
                             String topic = path[3];
-                            title = chapter + " - " + topic;
+                            title = subject + " - " + chapter + " - " + topic;
                             card = couch.loadTopic(subject, chapter, topic);
                         }
                         else {
-                            title = chapter;
+                            title = subject + " - " + chapter;
                             card = couch.loadTopic(subject, chapter, "_");
                         }
                         if (card != null) {
@@ -66,10 +66,10 @@ public class IndexServlet extends JsonServlet {
                     else if ("test".equals(page)) {
                         if (path.length == 4) {
                             String topic = path[3];
-                            title = "Aufgaben zum Thema " + chapter + " - " + topic;
+                            title = "Aufgaben zum Thema " + subject + " - " + chapter + " - " + topic;
                         }
                         else {
-                            title = "Aufgaben zum Thema " + chapter;
+                            title = "Aufgaben zum Thema " + subject + " - " + chapter;
                         }
                         description = "Ermittle Deinen Wissensstand mit Hilfe von interaktiven Aufgaben!";
                     }
@@ -88,6 +88,7 @@ public class IndexServlet extends JsonServlet {
         }
 
         String string = file();
+        string = string.replace("<title>KMap</title>", "<title>" + title + "</title>");
         string = string.replace("<meta ogtitle=\"\">", "<meta property=\"og:title\" content=\"" + title + "\">");
         string = string.replace("<meta ogdescription=\"\">", "<meta property=\"og:description\" content=\"" + description + "\">");
 

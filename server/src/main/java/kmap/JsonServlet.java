@@ -110,16 +110,14 @@ public class JsonServlet extends HttpServlet {
         Properties properties = (Properties)request.getServletContext().getAttribute("properties");
         if (Boolean.parseBoolean(properties.getProperty("kmap.cors"))) {
             String referer = getHeader(request, "referer");
-            if (referer == null)
-                throw new RuntimeException("referer header missing");
+            if (referer != null) {
+                int i = referer.indexOf("/", 9);
+                if (i != -1)
+                    referer = referer.substring(0, i);
 
-            int i = referer.indexOf("/", 9);
-            if (i != -1)
-                referer = referer.substring(0, i);
-
-            System.out.println(referer);
-
-            resp.setHeader("Access-Control-Allow-Origin", referer);
+                System.out.println(referer);
+                resp.setHeader("Access-Control-Allow-Origin", referer);
+            }
             resp.setHeader("Access-Control-Allow-Credentials", "true");
             resp.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS, HEAD, PUT, POST");
             resp.setHeader("Access-Control-Allow-Headers", "Origin, Accept, Content-Type, X-Requested-With, X-CSRF-Token, X-Instance");
