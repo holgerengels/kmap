@@ -14,11 +14,11 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.*;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Locale;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static kmap.JSON.loong;
 import static kmap.JSON.string;
@@ -64,7 +64,7 @@ public class RSSServlet extends JsonServlet {
             createNode(eventWriter, "description", "KMap kartographiert Wissen mit Zusammenhang");
             createNode(eventWriter, "language", Locale.GERMANY.toLanguageTag());
             createNode(eventWriter, "copyright", "KMap Team");
-            SimpleDateFormat date_format = new SimpleDateFormat("EEE', 'dd' 'MMM' 'yyyy' 'HH:mm:ss' 'Z", Locale.GERMANY);
+            SimpleDateFormat date_format = new SimpleDateFormat("EEE', 'dd' 'MMM' 'yyyy' 'HH:mm:ss' 'Z", Locale.ENGLISH);
             createNode(eventWriter, "pubDate", date_format.format(new Date()));
 
             if (subject != null) {
@@ -78,20 +78,23 @@ public class RSSServlet extends JsonServlet {
                     String topic = string(card, "topic");
                     String author = string(card, "author");
                     if (author == null)
-                        author = "KMap Team";
+                        author = "KMap Team <hengels@gmail.com>";
                     Long modified = loong(card, "modified");
                     String keywords = string(card, "keywords");
                     createNode(eventWriter, "title", chapter + " - " + topic);
                     createNode(eventWriter, "description", string(card, "summary"));
-                    createNode(eventWriter, "link", "https://kmap.eu/browser/" + subject + "/" + chapter + "/" + topic);
+                    createNode(eventWriter, "link", "https://kmap.eu/browser/" + encode(subject) + "/" + encode(chapter) + "/" + encode(topic));
                     createNode(eventWriter, "author", author);
-                    createNode(eventWriter, "guid", DigestUtils.md5Hex(subject + "/" + chapter + "/" + topic));
+                    createNode(eventWriter, "guid", DigestUtils.md5Hex(subject + "/" + chapter + "/" + topic), Collections.singletonMap("isPermaLink", "false"));
                     if (modified != null)
                         createNode(eventWriter, "pubDate", date_format.format(new Date(modified)));
+
+                    createNode(eventWriter, "category", chapter, null, true);
+                    createNode(eventWriter, "category", topic, null, true);
                     if (keywords != null) {
                         for (String keyword : keywords.split(",")) {
                             keyword = keyword.trim();
-                            createNode(eventWriter, "category", keyword, true);
+                            createNode(eventWriter, "category", keyword, null, true);
                         }
                     }
 
@@ -130,18 +133,26 @@ public class RSSServlet extends JsonServlet {
         return null;
     }
 
-    private void createNode(XMLEventWriter eventWriter, String name, String value)
+    private void createNode(XMLEventWriter eventWriter, String name, String value) throws XMLStreamException {
+        createNode(eventWriter, name, value, null, false);
+    }
+    private void createNode(XMLEventWriter eventWriter, String name, String value, Map<String, String> attributes)
             throws XMLStreamException {
-        createNode(eventWriter, name, value, false);
+        createNode(eventWriter, name, value, attributes, false);
     }
 
-    private void createNode(XMLEventWriter eventWriter, String name, String value, boolean cdata)
+    private void createNode(XMLEventWriter eventWriter, String name, String value, Map<String, String> attributes, boolean cdata)
             throws XMLStreamException {
         XMLEventFactory eventFactory = XMLEventFactory.newInstance();
         XMLEvent end = eventFactory.createDTD("\n");
         XMLEvent tab = eventFactory.createDTD("\t");
         // create Start node
-        StartElement sElement = eventFactory.createStartElement("", "", name);
+        List<Attribute> attrs = attributes != null
+                ? attributes.entrySet().stream().map((entry) -> eventFactory.createAttribute(entry.getKey(), entry.getValue())).collect(Collectors.toList())
+                : null;
+        StartElement sElement = attrs != null
+                ? eventFactory.createStartElement("", "", name, attrs.iterator(), null)
+                : eventFactory.createStartElement("", "", name);
         eventWriter.add(tab);
         eventWriter.add(sElement);
         // create Content
