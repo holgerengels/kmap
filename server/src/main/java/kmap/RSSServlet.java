@@ -83,7 +83,7 @@ public class RSSServlet extends JsonServlet {
                     String keywords = string(card, "keywords");
                     createNode(eventWriter, "title", chapter + " - " + topic);
                     createNode(eventWriter, "description", string(card, "summary"));
-                    createNode(eventWriter, "link", "https://kmap.eu/browser/" + encode(subject) + "/" + encode(chapter) + "/" + encode(topic));
+                    createNode(eventWriter, "link", "https://kmap.eu/app/browser/" + encode(subject) + "/" + encode(chapter) + "/" + encode(topic));
                     createNode(eventWriter, "author", author);
                     createNode(eventWriter, "guid", DigestUtils.md5Hex(subject + "/" + chapter + "/" + topic), Collections.singletonMap("isPermaLink", "false"));
                     if (modified != null)
