@@ -51,6 +51,11 @@
         <servlet-class>kmap.RSSServlet</servlet-class>
     </servlet>
 
+    <servlet>
+        <servlet-name>sitemap</servlet-name>
+        <servlet-class>kmap.SitemapServlet</servlet-class>
+    </servlet>
+
     <servlet-mapping>
         <servlet-name>data</servlet-name>
         <url-pattern>/data</url-pattern>
@@ -99,6 +104,11 @@
     <servlet-mapping>
         <servlet-name>feed</servlet-name>
         <url-pattern>/feed/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>sitemap</servlet-name>
+        <url-pattern>/sitemap/*</url-pattern>
     </servlet-mapping>
 
     <welcome-file-list>
