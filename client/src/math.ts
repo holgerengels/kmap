@@ -13,11 +13,12 @@ export function math(code, setter) {
   for (let i=0; i < segments.length; i+=2) {
     const text = segments[i];
     const ascii = segments[i+1];
-    const tex = parser.parse(ascii);
+    let tex = parser.parse(ascii);
+    tex = tex.replace(/\\color/g, "\\textcolor");
     const math = katex.renderToString(tex, { output: "html", throwOnError: false, trust: true });
     buffer += text;
-    buffer += math;
-    //buffer += "<span style='display: none'>" + tex + "</span>" + math;
+    //buffer += math;
+    buffer += "<span style='display: none'>" + tex + "</span>" + math;
   }
   setter(buffer);
 }
