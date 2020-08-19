@@ -46,4 +46,8 @@ public class JSON {
         objects.stream().sorted(Comparator.comparing(o -> o.getAsJsonPrimitive(member).getAsString())).forEach(array::add);
         return array;
     }
+
+    static boolean removeEmptyStrings(JsonObject o) {
+        return o.entrySet().removeIf(entry -> entry.getValue().isJsonPrimitive() && "".equals(entry.getValue().getAsString()));
+    }
 }

@@ -74,7 +74,7 @@ public class Couch extends Server {
                 || string(o,"description") == null);
         if (n < objects.size())
             objects = objects.subList(0, n);
-        objects.forEach(o -> o.entrySet().removeIf(entry -> entry.getValue().isJsonPrimitive() && "".equals(entry.getValue().getAsString())));
+        objects.forEach(JSON::removeEmptyStrings);
         objects.forEach(o -> {
             JsonArray attachments = o.getAsJsonArray("attachments");
             JsonObject _attachments = o.getAsJsonObject("_attachments");
