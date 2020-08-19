@@ -44,9 +44,9 @@ export class KMapKnowledgeCardDepends extends LitElement {
       ? html`
           <b>Voraussetzungen:</b> ${this.depends.map((depend) => html`
             ${this.chapterDepends ? html`
-              &nbsp;<a href="/app/browser/${this.subject}/${depend}">${depend}</a>
+              &nbsp;<a href="/app/browser/${this.subject}/${depend}" title="${(depend.includes('/') ? 'Wissenskarte ': 'Wissenslandkarte ') + depend}">${depend}</a>
             ` : html`
-              &nbsp;<a href="/app/browser/${this.subject}/${this.chapter}/${depend}">${depend}</a>
+              &nbsp;<a href="/app/browser/${this.subject}/${this.chapter}/${depend}" title="Wissenskarte ${depend}">${depend}</a>
             `}
           `)}
         `

@@ -347,18 +347,18 @@ export class KMapBrowser extends connect(store, LitElement) {
           ` : ''}
           ${this._chapterCard ? html`
             <div class="chapter-line font-body">
-              <a href="/app/browser/${encode(this._subject, this._chapter, '_')}" title="Wissenskarte ${this._chapter}" alt="Wissenskarte ${this._chapter}"><mwc-icon style="float: right">fullscreen</mwc-icon></a>
+              <a href="/app/browser/${encode(this._subject, this._chapter, '_')}" title="Wissenskarte ${this._chapter}"><mwc-icon style="float: right">fullscreen</mwc-icon></a>
               ${this._chapterCard.links ? html`
                 <div>
                   <b>Zurück zu</b> ${this._chapterCard.links.split("/").map((backlink) => html`
-                    <a href="/app/browser/${encode(this._subject, backlink)}">${backlink}</a>&nbsp;
+                    <a href="/app/browser/${encode(this._subject, backlink)}" title="Wissenslandkarte ${backlink}">${backlink}</a>&nbsp;
                   `)}
                 </div>
               ` : ''}
               ${this._chapterCard.depends ? html`
                 <div>
                   <b>Voraussetzung für das Kapitel ${this._chapter}:</b> ${this._chapterCard.depends.map((depend) => html`
-                    <a href="/app/browser/${encode(this._subject, depend)}">${depend}</a>&nbsp;
+                    <a href="/app/browser/${encode(this._subject, depend)}" title="${(depend.includes('/') ? 'Wissenskarte ': 'Wissenslandkarte ') + depend}">${depend}</a>&nbsp;
                   `)}
                 </div>
               ` : ''}
