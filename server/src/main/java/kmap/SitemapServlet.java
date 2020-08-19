@@ -57,9 +57,11 @@ public class SitemapServlet extends JsonServlet {
             eventWriter.add(end);
 
             SimpleDateFormat date_format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+            Long start = new SimpleDateFormat("dd/MM/yyyy").parse("01/01/2020").getTime();
 
             if (subject != null) {
                 JsonArray array = couch.latest(subject, 100000);
+                Map<String, Long> map = new HashMap<>();
                 for (JsonElement element : array) {
                     JsonObject card = (JsonObject) element;
                     eventWriter.add(eventFactory.createStartElement("", "", "url"));
@@ -68,8 +70,28 @@ public class SitemapServlet extends JsonServlet {
                     String chapter = string(card, "chapter");
                     String topic = string(card, "topic");
                     Long modified = loong(card, "modified");
+                    if (modified == null)
+                        modified = start;
                     createNode(eventWriter, "loc", "https://kmap.eu/app/browser/" + encode(subject) + "/" + encode(chapter) + "/" + encode(topic));
-                    createNode(eventWriter, "lastmod", modified != null ? date_format.format(new Date(modified)) : "2020-01-01");
+                    createNode(eventWriter, "lastmod", date_format.format(new Date(modified)));
+
+                    eventWriter.add(end);
+                    eventWriter.add(eventFactory.createEndElement("", "", "url"));
+                    eventWriter.add(end);
+
+                    Long lala = map.get(chapter);
+                    if (lala == null || lala < modified)
+                        map.put(chapter, modified);
+                }
+
+                for (Map.Entry<String, Long> entry : map.entrySet()) {
+                    String chapter = entry.getKey();
+                    Long modified = entry.getValue();
+                    eventWriter.add(eventFactory.createStartElement("", "", "url"));
+                    eventWriter.add(end);
+
+                    createNode(eventWriter, "loc", "https://kmap.eu/app/browser/" + encode(subject) + "/" + encode(chapter));
+                    createNode(eventWriter, "lastmod", date_format.format(new Date(modified)));
 
                     eventWriter.add(end);
                     eventWriter.add(eventFactory.createEndElement("", "", "url"));
