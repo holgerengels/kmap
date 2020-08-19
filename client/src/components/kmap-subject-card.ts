@@ -3,12 +3,13 @@ import {LitElement, html, css, customElement, property} from 'lit-element';
 import '@material/mwc-icon';
 import {STATE_COLORS} from './state-colors';
 import {fontStyles, colorStyles} from "./kmap-styles";
+import {Subject} from "../models/subjects";
 
 @customElement('kmap-subject-card')
 export class KMapSubjectCard extends LitElement {
 
-  @property({type: String})
-  private subject: string = '';
+  @property()
+  private subject?: Subject;
   @property()
   private _states: object = {};
   @property()
@@ -50,10 +51,10 @@ export class KMapSubjectCard extends LitElement {
     if (changedProperties.has("_states") || changedProperties.has("subject")) {
       this._hasStates = this._states && Object.keys(this._states).length !== 0;
 
-      if (this._hasStates) {
-        this._state = this._getStateValue(this.subject);
-        this._progressNum = this._getStateValue(this.subject + "*");
-        this._progressOf = this._getStateValue(this.subject + "#");
+      if (this._hasStates && this.subject) {
+        this._state = this._getStateValue(this.subject.name);
+        this._progressNum = this._getStateValue(this.subject.name + "*");
+        this._progressOf = this._getStateValue(this.subject.name + "#");
         this._progressPercent = Math.round(100 * this._progressNum / this._progressOf);
       }
       else {
@@ -97,7 +98,7 @@ export class KMapSubjectCard extends LitElement {
           0 4px 1px -2px rgba(0, 0, 0, 0.2);
           color: var(--color-darkgray);
         }
-        .card-header, .card-footer {
+        .card-header, .card-footer, .card-content {
           transition: background-color .5s ease-in-out;
           padding: 4px 8px;
           display: flex;
@@ -124,16 +125,19 @@ export class KMapSubjectCard extends LitElement {
 
   render() {
     return html`
+      ${this.subject ? html`
 <div class="card">
   <div class="card-header font-body">
-    <span>${this.subject}</span>
+    <span>${this.subject.name}</span>
     <div style="flex: 1 0 auto"></div>
-    <a href="/app/browser/${this.subject}/${this.subject}" title="Wissenslandkarte ${this.subject}" alt="Wissenslandkarte ${this.subject}"><mwc-icon style="--mdc-icon-size: 20px; margin:2px 0px">open_in_new</mwc-icon></a>
+    <a href="/app/browser/${this.subject.name}/${this.subject.name}" title="Wissenslandkarte ${this.subject.name}" alt="Wissenslandkarte ${this.subject.name}"><mwc-icon style="--mdc-icon-size: 20px; margin:2px 0px">open_in_new</mwc-icon></a>
   </div>
+  <div class="card-content font-body">${this.subject.count} Wissenskarten</div>
   <div class="card-footer font-body">
       <div style="flex: 1 0 auto; height: 24px"></div>
   </div>
   </div>
+  ` : ''}
     `;
   }
 }

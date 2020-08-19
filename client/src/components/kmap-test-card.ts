@@ -247,6 +247,7 @@ export class KMapTestCard extends connect(store, LitElement) {
         @keyframes blinker {
           70% {
             text-shadow: 1px 1px 4px var(--color-darkgray);
+            transform: scale(1.1);
           }
         }
       `];

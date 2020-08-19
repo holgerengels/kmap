@@ -211,7 +211,7 @@ export default createModel({
     error(state, message) {
       return { ...state,
         loading: false,
-        storing: false,
+        deleting: false,
         error: message,
       }
     },

@@ -13,11 +13,12 @@ import '@material/mwc-top-app-bar';
 import '@material/mwc-top-app-bar';
 import '@material/menu-surface';
 import {colorStyles, elevationStyles, fontStyles} from "./kmap-styles";
+import {Subject} from "../models/subjects";
 
 @customElement('kmap-test-chooser')
 export class KmapTestChooser extends connect(store, LitElement) {
   @property()
-  private _subjects: string[] = [];
+  private _subjects: Subject[] = [];
   @property()
   private _subject: string = '';
   @property()
@@ -132,7 +133,7 @@ export class KmapTestChooser extends connect(store, LitElement) {
     <div>
       <mwc-formfield>
         <mwc-select label="Fach" required @change="${e => this._subject = e.target.value}">
-          ${this._subjects.map((subject) => html`<mwc-list-item value="${subject}">${subject}</mwc-list-item>`)}
+          ${this._subjects.map((subject) => html`<mwc-list-item value="${subject.name}">${subject.name}</mwc-list-item>`)}
         </mwc-select>
       </mwc-formfield>
       ${!this._chaptersLoading ? html`

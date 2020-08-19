@@ -22,6 +22,10 @@ public class States {
         this.couch = couch;
     }
 
+    public Couch getCouch() {
+        return couch;
+    }
+
     public synchronized JsonObject states(String user, String subject) {
         CouchDbClient client = getClient();
         try {
@@ -104,97 +108,6 @@ public class States {
         return sum;
     }
 
-    public JsonArray courses(String user) {
-        CouchDbClient client = getClient();
-        JsonObject object;
-        try {
-            object = client.find(JsonObject.class, user + ".courses");
-        }
-        catch (NoDocumentException e) {
-            JsonObject courses = new JsonObject();
-            courses.addProperty("_id", user + ".courses");
-            courses.add("courses", new JsonArray());
-            client.save(courses);
-            object = client.find(JsonObject.class, user + ".courses");
-        }
-
-        return JSON.sort(object.getAsJsonArray("courses"));
-    }
-
-    public JsonArray course(String user, String name) {
-        CouchDbClient client = getClient();
-        try {
-            JsonObject object = client.find(JsonObject.class, user + ".courses");
-            return object.getAsJsonArray(name);
-        }
-        catch (NoDocumentException e) {
-            System.out.println("WARNING: there should be a document = " + e);
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void storeCourses(String user, String json) {
-        CouchDbClient client = getClient();
-        JsonArray data = client.getGson().fromJson(json, JsonArray.class);
-        try {
-            JsonObject object = client.find(JsonObject.class, user + ".courses");
-            JsonArray courses = JSON.sort(data);
-            object.add("courses", courses);
-            for (Iterator<Map.Entry<String, JsonElement>> iterator = object.entrySet().iterator(); iterator.hasNext(); ) {
-                Map.Entry<String, JsonElement> entry = iterator.next();
-                if ("_id|_rev|courses".contains(entry.getKey()))
-                    continue;
-                if (!courses.contains(new JsonPrimitive(entry.getKey())))
-                    iterator.remove();
-            }
-            client.update(object);
-        }
-        catch (NoDocumentException e) {
-            System.out.println("WARNING: there should be a document = " + e);
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void storeCourse(String user, String name, String json) {
-        CouchDbClient client = getClient();
-        JsonArray data = client.getGson().fromJson(json, JsonArray.class);
-        try {
-            JsonObject object = client.find(JsonObject.class, user + ".courses");
-            object.add(name, data);
-            JsonArray courses = object.get("courses").getAsJsonArray();
-            if (!courses.contains(new JsonPrimitive(name)))
-                courses.add(name);
-            client.update(object);
-        }
-        catch (NoDocumentException e) {
-            System.out.println("WARNING: there should be a document = " + e);
-            throw new RuntimeException(e);
-        }
-    }
-
-    public synchronized JsonObject courseStates(String user, String course, String subject) {
-        Map<String, Couch.WeightedSum> map = new HashMap<>();
-        JsonArray array = course(user, course);
-        for (JsonElement element : array) {
-            JsonObject states = states(element.getAsString(), subject);
-            states.remove("_id");
-            states.remove("_rev");
-            states.entrySet().forEach(entry -> map.merge(entry.getKey(), new Couch.WeightedSum(entry.getValue().getAsInt()), Couch.WeightedSum::add));
-        }
-
-        JsonObject states = new JsonObject();
-        states.addProperty("@", array.size());
-
-        for (Map.Entry<String, Couch.WeightedSum> entry : map.entrySet()) {
-            String topic = entry.getKey();
-            Couch.WeightedSum weightedSum = entry.getValue();
-            states.addProperty(topic, Math.round(weightedSum.average()));
-            states.addProperty(topic + "*", weightedSum.getCount());
-        }
-        averageAndProgress(states, subject);
-
-        return states;
-    }
 
     public synchronized JsonObject store(String user, String subject, String json) {
         CouchDbClient client = getClient();

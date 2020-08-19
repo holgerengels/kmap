@@ -3,8 +3,12 @@ import { Store } from '../store';
 import {endpoint, fetchjson} from "../endpoint";
 import {urls} from "../urls";
 
+export interface Subject {
+  name: string,
+  count: number,
+}
 export interface SubjectsState {
-  subjects: string[],
+  subjects: Subject[],
   timestamp: number,
   loading: boolean,
   error: string,
@@ -24,7 +28,7 @@ export default createModel({
         error: "",
       };
     },
-    receivedLoad(state, payload: string[]) {
+    receivedLoad(state, payload: Subject[]) {
       return { ...state,
         subjects: payload,
         loading: false,

@@ -8,3 +8,12 @@ export const iconTest = svg`
     <path d="M44.755,63.16c0,1.66-1.35,3-3,3h-8.34c-1.65,0-3-1.34-3-3c0-1.65,1.35-3,3-3h8.34C43.405,60.16,44.755,61.51,44.755,63.16z  "/>
     <path d="M68.766,52.68L58.355,63.1c-0.59,0.58-1.36,0.881-2.121,0.881c-0.77,0-1.539-0.301-2.129-0.881l-4-4  c-1.17-1.17-1.17-3.069,0-4.25c1.17-1.17,3.081-1.17,4.25,0l1.879,1.881l8.291-8.29c1.17-1.171,3.069-1.171,4.24,0  C69.936,49.61,69.936,51.51,68.766,52.68z"/>
 </svg>`;
+
+export const iconPointInTime = svg`
+<svg viewBox="0 0 24 24" fill="black" width="18px" height="18px" xmlns="http://www.w3.org/2000/svg">
+  <path d="M0 0h24v24H0z" fill="none"/>
+  <circle style="transition: fill 0.3s ease-in-out; stroke: var(--foreground); stroke-width: 2px; fill: var(--background);" cx="12" cy="12" r="10"/>
+</svg>`;
+
+export const pixes = svg`
+<svg viewBox="0 0 1 1"><path style="fill: var(--background);" d="m0,0v1h1V0"/></svg>`;

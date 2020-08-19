@@ -65,12 +65,12 @@ export default createModel({
         return;
 
       // @ts-ignore
-      if (Date.now() - state.averages.timestamp > 3000 || state.averages.subject !== subject || state.averages.course !== course) {
+      if (Date.now() - state.averages.timestamp > 3000 || state.averages.subject !== subject || state.averages.course !== course.name) {
         dispatch.averages.requestLoad();
-        fetchjson(`${urls.server}state?load=${userid}&subject=${subject}&course=${course}`, endpoint.get(state),
+        fetchjson(`${urls.server}state?load=${userid}&subject=${subject}&course=${course.name}`, endpoint.get(state),
           (json) => {
             // @ts-ignore
-            dispatch.averages.receivedLoad({subject: subject, course: course, rates: json});
+            dispatch.averages.receivedLoad({subject: subject, course: course.name, rates: json});
           },
           dispatch.app.handleError,
           dispatch.averages.error);

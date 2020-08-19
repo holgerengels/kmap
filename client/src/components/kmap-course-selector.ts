@@ -6,12 +6,13 @@ import '@material/mwc-icon';
 import '@material/mwc-list/mwc-list';
 import '@material/mwc-list/mwc-list-item';
 import {fontStyles, colorStyles} from "./kmap-styles";
+import {Course} from "../models/courses";
 
 @customElement('kmap-course-selector')
 export class KMapCourseSelector extends connect(store, LitElement) {
 
   @property()
-  private _courses: string[] = [];
+  private _courses: Course[] = [];
   @property()
   private _selectedIndex: number = -1;
 
@@ -21,7 +22,10 @@ export class KMapCourseSelector extends connect(store, LitElement) {
     else
       this._selectedIndex = index;
 
-    store.dispatch.courses.selectCourse(this._selectedIndex !== -1 ? this._courses[this._selectedIndex] : '');
+    if (this._selectedIndex !== -1)
+      store.dispatch.courses.selectCourse(this._courses[this._selectedIndex]);
+    else
+      store.dispatch.courses.unselectCourse();
   }
 
   mapState(state: State) {
@@ -44,7 +48,7 @@ export class KMapCourseSelector extends connect(store, LitElement) {
         <mwc-list>
           ${this._courses.map((course, i) => html`
             <mwc-list-item ?activated="${this._selectedIndex === i}" @click="${() => this._select(i)}" graphic="icon">
-              <span>${course}</span>
+              <span>${course.name}</span>
               <mwc-icon slot="graphic">group</mwc-icon>
             </mwc-list-item>
           `)}

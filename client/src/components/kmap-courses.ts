@@ -11,47 +11,45 @@ import '@material/mwc-list/mwc-list-item';
 import '@material/mwc-textarea';
 import '@material/mwc-textfield';
 import '@material/mwc-top-app-bar';
+import {Course} from "../models/courses";
 
 @customElement('kmap-courses')
-export class KCourses extends connect(store, LitElement) {
+export class KMapCourses extends connect(store, LitElement) {
   @property()
   private _page: string = '';
   @property()
-  private _courses: string[] = [];
+  private _courses: Course[] = [];
   @property()
   private _selectedIndex: number = -1;
-
   @property()
-  private _selectedName: string = '';
-  @property()
-  private _selectedStudents: string = '';
+  private _selected?: Course;
   @property()
   private _newName: string = '';
   @property()
   private _newStudents: string = '';
   @property()
+  private _newCurriculum: string = '';
+  @property()
   private _editName: string = '';
   @property()
   private _editStudents: string = '';
+  @property()
+  private _editCurriculum: string = '';
 
   mapState(state: State) {
     return {
       _courses: state.courses.courses,
-      _selectedIndex: state.courses.courses.includes(this._selectedName) ? state.courses.courses.indexOf(this._selectedName) : -1,
-      _selectedStudents: state.courses.students || '',
-      _editStudents: state.courses.students || '',
+      _selectedIndex: this._selected && state.courses.courses.includes(this._selected) ? state.courses.courses.indexOf(this._selected) : -1,
     };
   }
 
   updated(changedProperties) {
     if (changedProperties.has('_selectedIndex')) {
       if (this._selectedIndex === -1) {
-        this._selectedName = '';
-        this._selectedStudents = '';
+        this._selected = undefined;
       }
       else {
-        this._selectedName = this._courses[this._selectedIndex];
-        store.dispatch.courses.loadCourse(this._selectedName);
+        this._selected = this._courses[this._selectedIndex];
       }
     }
   }
@@ -69,8 +67,11 @@ export class KCourses extends connect(store, LitElement) {
     this._page = page;
 
     if (page === 'edit') {
-      this._editName = this._selectedName;
-      store.dispatch.courses.loadCourse(this._selectedName);
+      if (!this._selected) return;
+
+      this._editName = this._selected.name;
+      this._editStudents = this._selected.students.join(", ") || '';
+      this._editCurriculum = this._selected.curriculum;
     }
   }
 
@@ -79,38 +80,44 @@ export class KCourses extends connect(store, LitElement) {
     let students = this._newStudents.split(',');
     for (let i = 0; i < students.length; i++)
       students[i] = students[i].trim();
+    let curriculum = this._newCurriculum;
 
-    this._selectedName = name;
-    this._selectedStudents = students.join(', ');
-
-    await store.dispatch.courses.storeChange({ name: name, students: students });
+    const course: Course = { name: name, students: students, curriculum: curriculum };
+    await store.dispatch.courses.saveCourse(course);
+    this._selected = course;
 
     this._newName = '';
     this._newStudents = '';
+    this._newCurriculum = '';
     this._page = 'default';
   }
 
-  _edit() {
+  async _edit() {
     let name = this._editName;
     let students = this._editStudents.split(',');
     for (let i = 0; i < students.length; i++)
       students[i] = students[i].trim();
+    let curriculum = this._editCurriculum;
 
-    this._selectedName = name;
-    this._selectedStudents = students.join(', ');
+    const course: Course = { name: name, students: students, curriculum: curriculum };
+    await store.dispatch.courses.saveCourse(course);
 
-    store.dispatch.courses.storeChange({name: name, students: students});
+    this._selected = course;
 
     this._editName = '';
     this._editStudents = '';
+    this._editCurriculum = '';
     this._page = 'default';
   }
 
   _delete() {
-    let courses = new Array(...this._courses);
-    courses.splice(this._selectedIndex, 1);
-    store.dispatch.courses.store(courses);
-    this._courses = courses;
+    if (!this._selected) return;
+
+    store.dispatch.courses.deleteCourse(this._selected);
+    this._courses = this._courses.filter(c => c.name === this._selected?.name);
+
+    this._selected = undefined;
+    this._selectedIndex = -1;
     this._page = '';
   }
 
@@ -185,7 +192,7 @@ export class KCourses extends connect(store, LitElement) {
           <mwc-list>
             ${this._courses.map((course, i) => html`
               <mwc-list-item ?activated="${this._selectedIndex === i}" @click="${() => this._select(i)}" graphic="icon">
-                <span>${course}</span>
+                <span>${course.name}</span>
                 <mwc-icon slot="graphic">group</mwc-icon>
               </mwc-list-item>
             `)}
@@ -197,27 +204,30 @@ export class KCourses extends connect(store, LitElement) {
             <label>Neuer Kurs</label>
             <mwc-textfield label="Name" type="text" required .value=${this._newName} @change=${e => this._newName = e.target.value}></mwc-textfield>
             <mwc-textarea placeholder="Schüler" required rows="7" .value=${this._newStudents} @change=${e => this._newStudents = e.target.value}></mwc-textarea>
+            <mwc-textarea placeholder="Lernplan" rows="7" .value=${this._newCurriculum} @change=${e => this._newCurriculum = e.target.value}></mwc-textarea>
             <mwc-button @click="${this._new}">Speichern</mwc-button>
           </div>
           <div class="page" ?active="${this._page === 'edit'}">
             <label>Kurs bearbeiten</label>
             <mwc-textfield type="text" disabled .value=${this._editName}></mwc-textfield>
             <mwc-textarea placeholder="Schüler" required rows="3" .value=${this._editStudents} @change=${e => this._editStudents = e.target.value}></mwc-textarea>
+            <mwc-textarea placeholder="Lernplan" rows="3" .value=${this._editCurriculum} @change=${e => this._editCurriculum = e.target.value}></mwc-textarea>
             <mwc-button @click="${this._edit}">Speichern</mwc-button>
           </div>
           <div class="page" ?active="${this._page === 'delete'}">
             <label>Kurs löschen</label>
             <div class="field">
-              ${this._selectedName
-                ? html`<label>Soll der Kurs '${this._selectedName}' wirklich gelöscht werden?</label>`
+              ${this._selected
+                ? html`<label>Soll der Kurs '${this._selected.name}' wirklich gelöscht werden?</label>`
                 : ''}
             </div>
             <mwc-button @click="${this._delete}">Löschen</mwc-button>
           </div>
           <div class="page" ?active="${this._page === 'default'}">
             <label>Kurs</label>
-            <mwc-textfield type="text" disabled .value=${this._selectedName}></mwc-textfield>
-            <mwc-textarea placeholder="Schüler" disabled rows="3" .value=${this._selectedStudents}></mwc-textarea>
+            <mwc-textfield type="text" disabled .value=${this._selected?.name || ''}></mwc-textfield>
+            <mwc-textarea placeholder="Schüler" disabled rows="3" .value=${this._selected?.students.join(", ") || ''}></mwc-textarea>
+            <mwc-textarea placeholder="Lernplan" disabled rows="3" .value=${this._selected?.curriculum || ''}></mwc-textarea>
           </div>
         </div>
         <div class="space"></div>

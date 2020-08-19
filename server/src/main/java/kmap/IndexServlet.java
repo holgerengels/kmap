@@ -29,6 +29,7 @@ public class IndexServlet extends JsonServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String title = "KMap";
         String description = "KMap kartographiert Wissen mit Zusammenhang";
+        String author = "KMap Team";
         String text = "";
 
         try {
@@ -60,6 +61,7 @@ public class IndexServlet extends JsonServlet {
                             String cardDescription = string(card, "description");
                             description = cardSummary != null ? cardSummary : description;
                             text = cardDescription != null ? cardDescription : cardSummary;
+                            author = string(card, "author");
                         }
                         Server.CLIENT.remove();
                     }
@@ -91,6 +93,7 @@ public class IndexServlet extends JsonServlet {
         string = string.replace("<title>KMap</title>", "<title>" + title + "</title>");
         string = string.replace("<meta ogtitle=\"\">", "<meta property=\"og:title\" content=\"" + title + "\">");
         string = string.replace("<meta ogdescription=\"\">", "<meta property=\"og:description\" content=\"" + description + "\">");
+        string = string.replace("<meta author=\"\">", "<meta name=\"author\" content=\"" + author + "\">");
 
         // if (text == null) text = "";
         // string = string.replace("<ogtext></ogtext>", text);

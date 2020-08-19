@@ -6,29 +6,29 @@ import {urls} from "../urls";
 export interface Course {
   name: string,
   students: string[],
+  curriculum: string,
 }
 
 export interface CoursesState {
-  courses: string[],
-  selectedCourse: string,
-  students?: string[],
+  courses: Course[],
+  selectedCourse?: Course,
   timestamp: number,
   loading: boolean,
   loadingCourse: boolean,
-  storing: boolean,
-  storingChange: boolean,
+  saving: boolean,
+  deleting: boolean,
   error: string,
 }
 
 export default createModel({
   state: <CoursesState>{
     courses: [],
-    selectedCourse: "",
+    selectedCourse: undefined,
     timestamp: -1,
     loading: false,
     loadingCourse: false,
-    storing: false,
-    storingChange: false,
+    saving: false,
+    deleting: false,
     error: "",
   },
   reducers: {
@@ -38,10 +38,10 @@ export default createModel({
         error: "",
       };
     },
-    receivedLoad(state, payload: string[]) {
+    receivedLoad(state, payload: Course[]) {
       return { ...state,
         courses: payload,
-        selectedCourse: payload.includes(state.selectedCourse) ? state.selectedCourse : "",
+        selectedCourse: state.selectedCourse && payload.includes(state.selectedCourse) ? state.selectedCourse : undefined,
         students: undefined,
         loading: false,
       };
@@ -49,65 +49,51 @@ export default createModel({
     forget(state) {
       return { ...state,
         courses: [],
-        selectedCourse: "",
+        selectedCourse: undefined,
         students: undefined,
         timestamp: Date.now(),
         error: "",
       };
     },
 
-    requestLoadCourse(state) {
-      return { ...state, loadingCourse: true,
+    requestDeleteCourse(state) {
+      return { ...state, deleting: true,
         error: "",
       };
     },
-    receivedLoadCourse(state, payload: string[]) {
-      return { ...state,
-        students: payload,
-        loadingCourse: false,
-      };
-    },
-
-    requestStore(state) {
-      return { ...state, storing: true,
-        courses: [],
-        timestamp: Date.now(),
-        error: "",
-      };
-    },
-    receivedStore(state, payload: string[]) {
+    receivedDeleteCourse(state, payload: Course[]) {
       return { ...state,
         courses: payload,
-        selectedCourse: payload.includes(state.selectedCourse) ? state.selectedCourse : "",
-        students: payload.includes(state.selectedCourse) ? state.students : undefined,
-        storing: false,
+        selectedCourse: state.selectedCourse && payload.includes(state.selectedCourse) ? state.selectedCourse : undefined,
+        deleting: false,
       };
     },
 
-    requestStoreChange(state) {
-      return { ...state, storingChange: true,
+    requestSaveCourse(state) {
+      return { ...state, saving: true,
         error: "",
       };
     },
-    receivedStoreChange(state, payload: string[]) {
+    receivedSaveCourse(state, payload: Course[]) {
       return { ...state,
-        students: payload,
-        storingChange: false,
+        courses: payload,
+        selectedCourse: state.selectedCourse && payload.includes(state.selectedCourse) ? state.selectedCourse : undefined,
+        saving: false,
       };
     },
 
-    selectCourse(state, course: string) {
+    selectCourse(state, course: Course) {
       return { ...state, selectedCourse: course }
     },
     unselectCourse(state) {
-      return { ...state, selectedCourse: "" }
+      return { ...state, selectedCourse: undefined }
     },
 
     error(state, message) {
       return { ...state,
         loading: false,
-        storing: false,
-        storingChange: false,
+        deleting: false,
+        saving: false,
         error: message,
       }
     },
@@ -136,50 +122,37 @@ export default createModel({
         dispatch.courses.error);
     },
 
-    async store(payload: string[]) {
+    async deleteCourse(course: Course) {
       const dispatch = store.dispatch();
       const state = store.getState();
       const userid = state.app.userid;
       if (!userid)
         return;
 
-      dispatch.courses.requestStore();
-      fetchjson(`${urls.server}state?userid=${userid}&storeCourses=${userid}`, {... endpoint.post(state), body: JSON.stringify(payload)},
+      dispatch.courses.requestDeleteCourse();
+      fetchjson(`${urls.server}state?userid=${userid}&deleteCourse=${name}`, {... endpoint.post(state), body: JSON.stringify(course)},
         () => {
-          dispatch.courses.receivedStore(payload);
+          const courses: Course[] = state.courses.courses.filter(c => c.name != course.name);
+          dispatch.courses.receivedDeleteCourse(courses);
         },
         dispatch.app.handleError,
         dispatch.courses.error);
     },
-    async loadCourse(course: string) {
-      const dispatch = store.dispatch();
-      const state = store.getState();
-      const userid = state.app.userid;
-      if (!userid || !course)
-        return;
 
-      dispatch.courses.requestLoadCourse();
-      fetchjson(`${urls.server}state?userid=${userid}&course=${course}`, endpoint.get(state),
-        (json) => {
-          dispatch.courses.receivedLoadCourse(json);
-        },
-        dispatch.app.handleError,
-        dispatch.courses.error);
-    },
-    async storeChange(payload: Course) {
+    async saveCourse(course: Course) {
       const dispatch = store.dispatch();
       const state = store.getState();
       const userid = state.app.userid;
       if (!userid)
         return;
 
-      dispatch.courses.requestStoreChange();
-      fetchjson(`${urls.server}state?userid=${userid}&storeCourse=${payload.name}`, {... endpoint.post(state), body: JSON.stringify(payload.students)},
+      dispatch.courses.requestSaveCourse();
+      fetchjson(`${urls.server}state?userid=${userid}&saveCourse=${course.name}`, {... endpoint.post(state), body: JSON.stringify(course)},
         () => {
-          dispatch.courses.receivedStoreChange(payload.students);
-
-          if (!state.courses.courses.includes(payload.name))
-            dispatch.courses.receivedLoad([... state.courses.courses, payload.name].sort());
+          const courses: Course[] = state.courses.courses.filter(c => c.name != course.name);
+          courses.push(course);
+          courses.sort((a, b) => a.name.localeCompare(b.name));
+          dispatch.courses.receivedSaveCourse(courses);
         },
         dispatch.app.handleError,
         dispatch.courses.error);

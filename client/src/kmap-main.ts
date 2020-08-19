@@ -304,7 +304,7 @@ export class KmapMain extends connect(store, LitElement) {
   render() {
     // language=HTML
     return html`
-  <mwc-drawer id="drawer" hasheader type="${this._narrow ? 'modal' : 'dismissible'}" ?open="${this._drawerOpen}">
+  <mwc-drawer id="drawer" hasheader type="${this._narrow ? 'modal' : 'dismissible'}" ?open="${this._drawerOpen}" @MDCDrawer:closed="${() => this._drawerOpen = false}">
     <span slot="title">Knowledge Map</span>
     <span slot="subtitle">[<span>&nbsp;<b>Instanz:</b> ${this._instance}</span>
         <mwc-icon-button icon="polymer" class="secondary" @click="${this._showChooseInstance}" title="Instanz wechseln"></mwc-icon-button>
@@ -334,6 +334,9 @@ export class KmapMain extends connect(store, LitElement) {
           <mwc-switch ?checked="${this._layers.includes('dependencies')}" @change="${e => this._switchLayer('dependencies', e.target.checked)}"></mwc-switch>
         </mwc-formfield>
         ${this._roles.includes("teacher") ? html`
+          <mwc-formfield label="Timeline">
+            <mwc-switch ?checked="${this._layers.includes('timeline')}" @change="${e => this._switchLayer('timeline', e.target.checked)}"></mwc-switch>
+          </mwc-formfield>
           <mwc-formfield label="Mittelwerte">
             <mwc-switch ?checked="${this._layers.includes('averages')}" @change="${e => this._switchLayer('averages', e.target.checked)}"></mwc-switch>
           </mwc-formfield>
@@ -381,7 +384,7 @@ export class KmapMain extends connect(store, LitElement) {
   <kmap-login-popup id="login-popup"></kmap-login-popup>
 
   ${this._messages.map((message, i) => html`
-      <mwc-snackbar id="snackbar" labeltext="${message}" ?isOpen="${i === 0}" style="bottom: 100px"></mwc-snackbar>
+      <mwc-snackbar id="snackbar" labeltext="${message}" ?open="${i === 0}" style="bottom: 100px"></mwc-snackbar>
 `)}
 `;
   }

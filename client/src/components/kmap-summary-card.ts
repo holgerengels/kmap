@@ -39,6 +39,10 @@ export class KMapSummaryCard extends connect(store, LitElement) {
   private selected: boolean = false;
   @property({type: Boolean})
   private highlighted: boolean = false;
+
+  @property()
+  private grayedOut: boolean = false;
+
   @property()
   private _layers: string[] = [];
   @property()
@@ -65,6 +69,7 @@ export class KMapSummaryCard extends connect(store, LitElement) {
       _layers: state.shell.layers,
       selected: this.card !== undefined && state.maps.selected === this.card.topic,
       highlighted: this.card !== undefined && state.maps.selectedDependencies && state.maps.selectedDependencies.includes(this.card.topic),
+      grayedOut:  this.card !== undefined && !this.card.links && state.maps.targeted && !state.maps.targeted.includes(this.chapter + "/" + this.card.topic)
     };
   }
 
@@ -157,12 +162,17 @@ export class KMapSummaryCard extends connect(store, LitElement) {
         }
         div.card[thumb] {
           min-height: 134px;
+          transition: opacity 1s ease-in-out;
         }
         div.card[selected] {
           filter: saturate(1.5) brightness(.8);
         }
         div.card[highlighted] {
           filter: saturate(1.5) brightness(.8);
+        }
+        div.card[grayedOut] {
+          filter: grayscale(.5);
+          opacity: .5;
         }
         .card-header, .card-footer {
           transition: background-color .5s ease-in-out;
@@ -202,7 +212,7 @@ export class KMapSummaryCard extends connect(store, LitElement) {
     class="${classMap({"card": true, "elevation-02": !this.selected && !this.highlighted, "elevation-05": this.selected || this.highlighted})}"
     style=${ifDefined(this._thumbStyles ? styleMap(this._thumbStyles) : undefined)}
     ?thumb="${this.card.thumb}"
-    @click="${this._clicked}" ?selected="${this.selected}" ?highlighted="${this.highlighted}"
+    @click="${this._clicked}" ?selected="${this.selected}" ?highlighted="${this.highlighted}" ?grayedOut="${this.grayedOut}"
           >
   <mwc-ripple></mwc-ripple>
   <div class="card-header font-body">

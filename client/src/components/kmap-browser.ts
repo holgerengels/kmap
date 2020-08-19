@@ -2,7 +2,7 @@ import {LitElement, html, css, customElement, property} from 'lit-element';
 import { connect } from '@captaincodeman/rdx';
 import {State, store} from "../store";
 
-import {colorStyles, fontStyles} from "./kmap-styles";
+import {colorStyles, elevationStyles, fontStyles} from "./kmap-styles";
 import '@material/mwc-icon';
 import '@material/mwc-icon-button';
 import '@material/mwc-top-app-bar';
@@ -10,6 +10,7 @@ import './kmap-login-button';
 import './kmap-summary-card';
 import './kmap-knowledge-card';
 import './kmap-browser-chapter-editor';
+import './kmap-timeline';
 import './svg-connector';
 import {Line} from "../models/maps";
 import {RoutingState} from "@captaincodeman/rdx-model";
@@ -63,6 +64,9 @@ export class KMapBrowser extends connect(store, LitElement) {
   private _selected: string = '';
   @property()
   private _highlighted: string[] = [];
+  @property({reflect: true, type: Boolean})
+  // @ts-ignore
+  private timeline: boolean = false;
 
   set route(val: RoutingState) {
     if (val.page === "browser") {
@@ -84,6 +88,8 @@ export class KMapBrowser extends connect(store, LitElement) {
       _testTopics: state.tests.topics ? state.tests.topics.topics : [],
       _selected: state.maps.selected,
       _highlighted: state.maps.selectedDependencies,
+      _targeted: state.maps.targeted,
+      timeline: state.shell.layers.includes('timeline'),
     };
   }
 
@@ -253,9 +259,31 @@ export class KMapBrowser extends connect(store, LitElement) {
     return [
       fontStyles,
       colorStyles,
+      elevationStyles,
       css`
         :host {
-          display: contents;
+          display: grid;
+          grid-template-columns: 1fr;
+        }
+        :host([timeline]) {
+          grid-template-columns: 1fr 300px;
+        }
+        main {
+          overflow-x: hidden;
+        }
+        :host kmap-timeline {
+          opacity: 0;
+          position: fixed;
+          top: 0px;
+          padding-top: 48px;
+          right: -300px;
+          width: 300px;
+          bottom: 0px;
+          transition: right 0.4s ease-in-out;
+        }
+        :host([timeline]) kmap-timeline {
+          opacity: 1;
+          right: 0px;
         }
         .scrollpane {
           display: flex;
@@ -263,6 +291,7 @@ export class KMapBrowser extends connect(store, LitElement) {
           outline: none;
           overflow-x: scroll;
           margin-top: 2px;
+          scroll-snap-type: x mandatory;
         }
         .scrollpane:hover::-webkit-scrollbar-thumb {
           background-color: var(--color-mediumgray);
@@ -274,6 +303,9 @@ export class KMapBrowser extends connect(store, LitElement) {
         .scrollpane::-webkit-scrollbar-thumb {
           transition: background-color;
           border-radius: 10px;
+        }
+        .scrollpane > kmap-summary-card {
+          scroll-snap-align: center;
         }
         .chapter-line {
           margin: 0px 0px 8px 6px;
@@ -361,6 +393,7 @@ export class KMapBrowser extends connect(store, LitElement) {
         <main id="search" class="page search" ?active="${this._page === 'search'}">
             search
         </main>
+        <kmap-timeline class="elevation-02"></kmap-timeline>
     `;
   }
 }

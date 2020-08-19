@@ -38,9 +38,7 @@ public class Couch extends Server {
 
     public synchronized JsonArray loadModule(String subject, String module) {
         List<JsonObject> objects = loadModuleAsList(subject, module);
-        JsonArray array = new JsonArray();
-        objects.forEach(array::add);
-        return array;
+        return array(objects);
     }
 
     private List<JsonObject> loadModuleAsList(String subject, String module) {
@@ -83,9 +81,7 @@ public class Couch extends Server {
             fixAttachments(attachments, subject, string(o, "chapter"), string(o, "topic"));
             o.remove("_attachments");
         });
-        JsonArray array = new JsonArray();
-        objects.forEach(array::add);
-        return array;
+        return array(objects);
     }
 
     public synchronized JsonArray loadModules() {
@@ -105,9 +101,7 @@ public class Couch extends Server {
             .comparing((JsonObject o) -> o.getAsJsonPrimitive("subject").getAsString())
             .thenComparing(o -> o.getAsJsonPrimitive("module").getAsString())
         );
-        JsonArray array = new JsonArray();
-        modules.forEach(array::add);
-        return array;
+        return array(modules);
     }
 
     public JsonArray loadSubjects() {
@@ -115,10 +109,21 @@ public class Couch extends Server {
             .group(true)
             .reduce(true);
         List<JsonObject> objects = view.query(JsonObject.class);
-        List<String> modules = new ArrayList<>();
-        objects.forEach(object -> modules.add(object.getAsJsonArray("key").get(0).getAsString()));
+        List<JsonObject> modules = new ArrayList<>();
+        objects.forEach(object -> {
+            JsonObject subject = new JsonObject();
+            subject.addProperty("subject", object.getAsJsonArray("key").get(0).getAsString());
+            subject.addProperty("count", object.get("value").getAsNumber());
+            modules.add(subject);
+        });
+        Map<String, Integer> map = modules.stream().collect(Collectors.groupingBy(s -> JSON.string(s, "subject"), Collectors.summingInt(c -> integer(c, "count"))));
         JsonArray array = new JsonArray();
-        modules.stream().filter(m -> !"Hilfe".equals(m)).sorted().distinct().forEach(array::add);
+        map.entrySet().stream().filter(entry -> !"Hilfe".equals(entry.getKey())).sorted(Map.Entry.comparingByKey()).distinct().forEach(e -> {
+            JsonObject subject = new JsonObject();
+            subject.addProperty("name", e.getKey());
+            subject.addProperty("count", e.getValue());
+            array.add(subject);
+        });
         return array;
     }
 
@@ -873,6 +878,8 @@ public class Couch extends Server {
         Couch couch = new Couch(readProperties(args[0]));
         Server.CLIENT.set("root");
 
+        JsonArray jsonElements = couch.loadSubjects();
+        System.out.println("jsonElements = " + jsonElements);
         JsonObject dependencies = couch.dependencies("Mathematik");
         System.out.println("dependencies = " + dependencies);
         MultiMap<String, String> deps = couch.deps("Mathematik");

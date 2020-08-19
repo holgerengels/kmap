@@ -35,6 +35,7 @@ export interface MapState {
   error: string,
   selected: string,
   selectedDependencies: string[],
+  targeted: string[],
   deleting: boolean,
   renaming: boolean,
   saving: boolean,
@@ -58,6 +59,7 @@ export default createModel({
     error: "",
     selected: "",
     selectedDependencies: [],
+    targeted: [],
     deleting: false,
     renaming: false,
     saving: false,
@@ -76,7 +78,9 @@ export default createModel({
     unselectCard(state) {
       return { ...state, selected: "", selectedDependencies: [] }
     },
-
+    setTargeted(state, targeted) {
+      return { ...state, targeted: targeted }
+    },
     request(state) {
       return { ...state, loading: true,
         timestamp: Date.now(),
@@ -317,6 +321,9 @@ export default createModel({
         dispatch.maps.unsetCardForDelete();
         dispatch.maps.unsetCardForEdit();
         dispatch.maps.unsetCardForRename();
+      }
+      if (!state.shell.layers.includes("timeline")) {
+        dispatch.maps.setTargeted(undefined);
       }
     },
   })

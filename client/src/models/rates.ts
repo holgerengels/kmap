@@ -51,7 +51,7 @@ export default createModel({
     },
 
     requestStore(state) {
-      return { ...state, storing: true,
+      return { ...state, deleting: true,
         rates: {},
         timestamp: Date.now(),
         error: "",
@@ -62,13 +62,13 @@ export default createModel({
       return { ...state,
         subject: payload.subject,
         rates: payload.rates,
-        storing: false,
+        deleting: false,
       };
     },
     error(state, message) {
       return { ...state,
         loading: false,
-        storing: false,
+        deleting: false,
         error: message,
       }
     },

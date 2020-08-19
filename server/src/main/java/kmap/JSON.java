@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 import java.util.Comparator;
+import java.util.List;
 import java.util.stream.StreamSupport;
 
 public class JSON {
@@ -32,5 +33,17 @@ public class JSON {
         JsonArray newArray = new JsonArray();
         StreamSupport.stream(array.spliterator(), false).sorted(Comparator.comparing(JsonElement::getAsString)).forEach(newArray::add);
         return newArray;
+    }
+
+    static JsonArray array(List<JsonObject> objects) {
+        JsonArray array = new JsonArray();
+        objects.forEach(array::add);
+        return array;
+    }
+
+    static JsonArray sortedArray(List<JsonObject> objects, String member) {
+        JsonArray array = new JsonArray();
+        objects.stream().sorted(Comparator.comparing(o -> o.getAsJsonPrimitive(member).getAsString())).forEach(array::add);
+        return array;
     }
 }

@@ -10,12 +10,13 @@ import './kmap-subject-card';
 import './kmap-randomtest-card';
 import {Random, Test} from "../models/tests";
 import {Latest} from "../models/maps";
+import {Subject} from "../models/subjects";
 
 
 @customElement('kmap-subjects')
 export class KMapSubjects extends connect(store, LitElement) {
   @property()
-  private _subjects: string[] = [];
+  private _subjects: Subject[] = [];
   @property()
   private _randomTests?: Random = undefined;
   @property()
