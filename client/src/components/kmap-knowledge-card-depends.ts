@@ -6,7 +6,7 @@ export class KMapKnowledgeCardDepends extends LitElement {
   @property({type: String})
   private subject: string = '';
   @property({type: String})
-  private depends: string[] = [];
+  private dependencies: string[] = [];
 
   static get styles() {
     // language=CSS
@@ -39,9 +39,9 @@ export class KMapKnowledgeCardDepends extends LitElement {
 
   render() {
     return html`
-    ${this.depends && this.depends.length > 0
+    ${this.dependencies && this.dependencies.length > 0
       ? html`
-          <b>Voraussetzungen:</b> ${this.depends.map((depend) => html`
+          <b>Voraussetzungen:</b> ${this.dependencies.map((depend) => html`
               &nbsp;<a href="/app/browser/${this.subject}/${depend}"
               title="${(depend.includes('/') ? 'Wissenskarte ': 'Wissenslandkarte ') + depend}">${depend.replace(/\//, " → ")}</a>
           `)}

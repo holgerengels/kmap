@@ -355,9 +355,9 @@ export class KMapBrowser extends connect(store, LitElement) {
                   `)}
                 </div>
               ` : ''}
-              ${this._chapterCard.depends ? html`
+              ${this._chapterCard.dependencies ? html`
                 <div>
-                  <b>Voraussetzung für das Kapitel ${this._chapter}:</b> ${this._chapterCard.depends.map((depend) => html`
+                  <b>Voraussetzung für das Kapitel ${this._chapter}:</b> ${this._chapterCard.dependencies.map((depend) => html`
                     <a href="/app/browser/${encode(this._subject, depend)}" title="${(depend.includes('/') ? 'Wissenskarte ': 'Wissenslandkarte ') + depend}">${depend}</a>&nbsp;
                   `)}
                 </div>
@@ -370,7 +370,7 @@ export class KMapBrowser extends connect(store, LitElement) {
               ${this._hasTests && this._page === "map" ? html`
                 <div>
                   <b>Aufgaben zum Kapitel</b>
-                  <a href="/app/test/${encode(this._subject, this._chapter)}" class="tests" title="Aufgaben zum Kapitel ${this._chapter}" alt="Aufgaben zum Kapitel ${this._chapter}">${iconTest}</a>
+                  <a href="/app/test/${encode(this._subject, this._chapter)}" class="tests" title="Aufgaben zum Kapitel ${this._chapter}">${iconTest}</a>
                 </div>
               ` : ''}
             </div>

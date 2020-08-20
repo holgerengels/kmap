@@ -252,8 +252,8 @@ export class KMapKnowledgeCard extends connect(store, LitElement) {
   </div>
   <kmap-knowledge-card-depends
       .subject="${this.subject}"
-      .depends="${this.card.depends}"
-      ?hidden="${!this.card.depends || this.card.depends.length === 0}">
+      .dependencies="${this.card.dependencies}"
+      ?hidden="${!this.card.dependencies || this.card.dependencies.length === 0}">
   </kmap-knowledge-card-depends>
     ${this.card.links ? html`
   <kmap-knowledge-card-progress
@@ -271,7 +271,6 @@ export class KMapKnowledgeCard extends connect(store, LitElement) {
       .topic="${this.card.topic}"
       .description="${this.card.description}"
       .links="${this.card.links}"
-      .depends="${this.card.depends}"
       .progressNum="${this.progressNum}"
       .progressOf="${this.progressOf}">
   </kmap-knowledge-card-description>

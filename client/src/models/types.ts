@@ -31,6 +31,7 @@ export interface Card {
   thumb?: string;
   links?: string,
   depends?: string[],
+  dependencies?: string[];
   priority?: number,
   attachments: Attachment[];
   annotations?: string,

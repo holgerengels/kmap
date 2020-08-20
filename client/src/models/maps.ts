@@ -73,7 +73,7 @@ export default createModel({
   },
   reducers: {
     selectCard(state, card: Card) {
-      return { ...state, selected: card.topic, selectedDependencies: card.depends || [] }
+      return { ...state, selected: card.topic, selectedDependencies: card.dependencies || [] }
     },
     unselectCard(state) {
       return { ...state, selected: "", selectedDependencies: [] }

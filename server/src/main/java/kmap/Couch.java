@@ -430,11 +430,14 @@ public class Couch extends Server {
             addProperty(card, "links", node.getLinks());
             add(card, "attachments", node.getAttachments());
             JsonArray depends = new JsonArray();
+            JsonArray dependencies = new JsonArray();
             for (String dependName : node.getDepends()) {
+                depends.add(dependName);
                 String link = links.get(name + "." + dependName);
-                depends.add(link != null ? link : name + "/" + dependName);
+                dependencies.add(link != null ? link : name + "/" + dependName);
             }
             card.add("depends", depends);
+            card.add("dependencies", dependencies);
             card.addProperty("annotations", String.join(", ", node.getAnnotations()));
             addProperty(card, "priority", node.getPriority());
             cards.add(card);
@@ -449,7 +452,7 @@ public class Couch extends Server {
             if (!chapterNode.getDepends().isEmpty()) {
                 JsonArray array = new JsonArray();
                 chapterNode.getDepends().forEach(array::add);
-                add(card, "depends", array);
+                add(card, "dependencies", array);
             }
             addProperty(card, "keywords", chapterNode.getKeywords());
             addProperty(card, "description", chapterNode.getDescription());
