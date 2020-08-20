@@ -136,6 +136,8 @@ curl -X PUT -u $1 http://localhost:5984/$2-test/_design/test -d @design-test.jso
             try (CloseableHttpResponse ignored = httpClient.execute(put, context)){ System.out.println("created " + name + "-state"); }
             put = new HttpPut(url() + name + "-feedback");
             try (CloseableHttpResponse ignored = httpClient.execute(put, context)){ System.out.println("created " + name + "-feedback"); }
+            put = new HttpPut(url() + name + "-course");
+            try (CloseableHttpResponse ignored = httpClient.execute(put, context)){ System.out.println("created " + name + "-course"); }
 
             put = new HttpPut(url() + name + "-map/_design/net");
             entity = new InputStreamEntity(Files.newInputStream(Paths.get(getProperty("kmap.designDocs") + "design-map.json")));
@@ -148,6 +150,12 @@ curl -X PUT -u $1 http://localhost:5984/$2-test/_design/test -d @design-test.jso
             entity.setContentType("application/json");
             put.setEntity(entity);
             try (CloseableHttpResponse ignored = httpClient.execute(put, context)){ System.out.println("design " + name + "-test"); }
+
+            put = new HttpPut(url() + name + "-course/_design/course");
+            entity = new InputStreamEntity(Files.newInputStream(Paths.get(getProperty("kmap.designDocs") + "design-course.json")));
+            entity.setContentType("application/json");
+            put.setEntity(entity);
+            try (CloseableHttpResponse ignored = httpClient.execute(put, context)){ System.out.println("design " + name + "-course"); }
 
             String current = Server.CLIENT.get();
             try {
@@ -193,6 +201,8 @@ curl -X DELETE -u $1 http://127.0.0.1:5984/$2-state
             try (CloseableHttpResponse ignored = client.execute(put, context)){ System.out.println("dropped " + name + "-state"); }
             put = new HttpDelete(url() + name + "-feedback");
             try (CloseableHttpResponse ignored = client.execute(put, context)){ System.out.println("dropped " + name + "-feedback"); }
+            put = new HttpDelete(url() + name + "-course");
+            try (CloseableHttpResponse ignored = client.execute(put, context)){ System.out.println("dropped " + name + "-course"); }
         }
         catch (IOException e) {
             throw new RuntimeException(e);
