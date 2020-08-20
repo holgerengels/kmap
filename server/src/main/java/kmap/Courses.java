@@ -1,5 +1,6 @@
 package kmap;
 
+import com.google.api.client.json.Json;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -34,8 +35,13 @@ public class Courses {
                 .key(user)
                 .reduce(false)
                 .includeDocs(true);
-        List<JsonObject> objects = view.query(JsonObject.class);
-        return sortedArray(objects, "name");
+        try {
+            List<JsonObject> objects = view.query(JsonObject.class);
+            return sortedArray(objects, "name");
+        }
+        catch (NoDocumentException e) {
+            return new JsonArray();
+        }
     }
 
     public JsonObject course(String user, String name) {
