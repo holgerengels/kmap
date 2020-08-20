@@ -50,8 +50,13 @@ public class Courses {
                 .key(user, name)
                 .reduce(false)
                 .includeDocs(true);
-        List<JsonObject> objects = view.query(JsonObject.class);
-        return objects.size() == 1 ? objects.get(0) : null;
+        try {
+            List<JsonObject> objects = view.query(JsonObject.class);
+            return objects.size() == 1 ? objects.get(0) : null;
+        }
+        catch (NoDocumentException e) {
+            return null;
+        }
     }
 
     public void deleteCourse(String user, String json) {
