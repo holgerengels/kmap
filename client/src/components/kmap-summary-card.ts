@@ -53,6 +53,8 @@ export class KMapSummaryCard extends connect(store, LitElement) {
   private _hasTests: boolean = false;
   @property()
   private _topics: string[] = [];
+  @property()
+  private _selectedDependencies: string[] = [];
 
   @queryAsync('mwc-ripple') ripple!: Promise<Ripple|null>;
 
@@ -67,8 +69,8 @@ export class KMapSummaryCard extends connect(store, LitElement) {
       _userid: state.app.userid,
       _topics: state.tests.topics ? state.tests.topics.topics : [],
       _layers: state.shell.layers,
+      _selectedDependencies: state.maps.selectedDependencies,
       selected: this.card !== undefined && state.maps.selected === this.card.topic,
-      highlighted: this.card !== undefined && state.maps.selectedDependencies && state.maps.selectedDependencies.includes(this.card.topic),
       grayedOut:  this.card !== undefined && !this.card.links && state.maps.targeted && !state.maps.targeted.includes(this.chapter + "/" + this.card.topic)
     };
   }
@@ -89,6 +91,12 @@ export class KMapSummaryCard extends connect(store, LitElement) {
 
     if (changedProperties.has("_userid") || changedProperties.has("_layers") || changedProperties.has("_key"))
       this._colorizeEvent( );
+
+    if (changedProperties.has("_selectedDependencies")) {
+      this.highlighted= this.card?.links
+        ? this._selectedDependencies.includes(this.card.links)
+        : this._selectedDependencies.includes(this.chapter + "/" + this.card?.topic);
+    }
   }
 
   _colorize(rate) {

@@ -431,7 +431,8 @@ public class Couch extends Server {
             add(card, "attachments", node.getAttachments());
             JsonArray depends = new JsonArray();
             for (String dependName : node.getDepends()) {
-                depends.add(dependName);
+                String link = links.get(name + "." + dependName);
+                depends.add(link != null ? link : name + "/" + dependName);
             }
             card.add("depends", depends);
             card.addProperty("annotations", String.join(", ", node.getAnnotations()));

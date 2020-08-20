@@ -1,0 +1,12 @@
+{
+  "_id": "_design/course",
+  "views": {
+    "byName": {
+      "map": "function(doc) {\n    if (doc.user && doc.name)\n      emit([doc.user, doc.name]);\n}"
+    },
+    "byUser": {
+      "map": "function(doc) {\n    if (doc.user)\n      emit(doc.user);\n}"
+    }
+  },
+  "language": "javascript"
+}

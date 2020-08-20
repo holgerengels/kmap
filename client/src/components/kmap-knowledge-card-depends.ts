@@ -6,11 +6,7 @@ export class KMapKnowledgeCardDepends extends LitElement {
   @property({type: String})
   private subject: string = '';
   @property({type: String})
-  private chapter: string = '';
-  @property({type: String})
   private depends: string[] = [];
-  @property({type: Boolean})
-  private chapterDepends: boolean = false;
 
   static get styles() {
     // language=CSS
@@ -34,6 +30,9 @@ export class KMapKnowledgeCardDepends extends LitElement {
         a:hover {
           text-decoration: underline;
         }
+        a:not(:last-child):after {
+            content: ", ";
+        }
       `
     ];
   }
@@ -43,11 +42,8 @@ export class KMapKnowledgeCardDepends extends LitElement {
     ${this.depends && this.depends.length > 0
       ? html`
           <b>Voraussetzungen:</b> ${this.depends.map((depend) => html`
-            ${this.chapterDepends ? html`
-              &nbsp;<a href="/app/browser/${this.subject}/${depend}" title="${(depend.includes('/') ? 'Wissenskarte ': 'Wissenslandkarte ') + depend}">${depend}</a>
-            ` : html`
-              &nbsp;<a href="/app/browser/${this.subject}/${this.chapter}/${depend}" title="Wissenskarte ${depend}">${depend}</a>
-            `}
+              &nbsp;<a href="/app/browser/${this.subject}/${depend}"
+              title="${(depend.includes('/') ? 'Wissenskarte ': 'Wissenslandkarte ') + depend}">${depend.replace(/\//, " → ")}</a>
           `)}
         `
       : ''}
