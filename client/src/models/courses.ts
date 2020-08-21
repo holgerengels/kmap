@@ -4,6 +4,7 @@ import {endpoint, fetchjson} from "../endpoint";
 import {urls} from "../urls";
 
 export interface Course {
+  subject: string,
   name: string,
   students: string[],
   curriculum: string,

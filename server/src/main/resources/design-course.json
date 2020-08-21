@@ -6,6 +6,9 @@
     },
     "byUser": {
       "map": "function(doc) {\n    if (doc.user)\n      emit(doc.user);\n}"
+    },
+    "byStudent": {
+      "map": "function (doc) {\n    if (doc.subject && doc.curriculum && doc.students) {\n        for (var i=0; i < doc.students.length; i++) {\n            emit([doc.students[i], doc.subject, doc.curriculum]);\n        }\n    }\n}"
     }
   },
   "language": "javascript"

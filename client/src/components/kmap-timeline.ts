@@ -52,10 +52,11 @@ export class KMapTimeline extends connect(store, LitElement) {
       { cw: 38, sw: 1, tops: ["Grundwissen/Mengenlehre", "Grundwissen/Zahlenmengen", "Grundwissen/Intervalle"] },
       { cw: 39, sw: 2, tops: ["Grundwissen/Terme", "Grundwissen/Gleichungen"] },
       { cw: 40, sw: 3, tops: ["Grundwissen/Koordinatensystem", "Grundwissen/Symmetrie", "Grundwissen/Geraden"] },
-      { cw: 41, sw: 4, tops: ["Grundwissen/Parabeln"] },
+      { cw: 41, sw: 4, tops: ["Parabeln/*", "Grundwissen/Parabeln"] },
       { cw: 42, sw: 5, tops: ["Funktionen/Allgemeines", "Funktionen/Darstellung"] },
       { cw: 43, sw: 6, tops: ["Lineare Funktionen/Steigung", "Lineare Funktionen/Hauptform"] },
       { cw: 46, sw: 7, tops: ["Lineare Funktionen/Punktsteigungsform", "Lineare Funktionen/Lage im Koordinatensystem"] },
+      { cw: 47, sw: 8, tops: ["Lineare Funktionen/*"] },
     ];
   }
 

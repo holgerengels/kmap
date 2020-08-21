@@ -71,7 +71,8 @@ export class KMapSummaryCard extends connect(store, LitElement) {
       _layers: state.shell.layers,
       _selectedDependencies: state.maps.selectedDependencies,
       selected: this.card !== undefined && state.maps.selected === this.card.topic,
-      grayedOut:  this.card !== undefined && !this.card.links && state.maps.targeted && !state.maps.targeted.includes(this.chapter + "/" + this.card.topic)
+      grayedOut:  this.card !== undefined && state.maps.targeted
+        && !(state.maps.targeted.includes(this.chapter + "/" + this.card.topic) || state.maps.targeted.includes(this.chapter + "/*"))
     };
   }
 

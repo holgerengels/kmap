@@ -8,13 +8,18 @@ import '@material/mwc-icon';
 import '@material/mwc-icon-button';
 import '@material/mwc-list/mwc-list';
 import '@material/mwc-list/mwc-list-item';
+import '@material/mwc-select';
 import '@material/mwc-textarea';
 import '@material/mwc-textfield';
 import '@material/mwc-top-app-bar';
 import {Course} from "../models/courses";
+import {Subject} from "../models/subjects";
 
 @customElement('kmap-courses')
 export class KMapCourses extends connect(store, LitElement) {
+  @property()
+  private _subjects: Subject[] = [];
+
   @property()
   private _page: string = '';
   @property()
@@ -24,11 +29,15 @@ export class KMapCourses extends connect(store, LitElement) {
   @property()
   private _selected?: Course;
   @property()
+  private _newSubject: string = '';
+  @property()
   private _newName: string = '';
   @property()
   private _newStudents: string = '';
   @property()
   private _newCurriculum: string = '';
+  @property()
+  private _editSubject: string = '';
   @property()
   private _editName: string = '';
   @property()
@@ -38,6 +47,7 @@ export class KMapCourses extends connect(store, LitElement) {
 
   mapState(state: State) {
     return {
+      _subjects: state.subjects.subjects,
       _courses: state.courses.courses,
       _selectedIndex: this._selected && state.courses.courses.includes(this._selected) ? state.courses.courses.indexOf(this._selected) : -1,
     };
@@ -76,16 +86,18 @@ export class KMapCourses extends connect(store, LitElement) {
   }
 
   async _new() {
+    let subject = this._newSubject;
     let name = this._newName;
     let students = this._newStudents.split(',');
     for (let i = 0; i < students.length; i++)
       students[i] = students[i].trim();
     let curriculum = this._newCurriculum;
 
-    const course: Course = { name: name, students: students, curriculum: curriculum };
+    const course: Course = { subject: subject, name: name, students: students, curriculum: curriculum };
     await store.dispatch.courses.saveCourse(course);
     this._selected = course;
 
+    this._newSubject = '';
     this._newName = '';
     this._newStudents = '';
     this._newCurriculum = '';
@@ -93,17 +105,19 @@ export class KMapCourses extends connect(store, LitElement) {
   }
 
   async _edit() {
+    let subject = this._editSubject;
     let name = this._editName;
     let students = this._editStudents.split(',');
     for (let i = 0; i < students.length; i++)
       students[i] = students[i].trim();
     let curriculum = this._editCurriculum;
 
-    const course: Course = { name: name, students: students, curriculum: curriculum };
+    const course: Course = { subject: subject, name: name, students: students, curriculum: curriculum };
     await store.dispatch.courses.saveCourse(course);
 
     this._selected = course;
 
+    this._editSubject = '';
     this._editName = '';
     this._editStudents = '';
     this._editCurriculum = '';
@@ -169,7 +183,7 @@ export class KMapCourses extends connect(store, LitElement) {
         .page[active] {
           display: block;
         }
-        mwc-textarea, mwc-textfield {
+        mwc-textarea, mwc-textfield, mwc-select {
           width: 300px;
           margin: 4px 0;
         }
@@ -202,6 +216,9 @@ export class KMapCourses extends connect(store, LitElement) {
         <div class="form">
           <div class="page" ?active="${this._page === 'new'}">
             <label>Neuer Kurs</label>
+            <mwc-select label="Fach" required @change="${e => this._newSubject = e.target.value}">
+              ${this._subjects.map((subject) => html`<mwc-list-item value="${subject.name}">${subject.name}</mwc-list-item>`)}
+            </mwc-select>
             <mwc-textfield label="Name" type="text" required .value=${this._newName} @change=${e => this._newName = e.target.value}></mwc-textfield>
             <mwc-textarea placeholder="Schüler" required rows="7" .value=${this._newStudents} @change=${e => this._newStudents = e.target.value}></mwc-textarea>
             <mwc-textarea placeholder="Lernplan" rows="7" .value=${this._newCurriculum} @change=${e => this._newCurriculum = e.target.value}></mwc-textarea>
@@ -209,6 +226,7 @@ export class KMapCourses extends connect(store, LitElement) {
           </div>
           <div class="page" ?active="${this._page === 'edit'}">
             <label>Kurs bearbeiten</label>
+            <mwc-textfield type="text" disabled .value=${this._editSubject}></mwc-textfield>
             <mwc-textfield type="text" disabled .value=${this._editName}></mwc-textfield>
             <mwc-textarea placeholder="Schüler" required rows="3" .value=${this._editStudents} @change=${e => this._editStudents = e.target.value}></mwc-textarea>
             <mwc-textarea placeholder="Lernplan" rows="3" .value=${this._editCurriculum} @change=${e => this._editCurriculum = e.target.value}></mwc-textarea>
@@ -225,6 +243,7 @@ export class KMapCourses extends connect(store, LitElement) {
           </div>
           <div class="page" ?active="${this._page === 'default'}">
             <label>Kurs</label>
+            <mwc-textfield type="text" disabled .value=${this._selected?.subject || ''}></mwc-textfield>
             <mwc-textfield type="text" disabled .value=${this._selected?.name || ''}></mwc-textfield>
             <mwc-textarea placeholder="Schüler" disabled rows="3" .value=${this._selected?.students.join(", ") || ''}></mwc-textarea>
             <mwc-textarea placeholder="Lernplan" disabled rows="3" .value=${this._selected?.curriculum || ''}></mwc-textarea>
