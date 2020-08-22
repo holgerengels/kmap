@@ -107,7 +107,7 @@ export class KMapTimeline extends connect(store, LitElement) {
       if (this._requirements)
         target.push(...this._requirements.tops);
 
-      for (let i = 0; i <= sw; i++) {
+      for (let i = 0; i < sw; i++) {
         target.push(...this._weeks[i].tops);
       }
       this._target = target;
