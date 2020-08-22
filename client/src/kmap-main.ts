@@ -2,8 +2,7 @@ import {LitElement, html, css, customElement, property, query} from 'lit-element
 import {installMediaQueryWatcher} from 'pwa-helpers/media-query.js';
 import {installOfflineWatcher} from 'pwa-helpers/network.js';
 import "web-animations-js/web-animations.min";
-import { connect } from '@captaincodeman/rdx'
-import { RoutingState } from '@captaincodeman/rdx-model'
+import {connect, RoutingState} from '@captaincodeman/rdx'
 import { store, State } from './store'
 
 import '@material/mwc-button';

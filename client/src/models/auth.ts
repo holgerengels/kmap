@@ -1,4 +1,4 @@
-import { createModel } from '@captaincodeman/rdx-model'
+import { createModel } from '@captaincodeman/rdx'
 import { State, Store } from '../store'
 import { createSelector } from 'reselect'
 import { authLoader } from '../firebase'

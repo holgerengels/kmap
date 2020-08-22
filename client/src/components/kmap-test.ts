@@ -1,7 +1,6 @@
 import {css, customElement, html, LitElement, property} from 'lit-element';
-import {connect} from '@captaincodeman/rdx';
+import {connect, RoutingState} from '@captaincodeman/rdx';
 import {State, store} from "../store";
-import {RoutingState} from "@captaincodeman/rdx-model";
 
 import '@material/mwc-button';
 import '@material/mwc-icon';

@@ -1,5 +1,5 @@
 import {LitElement, html, css, customElement, property} from 'lit-element';
-import { connect } from '@captaincodeman/rdx';
+import {connect, RoutingState} from '@captaincodeman/rdx';
 import {State, store} from "../store";
 
 import {colorStyles, elevationStyles, fontStyles} from "./kmap-styles";
@@ -13,7 +13,6 @@ import './kmap-browser-chapter-editor';
 import './kmap-timeline';
 import './svg-connector';
 import {Line} from "../models/maps";
-import {RoutingState} from "@captaincodeman/rdx-model";
 import {Card} from "../models/types";
 import {Connector} from "./svg-connector";
 import {iconTest} from "./icons";

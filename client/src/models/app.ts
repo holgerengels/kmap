@@ -1,4 +1,4 @@
-import { createModel } from '@captaincodeman/rdx-model';
+import { createModel } from '@captaincodeman/rdx';
 import { Store } from '../store';
 import {endpoint, fetchjson} from "../endpoint";
 import {urls} from "../urls";
