@@ -19,6 +19,7 @@ import './components/kmap-browser';
 import './components/kmap-test';
 import './components/kmap-instance-popup';
 import './components/kmap-login-popup';
+import './components/kmap-timeline-selector';
 //import './components/kmap-course-selector';
 //import './components/kmap-courses';
 //import './components/kmap-content-manager';
@@ -337,6 +338,7 @@ export class KmapMain extends connect(store, LitElement) {
           <mwc-formfield label="Timeline">
             <mwc-switch ?checked="${this._layers.includes('timeline')}" @change="${e => this._switchLayer('timeline', e.target.checked)}"></mwc-switch>
           </mwc-formfield>
+          ${this._layers.includes('timeline') ? html`<kmap-timeline-selector></kmap-timeline-selector>` : ''}
           <mwc-formfield label="Mittelwerte">
             <mwc-switch ?checked="${this._layers.includes('averages')}" @change="${e => this._switchLayer('averages', e.target.checked)}"></mwc-switch>
           </mwc-formfield>

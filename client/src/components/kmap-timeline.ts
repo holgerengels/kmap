@@ -13,6 +13,7 @@ import './kmap-browser-chapter-editor';
 import './svg-connector';
 import {cardStyles} from "../mdc.card.css";
 import {iconPointInTime} from "./icons";
+import {Timeline} from "../models/courses";
 
 export interface Week {
   cw: number,
@@ -37,6 +38,8 @@ export class KMapTimeline extends connect(store, LitElement) {
   @property()
   private _weeks: Week[] = [];
   @property()
+  private _selectedTimeline?: Timeline;
+  @property()
   private _target?: string[];
 
   mapState(state: State) {
@@ -44,10 +47,12 @@ export class KMapTimeline extends connect(store, LitElement) {
       _instance: state.app.instance,
       _userid: state.app.userid,
       _subject: state.maps.subject,
+      _selectedTimeline: state.courses.selectedTimeline,
     };
   }
 
   firstUpdated() {
+    /*
     this._weeks = [
       { cw: 38, sw: 1, tops: ["Grundwissen/Mengenlehre", "Grundwissen/Zahlenmengen", "Grundwissen/Intervalle"] },
       { cw: 39, sw: 2, tops: ["Grundwissen/Terme", "Grundwissen/Gleichungen"] },
@@ -58,6 +63,7 @@ export class KMapTimeline extends connect(store, LitElement) {
       { cw: 46, sw: 7, tops: ["Lineare Funktionen/Punktsteigungsform", "Lineare Funktionen/Lage im Koordinatensystem"] },
       { cw: 47, sw: 8, tops: ["Lineare Funktionen/*"] },
     ];
+     */
   }
 
   updated(changedProperties) {
@@ -77,6 +83,9 @@ export class KMapTimeline extends connect(store, LitElement) {
       console.log(cw);
       console.log(index)
       console.log(sw)
+    }
+    if (changedProperties.has("_selectedTimeline")) {
+      this._weeks = this._selectedTimeline ? JSON.parse(this._selectedTimeline.curriculum) : [];
     }
     if (changedProperties.has("_target")) {
       store.dispatch.maps.setTargeted(this._target);

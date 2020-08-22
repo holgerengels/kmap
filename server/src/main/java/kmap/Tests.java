@@ -139,6 +139,8 @@ public class Tests {
 
     public JsonArray loadRandomTests(String subject) {
         JsonArray topics = loadTopics(subject);
+        if (topics.size() < 3)
+            return topics;
         String topic = topics.get(new Random().nextInt(topics.size())).getAsString();
         String[] split = topic.split("\\.");
         JsonArray array = loadTestsByTopic(subject, split[0], split[1]);

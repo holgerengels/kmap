@@ -1,4 +1,4 @@
-import {LitElement, html, css, customElement, property} from 'lit-element';
+import {LitElement, html, css, customElement, property, query} from 'lit-element';
 import {connect} from '@captaincodeman/rdx';
 import {State, store} from "../store";
 
@@ -14,6 +14,7 @@ import '@material/mwc-textfield';
 import '@material/mwc-top-app-bar';
 import {Course} from "../models/courses";
 import {Subject} from "../models/subjects";
+import {TextArea} from "@material/mwc-textarea/mwc-textarea";
 
 @customElement('kmap-courses')
 export class KMapCourses extends connect(store, LitElement) {
@@ -45,12 +46,38 @@ export class KMapCourses extends connect(store, LitElement) {
   @property()
   private _editCurriculum: string = '';
 
+  @query(`#newCurriculum`)
+  private _newCurriculumField: TextArea;
+  @query(`#editCurriculum`)
+  private _editCurriculumField: TextArea;
+
   mapState(state: State) {
     return {
       _subjects: state.subjects.subjects,
       _courses: state.courses.courses,
       _selectedIndex: this._selected && state.courses.courses.includes(this._selected) ? state.courses.courses.indexOf(this._selected) : -1,
     };
+  }
+
+  firstUpdated() {
+    const validityTransform = (newValue, nativeValidity) => {
+      if (nativeValidity.valid) {
+        try {
+          JSON.parse(newValue);
+          return { valid: true };
+        }
+          // @ts-ignore
+        catch (e: SyntaxError) {
+          return {
+            valid: false,
+            customError: true,
+          };
+        }
+      }
+      return {};
+    };
+    this._newCurriculumField.validityTransform = validityTransform;
+    this._editCurriculumField.validityTransform = validityTransform;
   }
 
   updated(changedProperties) {
@@ -86,42 +113,46 @@ export class KMapCourses extends connect(store, LitElement) {
   }
 
   async _new() {
-    let subject = this._newSubject;
-    let name = this._newName;
-    let students = this._newStudents.split(',');
-    for (let i = 0; i < students.length; i++)
-      students[i] = students[i].trim();
-    let curriculum = this._newCurriculum;
+    if (this._newCurriculumField.reportValidity()) {
+      let subject = this._newSubject;
+      let name = this._newName;
+      let students = this._newStudents.split(',');
+      for (let i = 0; i < students.length; i++)
+        students[i] = students[i].trim();
+      let curriculum = this._newCurriculum;
 
-    const course: Course = { subject: subject, name: name, students: students, curriculum: curriculum };
-    await store.dispatch.courses.saveCourse(course);
-    this._selected = course;
+      const course: Course = {subject: subject, name: name, students: students, curriculum: curriculum};
+      await store.dispatch.courses.saveCourse(course);
+      this._selected = course;
 
-    this._newSubject = '';
-    this._newName = '';
-    this._newStudents = '';
-    this._newCurriculum = '';
-    this._page = 'default';
+      this._newSubject = '';
+      this._newName = '';
+      this._newStudents = '';
+      this._newCurriculum = '';
+      this._page = 'default';
+    }
   }
 
   async _edit() {
-    let subject = this._editSubject;
-    let name = this._editName;
-    let students = this._editStudents.split(',');
-    for (let i = 0; i < students.length; i++)
-      students[i] = students[i].trim();
-    let curriculum = this._editCurriculum;
+    if (this._editCurriculumField.reportValidity()) {
+      let subject = this._editSubject;
+      let name = this._editName;
+      let students = this._editStudents.split(',');
+      for (let i = 0; i < students.length; i++)
+        students[i] = students[i].trim();
+      let curriculum = this._editCurriculum;
 
-    const course: Course = { subject: subject, name: name, students: students, curriculum: curriculum };
-    await store.dispatch.courses.saveCourse(course);
+      const course: Course = {subject: subject, name: name, students: students, curriculum: curriculum};
+      await store.dispatch.courses.saveCourse(course);
 
-    this._selected = course;
+      this._selected = course;
 
-    this._editSubject = '';
-    this._editName = '';
-    this._editStudents = '';
-    this._editCurriculum = '';
-    this._page = 'default';
+      this._editSubject = '';
+      this._editName = '';
+      this._editStudents = '';
+      this._editCurriculum = '';
+      this._page = 'default';
+    }
   }
 
   _delete() {
@@ -221,15 +252,15 @@ export class KMapCourses extends connect(store, LitElement) {
             </mwc-select>
             <mwc-textfield label="Name" type="text" required .value=${this._newName} @change=${e => this._newName = e.target.value}></mwc-textfield>
             <mwc-textarea placeholder="Schüler" required rows="7" .value=${this._newStudents} @change=${e => this._newStudents = e.target.value}></mwc-textarea>
-            <mwc-textarea placeholder="Lernplan" rows="7" .value=${this._newCurriculum} @change=${e => this._newCurriculum = e.target.value}></mwc-textarea>
+            <mwc-textarea id="newCurriculum" placeholder="Lernplan" rows="7" validationMessage="Kein valides JSON" .value=${this._newCurriculum} @change=${e => this._newCurriculum = e.target.value}></mwc-textarea>
             <mwc-button @click="${this._new}">Speichern</mwc-button>
           </div>
           <div class="page" ?active="${this._page === 'edit'}">
             <label>Kurs bearbeiten</label>
             <mwc-textfield type="text" disabled .value=${this._editSubject}></mwc-textfield>
             <mwc-textfield type="text" disabled .value=${this._editName}></mwc-textfield>
-            <mwc-textarea placeholder="Schüler" required rows="3" .value=${this._editStudents} @change=${e => this._editStudents = e.target.value}></mwc-textarea>
-            <mwc-textarea placeholder="Lernplan" rows="3" .value=${this._editCurriculum} @change=${e => this._editCurriculum = e.target.value}></mwc-textarea>
+            <mwc-textarea placeholder="Schüler" required rows="7" .value=${this._editStudents} @change=${e => this._editStudents = e.target.value}></mwc-textarea>
+            <mwc-textarea id="editCurriculum" placeholder="Lernplan" rows="7" validationMessage="Kein valides JSON" .value=${this._editCurriculum} @change=${e => this._editCurriculum = e.target.value}></mwc-textarea>
             <mwc-button @click="${this._edit}">Speichern</mwc-button>
           </div>
           <div class="page" ?active="${this._page === 'delete'}">

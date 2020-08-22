@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.*;
 
 import static kmap.JSON.*;
+import static kmap.Server.readProperties;
 
 /**
  * Created by holger on 04.04.17.
@@ -33,6 +34,22 @@ public class Courses {
         CouchDbClient client = getClient();
         View view = client.view("course/byUser")
                 .key(user)
+                .reduce(false)
+                .includeDocs(true);
+        try {
+            List<JsonObject> objects = view.query(JsonObject.class);
+            return sortedArray(objects, "name");
+        }
+        catch (NoDocumentException e) {
+            return new JsonArray();
+        }
+    }
+
+    public JsonArray timelines(String user) {
+        CouchDbClient client = getClient();
+        View view = client.view("course/byStudent")
+                .startKey(user, "\u0000", "\u0000")
+                .endKey(user, "\uffff", "\uffff")
                 .reduce(false)
                 .includeDocs(true);
         try {
@@ -118,5 +135,13 @@ public class Courses {
         states.averageAndProgress(courseStates, subject);
 
         return courseStates;
+    }
+
+    public static void main(String[] args) throws IOException {
+        Courses courses = new Courses(new States(new Couch(readProperties(args[0]))));
+        Server.CLIENT.set("vu");
+
+        JsonArray jsonElements = courses.timelines("lala");
+        System.out.println("jsonElements = " + jsonElements);
     }
 }

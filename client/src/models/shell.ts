@@ -98,12 +98,5 @@ export default createModel({
       dispatch.shell.removeLayer("averages");
       dispatch.shell.removeLayer("editor");
     },
-    'shell/addLayer': async function() {
-      const dispatch = store.dispatch();
-      const state = store.getState();
-      if (state.shell.layers.includes("timeline")) {
-        dispatch.shell.addMessage("Die Timeline Funktion ist noch nicht fertig umgesetzt");
-      }
-    },
   })
 })

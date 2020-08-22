@@ -76,6 +76,7 @@ public class StateServlet
                 String load = req.getParameter("load");
                 String subject = req.getParameter("subject");
                 String courses = req.getParameter("courses");
+                String timelines = req.getParameter("timelines");
                 String course = req.getParameter("course");
                 if (load != null) {
                     log("load state = " + load);
@@ -86,6 +87,12 @@ public class StateServlet
                 else if (courses != null) {
                     log("load courses = " + courses);
                     JsonArray array = this.courses.courses(courses);
+                    if (array != null)
+                        writeResponse(req, resp, array);
+                }
+                else if (timelines != null) {
+                    log("load timelines = " + timelines);
+                    JsonArray array = this.courses.timelines(timelines);
                     if (array != null)
                         writeResponse(req, resp, array);
                 }

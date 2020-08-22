@@ -10,9 +10,17 @@ export interface Course {
   curriculum: string,
 }
 
+export interface Timeline {
+  subject: string,
+  name: string,
+  curriculum: string,
+}
+
 export interface CoursesState {
   courses: Course[],
   selectedCourse?: Course,
+  timelines: Timeline[],
+  selectedTimeline?: Timeline,
   timestamp: number,
   loading: boolean,
   loadingCourse: boolean,
@@ -25,6 +33,8 @@ export default createModel({
   state: <CoursesState>{
     courses: [],
     selectedCourse: undefined,
+    timelines: [],
+    selectedTimeline: undefined,
     timestamp: -1,
     loading: false,
     loadingCourse: false,
@@ -33,16 +43,30 @@ export default createModel({
     error: "",
   },
   reducers: {
-    requestLoad(state) {
+    requestLoadCourses(state) {
       return { ...state, loading: true,
         timestamp: Date.now(),
         error: "",
       };
     },
-    receivedLoad(state, payload: Course[]) {
+    receivedLoadCourses(state, payload: Course[]) {
       return { ...state,
         courses: payload,
         selectedCourse: state.selectedCourse && payload.includes(state.selectedCourse) ? state.selectedCourse : undefined,
+        students: undefined,
+        loading: false,
+      };
+    },
+    requestLoadTimelines(state) {
+      return { ...state, loading: true,
+        timestamp: Date.now(),
+        error: "",
+      };
+    },
+    receivedLoadTimelines(state, payload: Timeline[]) {
+      return { ...state,
+        timelines: payload,
+        selectedTimeline: state.selectedTimeline && payload.includes(state.selectedTimeline) ? state.selectedTimeline : undefined,
         students: undefined,
         loading: false,
       };
@@ -51,6 +75,8 @@ export default createModel({
       return { ...state,
         courses: [],
         selectedCourse: undefined,
+        timelines: [],
+        selectedTimeline: undefined,
         students: undefined,
         timestamp: Date.now(),
         error: "",
@@ -90,6 +116,13 @@ export default createModel({
       return { ...state, selectedCourse: undefined }
     },
 
+    selectTimeline(state, timeline: Timeline) {
+      return { ...state, selectedTimeline: timeline }
+    },
+    unselectTimeline(state) {
+      return { ...state, selectedTimeline: undefined }
+    },
+
     error(state, message) {
       return { ...state,
         loading: false,
@@ -102,7 +135,7 @@ export default createModel({
 
   // @ts-ignore
   effects: (store: Store) => ({
-    async load() {
+    async loadCourses() {
       const dispatch = store.dispatch();
       const state = store.getState();
       const userid = state.app.userid;
@@ -114,10 +147,30 @@ export default createModel({
         console.warn("reloading after " + (state.courses.timestamp - Date.now()) + " ms");
       }
 
-      dispatch.courses.requestLoad();
+      dispatch.courses.requestLoadCourses();
       fetchjson(`${urls.server}state?courses=${userid}`, endpoint.get(state),
         (json) => {
-          dispatch.courses.receivedLoad(json);
+          dispatch.courses.receivedLoadCourses(json);
+        },
+        dispatch.app.handleError,
+        dispatch.courses.error);
+    },
+    async loadTimelines() {
+      const dispatch = store.dispatch();
+      const state = store.getState();
+      const userid = state.app.userid;
+      if (!userid)
+        return;
+
+      // @ts-ignore
+      if (Date.now() - state.courses.timestamp < 3000) {
+        console.warn("reloading after " + (state.courses.timestamp - Date.now()) + " ms");
+      }
+
+      dispatch.courses.requestLoadTimelines();
+      fetchjson(`${urls.server}state?timelines=${userid}`, endpoint.get(state),
+        (json) => {
+          dispatch.courses.receivedLoadTimelines(json);
         },
         dispatch.app.handleError,
         dispatch.courses.error);
@@ -169,7 +222,7 @@ export default createModel({
       const dispatch = store.dispatch();
       const state = store.getState();
       if (state.app.roles.includes("teacher"))
-        dispatch.courses.load();
+        dispatch.courses.loadCourses();
     },
     'app/receivedLogout': async function() {
       const dispatch = store.dispatch();
@@ -178,6 +231,14 @@ export default createModel({
     'app/chooseInstance': async function() {
       const dispatch = store.dispatch();
       dispatch.courses.forget();
+    },
+    'shell/addLayer': async function() {
+      const dispatch = store.dispatch();
+      const state = store.getState();
+      if (state.shell.layers.includes("timeline")) {
+        dispatch.shell.addMessage("Die Timeline Funktion ist noch nicht fertig umgesetzt");
+        dispatch.courses.loadTimelines();
+      }
     },
   })
 })
