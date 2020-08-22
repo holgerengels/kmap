@@ -36,6 +36,8 @@ export class KMapTimeline extends connect(store, LitElement) {
   @property()
   private _sw: number = -1;
   @property()
+  private _requirements?: Week;
+  @property()
   private _weeks: Week[] = [];
   @property()
   private _selectedTimeline?: Timeline;
@@ -49,21 +51,6 @@ export class KMapTimeline extends connect(store, LitElement) {
       _subject: state.maps.subject,
       _selectedTimeline: state.courses.selectedTimeline,
     };
-  }
-
-  firstUpdated() {
-    /*
-    this._weeks = [
-      { cw: 38, sw: 1, tops: ["Grundwissen/Mengenlehre", "Grundwissen/Zahlenmengen", "Grundwissen/Intervalle"] },
-      { cw: 39, sw: 2, tops: ["Grundwissen/Terme", "Grundwissen/Gleichungen"] },
-      { cw: 40, sw: 3, tops: ["Grundwissen/Koordinatensystem", "Grundwissen/Symmetrie", "Grundwissen/Geraden"] },
-      { cw: 41, sw: 4, tops: ["Parabeln/*", "Grundwissen/Parabeln"] },
-      { cw: 42, sw: 5, tops: ["Funktionen/Allgemeines", "Funktionen/Darstellung"] },
-      { cw: 43, sw: 6, tops: ["Lineare Funktionen/Steigung", "Lineare Funktionen/Hauptform"] },
-      { cw: 46, sw: 7, tops: ["Lineare Funktionen/Punktsteigungsform", "Lineare Funktionen/Lage im Koordinatensystem"] },
-      { cw: 47, sw: 8, tops: ["Lineare Funktionen/*"] },
-    ];
-     */
   }
 
   updated(changedProperties) {
@@ -85,6 +72,12 @@ export class KMapTimeline extends connect(store, LitElement) {
       console.log(sw)
     }
     if (changedProperties.has("_selectedTimeline")) {
+      if (this._selectedTimeline) {
+        const curriculum: Week[] = JSON.parse(this._selectedTimeline.curriculum);
+        this._weeks = curriculum.filter(w => w.sw !== 0);
+        const reqs: Week[] = curriculum.filter(w => w.sw === 0);
+        this._requirements = reqs.length !== 0 ? reqs[0] : undefined;
+      }
       this._weeks = this._selectedTimeline ? JSON.parse(this._selectedTimeline.curriculum) : [];
     }
     if (changedProperties.has("_target")) {
@@ -110,7 +103,10 @@ export class KMapTimeline extends connect(store, LitElement) {
       }
 
       const target: string[] = [];
-      for (let i = 0; i < sw; i++) {
+      if (this._requirements)
+        target.push(...this._requirements.tops);
+
+      for (let i = 0; i <= sw; i++) {
         target.push(...this._weeks[i].tops);
       }
       this._target = target;
