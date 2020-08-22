@@ -89,7 +89,7 @@ export class KMapBrowser extends connect(store, LitElement) {
       _selected: state.maps.selected,
       _highlighted: state.maps.selectedDependencies,
       _targeted: state.maps.targeted,
-      timeline: state.shell.layers.includes('timeline'),
+      timeline: state.shell.layers.includes('timeline') && state.courses.selectedTimeline,
     };
   }
 

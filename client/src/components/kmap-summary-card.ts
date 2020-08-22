@@ -74,7 +74,7 @@ export class KMapSummaryCard extends connect(store, LitElement) {
       grayedOut:  this.card !== undefined && state.maps.targeted
         && !(state.maps.targeted.includes(this.chapter + "/" + this.card.topic)
           || state.maps.targeted.includes(this.chapter + "/*")
-          || (this.card.links && state.maps.targeted.includes(this.card.links + "/*")))
+          || (this.card.links && state.maps.targeted.filter(t => t.startsWith(this.card?.links || "!!!")).length > 0))
     };
   }
 

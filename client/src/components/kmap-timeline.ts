@@ -190,7 +190,7 @@ export class KMapTimeline extends connect(store, LitElement) {
                 <div class="right">
                   ${week.tops.map((top) => html`
                       <div class="mdc-card">
-                          <div class="title mdc-card__primary-action">${top.replace("/", " → ")}</div>
+                          <div class="title mdc-card__primary-action">${top.replace("/", " → ").replace("*", "∗")}</div>
                       </div>
                   `)}
                 </div>
