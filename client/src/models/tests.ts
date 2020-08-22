@@ -217,178 +217,195 @@ export default createModel({
     },
   },
 
-  // @ts-ignore
-  effects: (store: Store) => ({
-    async loadTopics() {
-      const dispatch = store.dispatch();
-      const state = store.getState();
-      const subject = state.maps.subject;
-      if (!subject)
-        return;
+  effects(store: Store) {
+    return {
+      async loadTopics() {
+        const dispatch = store.dispatch();
+        const state = store.getState();
+        const subject = state.maps.subject;
+        if (!subject)
+          return;
 
-      // @ts-ignore
-      if (!state.topics || state.topics.subject !== subject) {
-        dispatch.tests.requestTopics();
-        fetchjson(`${urls.server}tests?topics=all&subject=${subject}`, endpoint.get(state),
-          (json) => {
-            dispatch.tests.receivedTopics({subject: subject, topics: json});
-          },
-          dispatch.app.handleError,
-          dispatch.tests.error);
-      }
-    },
-    async loadChapters(subject: string) {
-      const dispatch = store.dispatch();
-      const state = store.getState();
-
-      // @ts-ignore
-      if (state.tests.subject !== subject || !state.tests.chapters) {
-        dispatch.tests.requestChapters();
-        fetchjson(`${urls.server}tests?chapters=all&subject=${subject}`, endpoint.get(state),
-          (json) => {
-            dispatch.tests.receivedChapters({subject: subject, chapters: json});
-          },
-          dispatch.app.handleError,
-          dispatch.tests.error);
-      }
-    },
-    async loadTree(subject: string) {
-      const dispatch = store.dispatch();
-      const state = store.getState();
-
-      // @ts-ignore
-      if (state.tests.subject !== subject || !state.tests.tree) {
-        dispatch.tests.requestTree();
-        fetchjson(`${urls.server}data?tree=all&subject=${subject}`, endpoint.get(state),
-          (json) => {
-            dispatch.tests.receivedTree({subject: subject, chapters: json});
-          },
-          dispatch.app.handleError,
-          dispatch.tests.error);
-      }
-    },
-    async loadTests(payload: Path) {
-      const dispatch = store.dispatch();
-      const state = store.getState();
-      if (!payload.subject || !payload.chapter)
-        return;
-
-      // @ts-ignore
-      if (!state.tests || state.tests.subject !== payload.subject || state.tests.chapter !== payload.chapter || state.tests.topic !== payload.topic || !state.tests.tests) {
-        dispatch.tests.requestTests();
-        const url = payload.topic
-          ? `${urls.server}tests?subject=${payload.subject}&chapter=${payload.chapter}&topic=${payload.topic}`
-          : `${urls.server}tests?subject=${payload.subject}&chapter=${payload.chapter}`;
-
-        fetchjson(url, endpoint.get(state),
-          (json) => {
-            dispatch.tests.receivedTests({subject: payload.subject, chapter: payload.chapter, topic: payload.topic, tests: json});
-          },
-          dispatch.app.handleError,
-          dispatch.tests.error);
-      }
-    },
-
-    async loadRandomTests(subject: string) {
-      const dispatch = store.dispatch();
-      const state = store.getState();
-
-      if (Date.now() - state.tests.randomTimestamp > 60*1000) {
-        dispatch.tests.requestRandomTests();
-
-        fetchjson(`${urls.server}tests?random=${subject}`, endpoint.get(state),
-          (json) => {
-            dispatch.tests.receivedRandomTests({subject: subject, tests: json});
-          },
-          dispatch.app.handleError,
-          dispatch.tests.error);
-      }
-    },
-
-    async deleteTest(test: Test) {
-      const dispatch = store.dispatch();
-      const state = store.getState();
-      const userid = state.app.userid;
-
-      dispatch.tests.requestDeleteTest();
-      fetchjson(`${urls.server}tests?userid=${userid}&subject=${test.subject}&save=${test.set}`, {... endpoint.post(state), body: JSON.stringify({delete: test})},
-        () => {
-          dispatch.tests.receivedDeleteTest();
-          dispatch.tests.unsetTestForDelete();
-          dispatch.contentSets.maybeObsoleteSet({subject: test.subject, set: test.set});
-        },
-        dispatch.app.handleError,
-        dispatch.tests.error);
-    },
-    async saveTest(test: Test) {
-      const dispatch = store.dispatch();
-      const state = store.getState();
-      const userid = state.app.userid;
-
-      dispatch.tests.requestSaveTest();
-      fetchjson(`${urls.server}tests?userid=${userid}&subject=${test.subject}&save=${test.set}`,
         // @ts-ignore
-        {... endpoint.post(state), body: JSON.stringify(test.added ? {changed: test} : {old: test, changed: test})},
-        () => {
-          dispatch.tests.receivedSaveTest();
-          dispatch.tests.unsetTestForEdit();
-          dispatch.contentSets.maybeNewSet({subject: test.subject, set: test.set});
-        },
-        dispatch.app.handleError,
-        dispatch.tests.error);
-    },
+        if (!state.topics || state.topics.subject !== subject) {
+          dispatch.tests.requestTopics();
+          fetchjson(`${urls.server}tests?topics=all&subject=${subject}`, endpoint.get(state),
+            (json) => {
+              dispatch.tests.receivedTopics({subject: subject, topics: json});
+            },
+            dispatch.app.handleError,
+            dispatch.tests.error);
+        }
+      },
+      async loadChapters(subject: string) {
+        const dispatch = store.dispatch();
+        const state = store.getState();
 
-    'maps/subjectChanged': async function() {
-      const dispatch = store.dispatch();
-      dispatch.tests.loadTopics();
-    },
-    'routing/change': async function(routing: RoutingState) {
-      const dispatch = store.dispatch();
-      switch (routing.page) {
-        case 'test':
-          dispatch.tests.loadTests({ subject: routing.params["subject"], chapter: routing.params["chapter"], topic: routing.params["topic"]});
+        // @ts-ignore
+        if (state.tests.subject !== subject || !state.tests.chapters) {
+          dispatch.tests.requestChapters();
+          fetchjson(`${urls.server}tests?chapters=all&subject=${subject}`, endpoint.get(state),
+            (json) => {
+              dispatch.tests.receivedChapters({subject: subject, chapters: json});
+            },
+            dispatch.app.handleError,
+            dispatch.tests.error);
+        }
+      },
+      async loadTree(subject: string) {
+        const dispatch = store.dispatch();
+        const state = store.getState();
 
-          if (routing.params["chapter"])
-            document.title = "KMap - Aufgaben bearbeiten";
-          else if (routing.params["results"])
-            document.title = "KMap - Aufgaben auswerten";
-          else
-            document.title = "KMap - Aufgaben wählen";
-          break;
-        case 'browser':
-          dispatch.tests.loadTopics();
-          break;
-        case 'home':
-          dispatch.tests.loadRandomTests("Mathematik");
-          break;
-      }
-    },
-    'app/chooseInstance': async function() {
-      const dispatch = store.dispatch();
-      const state = store.getState();
-      const routing: RoutingState = state.routing;
-      if (routing.page === 'test')
-        dispatch.tests.loadTests({ subject: routing.params["subject"], chapter: routing.params["chapter"], topic: routing.params["topic"]});
-      else if (routing.page === 'browser')
+        // @ts-ignore
+        if (state.tests.subject !== subject || !state.tests.tree) {
+          dispatch.tests.requestTree();
+          fetchjson(`${urls.server}data?tree=all&subject=${subject}`, endpoint.get(state),
+            (json) => {
+              dispatch.tests.receivedTree({subject: subject, chapters: json});
+            },
+            dispatch.app.handleError,
+            dispatch.tests.error);
+        }
+      },
+      async loadTests(payload: Path) {
+        const dispatch = store.dispatch();
+        const state = store.getState();
+        if (!payload.subject || !payload.chapter)
+          return;
+
+        // @ts-ignore
+        if (!state.tests || state.tests.subject !== payload.subject || state.tests.chapter !== payload.chapter || state.tests.topic !== payload.topic || !state.tests.tests) {
+          dispatch.tests.requestTests();
+          const url = payload.topic
+            ? `${urls.server}tests?subject=${payload.subject}&chapter=${payload.chapter}&topic=${payload.topic}`
+            : `${urls.server}tests?subject=${payload.subject}&chapter=${payload.chapter}`;
+
+          fetchjson(url, endpoint.get(state),
+            (json) => {
+              dispatch.tests.receivedTests({
+                subject: payload.subject,
+                chapter: payload.chapter,
+                topic: payload.topic,
+                tests: json
+              });
+            },
+            dispatch.app.handleError,
+            dispatch.tests.error);
+        }
+      },
+
+      async loadRandomTests(subject: string) {
+        const dispatch = store.dispatch();
+        const state = store.getState();
+
+        if (Date.now() - state.tests.randomTimestamp > 60 * 1000) {
+          dispatch.tests.requestRandomTests();
+
+          fetchjson(`${urls.server}tests?random=${subject}`, endpoint.get(state),
+            (json) => {
+              dispatch.tests.receivedRandomTests({subject: subject, tests: json});
+            },
+            dispatch.app.handleError,
+            dispatch.tests.error);
+        }
+      },
+
+      async deleteTest(test: Test) {
+        const dispatch = store.dispatch();
+        const state = store.getState();
+        const userid = state.app.userid;
+
+        dispatch.tests.requestDeleteTest();
+        fetchjson(`${urls.server}tests?userid=${userid}&subject=${test.subject}&save=${test.set}`, {
+            ...endpoint.post(state),
+            body: JSON.stringify({delete: test})
+          },
+          () => {
+            dispatch.tests.receivedDeleteTest();
+            dispatch.tests.unsetTestForDelete();
+            dispatch.contentSets.maybeObsoleteSet({subject: test.subject, set: test.set});
+          },
+          dispatch.app.handleError,
+          dispatch.tests.error);
+      },
+      async saveTest(test: Test) {
+        const dispatch = store.dispatch();
+        const state = store.getState();
+        const userid = state.app.userid;
+
+        dispatch.tests.requestSaveTest();
+        fetchjson(`${urls.server}tests?userid=${userid}&subject=${test.subject}&save=${test.set}`,
+          // @ts-ignore
+          {...endpoint.post(state), body: JSON.stringify(test.added ? {changed: test} : {old: test, changed: test})},
+          () => {
+            dispatch.tests.receivedSaveTest();
+            dispatch.tests.unsetTestForEdit();
+            dispatch.contentSets.maybeNewSet({subject: test.subject, set: test.set});
+          },
+          dispatch.app.handleError,
+          dispatch.tests.error);
+      },
+
+      'maps/subjectChanged': async function () {
+        const dispatch = store.dispatch();
         dispatch.tests.loadTopics();
-      else
-        dispatch.tests.forget();
-    },
-    'shell/removeLayer': async function() {
-      const dispatch = store.dispatch();
-      const state = store.getState();
-      if (!state.shell.layers.includes("editor")) {
-        dispatch.tests.unsetTestForDelete();
-        dispatch.tests.unsetTestForEdit();
-      }
-    },
-    'tests/setTestForEdit': async function() {
-      const dispatch = store.dispatch();
-      const state = store.getState();
-      if (state.tests.testForEdit === undefined)
-        return;
-      if (state.contentSets.selected == undefined || state.tests.testForEdit.subject !== state.contentSets.selected.subject)
-        dispatch.maps.loadAllTopics(state.tests.testForEdit.subject);
-    },
-  })
+      },
+      'routing/change': async function (routing: RoutingState) {
+        const dispatch = store.dispatch();
+        switch (routing.page) {
+          case 'test':
+            dispatch.tests.loadTests({
+              subject: routing.params["subject"],
+              chapter: routing.params["chapter"],
+              topic: routing.params["topic"]
+            });
+
+            if (routing.params["chapter"])
+              document.title = "KMap - Aufgaben bearbeiten";
+            else if (routing.params["results"])
+              document.title = "KMap - Aufgaben auswerten";
+            else
+              document.title = "KMap - Aufgaben wählen";
+            break;
+          case 'browser':
+            dispatch.tests.loadTopics();
+            break;
+          case 'home':
+            dispatch.tests.loadRandomTests("Mathematik");
+            break;
+        }
+      },
+      'app/chooseInstance': async function () {
+        const dispatch = store.dispatch();
+        const state = store.getState();
+        const routing: RoutingState = state.routing;
+        if (routing.page === 'test')
+          dispatch.tests.loadTests({
+            subject: routing.params["subject"],
+            chapter: routing.params["chapter"],
+            topic: routing.params["topic"]
+          });
+        else if (routing.page === 'browser')
+          dispatch.tests.loadTopics();
+        else
+          dispatch.tests.forget();
+      },
+      'shell/removeLayer': async function () {
+        const dispatch = store.dispatch();
+        const state = store.getState();
+        if (!state.shell.layers.includes("editor")) {
+          dispatch.tests.unsetTestForDelete();
+          dispatch.tests.unsetTestForEdit();
+        }
+      },
+      'tests/setTestForEdit': async function () {
+        const dispatch = store.dispatch();
+        const state = store.getState();
+        if (state.tests.testForEdit === undefined)
+          return;
+        if (state.contentSets.selected == undefined || state.tests.testForEdit.subject !== state.contentSets.selected.subject)
+          dispatch.maps.loadAllTopics(state.tests.testForEdit.subject);
+      },
+    }
+  }
 })

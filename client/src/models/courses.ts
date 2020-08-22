@@ -133,112 +133,119 @@ export default createModel({
     },
   },
 
-  // @ts-ignore
-  effects: (store: Store) => ({
-    async loadCourses() {
-      const dispatch = store.dispatch();
-      const state = store.getState();
-      const userid = state.app.userid;
-      if (!userid)
-        return;
+  effects(store: Store) {
+    return {
+      async loadCourses() {
+        const dispatch = store.dispatch();
+        const state = store.getState();
+        const userid = state.app.userid;
+        if (!userid)
+          return;
 
-      // @ts-ignore
-      if (Date.now() - state.courses.timestamp < 3000) {
-        console.warn("reloading after " + (state.courses.timestamp - Date.now()) + " ms");
-      }
+        // @ts-ignore
+        if (Date.now() - state.courses.timestamp < 3000) {
+          console.warn("reloading after " + (state.courses.timestamp - Date.now()) + " ms");
+        }
 
-      dispatch.courses.requestLoadCourses();
-      fetchjson(`${urls.server}state?courses=${userid}`, endpoint.get(state),
-        (json) => {
-          dispatch.courses.receivedLoadCourses(json);
-        },
-        dispatch.app.handleError,
-        dispatch.courses.error);
-    },
-    async loadTimelines() {
-      const dispatch = store.dispatch();
-      const state = store.getState();
-      const userid = state.app.userid;
-      if (!userid)
-        return;
+        dispatch.courses.requestLoadCourses();
+        fetchjson(`${urls.server}state?courses=${userid}`, endpoint.get(state),
+          (json) => {
+            dispatch.courses.receivedLoadCourses(json);
+          },
+          dispatch.app.handleError,
+          dispatch.courses.error);
+      },
+      async loadTimelines() {
+        const dispatch = store.dispatch();
+        const state = store.getState();
+        const userid = state.app.userid;
+        if (!userid)
+          return;
 
-      // @ts-ignore
-      if (Date.now() - state.courses.timestamp < 3000) {
-        console.warn("reloading after " + (state.courses.timestamp - Date.now()) + " ms");
-      }
+        // @ts-ignore
+        if (Date.now() - state.courses.timestamp < 3000) {
+          console.warn("reloading after " + (state.courses.timestamp - Date.now()) + " ms");
+        }
 
-      dispatch.courses.requestLoadTimelines();
-      fetchjson(`${urls.server}state?timelines=${userid}`, endpoint.get(state),
-        (json) => {
-          dispatch.courses.receivedLoadTimelines(json);
-        },
-        dispatch.app.handleError,
-        dispatch.courses.error);
-    },
+        dispatch.courses.requestLoadTimelines();
+        fetchjson(`${urls.server}state?timelines=${userid}`, endpoint.get(state),
+          (json) => {
+            dispatch.courses.receivedLoadTimelines(json);
+          },
+          dispatch.app.handleError,
+          dispatch.courses.error);
+      },
 
-    async deleteCourse(course: Course) {
-      const dispatch = store.dispatch();
-      const state = store.getState();
-      const userid = state.app.userid;
-      if (!userid)
-        return;
+      async deleteCourse(course: Course) {
+        const dispatch = store.dispatch();
+        const state = store.getState();
+        const userid = state.app.userid;
+        if (!userid)
+          return;
 
-      dispatch.courses.requestDeleteCourse();
-      fetchjson(`${urls.server}state?userid=${userid}&deleteCourse=${name}`, {... endpoint.post(state), body: JSON.stringify(course)},
-        () => {
-          const courses: Course[] = state.courses.courses.filter(c => c.name != course.name);
-          dispatch.courses.receivedDeleteCourse(courses);
-        },
-        dispatch.app.handleError,
-        dispatch.courses.error);
-    },
+        dispatch.courses.requestDeleteCourse();
+        fetchjson(`${urls.server}state?userid=${userid}&deleteCourse=${name}`, {
+            ...endpoint.post(state),
+            body: JSON.stringify(course)
+          },
+          () => {
+            const courses: Course[] = state.courses.courses.filter(c => c.name != course.name);
+            dispatch.courses.receivedDeleteCourse(courses);
+          },
+          dispatch.app.handleError,
+          dispatch.courses.error);
+      },
 
-    async saveCourse(course: Course) {
-      const dispatch = store.dispatch();
-      const state = store.getState();
-      const userid = state.app.userid;
-      if (!userid)
-        return;
+      async saveCourse(course: Course) {
+        const dispatch = store.dispatch();
+        const state = store.getState();
+        const userid = state.app.userid;
+        if (!userid)
+          return;
 
-      dispatch.courses.requestSaveCourse();
-      fetchjson(`${urls.server}state?userid=${userid}&saveCourse=${course.name}`, {... endpoint.post(state), body: JSON.stringify(course)},
-        () => {
-          const courses: Course[] = state.courses.courses.filter(c => c.name != course.name);
-          courses.push(course);
-          courses.sort((a, b) => a.name.localeCompare(b.name));
-          dispatch.courses.receivedSaveCourse(courses);
-        },
-        dispatch.app.handleError,
-        dispatch.courses.error);
-    },
+        dispatch.courses.requestSaveCourse();
+        fetchjson(`${urls.server}state?userid=${userid}&saveCourse=${course.name}`, {
+            ...endpoint.post(state),
+            body: JSON.stringify(course)
+          },
+          () => {
+            const courses: Course[] = state.courses.courses.filter(c => c.name != course.name);
+            courses.push(course);
+            courses.sort((a, b) => a.name.localeCompare(b.name));
+            dispatch.courses.receivedSaveCourse(courses);
+          },
+          dispatch.app.handleError,
+          dispatch.courses.error);
+      },
 
-    'routing/change': async function(routing: RoutingState) {
-      switch (routing.page) {
-        case 'courses':
-          document.title = "KMap - Kurse";
-      }
-    },
-    'app/receivedLogin': async function() {
-      const dispatch = store.dispatch();
-      const state = store.getState();
-      if (state.app.roles.includes("teacher"))
-        dispatch.courses.loadCourses();
-    },
-    'app/receivedLogout': async function() {
-      const dispatch = store.dispatch();
-      dispatch.courses.forget();
-    },
-    'app/chooseInstance': async function() {
-      const dispatch = store.dispatch();
-      dispatch.courses.forget();
-    },
-    'shell/addLayer': async function() {
-      const dispatch = store.dispatch();
-      const state = store.getState();
-      if (state.shell.layers.includes("timeline")) {
-        dispatch.shell.addMessage("Die Timeline Funktion ist noch nicht fertig umgesetzt");
-        dispatch.courses.loadTimelines();
-      }
-    },
-  })
+      'routing/change': async function (routing: RoutingState) {
+        switch (routing.page) {
+          case 'courses':
+            document.title = "KMap - Kurse";
+        }
+      },
+      'app/receivedLogin': async function () {
+        const dispatch = store.dispatch();
+        const state = store.getState();
+        if (state.app.roles.includes("teacher"))
+          dispatch.courses.loadCourses();
+      },
+      'app/receivedLogout': async function () {
+        const dispatch = store.dispatch();
+        dispatch.courses.forget();
+      },
+      'app/chooseInstance': async function () {
+        const dispatch = store.dispatch();
+        dispatch.courses.forget();
+      },
+      'shell/addLayer': async function () {
+        const dispatch = store.dispatch();
+        const state = store.getState();
+        if (state.shell.layers.includes("timeline")) {
+          dispatch.shell.addMessage("Die Timeline Funktion ist noch nicht fertig umgesetzt");
+          dispatch.courses.loadTimelines();
+        }
+      },
+    }
+  }
 })

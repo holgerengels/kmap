@@ -53,53 +53,54 @@ export default createModel({
     },
   },
 
-  // @ts-ignore
-  effects: (store: Store) => ({
-    async load() {
-      const dispatch = store.dispatch();
-      const state = store.getState();
-      const userid = state.app.userid;
-      const subject = state.maps.subject;
-      const course = state.courses.selectedCourse;
-      if (!userid || !subject || !course)
-        return;
+  effects(store: Store) {
+    return {
+      async load() {
+        const dispatch = store.dispatch();
+        const state = store.getState();
+        const userid = state.app.userid;
+        const subject = state.maps.subject;
+        const course = state.courses.selectedCourse;
+        if (!userid || !subject || !course)
+          return;
 
-      // @ts-ignore
-      if (Date.now() - state.averages.timestamp > 3000 || state.averages.subject !== subject || state.averages.course !== course.name) {
-        dispatch.averages.requestLoad();
-        fetchjson(`${urls.server}state?load=${userid}&subject=${subject}&course=${course.name}`, endpoint.get(state),
-          (json) => {
-            // @ts-ignore
-            dispatch.averages.receivedLoad({subject: subject, course: course.name, rates: json});
-          },
-          dispatch.app.handleError,
-          dispatch.averages.error);
-      }
-    },
+        // @ts-ignore
+        if (Date.now() - state.averages.timestamp > 3000 || state.averages.subject !== subject || state.averages.course !== course.name) {
+          dispatch.averages.requestLoad();
+          fetchjson(`${urls.server}state?load=${userid}&subject=${subject}&course=${course.name}`, endpoint.get(state),
+            (json) => {
+              // @ts-ignore
+              dispatch.averages.receivedLoad({subject: subject, course: course.name, rates: json});
+            },
+            dispatch.app.handleError,
+            dispatch.averages.error);
+        }
+      },
 
-    'maps/received': async function() {
-      const dispatch = store.dispatch();
-      dispatch.rates.load();
-    },
-    'courses/selectCourse': async function() {
-      const dispatch = store.dispatch();
-      dispatch.averages.load();
-    },
-    'courses/unselectCourse': async function() {
-      const dispatch = store.dispatch();
-      dispatch.averages.forget();
-    },
-    'app/receivedLogin': async function() {
-      const dispatch = store.dispatch();
-      dispatch.rates.load();
-    },
-    'app/receivedLogout': async function() {
-      const dispatch = store.dispatch();
-      dispatch.rates.forget();
-    },
-    'app/chooseInstance': async function() {
-      const dispatch = store.dispatch();
-      dispatch.rates.forget();
-    },
-  })
+      'maps/received': async function () {
+        const dispatch = store.dispatch();
+        dispatch.rates.load();
+      },
+      'courses/selectCourse': async function () {
+        const dispatch = store.dispatch();
+        dispatch.averages.load();
+      },
+      'courses/unselectCourse': async function () {
+        const dispatch = store.dispatch();
+        dispatch.averages.forget();
+      },
+      'app/receivedLogin': async function () {
+        const dispatch = store.dispatch();
+        dispatch.rates.load();
+      },
+      'app/receivedLogout': async function () {
+        const dispatch = store.dispatch();
+        dispatch.rates.forget();
+      },
+      'app/chooseInstance': async function () {
+        const dispatch = store.dispatch();
+        dispatch.rates.forget();
+      },
+    }
+  }
 })

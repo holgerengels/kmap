@@ -188,143 +188,144 @@ export default createModel({
     },
   },
 
-  // @ts-ignore
-  effects: (store: Store) => ({
-    async load(path: Path) {
-      const dispatch = store.dispatch();
-      const state = store.getState();
-      const oldSubject: string = state.maps.subject;
+  effects(store: Store) {
+    return {
+      async load(path: Path) {
+        const dispatch = store.dispatch();
+        const state = store.getState();
+        const oldSubject: string = state.maps.subject;
 
-      if (state.maps.subject === path.subject && state.maps.chapter === path.chapter) {
-        console.warn("reloading map " + path.subject + " " + path.chapter);
-      }
+        if (state.maps.subject === path.subject && state.maps.chapter === path.chapter) {
+          console.warn("reloading map " + path.subject + " " + path.chapter);
+        }
 
-      dispatch.maps.request();
-      fetchjson(`${urls.server}data?subject=${path.subject}&load=${path.chapter}`, endpoint.get(state),
-        (json) => {
-          dispatch.maps.received(json);
-          dispatch.maps.unselectCard();
-          if (path.subject !== oldSubject) {
-            dispatch.maps.subjectChanged();
-          }
-        },
-        dispatch.app.handleError,
-        dispatch.maps.error);
-    },
-
-    async loadLatest(subject: string) {
-      const dispatch = store.dispatch();
-      const state = store.getState();
-
-      if (Date.now() - state.maps.latestTimestamp > 60*1000) {
-        dispatch.maps.requestLatest();
-
-        fetchjson(`${urls.server}data?latest=${subject}`, endpoint.get(state),
+        dispatch.maps.request();
+        fetchjson(`${urls.server}data?subject=${path.subject}&load=${path.chapter}`, endpoint.get(state),
           (json) => {
-            dispatch.maps.receivedLatest({subject: subject, cards: json});
+            dispatch.maps.received(json);
+            dispatch.maps.unselectCard();
+            if (path.subject !== oldSubject) {
+              dispatch.maps.subjectChanged();
+            }
           },
           dispatch.app.handleError,
           dispatch.maps.error);
-      }
-    },
+      },
 
-    async deleteTopic(card: Card) {
-      const dispatch = store.dispatch();
-      const state = store.getState();
-      const userid = state.app.userid;
+      async loadLatest(subject: string) {
+        const dispatch = store.dispatch();
+        const state = store.getState();
 
-      dispatch.maps.requestDeleteTopic();
-      fetchjson(`${urls.server}edit?userid=${userid}&subject=${card.subject}&save=${card.module}`,
-        {... endpoint.post(state), body: JSON.stringify({delete: card})},
-        () => {
-          dispatch.maps.receivedDeleteTopic();
+        if (Date.now() - state.maps.latestTimestamp > 60 * 1000) {
+          dispatch.maps.requestLatest();
+
+          fetchjson(`${urls.server}data?latest=${subject}`, endpoint.get(state),
+            (json) => {
+              dispatch.maps.receivedLatest({subject: subject, cards: json});
+            },
+            dispatch.app.handleError,
+            dispatch.maps.error);
+        }
+      },
+
+      async deleteTopic(card: Card) {
+        const dispatch = store.dispatch();
+        const state = store.getState();
+        const userid = state.app.userid;
+
+        dispatch.maps.requestDeleteTopic();
+        fetchjson(`${urls.server}edit?userid=${userid}&subject=${card.subject}&save=${card.module}`,
+          {...endpoint.post(state), body: JSON.stringify({delete: card})},
+          () => {
+            dispatch.maps.receivedDeleteTopic();
+            dispatch.maps.unsetCardForDelete();
+          },
+          dispatch.app.handleError,
+          dispatch.maps.error);
+      },
+      async renameTopic(card: Card) {
+        const dispatch = store.dispatch();
+        const state = store.getState();
+        const userid = state.app.userid;
+
+        dispatch.maps.requestRenameTopic();
+        fetchjson(`${urls.server}edit?userid=${userid}&subject=${card.subject}&save=${card.module}`,
+          // @ts-ignore
+          {...endpoint.post(state), body: JSON.stringify({rename: card, name: card.newName})},
+          () => {
+            dispatch.maps.receivedRenameTopic();
+            dispatch.maps.unsetCardForRename();
+          },
+          dispatch.app.handleError,
+          dispatch.maps.error);
+      },
+      async saveTopic(card: Card) {
+        const dispatch = store.dispatch();
+        const state = store.getState();
+        const userid = state.app.userid;
+
+        dispatch.maps.requestSaveTopic();
+        fetchjson(`${urls.server}edit?userid=${userid}&subject=${card.subject}&save=${card.module}`,
+          // @ts-ignore
+          {...endpoint.post(state), body: JSON.stringify(card.added ? {changed: card} : {old: card, changed: card})},
+          () => {
+            dispatch.maps.receivedSaveTopic();
+            dispatch.maps.unsetCardForEdit();
+          },
+          dispatch.app.handleError,
+          dispatch.maps.error);
+      },
+
+      async loadAllTopics(subject: string) {
+        const dispatch = store.dispatch();
+        const state = store.getState();
+
+        if (state.maps.allTopics && state.maps.allTopics.subject === subject) {
+          console.warn("reloading all topics " + subject);
+        }
+
+        dispatch.maps.requestAllTopics();
+        fetchjson(`${urls.server}data?subject=${subject}&topics=all`, endpoint.get(state),
+          (json) => {
+            dispatch.maps.receivedAllTopics({subject: subject, topics: json});
+          },
+          dispatch.app.handleError,
+          dispatch.maps.error);
+      },
+
+      'routing/change': async function (routing: RoutingState) {
+        const dispatch = store.dispatch();
+        switch (routing.page) {
+          case 'browser':
+            dispatch.maps.load({subject: routing.params["subject"], chapter: routing.params["chapter"]});
+            document.title = "KMap - " + (routing.params["topic"] ? decodeURIComponent(routing.params["topic"]) : decodeURIComponent(routing.params["chapter"]));
+            break;
+          case 'home':
+            dispatch.maps.loadLatest("Mathematik");
+            break;
+        }
+      },
+      'app/chooseInstance': async function () {
+        const dispatch = store.dispatch();
+        const state = store.getState();
+        const routing: RoutingState = state.routing;
+        if (routing.page === 'browser')
+          dispatch.maps.load({subject: routing.params["subject"], chapter: routing.params["chapter"]});
+        else
+          dispatch.maps.forget();
+      },
+      'shell/removeLayer': async function () {
+        const dispatch = store.dispatch();
+        const state = store.getState();
+        if (!state.shell.layers.includes("editor")) {
           dispatch.maps.unsetCardForDelete();
-        },
-        dispatch.app.handleError,
-        dispatch.maps.error);
-    },
-    async renameTopic(card: Card) {
-      const dispatch = store.dispatch();
-      const state = store.getState();
-      const userid = state.app.userid;
-
-      dispatch.maps.requestRenameTopic();
-      fetchjson(`${urls.server}edit?userid=${userid}&subject=${card.subject}&save=${card.module}`,
-        // @ts-ignore
-        {... endpoint.post(state), body: JSON.stringify({rename: card, name: card.newName })},
-        () => {
-          dispatch.maps.receivedRenameTopic();
-          dispatch.maps.unsetCardForRename();
-        },
-        dispatch.app.handleError,
-        dispatch.maps.error);
-    },
-    async saveTopic(card: Card) {
-      const dispatch = store.dispatch();
-      const state = store.getState();
-      const userid = state.app.userid;
-
-      dispatch.maps.requestSaveTopic();
-      fetchjson(`${urls.server}edit?userid=${userid}&subject=${card.subject}&save=${card.module}`,
-        // @ts-ignore
-        {... endpoint.post(state), body: JSON.stringify(card.added ? {changed: card} : {old: card, changed: card})},
-        () => {
-          dispatch.maps.receivedSaveTopic();
           dispatch.maps.unsetCardForEdit();
-        },
-        dispatch.app.handleError,
-        dispatch.maps.error);
-    },
-
-    async loadAllTopics(subject: string) {
-      const dispatch = store.dispatch();
-      const state = store.getState();
-
-      if (state.maps.allTopics && state.maps.allTopics.subject === subject) {
-        console.warn("reloading all topics " + subject);
-      }
-
-      dispatch.maps.requestAllTopics();
-      fetchjson(`${urls.server}data?subject=${subject}&topics=all`, endpoint.get(state),
-        (json) => {
-          dispatch.maps.receivedAllTopics({subject: subject, topics: json});
-        },
-        dispatch.app.handleError,
-        dispatch.maps.error);
-    },
-
-    'routing/change': async function(routing: RoutingState) {
-      const dispatch = store.dispatch();
-      switch (routing.page) {
-        case 'browser':
-          dispatch.maps.load({ subject: routing.params["subject"], chapter: routing.params["chapter"]});
-          document.title = "KMap - " + (routing.params["topic"] ? decodeURIComponent(routing.params["topic"]) : decodeURIComponent(routing.params["chapter"]));
-          break;
-        case 'home':
-          dispatch.maps.loadLatest("Mathematik");
-          break;
-      }
-    },
-    'app/chooseInstance': async function() {
-      const dispatch = store.dispatch();
-      const state = store.getState();
-      const routing: RoutingState = state.routing;
-      if (routing.page === 'browser')
-        dispatch.maps.load({ subject: routing.params["subject"], chapter: routing.params["chapter"]});
-      else
-        dispatch.maps.forget();
-    },
-    'shell/removeLayer': async function() {
-      const dispatch = store.dispatch();
-      const state = store.getState();
-      if (!state.shell.layers.includes("editor")) {
-        dispatch.maps.unsetCardForDelete();
-        dispatch.maps.unsetCardForEdit();
-        dispatch.maps.unsetCardForRename();
-      }
-      if (!state.shell.layers.includes("timeline")) {
-        dispatch.maps.setTargeted(undefined);
-      }
-    },
-  })
+          dispatch.maps.unsetCardForRename();
+        }
+        if (!state.shell.layers.includes("timeline")) {
+          dispatch.maps.setTargeted(undefined);
+        }
+      },
+    }
+  }
 })

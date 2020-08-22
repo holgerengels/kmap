@@ -39,27 +39,28 @@ export default createModel({
     },
   },
 
-  // @ts-ignore
-  effects: (store: Store) => ({
-    async upload(file: File) {
-      const dispatch = store.dispatch();
-      const state = store.getState();
+  effects(store: Store) {
+    return {
+      async upload(file: File) {
+        const dispatch = store.dispatch();
+        const state = store.getState();
 
-      var formData: FormData = new FormData();
-      formData.append('files', file);
+        var formData: FormData = new FormData();
+        formData.append('files', file);
 
-      dispatch.uploads.startUpload(file);
-      fetchjson(`${urls.server}edit?upload=${file.name}`, {... endpoint.postFormData(state), body: formData},
-        () => {
-          dispatch.uploads.finishedUpload(file);
-        },
-        dispatch.app.handleError,
-        dispatch.uploads.error);
-    },
+        dispatch.uploads.startUpload(file);
+        fetchjson(`${urls.server}edit?upload=${file.name}`, {...endpoint.postFormData(state), body: formData},
+          () => {
+            dispatch.uploads.finishedUpload(file);
+          },
+          dispatch.app.handleError,
+          dispatch.uploads.error);
+      },
 
-    'app/receivedLogout': async function() {
-      const dispatch = store.dispatch();
-      dispatch.uploads.clearUploads();
-    },
-  })
+      'app/receivedLogout': async function () {
+        const dispatch = store.dispatch();
+        dispatch.uploads.clearUploads();
+      },
+    }
+  }
 })

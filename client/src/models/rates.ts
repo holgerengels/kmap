@@ -74,57 +74,61 @@ export default createModel({
     },
   },
 
-  // @ts-ignore
-  effects: (store: Store) => ({
-    async load() {
-      const dispatch = store.dispatch();
-      const state = store.getState();
-      const userid = state.app.userid;
-      const subject = state.maps.subject;
-      if (!userid || !subject)
-        return;
+  effects(store: Store) {
+    return {
+      async load() {
+        const dispatch = store.dispatch();
+        const state = store.getState();
+        const userid = state.app.userid;
+        const subject = state.maps.subject;
+        if (!userid || !subject)
+          return;
 
-      // @ts-ignore
-      if (state.rates.subject !== subject || !state.rates.rates) {
-        dispatch.rates.requestLoad();
-        fetchjson(`${urls.server}state?load=${userid}&subject=${subject}`, endpoint.get(state),
+        // @ts-ignore
+        if (state.rates.subject !== subject || !state.rates.rates) {
+          dispatch.rates.requestLoad();
+          fetchjson(`${urls.server}state?load=${userid}&subject=${subject}`, endpoint.get(state),
+            (json) => {
+              // @ts-ignore
+              dispatch.rates.receivedLoad({subject: subject, rates: json});
+            },
+            dispatch.app.handleError,
+            dispatch.rates.error);
+        }
+      },
+      async store(payload: Rate) {
+        const dispatch = store.dispatch();
+        const state = store.getState();
+        dispatch.rates.requestStore();
+        let body = {...payload, save: state.app.userid};
+        fetchjson(`${urls.server}state?save=${state.app.userid}&subject=${payload.subject}`, {
+            ...endpoint.post(state),
+            body: JSON.stringify(body)
+          },
           (json) => {
             // @ts-ignore
-            dispatch.rates.receivedLoad({subject: subject, rates: json});
+            dispatch.rates.receivedStore({subject: payload.subject, rates: json});
           },
           dispatch.app.handleError,
           dispatch.rates.error);
-      }
-    },
-    async store(payload: Rate) {
-      const dispatch = store.dispatch();
-      const state = store.getState();
-      dispatch.rates.requestStore();
-      let body = {... payload, save: state.app.userid};
-      fetchjson(`${urls.server}state?save=${state.app.userid}&subject=${payload.subject}`, {... endpoint.post(state), body: JSON.stringify(body)},
-        (json) => {
-          // @ts-ignore
-          dispatch.rates.receivedStore({subject: payload.subject, rates: json});
-        },
-        dispatch.app.handleError,
-        dispatch.rates.error);
-    },
+      },
 
-    'maps/received': async function() {
-      const dispatch = store.dispatch();
+      'maps/received': async function () {
+        const dispatch = store.dispatch();
         dispatch.rates.load();
-    },
-    'app/receivedLogin': async function() {
-      const dispatch = store.dispatch();
+      },
+      'app/receivedLogin': async function () {
+        const dispatch = store.dispatch();
         dispatch.rates.load();
-    },
-    'app/receivedLogout': async function() {
-      const dispatch = store.dispatch();
-      dispatch.rates.forget();
-    },
-    'app/chooseInstance': async function() {
-      const dispatch = store.dispatch();
-      dispatch.rates.forget();
-    },
-  })
+      },
+      'app/receivedLogout': async function () {
+        const dispatch = store.dispatch();
+        dispatch.rates.forget();
+      },
+      'app/chooseInstance': async function () {
+        const dispatch = store.dispatch();
+        dispatch.rates.forget();
+      },
+    }
+  }
 })

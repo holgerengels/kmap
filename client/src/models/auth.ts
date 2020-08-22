@@ -28,52 +28,52 @@ export default createModel({
     },
   },
 
-  effects: (store: Store) => ({
-    async signout() {
-      const auth = await authLoader
-      await auth.signOut()
-    },
+  effects(store: Store) {
+    return {
+      async signout() {
+        const auth = await authLoader
+        await auth.signOut()
+      },
 
-    async signinProvider(name: string) {
-      const dispatch = store.dispatch();
-      const auth = await authLoader;
+      async signinProvider(name: string) {
+        const dispatch = store.dispatch();
+        const auth = await authLoader;
 
-      const provider = providerFromName(name);
-      auth.signInWithPopup(provider).catch(error => {
-        dispatch.shell.showMessage(_errorCodes.get(error.code) || error.code);
-        console.log(error);
-      });
-    },
+        const provider = providerFromName(name);
+        auth.signInWithPopup(provider).catch(error => {
+          dispatch.shell.showMessage(_errorCodes.get(error.code) || error.code);
+          console.log(error);
+        });
+      },
 
-    async init() {
-      const auth = await authLoader
-      const dispatch = store.dispatch()
+      async init() {
+        const auth = await authLoader
+        const dispatch = store.dispatch()
 
-      auth.onAuthStateChanged(async user => {
-        console.log("onAuthStateChanged");
-        console.log(user);
-        if (user) {
+        auth.onAuthStateChanged(async user => {
+          console.log("onAuthStateChanged");
           console.log(user);
-          dispatch.auth.signedIn(user)
-        }
-        else {
-          dispatch.auth.signedOut()
-        }
-      });
-      auth.onIdTokenChanged(async user => {
-        console.log("onIdTokenChanged");
-        console.log(user);
-        if (auth.currentUser !== null) {
-          const token = await auth.currentUser.getIdToken();
-          console.log(token);
-          dispatch.app.login({userid: user.uid, password: token});
-        }
-        else {
-          dispatch.app.logout();
-        }
-      });
-    },
-  })
+          if (user) {
+            console.log(user);
+            dispatch.auth.signedIn(user)
+          } else {
+            dispatch.auth.signedOut()
+          }
+        });
+        auth.onIdTokenChanged(async user => {
+          console.log("onIdTokenChanged");
+          console.log(user);
+          if (auth.currentUser !== null) {
+            const token = await auth.currentUser.getIdToken();
+            console.log(token);
+            dispatch.app.login({userid: user.uid, password: token});
+          } else {
+            dispatch.app.logout();
+          }
+        });
+      },
+    }
+  }
 })
 
 function providerFromName(name: string) {

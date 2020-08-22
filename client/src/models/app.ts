@@ -85,51 +85,58 @@ export default createModel({
     },
   },
 
-  // @ts-ignore
-  effects: (store: Store) => ({
-    async login(payload: Credentials) {
-      const dispatch = store.dispatch();
-      const state = store.getState();
+  effects(store: Store) {
+    return {
+      async login(payload: Credentials) {
+        const dispatch = store.dispatch();
+        const state = store.getState();
 
-      dispatch.app.requestLogin();
-      fetchjson(`${urls.server}state?login=${payload.userid}`, {... endpoint.post(state), body: JSON.stringify(payload)},
-        (json) => {
-          const roles = json.filter(r => !r.startsWith("displayName:"));
-          const username = roles.length != json.length ? json.filter(r => r.startsWith("displayName:"))[0].substr("displayName:".length) : payload.userid;
-          dispatch.app.receivedLogin({ userid: payload.userid, roles: roles, username: username});
-        },
-        dispatch.app.handleError,
-        dispatch.app.loginResponse);
-    },
-    async logout() {
-      const dispatch = store.dispatch();
-      const state = store.getState();
+        dispatch.app.requestLogin();
+        fetchjson(`${urls.server}state?login=${payload.userid}`, {
+            ...endpoint.post(state),
+            body: JSON.stringify(payload)
+          },
+          (json) => {
+            const roles = json.filter(r => !r.startsWith("displayName:"));
+            const username = roles.length != json.length ? json.filter(r => r.startsWith("displayName:"))[0].substr("displayName:".length) : payload.userid;
+            dispatch.app.receivedLogin({userid: payload.userid, roles: roles, username: username});
+          },
+          dispatch.app.handleError,
+          dispatch.app.loginResponse);
+      },
+      async logout() {
+        const dispatch = store.dispatch();
+        const state = store.getState();
 
-      dispatch.app.requestLogout();
-      fetchjson(`${urls.server}state?logout=${state.app.userid}`, {... endpoint.post(state), body: JSON.stringify({userid: state.app.userid})},
-        () => {
-          dispatch.app.receivedLogout();
-        },
-        dispatch.app.handleError,
-        dispatch.app.error);
-    },
+        dispatch.app.requestLogout();
+        fetchjson(`${urls.server}state?logout=${state.app.userid}`, {
+            ...endpoint.post(state),
+            body: JSON.stringify({userid: state.app.userid})
+          },
+          () => {
+            dispatch.app.receivedLogout();
+          },
+          dispatch.app.handleError,
+          dispatch.app.error);
+      },
 
-    handleError(error: Error) {
-      const dispatch = store.dispatch();
-      switch (error.code) {
-        case 401:
-          dispatch.shell.showMessage(error.message);
-          dispatch.app.logout();
-          break;
-        case 500:
-          dispatch.shell.showMessage(error.message);
-          break;
-      }
-    },
+      handleError(error: Error) {
+        const dispatch = store.dispatch();
+        switch (error.code) {
+          case 401:
+            dispatch.shell.showMessage(error.message);
+            dispatch.app.logout();
+            break;
+          case 500:
+            dispatch.shell.showMessage(error.message);
+            break;
+        }
+      },
 
-    'app/chooseInstance': async function() {
-      const dispatch = store.dispatch();
-      dispatch.app.logout();
-    },
-  })
+      'app/chooseInstance': async function () {
+        const dispatch = store.dispatch();
+        dispatch.app.logout();
+      },
+    }
+  }
 })

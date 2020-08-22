@@ -81,99 +81,103 @@ export default createModel({
     },
   },
 
-  // @ts-ignore
-  effects: (store: Store) => ({
-    async load() {
-      const dispatch = store.dispatch();
-      const state = store.getState();
-      // @ts-ignore
-      if (Date.now() - state.contentMaps.timestamp > 3000) {
-        dispatch.contentMaps.requestLoad();
-        fetchjson(`${urls.server}edit?modules=all`, endpoint.get(state),
-          (json) => {
-            dispatch.contentMaps.receivedLoad(json);
+  effects(store: Store) {
+    return {
+      async load() {
+        const dispatch = store.dispatch();
+        const state = store.getState();
+        // @ts-ignore
+        if (Date.now() - state.contentMaps.timestamp > 3000) {
+          dispatch.contentMaps.requestLoad();
+          fetchjson(`${urls.server}edit?modules=all`, endpoint.get(state),
+            (json) => {
+              dispatch.contentMaps.receivedLoad(json);
+            },
+            dispatch.app.handleError,
+            dispatch.contentMaps.error);
+        }
+      },
+      async import(files: FileList) {
+        const dispatch = store.dispatch();
+        const state = store.getState();
+
+        let names: string[] = [];
+        var formData: FormData = new FormData();
+
+        for (let i = 0; i < files.length; i++) {
+          let file: File = files[i];
+          names.push(file.name);
+          formData.append('files', file);
+        }
+
+        dispatch.contentMaps.requestImport();
+        fetchjson(`${urls.server}content?import-module=${names.join(",")}`, {
+            ...endpoint.postFormData(state),
+            body: formData
+          },
+          () => {
+            dispatch.contentMaps.receivedImport();
+            dispatch.shell.addMessage("Import von " + names.join(", ") + " abgeschlossen");
           },
           dispatch.app.handleError,
           dispatch.contentMaps.error);
-      }
-    },
-    async import(files: FileList) {
-      const dispatch = store.dispatch();
-      const state = store.getState();
+      },
+      async export(payload: Module) {
+        const dispatch = store.dispatch();
+        const state = store.getState();
 
-      let names: string[] = [];
-      var formData: FormData = new FormData();
+        dispatch.contentMaps.requestExport();
+        fetchblob(`${urls.server}content?subject=${payload.subject}&export-module=${payload.module}`, endpoint.get(state),
+          (blob) => {
+            let url = window.URL.createObjectURL(blob);
+            var a: HTMLAnchorElement = document.createElement('a');
+            a.href = url;
+            a.download = payload.subject + " - " + payload.module + ".zip";
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+            // @ts-ignore
+            dispatch.contentMaps.receivedExport();
+          },
+          dispatch.app.handleError,
+          dispatch.contentMaps.error);
+      },
+      async delete(payload: Module) {
+        const dispatch = store.dispatch();
+        const state = store.getState();
 
-      for (let i = 0; i < files.length; i++) {
-        let file:File = files[i];
-        names.push(file.name);
-        formData.append('files', file);
-      }
+        dispatch.contentMaps.requestDelete();
+        fetchjson(`${urls.server}content?subject=${payload.subject}&delete-module=${payload.module}`, endpoint.post(state),
+          () => {
+            dispatch.contentMaps.receivedDelete();
+          },
+          dispatch.app.handleError,
+          dispatch.contentMaps.error);
+      },
 
-      dispatch.contentMaps.requestImport();
-      fetchjson(`${urls.server}content?import-module=${names.join(",")}`, {... endpoint.postFormData(state), body: formData},
-        () => {
-          dispatch.contentMaps.receivedImport();
-          dispatch.shell.addMessage("Import von " + names.join(", ") + " abgeschlossen");
-        },
-        dispatch.app.handleError,
-        dispatch.contentMaps.error);
-    },
-    async export(payload: Module) {
-      const dispatch = store.dispatch();
-      const state = store.getState();
+      'routing/change': async function (routing: RoutingState) {
+        const dispatch = store.dispatch();
+        const state = store.getState();
+        if (state.app.roles.includes("teacher") && (routing.page === 'content-manager' || routing.page === 'browser'))
+          dispatch.contentMaps.load();
+      },
+      'app/receivedLogin': async function () {
+        const dispatch = store.dispatch();
+        const state = store.getState();
+        const routing: RoutingState = state.routing;
+        if (state.app.roles.includes("teacher") && (routing.page === 'content-manager' || routing.page === 'browser'))
+          dispatch.contentMaps.load();
+      },
 
-      dispatch.contentMaps.requestExport();
-      fetchblob(`${urls.server}content?subject=${payload.subject}&export-module=${payload.module}`, endpoint.get(state),
-        (blob) => {
-          let url = window.URL.createObjectURL(blob);
-          var a: HTMLAnchorElement = document.createElement('a');
-          a.href = url;
-          a.download = payload.subject + " - " + payload.module + ".zip";
-          document.body.appendChild(a);
-          a.click();
-          a.remove();
-          URL.revokeObjectURL(url);
-          // @ts-ignore
-          dispatch.contentMaps.receivedExport();
-        },
-        dispatch.app.handleError,
-        dispatch.contentMaps.error);
-    },
-    async delete(payload: Module) {
-      const dispatch = store.dispatch();
-      const state = store.getState();
-
-      dispatch.contentMaps.requestDelete();
-      fetchjson(`${urls.server}content?subject=${payload.subject}&delete-module=${payload.module}`, endpoint.post(state),
-        () => {
-          dispatch.contentMaps.receivedDelete();
-        },
-        dispatch.app.handleError,
-        dispatch.contentMaps.error);
-    },
-
-    'routing/change': async function(routing: RoutingState) {
-      const dispatch = store.dispatch();
-      const state = store.getState();
-      if (state.app.roles.includes("teacher") && (routing.page === 'content-manager' || routing.page === 'browser'))
-        dispatch.contentMaps.load();
-    },
-    'app/receivedLogin': async function() {
-      const dispatch = store.dispatch();
-      const state = store.getState();
-      const routing: RoutingState = state.routing;
-      if (state.app.roles.includes("teacher") && (routing.page === 'content-manager' || routing.page === 'browser'))
-        dispatch.contentMaps.load();
-    },
-
-    'app/receivedLogout': async function() {
-      const dispatch = store.dispatch();
-      dispatch.contentMaps.forget();
-    },
-    'app/chooseInstance': async function() {
-      const dispatch = store.dispatch();
-      dispatch.contentMaps.forget();
-    },
-  })
+      'app/receivedLogout': async function () {
+        const dispatch = store.dispatch();
+        dispatch.contentMaps.forget();
+      },
+      'app/chooseInstance': async function () {
+        const dispatch = store.dispatch();
+        dispatch.contentMaps.forget();
+      },
+    }
+  }
 })

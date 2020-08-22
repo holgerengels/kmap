@@ -109,84 +109,91 @@ export default createModel({
     },
   },
 
-  // @ts-ignore
-  effects: (store: Store) => ({
-    async load() {
-      const dispatch = store.dispatch();
-      const state = store.getState();
-      // @ts-ignore
-      if (Date.now() - state.instances.timestamp > 3000) {
-        dispatch.instances.requestLoad();
-        fetchjson(`${urls.server}content?instances=all`, endpoint.get(state),
-          (json) => {
-            dispatch.instances.receivedLoad(json);
+  effects(store: Store) {
+    return {
+      async load() {
+        const dispatch = store.dispatch();
+        const state = store.getState();
+        // @ts-ignore
+        if (Date.now() - state.instances.timestamp > 3000) {
+          dispatch.instances.requestLoad();
+          fetchjson(`${urls.server}content?instances=all`, endpoint.get(state),
+            (json) => {
+              dispatch.instances.receivedLoad(json);
+            },
+            dispatch.app.handleError,
+            dispatch.instances.error);
+        }
+      },
+      async create(instance: Instance) {
+        const dispatch = store.dispatch();
+        const state = store.getState();
+        // @ts-ignore
+        dispatch.instances.requestCreate();
+        fetchjson(`${urls.server}content?create=${instance.name}`,
+          {
+            ...endpoint.post(state),
+            body: JSON.stringify({name: instance.name, description: instance.description, authconf: instance.authconf})
+          },
+          () => {
+            dispatch.instances.receivedCreate(instance);
           },
           dispatch.app.handleError,
           dispatch.instances.error);
-      }
-    },
-    async create(instance: Instance) {
-      const dispatch = store.dispatch();
-      const state = store.getState();
-      // @ts-ignore
-      dispatch.instances.requestCreate();
-      fetchjson(`${urls.server}content?create=${instance.name}`,
-        {... endpoint.post(state), body: JSON.stringify({name: instance.name, description: instance.description, authconf: instance.authconf})},
-        () => {
-          dispatch.instances.receivedCreate(instance);
-        },
-        dispatch.app.handleError,
-        dispatch.instances.error);
-    },
-    async edit(instance: Instance) {
-      const dispatch = store.dispatch();
-      const state = store.getState();
-      // @ts-ignore
-      dispatch.instances.requestEdit();
-      fetchjson(`${urls.server}content?edit=${instance.name}`,
-        {... endpoint.post(state), body: JSON.stringify({name: instance.name, description: instance.description, authconf: instance.authconf})},
-        () => {
-          dispatch.instances.receivedEdit(instance);
-        },
-        dispatch.app.handleError,
-        dispatch.instances.error);
-    },
-    async drop(instance: Instance) {
-      const dispatch = store.dispatch();
-      const state = store.getState();
-      // @ts-ignore
-      dispatch.instances.requestDrop();
-      fetchjson(`${urls.server}content?drop=${instance.name}`,
-        {... endpoint.post(state), body: JSON.stringify({name: instance.name, description: instance.description})},
-        () => {
-          dispatch.instances.receivedDrop(instance);
-        },
-        dispatch.app.handleError,
-        dispatch.instances.error);
-    },
+      },
+      async edit(instance: Instance) {
+        const dispatch = store.dispatch();
+        const state = store.getState();
+        // @ts-ignore
+        dispatch.instances.requestEdit();
+        fetchjson(`${urls.server}content?edit=${instance.name}`,
+          {
+            ...endpoint.post(state),
+            body: JSON.stringify({name: instance.name, description: instance.description, authconf: instance.authconf})
+          },
+          () => {
+            dispatch.instances.receivedEdit(instance);
+          },
+          dispatch.app.handleError,
+          dispatch.instances.error);
+      },
+      async drop(instance: Instance) {
+        const dispatch = store.dispatch();
+        const state = store.getState();
+        // @ts-ignore
+        dispatch.instances.requestDrop();
+        fetchjson(`${urls.server}content?drop=${instance.name}`,
+          {...endpoint.post(state), body: JSON.stringify({name: instance.name, description: instance.description})},
+          () => {
+            dispatch.instances.receivedDrop(instance);
+          },
+          dispatch.app.handleError,
+          dispatch.instances.error);
+      },
 
-    async sync(sync: Sync) {
-      const dispatch = store.dispatch();
-      const state = store.getState();
-      // @ts-ignore
-      dispatch.instances.requestSync();
-      fetchjson(`${urls.server}content?sync=${sync.from}`,
-        {... endpoint.post(state), body: JSON.stringify(sync)},
-        () => {
-          dispatch.instances.receivedSync();
-          dispatch.shell.addMessage("Sync von " + sync.from + " nach " + sync.to + " abgeschlossen");
-        },
-        dispatch.app.handleError,
-        dispatch.instances.error);
-    },
+      async sync(sync: Sync) {
+        const dispatch = store.dispatch();
+        const state = store.getState();
+        // @ts-ignore
+        dispatch.instances.requestSync();
+        fetchjson(`${urls.server}content?sync=${sync.from}`,
+          {...endpoint.post(state), body: JSON.stringify(sync)},
+          () => {
+            dispatch.instances.receivedSync();
+            dispatch.shell.addMessage("Sync von " + sync.from + " nach " + sync.to + " abgeschlossen");
+          },
+          dispatch.app.handleError,
+          dispatch.instances.error);
+      },
 
-    'routing/change': async function(routing: RoutingState) {
-      const dispatch = store.dispatch();
-      switch (routing.page) {
-        case 'content-manager':
-          document.title = "KMap - Content Manager";
-          dispatch.instances.load();
-      }
-    },
-  })
+      'routing/change': async function (routing: RoutingState) {
+        const dispatch = store.dispatch();
+        switch (routing.page) {
+          case 'content-manager':
+            document.title = "KMap - Content Manager";
+            dispatch.instances.load();
+        }
+      },
+    }
+  }
 })

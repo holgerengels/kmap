@@ -43,37 +43,38 @@ export default createModel({
     },
   },
 
-  // @ts-ignore
-  effects: (store: Store) => ({
-    async load() {
-      const dispatch = store.dispatch();
-      const state = store.getState();
-      // @ts-ignore
-      if (Date.now() - state.subjects.timestamp > 3000) {
-        dispatch.subjects.requestLoad();
-        fetchjson(`${urls.server}data?subjects=all`, endpoint.get(state),
-          (json) => {
-            dispatch.subjects.receivedLoad(json);
-          },
-          dispatch.app.handleError,
-          dispatch.subjects.error);
-      }
-    },
+  effects(store: Store) {
+    return {
+      async load() {
+        const dispatch = store.dispatch();
+        const state = store.getState();
+        // @ts-ignore
+        if (Date.now() - state.subjects.timestamp > 3000) {
+          dispatch.subjects.requestLoad();
+          fetchjson(`${urls.server}data?subjects=all`, endpoint.get(state),
+            (json) => {
+              dispatch.subjects.receivedLoad(json);
+            },
+            dispatch.app.handleError,
+            dispatch.subjects.error);
+        }
+      },
 
-    'routing/change': async function(routing: RoutingState) {
-      const dispatch = store.dispatch();
-      switch (routing.page) {
-        case 'home':
-          document.title = "KMap - Knowledge Map";
-        case 'test':
-          if (Object.keys(routing.params).length === 0)
-            dispatch.subjects.load();
-          break;
-      }
-    },
-    'app/chooseInstance': async function() {
-      const dispatch = store.dispatch();
-      dispatch.subjects.load();
-    },
-  })
+      'routing/change': async function (routing: RoutingState) {
+        const dispatch = store.dispatch();
+        switch (routing.page) {
+          case 'home':
+            document.title = "KMap - Knowledge Map";
+          case 'test':
+            if (Object.keys(routing.params).length === 0)
+              dispatch.subjects.load();
+            break;
+        }
+      },
+      'app/chooseInstance': async function () {
+        const dispatch = store.dispatch();
+        dispatch.subjects.load();
+      },
+    }
+  }
 })

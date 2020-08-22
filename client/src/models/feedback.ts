@@ -80,91 +80,101 @@ export default createModel({
     },
   },
 
-  // @ts-ignore
-  effects: (store: Store) => ({
-    async load() {
-      const dispatch = store.dispatch();
-      const state = store.getState();
-      // @ts-ignore
-      if (Date.now() - state.feedback.timestamp > 3000) {
-        dispatch.feedback.requestLoad();
-        fetchjson(`${urls.server}feedback?load=all`, endpoint.get(state),
-          (json) => {
-            dispatch.feedback.receivedLoad(json);
+  effects(store: Store) {
+    return {
+      async load() {
+        const dispatch = store.dispatch();
+        const state = store.getState();
+        // @ts-ignore
+        if (Date.now() - state.feedback.timestamp > 3000) {
+          dispatch.feedback.requestLoad();
+          fetchjson(`${urls.server}feedback?load=all`, endpoint.get(state),
+            (json) => {
+              dispatch.feedback.receivedLoad(json);
+            },
+            dispatch.app.handleError,
+            dispatch.feedback.error);
+        }
+      },
+      async submit(feedback: Feedback) {
+        const dispatch = store.dispatch();
+        const state = store.getState();
+        const userid = state.app.userid;
+        if (!userid)
+          return;
+
+        feedback.state = 'open';
+        feedback.userid = userid;
+        dispatch.feedback.requestSubmit();
+        fetchjson(`${urls.server}feedback?submit=${feedback.type}`, {
+            ...endpoint.post(state),
+            body: JSON.stringify(feedback)
+          },
+          () => {
+            dispatch.feedback.receivedSubmit();
           },
           dispatch.app.handleError,
           dispatch.feedback.error);
-      }
-    },
-    async submit(feedback: Feedback) {
-      const dispatch = store.dispatch();
-      const state = store.getState();
-      const userid = state.app.userid;
-      if (!userid)
-        return;
+      },
+      async bug(error: ErrorReport) {
+        const dispatch = store.dispatch();
+        const state = store.getState();
+        const userid = state.app.userid;
 
-      feedback.state = 'open';
-      feedback.userid = userid;
-      dispatch.feedback.requestSubmit();
-      fetchjson(`${urls.server}feedback?submit=${feedback.type}`, {... endpoint.post(state), body: JSON.stringify(feedback)},
-        () => {
-          dispatch.feedback.receivedSubmit();
-        },
-        dispatch.app.handleError,
-        dispatch.feedback.error);
-    },
-    async bug(error: ErrorReport) {
-      const dispatch = store.dispatch();
-      const state = store.getState();
-      const userid = state.app.userid;
+        dispatch.feedback.requestSubmitError();
 
-      dispatch.feedback.requestSubmitError();
+        if (error.detail.startsWith(error.message))
+          error.detail = error.detail.substr((error.message).length + 1);
 
-      if (error.detail.startsWith(error.message))
-        error.detail = error.detail.substr((error.message).length + 1);
+        const feedback: Feedback = {type: 'bug', title: error.message, text: error.detail, userid: userid};
+        fetchjson(`${urls.server}feedback?bug=${error.message}`, {
+            ...endpoint.post(state),
+            body: JSON.stringify(feedback)
+          },
+          () => {
+            dispatch.feedback.receivedSubmitError();
+          },
+          dispatch.app.handleError,
+          dispatch.feedback.error);
+      },
+      async resolve(feedback: Feedback) {
+        const dispatch = store.dispatch();
+        const state = store.getState();
 
-      const feedback: Feedback = {type: 'bug', title: error.message, text: error.detail, userid: userid };
-      fetchjson(`${urls.server}feedback?bug=${error.message}`, {... endpoint.post(state), body: JSON.stringify(feedback)},
-        () => {
-          dispatch.feedback.receivedSubmitError();
-        },
-        dispatch.app.handleError,
-        dispatch.feedback.error);
-    },
-    async resolve(feedback: Feedback) {
-      const dispatch = store.dispatch();
-      const state = store.getState();
+        dispatch.feedback.requestResolve();
+        fetchjson(`${urls.server}feedback?resolve=${feedback.type}`, {
+            ...endpoint.post(state),
+            body: JSON.stringify(feedback)
+          },
+          () => {
+            dispatch.feedback.receivedResolve(feedback);
+          },
+          dispatch.app.handleError,
+          dispatch.feedback.error);
+      },
 
-      dispatch.feedback.requestResolve();
-      fetchjson(`${urls.server}feedback?resolve=${feedback.type}`, {... endpoint.post(state), body: JSON.stringify(feedback)},
-        () => {
-          dispatch.feedback.receivedResolve(feedback);
-        },
-        dispatch.app.handleError,
-        dispatch.feedback.error);
-    },
+      'routing/change': async function (routing: RoutingState) {
+        const dispatch = store.dispatch();
+        const state = store.getState();
+        if (state.app.roles.includes("teacher") && (routing.page === 'content-manager'))
+          dispatch.feedback.load();
+      },
+      'app/receivedLogin': async function () {
+        const dispatch = store.dispatch();
+        const state = store.getState();
+        const routing: RoutingState = state.routing;
+        if (state.app.roles.includes("teacher") && (routing.page === 'content-manager'))
+          dispatch.feedback.load();
+      },
 
-    'routing/change': async function(routing: RoutingState) {
-      const dispatch = store.dispatch();
-      const state = store.getState();
-      if (state.app.roles.includes("teacher") && (routing.page === 'content-manager'))
-        dispatch.feedback.load();
-    },
-    'app/receivedLogin': async function() {
-      const dispatch = store.dispatch();
-      const state = store.getState();
-      const routing: RoutingState = state.routing;
-      if (state.app.roles.includes("teacher") && (routing.page === 'content-manager'))
-        dispatch.feedback.load();
-    },
-
-    'app/receivedLogout': async function() {
-      const dispatch = store.dispatch();
-      dispatch.feedback.forget();
-    },
-    'app/chooseInstance': async function() {
-      const dispatch = store.dispatch();
-      dispatch.feedback.forget();
-    },
-  })
+      'app/receivedLogout': async function () {
+        const dispatch = store.dispatch();
+        dispatch.feedback.forget();
+      },
+      'app/chooseInstance': async function () {
+        const dispatch = store.dispatch();
+        dispatch.feedback.forget();
+      },
+    }
+  }
 })
