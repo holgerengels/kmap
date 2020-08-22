@@ -78,7 +78,8 @@ export class KMapTimeline extends connect(store, LitElement) {
         const reqs: Week[] = curriculum.filter(w => w.sw === 0);
         this._requirements = reqs.length !== 0 ? reqs[0] : undefined;
       }
-      this._weeks = this._selectedTimeline ? JSON.parse(this._selectedTimeline.curriculum) : [];
+      else
+        this._weeks = [];
     }
     if (changedProperties.has("_target")) {
       store.dispatch.maps.setTargeted(this._target);
