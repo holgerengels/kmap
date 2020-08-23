@@ -95,6 +95,7 @@ export default createModel({
         const dispatch = store.dispatch();
         dispatch.shell.removeLayer("averages");
         dispatch.shell.removeLayer("editor");
+        dispatch.shell.removeLayer("timeline");
       },
     }
   }

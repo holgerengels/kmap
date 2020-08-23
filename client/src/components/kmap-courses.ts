@@ -60,10 +60,11 @@ export class KMapCourses extends connect(store, LitElement) {
   }
 
   firstUpdated() {
-    const validityTransform = (newValue, nativeValidity) => {
+    const validityTransform = (newValue, nativeValidity: ValidityState) => {
       if (nativeValidity.valid) {
         try {
-          JSON.parse(newValue);
+          if (newValue)
+            JSON.parse(newValue);
           return { valid: true };
         }
           // @ts-ignore
@@ -251,16 +252,16 @@ export class KMapCourses extends connect(store, LitElement) {
               ${this._subjects.map((subject) => html`<mwc-list-item value="${subject.name}">${subject.name}</mwc-list-item>`)}
             </mwc-select>
             <mwc-textfield label="Name" type="text" required .value=${this._newName} @change=${e => this._newName = e.target.value}></mwc-textfield>
-            <mwc-textarea placeholder="Schüler" required rows="7" .value=${this._newStudents} @change=${e => this._newStudents = e.target.value}></mwc-textarea>
-            <mwc-textarea id="newCurriculum" placeholder="Lernplan" rows="7" validationMessage="Kein valides JSON" .value=${this._newCurriculum} @change=${e => this._newCurriculum = e.target.value}></mwc-textarea>
+            <mwc-textarea label="Schüler" required rows="7" helper="Komma- separierte Benutzerkennungen" .value=${this._newStudents} @change=${e => this._newStudents = e.target.value}></mwc-textarea>
+            <mwc-textarea id="newCurriculum" label="Lernplan" rows="7" validationMessage="Kein valides JSON" .value=${this._newCurriculum} @change=${e => this._newCurriculum = e.target.value}></mwc-textarea>
             <mwc-button @click="${this._new}">Speichern</mwc-button>
           </div>
           <div class="page" ?active="${this._page === 'edit'}">
             <label>Kurs bearbeiten</label>
             <mwc-textfield type="text" disabled .value=${this._editSubject}></mwc-textfield>
             <mwc-textfield type="text" disabled .value=${this._editName}></mwc-textfield>
-            <mwc-textarea placeholder="Schüler" required rows="7" .value=${this._editStudents} @change=${e => this._editStudents = e.target.value}></mwc-textarea>
-            <mwc-textarea id="editCurriculum" placeholder="Lernplan" rows="7" validationMessage="Kein valides JSON" .value=${this._editCurriculum} @change=${e => this._editCurriculum = e.target.value}></mwc-textarea>
+            <mwc-textarea label="Schüler" required rows="7" helper="Komma- separierte Benutzerkennungen" .value=${this._editStudents} @change=${e => this._editStudents = e.target.value}></mwc-textarea>
+            <mwc-textarea id="editCurriculum" label="Lernplan" rows="7" validationMessage="Kein valides JSON" .value=${this._editCurriculum} @change=${e => this._editCurriculum = e.target.value}></mwc-textarea>
             <mwc-button @click="${this._edit}">Speichern</mwc-button>
           </div>
           <div class="page" ?active="${this._page === 'delete'}">
@@ -276,8 +277,8 @@ export class KMapCourses extends connect(store, LitElement) {
             <label>Kurs</label>
             <mwc-textfield type="text" disabled .value=${this._selected?.subject || ''}></mwc-textfield>
             <mwc-textfield type="text" disabled .value=${this._selected?.name || ''}></mwc-textfield>
-            <mwc-textarea placeholder="Schüler" disabled rows="3" .value=${this._selected?.students.join(", ") || ''}></mwc-textarea>
-            <mwc-textarea placeholder="Lernplan" disabled rows="3" .value=${this._selected?.curriculum || ''}></mwc-textarea>
+            <mwc-textarea label="Schüler" disabled rows="3" .value=${this._selected?.students.join(", ") || ''}></mwc-textarea>
+            <mwc-textarea label="Lernplan" disabled rows="3" .value=${this._selected?.curriculum || ''}></mwc-textarea>
           </div>
         </div>
         <div class="space"></div>

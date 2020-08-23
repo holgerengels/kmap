@@ -88,7 +88,7 @@ export class KMapFeedback extends LitElement {
         <mwc-formfield label="Verbesserungsvorschlag"><mwc-radio id="proposal" name="type" value="proposal" @change="${() => this._type = 'proposal'}"></mwc-radio></mwc-formfield>
       </div>
       <mwc-textfield id="title" label="Titel" dense .value=${this._title} @input="${e => this._title = e.target.value}"></mwc-textfield>
-      <mwc-textarea id="text" placeholder="Text" dense fullwidth rows="7" .value=${this._text} @input="${e => this._text = e.target.value}"></mwc-textarea>
+      <mwc-textarea id="text" label="Text" dense fullwidth rows="7" .value=${this._text} @input="${e => this._text = e.target.value}"></mwc-textarea>
     </form>
     <mwc-button slot="secondaryAction" @click=${this._cancel}>Abbrechen</mwc-button>
     <mwc-button slot="primaryAction" ?disabled=${this._type === '' || this._title === '' || this._text === ''} @click=${this._send}>Abschicken</mwc-button>

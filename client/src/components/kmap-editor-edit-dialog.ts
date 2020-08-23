@@ -297,8 +297,8 @@ ${this._card ? html`
         <mwc-textfield s5 ?hidden="${this._card.topic === '_'}" ?dialogInitialFocus="${this._card.topic !== '_'}" id="depends" label="Basiert auf ..." dense .value=${this._depends} @change="${e => this._depends = e.target.value}"></mwc-textfield>
         <mwc-textfield s1 ?hidden="${this._card.topic === '_'}" id="thumb" label="Thumbnail" dense .value=${this._thumb} @change="${e => this._thumb = e.target.value}"></mwc-textfield>
         <mwc-textfield s6 ?hidden="${this._card.topic === '_'}" id="keywords" label="Keywords" dense .value=${this._keywords} @change="${e => this._keywords = e.target.value}"></mwc-textfield>
-        <mwc-textarea s6 id="summary" placeholder="Kurztext" ?dialogInitialFocus="${this._card.topic === '_'}" dense fullwidth rows="2" .value=${this._card.summary} @keyup="${this._setSummary}"></mwc-textarea>
-        <mwc-textarea s6 id="description" placeholder="Langtext" dense fullwidth rows="9" .value=${this._card.description} @keyup="${this._setDescription}"></mwc-textarea>
+        <mwc-textarea s6 id="summary" label="Kurztext" ?dialogInitialFocus="${this._card.topic === '_'}" dense fullwidth rows="2" .value=${this._card.summary} @keyup="${this._setSummary}"></mwc-textarea>
+        <mwc-textarea s6 id="description" label="Langtext" dense fullwidth rows="9" .value=${this._card.description} @keyup="${this._setDescription}"></mwc-textarea>
       </div>
     </validating-form>
 

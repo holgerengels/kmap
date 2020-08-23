@@ -249,17 +249,16 @@ export class KmapMain extends connect(store, LitElement) {
         --app-drawer-selected-color: #c67100;
       }
       .drawer-content {
-        padding: 0px 16px 0 16px;
+        padding: 0px 16px;
       }
       .drawer-list {
-        padding: 16px;
+        padding: 0px 8px;
       }
       .drawer-list > * {
           display: block;
-          margin: 4px 0px;
       }
       .drawer-list > a {
-        line-height: 30px;
+        line-height: 36px;
         color: var(--app-drawer-text-color);
       }
       .drawer-list > a[selected] {
@@ -295,7 +294,8 @@ export class KmapMain extends connect(store, LitElement) {
         color: var(--color-primary-dark);
       }
         share-facebook, a[rel=license] {
-          padding-left: 16px;
+          display: inline-flex;
+          padding: 16px;
         }
       `,
     ];
@@ -323,7 +323,6 @@ export class KmapMain extends connect(store, LitElement) {
         <pwa-update-available><mwc-button outlined style="--mdc-theme-primary: var(--color-secondary-dark);">App aktualisieren</mwc-button></pwa-update-available>
       </nav>
       <!--googleoff: all-->
-        <share-facebook></share-facebook>
       <nav class="drawer-list">
         <hr/><br/>
         <label section>Layer ein-/ausblenden</label>
@@ -352,7 +351,10 @@ export class KmapMain extends connect(store, LitElement) {
         ` : ''}
       </nav>
       <!--googleon: all-->
-      <a style="display: inline-block" rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/deed.de"><img src="//i.creativecommons.org/l/by-sa/4.0/88x31.png" alt="CC BY-SA 4.0"></a>
+      <div style="display: flex; align-items: center">
+        <a class="license" rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/deed.de"><img src="//i.creativecommons.org/l/by-sa/4.0/88x31.png" alt="CC BY-SA 4.0"></a>
+        <share-facebook></share-facebook>
+      </div>
     </div>
 
     <div slot="appContent" class="main-content" role="main">
