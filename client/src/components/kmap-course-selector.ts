@@ -47,9 +47,8 @@ export class KMapCourseSelector extends connect(store, LitElement) {
     return html`
         <mwc-list>
           ${this._courses.map((course, i) => html`
-            <mwc-list-item ?activated="${this._selectedIndex === i}" @click="${() => this._select(i)}" graphic="icon">
+            <mwc-list-item ?activated="${this._selectedIndex === i}" @click="${() => this._select(i)}">
               <span>${course.name}</span>
-              <mwc-icon slot="graphic">group</mwc-icon>
             </mwc-list-item>
           `)}
         </mwc-list>

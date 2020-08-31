@@ -249,23 +249,21 @@ export class KmapMain extends connect(store, LitElement) {
         --app-drawer-selected-color: #c67100;
       }
       .drawer-content {
-        padding: 0px 16px;
+        padding: 4px 16px;
       }
       .drawer-list {
+        display: flex;
+        flex-direction: column;
         padding: 0px 8px;
       }
-      .drawer-list > * {
-          display: block;
+      .drawer-list > a, .drawer-list > mwc-formfield, label {
+        margin: 8px 0px;
       }
       .drawer-list > a {
-        line-height: 36px;
         color: var(--app-drawer-text-color);
       }
       .drawer-list > a[selected] {
         color: var(--app-drawer-selected-color);
-      }
-      .drawer-list > mwc-formfield {
-        margin: 16px 0px;
       }
       .main-content {
         width: 100%;
@@ -323,8 +321,8 @@ export class KmapMain extends connect(store, LitElement) {
         <pwa-update-available><mwc-button outlined style="--mdc-theme-primary: var(--color-secondary-dark);">App aktualisieren</mwc-button></pwa-update-available>
       </nav>
       <!--googleoff: all-->
+      <hr/>
       <nav class="drawer-list">
-        <hr/><br/>
         <label section>Layer ein-/ausblenden</label>
         <mwc-formfield label="Kurztexte">
           <mwc-switch ?checked="${this._layers.includes('summaries')}" @change="${e => this._switchLayer('summaries', e.target.checked)}"></mwc-switch>

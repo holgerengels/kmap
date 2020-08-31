@@ -47,9 +47,8 @@ export class KMapTimelineSelector extends connect(store, LitElement) {
     return html`
         <mwc-list>
           ${this._timelines.map((timeline, i) => html`
-            <mwc-list-item ?activated="${this._selectedIndex === i}" @click="${() => this._select(i)}" graphic="icon">
+            <mwc-list-item ?activated="${this._selectedIndex === i}" @click="${() => this._select(i)}">
               <span>${timeline.name}</span>
-              <mwc-icon slot="graphic">group</mwc-icon>
             </mwc-list-item>
           `)}
         </mwc-list>

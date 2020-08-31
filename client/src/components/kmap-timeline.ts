@@ -142,6 +142,9 @@ export class KMapTimeline extends connect(store, LitElement) {
           height: 100%;
           overflow-y: auto;
           scroll-snap-type: y mandatory;
+          background-image: url(/app/1x1.svg);
+          background-position-x: 77px;
+          background-repeat: repeat-y;
         }
         .grid {
           scroll-snap-align: start;
@@ -158,11 +161,6 @@ export class KMapTimeline extends connect(store, LitElement) {
         }
         .knob[selected] {
           --background: var(--color-secondary-dark);
-        }
-        .knobs {
-          background-image: url("/app/1x1.svg");
-          background-repeat: repeat-y;
-          background-position-x: 23px;
         }
         .right {
           display: flex;
