@@ -172,6 +172,9 @@ export class KMapTimeline extends connect(store, LitElement) {
         .title {
           margin: 12px
         }
+        .title:not(:first-of-type) {
+          margin-top: 0px
+        }
       `];
   }
 
@@ -186,15 +189,25 @@ export class KMapTimeline extends connect(store, LitElement) {
                   <mwc-icon-button id="${week.sw}" class="knob" @click="${this._markWeek}">${iconPointInTime}</mwc-icon-button>
                 </div>
                 <div class="right">
-                  ${week.tops.map((top) => html`
-                      <div class="mdc-card">
-                          <div class="title mdc-card__primary-action">${top.replace("/", " → ").replace("*", "∗")}</div>
-                      </div>
-                  `)}
+                  <div class="mdc-card">
+                    ${week.tops.map((top) => html`
+                      <a href="${(this.link(top))}" class="title mdc-card__primary-action">${top.replace("/", " → ").replace("*", "∗")}</a>
+                    `)}
+                  </div>
                 </div>
               </div>
             `)}
         </aside>
     `;
+  }
+
+  private link(top: string) {
+    if (top.includes('*')) {
+      const pos = top.indexOf("/");
+      return "browser/" + this._selectedTimeline?.subject + '/' + top.substr(0, pos);
+    }
+    else {
+      return "browser/" + this._selectedTimeline?.subject + '/' + top.split("/").map(p => encodeURIComponent(p)).join("/");
+    }
   }
 }
