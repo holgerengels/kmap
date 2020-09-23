@@ -54,9 +54,9 @@ export default createModel({
   },
 
   effects(store: Store) {
+    const dispatch = store.getDispatch();
     return {
       async load() {
-        const dispatch = store.dispatch();
         const state = store.getState();
         const userid = state.app.userid;
         const subject = state.maps.subject;
@@ -78,27 +78,21 @@ export default createModel({
       },
 
       'maps/received': async function () {
-        const dispatch = store.dispatch();
         dispatch.rates.load();
       },
       'courses/selectCourse': async function () {
-        const dispatch = store.dispatch();
         dispatch.averages.load();
       },
       'courses/unselectCourse': async function () {
-        const dispatch = store.dispatch();
         dispatch.averages.forget();
       },
       'app/receivedLogin': async function () {
-        const dispatch = store.dispatch();
         dispatch.rates.load();
       },
       'app/receivedLogout': async function () {
-        const dispatch = store.dispatch();
         dispatch.rates.forget();
       },
       'app/chooseInstance': async function () {
-        const dispatch = store.dispatch();
         dispatch.rates.forget();
       },
     }

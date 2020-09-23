@@ -29,6 +29,7 @@ export default createModel({
   },
 
   effects(store: Store) {
+    const dispatch = store.getDispatch();
     return {
       async signout() {
         const auth = await authLoader
@@ -36,7 +37,6 @@ export default createModel({
       },
 
       async signinProvider(name: string) {
-        const dispatch = store.dispatch();
         const auth = await authLoader;
 
         const provider = providerFromName(name);
@@ -48,7 +48,6 @@ export default createModel({
 
       async init() {
         const auth = await authLoader
-        const dispatch = store.dispatch()
 
         auth.onAuthStateChanged(async user => {
           console.log("onAuthStateChanged");

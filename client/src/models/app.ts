@@ -86,9 +86,9 @@ export default createModel({
   },
 
   effects(store: Store) {
+    const dispatch = store.getDispatch();
     return {
       async login(payload: Credentials) {
-        const dispatch = store.dispatch();
         const state = store.getState();
 
         dispatch.app.requestLogin();
@@ -105,7 +105,6 @@ export default createModel({
           dispatch.app.loginResponse);
       },
       async logout() {
-        const dispatch = store.dispatch();
         const state = store.getState();
 
         dispatch.app.requestLogout();
@@ -121,7 +120,6 @@ export default createModel({
       },
 
       handleError(error: Error) {
-        const dispatch = store.dispatch();
         switch (error.code) {
           case 401:
             dispatch.shell.showMessage(error.message);
@@ -134,7 +132,6 @@ export default createModel({
       },
 
       'app/chooseInstance': async function () {
-        const dispatch = store.dispatch();
         dispatch.app.logout();
       },
     }

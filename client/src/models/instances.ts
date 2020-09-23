@@ -110,9 +110,9 @@ export default createModel({
   },
 
   effects(store: Store) {
+    const dispatch = store.getDispatch();
     return {
       async load() {
-        const dispatch = store.dispatch();
         const state = store.getState();
         // @ts-ignore
         if (Date.now() - state.instances.timestamp > 3000) {
@@ -126,7 +126,6 @@ export default createModel({
         }
       },
       async create(instance: Instance) {
-        const dispatch = store.dispatch();
         const state = store.getState();
         // @ts-ignore
         dispatch.instances.requestCreate();
@@ -142,7 +141,6 @@ export default createModel({
           dispatch.instances.error);
       },
       async edit(instance: Instance) {
-        const dispatch = store.dispatch();
         const state = store.getState();
         // @ts-ignore
         dispatch.instances.requestEdit();
@@ -158,7 +156,6 @@ export default createModel({
           dispatch.instances.error);
       },
       async drop(instance: Instance) {
-        const dispatch = store.dispatch();
         const state = store.getState();
         // @ts-ignore
         dispatch.instances.requestDrop();
@@ -172,7 +169,6 @@ export default createModel({
       },
 
       async sync(sync: Sync) {
-        const dispatch = store.dispatch();
         const state = store.getState();
         // @ts-ignore
         dispatch.instances.requestSync();
@@ -187,7 +183,6 @@ export default createModel({
       },
 
       'routing/change': async function (routing: RoutingState) {
-        const dispatch = store.dispatch();
         switch (routing.page) {
           case 'content-manager':
             document.title = "KMap - Content Manager";

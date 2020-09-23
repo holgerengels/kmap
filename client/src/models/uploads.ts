@@ -40,9 +40,9 @@ export default createModel({
   },
 
   effects(store: Store) {
+    const dispatch = store.getDispatch();
     return {
       async upload(file: File) {
-        const dispatch = store.dispatch();
         const state = store.getState();
 
         var formData: FormData = new FormData();
@@ -58,7 +58,6 @@ export default createModel({
       },
 
       'app/receivedLogout': async function () {
-        const dispatch = store.dispatch();
         dispatch.uploads.clearUploads();
       },
     }

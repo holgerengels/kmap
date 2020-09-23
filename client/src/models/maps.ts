@@ -189,9 +189,9 @@ export default createModel({
   },
 
   effects(store: Store) {
+    const dispatch = store.getDispatch();
     return {
       async load(path: Path) {
-        const dispatch = store.dispatch();
         const state = store.getState();
         const oldSubject: string = state.maps.subject;
 
@@ -213,7 +213,6 @@ export default createModel({
       },
 
       async loadLatest(subject: string) {
-        const dispatch = store.dispatch();
         const state = store.getState();
 
         if (Date.now() - state.maps.latestTimestamp > 60 * 1000) {
@@ -229,7 +228,6 @@ export default createModel({
       },
 
       async deleteTopic(card: Card) {
-        const dispatch = store.dispatch();
         const state = store.getState();
         const userid = state.app.userid;
 
@@ -244,7 +242,6 @@ export default createModel({
           dispatch.maps.error);
       },
       async renameTopic(card: Card) {
-        const dispatch = store.dispatch();
         const state = store.getState();
         const userid = state.app.userid;
 
@@ -260,7 +257,6 @@ export default createModel({
           dispatch.maps.error);
       },
       async saveTopic(card: Card) {
-        const dispatch = store.dispatch();
         const state = store.getState();
         const userid = state.app.userid;
 
@@ -277,7 +273,6 @@ export default createModel({
       },
 
       async loadAllTopics(subject: string) {
-        const dispatch = store.dispatch();
         const state = store.getState();
 
         if (state.maps.allTopics && state.maps.allTopics.subject === subject) {
@@ -294,7 +289,6 @@ export default createModel({
       },
 
       'routing/change': async function (routing: RoutingState) {
-        const dispatch = store.dispatch();
         switch (routing.page) {
           case 'browser':
             dispatch.maps.load({subject: routing.params["subject"], chapter: routing.params["chapter"]});
@@ -306,7 +300,6 @@ export default createModel({
         }
       },
       'app/chooseInstance': async function () {
-        const dispatch = store.dispatch();
         const state = store.getState();
         const routing: RoutingState = state.routing;
         if (routing.page === 'browser')
@@ -315,7 +308,6 @@ export default createModel({
           dispatch.maps.forget();
       },
       'shell/removeLayer': async function () {
-        const dispatch = store.dispatch();
         const state = store.getState();
         if (!state.shell.layers.includes("editor")) {
           dispatch.maps.unsetCardForDelete();

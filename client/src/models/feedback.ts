@@ -81,9 +81,9 @@ export default createModel({
   },
 
   effects(store: Store) {
+    const dispatch = store.getDispatch();
     return {
       async load() {
-        const dispatch = store.dispatch();
         const state = store.getState();
         // @ts-ignore
         if (Date.now() - state.feedback.timestamp > 3000) {
@@ -97,7 +97,6 @@ export default createModel({
         }
       },
       async submit(feedback: Feedback) {
-        const dispatch = store.dispatch();
         const state = store.getState();
         const userid = state.app.userid;
         if (!userid)
@@ -117,7 +116,6 @@ export default createModel({
           dispatch.feedback.error);
       },
       async bug(error: ErrorReport) {
-        const dispatch = store.dispatch();
         const state = store.getState();
         const userid = state.app.userid;
 
@@ -138,7 +136,6 @@ export default createModel({
           dispatch.feedback.error);
       },
       async resolve(feedback: Feedback) {
-        const dispatch = store.dispatch();
         const state = store.getState();
 
         dispatch.feedback.requestResolve();
@@ -154,13 +151,11 @@ export default createModel({
       },
 
       'routing/change': async function (routing: RoutingState) {
-        const dispatch = store.dispatch();
         const state = store.getState();
         if (state.app.roles.includes("teacher") && (routing.page === 'content-manager'))
           dispatch.feedback.load();
       },
       'app/receivedLogin': async function () {
-        const dispatch = store.dispatch();
         const state = store.getState();
         const routing: RoutingState = state.routing;
         if (state.app.roles.includes("teacher") && (routing.page === 'content-manager'))
@@ -168,11 +163,9 @@ export default createModel({
       },
 
       'app/receivedLogout': async function () {
-        const dispatch = store.dispatch();
         dispatch.feedback.forget();
       },
       'app/chooseInstance': async function () {
-        const dispatch = store.dispatch();
         dispatch.feedback.forget();
       },
     }

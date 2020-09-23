@@ -134,9 +134,9 @@ export default createModel({
   },
 
   effects(store: Store) {
+    const dispatch = store.getDispatch();
     return {
       async loadCourses() {
-        const dispatch = store.dispatch();
         const state = store.getState();
         const userid = state.app.userid;
         if (!userid)
@@ -156,7 +156,6 @@ export default createModel({
           dispatch.courses.error);
       },
       async loadTimelines() {
-        const dispatch = store.dispatch();
         const state = store.getState();
         const userid = state.app.userid;
         if (!userid)
@@ -177,7 +176,6 @@ export default createModel({
       },
 
       async deleteCourse(course: Course) {
-        const dispatch = store.dispatch();
         const state = store.getState();
         const userid = state.app.userid;
         if (!userid)
@@ -197,7 +195,6 @@ export default createModel({
       },
 
       async saveCourse(course: Course) {
-        const dispatch = store.dispatch();
         const state = store.getState();
         const userid = state.app.userid;
         if (!userid)
@@ -225,21 +222,17 @@ export default createModel({
         }
       },
       'app/receivedLogin': async function () {
-        const dispatch = store.dispatch();
         const state = store.getState();
         if (state.app.roles.includes("teacher"))
           dispatch.courses.loadCourses();
       },
       'app/receivedLogout': async function () {
-        const dispatch = store.dispatch();
         dispatch.courses.forget();
       },
       'app/chooseInstance': async function () {
-        const dispatch = store.dispatch();
         dispatch.courses.forget();
       },
       'shell/addLayer': async function () {
-        const dispatch = store.dispatch();
         const state = store.getState();
         if (state.shell.layers.includes("timeline")) {
           dispatch.shell.addMessage("Die Timeline Funktion ist noch nicht fertig umgesetzt");

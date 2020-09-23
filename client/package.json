@@ -30,7 +30,7 @@
     "rollup-plugin-workbox": "^5.1.0",
     "source-map-explorer": "^2.4.2",
     "tslib": "^2.0.1",
-    "typescript": "^3.9.7"
+    "typescript": "^4.0.2"
   },
   "lint-staged": {
     "*.js": [
@@ -44,7 +44,7 @@
   "description": "KMap - Wissen mit Zusammenhang",
   "license": "MIT",
   "dependencies": {
-    "@captaincodeman/rdx": "^1.0.0-rc.6",
+    "@captaincodeman/rdx": "^1.0.0-rc.8",
     "@captaincodeman/router": "^1.0.1",
     "@material/mwc-button": "^0.18.0",
     "@material/mwc-dialog": "^0.18.0",

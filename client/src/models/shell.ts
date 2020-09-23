@@ -55,9 +55,9 @@ export default createModel({
   },
 
   effects(store: Store) {
+    const dispatch = store.getDispatch();
     return {
       showMessage(payload: string) {
-        const dispatch = store.dispatch();
         window.setTimeout(() => dispatch.shell.removeMessage(payload), 3000);
         dispatch.shell.addMessage(payload);
       },
@@ -73,26 +73,27 @@ export default createModel({
           await import('../components/kmap-test-editor-add-fabs');
           await import('../components/kmap-test-editor-delete-dialog');
           await import('../components/kmap-test-editor-edit-dialog');
-        } else if (layer === 'averages') {
+        }
+        else if (layer === 'averages') {
           await import('../components/kmap-course-selector');
         }
       },
 
       'routing/change': async function (routing: RoutingState) {
-        const dispatch = store.dispatch();
         if (routing.page !== 'browser')
           dispatch.shell.updateMeta({});
+
         if (routing.page === 'courses') {
           console.log("loading courses")
           import('../components/kmap-courses').then(() => console.log("loaded courses"));
-        } else if (routing.page === 'content-manager') {
+        }
+        else if (routing.page === 'content-manager') {
           console.log("loading content-manager")
           import('../components/kmap-content-manager').then(() => console.log("loaded content-manager"));
         }
       },
 
       'app/receivedLogout': async function () {
-        const dispatch = store.dispatch();
         dispatch.shell.removeLayer("averages");
         dispatch.shell.removeLayer("editor");
         dispatch.shell.removeLayer("timeline");

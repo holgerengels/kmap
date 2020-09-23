@@ -82,9 +82,9 @@ export default createModel({
   },
 
   effects(store: Store) {
+    const dispatch = store.getDispatch();
     return {
       async load() {
-        const dispatch = store.dispatch();
         const state = store.getState();
         // @ts-ignore
         if (Date.now() - state.contentMaps.timestamp > 3000) {
@@ -98,7 +98,6 @@ export default createModel({
         }
       },
       async import(files: FileList) {
-        const dispatch = store.dispatch();
         const state = store.getState();
 
         let names: string[] = [];
@@ -123,7 +122,6 @@ export default createModel({
           dispatch.contentMaps.error);
       },
       async export(payload: Module) {
-        const dispatch = store.dispatch();
         const state = store.getState();
 
         dispatch.contentMaps.requestExport();
@@ -144,7 +142,6 @@ export default createModel({
           dispatch.contentMaps.error);
       },
       async delete(payload: Module) {
-        const dispatch = store.dispatch();
         const state = store.getState();
 
         dispatch.contentMaps.requestDelete();
@@ -157,13 +154,11 @@ export default createModel({
       },
 
       'routing/change': async function (routing: RoutingState) {
-        const dispatch = store.dispatch();
         const state = store.getState();
         if (state.app.roles.includes("teacher") && (routing.page === 'content-manager' || routing.page === 'browser'))
           dispatch.contentMaps.load();
       },
       'app/receivedLogin': async function () {
-        const dispatch = store.dispatch();
         const state = store.getState();
         const routing: RoutingState = state.routing;
         if (state.app.roles.includes("teacher") && (routing.page === 'content-manager' || routing.page === 'browser'))
@@ -171,11 +166,9 @@ export default createModel({
       },
 
       'app/receivedLogout': async function () {
-        const dispatch = store.dispatch();
         dispatch.contentMaps.forget();
       },
       'app/chooseInstance': async function () {
-        const dispatch = store.dispatch();
         dispatch.contentMaps.forget();
       },
     }

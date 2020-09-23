@@ -218,9 +218,9 @@ export default createModel({
   },
 
   effects(store: Store) {
+    const dispatch = store.getDispatch();
     return {
       async loadTopics() {
-        const dispatch = store.dispatch();
         const state = store.getState();
         const subject = state.maps.subject;
         if (!subject)
@@ -238,7 +238,6 @@ export default createModel({
         }
       },
       async loadChapters(subject: string) {
-        const dispatch = store.dispatch();
         const state = store.getState();
 
         // @ts-ignore
@@ -253,7 +252,6 @@ export default createModel({
         }
       },
       async loadTree(subject: string) {
-        const dispatch = store.dispatch();
         const state = store.getState();
 
         // @ts-ignore
@@ -268,7 +266,6 @@ export default createModel({
         }
       },
       async loadTests(payload: Path) {
-        const dispatch = store.dispatch();
         const state = store.getState();
         if (!payload.subject || !payload.chapter)
           return;
@@ -295,7 +292,6 @@ export default createModel({
       },
 
       async loadRandomTests(subject: string) {
-        const dispatch = store.dispatch();
         const state = store.getState();
 
         if (Date.now() - state.tests.randomTimestamp > 60 * 1000) {
@@ -311,7 +307,6 @@ export default createModel({
       },
 
       async deleteTest(test: Test) {
-        const dispatch = store.dispatch();
         const state = store.getState();
         const userid = state.app.userid;
 
@@ -329,7 +324,6 @@ export default createModel({
           dispatch.tests.error);
       },
       async saveTest(test: Test) {
-        const dispatch = store.dispatch();
         const state = store.getState();
         const userid = state.app.userid;
 
@@ -347,11 +341,9 @@ export default createModel({
       },
 
       'maps/subjectChanged': async function () {
-        const dispatch = store.dispatch();
         dispatch.tests.loadTopics();
       },
       'routing/change': async function (routing: RoutingState) {
-        const dispatch = store.dispatch();
         switch (routing.page) {
           case 'test':
             dispatch.tests.loadTests({
@@ -376,7 +368,6 @@ export default createModel({
         }
       },
       'app/chooseInstance': async function () {
-        const dispatch = store.dispatch();
         const state = store.getState();
         const routing: RoutingState = state.routing;
         if (routing.page === 'test')
@@ -391,7 +382,6 @@ export default createModel({
           dispatch.tests.forget();
       },
       'shell/removeLayer': async function () {
-        const dispatch = store.dispatch();
         const state = store.getState();
         if (!state.shell.layers.includes("editor")) {
           dispatch.tests.unsetTestForDelete();
@@ -399,7 +389,6 @@ export default createModel({
         }
       },
       'tests/setTestForEdit': async function () {
-        const dispatch = store.dispatch();
         const state = store.getState();
         if (state.tests.testForEdit === undefined)
           return;

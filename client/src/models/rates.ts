@@ -75,9 +75,9 @@ export default createModel({
   },
 
   effects(store: Store) {
+    const dispatch = store.getDispatch();
     return {
       async load() {
-        const dispatch = store.dispatch();
         const state = store.getState();
         const userid = state.app.userid;
         const subject = state.maps.subject;
@@ -97,7 +97,6 @@ export default createModel({
         }
       },
       async store(payload: Rate) {
-        const dispatch = store.dispatch();
         const state = store.getState();
         dispatch.rates.requestStore();
         let body = {...payload, save: state.app.userid};
@@ -114,19 +113,15 @@ export default createModel({
       },
 
       'maps/received': async function () {
-        const dispatch = store.dispatch();
         dispatch.rates.load();
       },
       'app/receivedLogin': async function () {
-        const dispatch = store.dispatch();
         dispatch.rates.load();
       },
       'app/receivedLogout': async function () {
-        const dispatch = store.dispatch();
         dispatch.rates.forget();
       },
       'app/chooseInstance': async function () {
-        const dispatch = store.dispatch();
         dispatch.rates.forget();
       },
     }

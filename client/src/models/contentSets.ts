@@ -110,9 +110,9 @@ export default createModel({
   },
 
   effects(store: Store) {
+    const dispatch = store.getDispatch();
     return {
       async load() {
-        const dispatch = store.dispatch();
         const state = store.getState();
         if (Date.now() - state.contentSets.timestamp > 3000) {
           dispatch.contentSets.requestLoad();
@@ -131,7 +131,6 @@ export default createModel({
         }
       },
       async loadSet(set: Set) {
-        const dispatch = store.dispatch();
         const state = store.getState();
         if (!set.subject || !set.set)
           return;
@@ -156,7 +155,6 @@ export default createModel({
         }
       },
       selectSet(set: Set) {
-        const dispatch = store.dispatch();
         if (!set.subject || !set.set)
           return;
 
@@ -164,7 +162,6 @@ export default createModel({
         dispatch.maps.loadAllTopics(set.subject);
       },
       maybeNewSet(set: Set) {
-        const dispatch = store.dispatch();
         const state = store.getState();
         if (state.contentSets.sets.filter(s => s.subject === set.subject && s.set === set.set).length === 0) {
           // @ts-ignore
@@ -176,21 +173,20 @@ export default createModel({
           }.bind(undefined, set), 1000);
       },
       maybeObsoleteSet(set: Set) {
-        const dispatch = store.dispatch();
         const state = store.getState();
 
         // @ts-ignore
         if (state.contentSets.set.count === 1) {
           dispatch.contentSets.receivedLoad(state.contentSets.sets.filter(s => s.set !== set.set));
           dispatch.contentSets.unselectSet();
-        } else
+        }
+        else
           window.setTimeout(function (set: Set) {
             dispatch.contentSets.loadSet(set);
           }.bind(undefined, set), 1000);
       },
 
       async import(files: FileList) {
-        const dispatch = store.dispatch();
         const state = store.getState();
 
         let names: string[] = [];
@@ -215,7 +211,6 @@ export default createModel({
           dispatch.contentSets.error);
       },
       async export(payload: Set) {
-        const dispatch = store.dispatch();
         const state = store.getState();
 
         dispatch.contentSets.requestExport();
@@ -236,7 +231,6 @@ export default createModel({
           dispatch.contentSets.error);
       },
       async delete(payload: Set) {
-        const dispatch = store.dispatch();
         const state = store.getState();
 
         dispatch.contentSets.requestDelete();
@@ -249,13 +243,11 @@ export default createModel({
       },
 
       'routing/change': async function (routing: RoutingState) {
-        const dispatch = store.dispatch();
         const state = store.getState();
         if (state.app.roles.includes("teacher") && (routing.page === 'content-manager' || routing.page === 'test'))
           dispatch.contentSets.load();
       },
       'app/receivedLogin': async function () {
-        const dispatch = store.dispatch();
         const state = store.getState();
         const routing: RoutingState = state.routing;
         if (state.app.roles.includes("teacher") && (routing.page === 'content-manager' || routing.page === 'test'))
@@ -263,11 +255,9 @@ export default createModel({
       },
 
       'app/receivedLogout': async function () {
-        const dispatch = store.dispatch();
         dispatch.contentSets.forget();
       },
       'app/chooseInstance': async function () {
-        const dispatch = store.dispatch();
         dispatch.contentSets.forget();
       },
     }

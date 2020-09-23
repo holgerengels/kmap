@@ -44,9 +44,9 @@ export default createModel({
   },
 
   effects(store: Store) {
+    const dispatch = store.getDispatch();
     return {
       async load() {
-        const dispatch = store.dispatch();
         const state = store.getState();
         // @ts-ignore
         if (Date.now() - state.subjects.timestamp > 3000) {
@@ -61,7 +61,6 @@ export default createModel({
       },
 
       'routing/change': async function (routing: RoutingState) {
-        const dispatch = store.dispatch();
         switch (routing.page) {
           case 'home':
             document.title = "KMap - Knowledge Map";
@@ -72,7 +71,6 @@ export default createModel({
         }
       },
       'app/chooseInstance': async function () {
-        const dispatch = store.dispatch();
         dispatch.subjects.load();
       },
     }
