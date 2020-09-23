@@ -87,7 +87,6 @@ export class KMapBrowser extends connect(store, LitElement) {
       _testTopics: state.tests.topics ? state.tests.topics.topics : [],
       _selected: state.maps.selected,
       _highlighted: state.maps.selectedDependencies,
-      _targeted: state.maps.targeted,
       timeline: state.shell.layers.includes('timeline') && state.courses.selectedTimeline,
     };
   }
@@ -275,8 +274,8 @@ export class KMapBrowser extends connect(store, LitElement) {
           position: fixed;
           top: 0px;
           padding-top: 48px;
-          right: -300px;
-          width: 300px;
+          right: -330px;
+          width: 330px;
           bottom: 0px;
           transition: right 0.4s ease-in-out;
         }

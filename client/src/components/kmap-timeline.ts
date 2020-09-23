@@ -14,11 +14,12 @@ import './svg-connector';
 import {cardStyles} from "../mdc.card.css";
 import {iconPointInTime} from "./icons";
 import {Timeline} from "../models/courses";
+import {iconTest} from "./icons";
 
 export interface Week {
   cw: number,
   sw: number,
-  tops: string[],
+  tops: string[][],
 }
 
 @customElement('kmap-timeline')
@@ -105,10 +106,10 @@ export class KMapTimeline extends connect(store, LitElement) {
 
       const target: string[] = [];
       if (this._requirements)
-        target.push(...this._requirements.tops);
+        target.push(...this._requirements.tops.filter(top => top[0] === 'card' || top[0] === 'map').map(top => top[1]));
 
       for (let i = 0; i < sw; i++) {
-        target.push(...this._weeks[i].tops);
+        target.push(...this._weeks[i].tops.filter(top => top[0] === 'card' || top[0] === 'map').map(top => top[1]));
       }
       this._target = target;
     }
@@ -143,19 +144,25 @@ export class KMapTimeline extends connect(store, LitElement) {
           overflow-y: auto;
           scroll-snap-type: y mandatory;
           background-image: url(/app/1x1.svg);
-          background-position-x: 77px;
+          background-position-x: 50px;
           background-repeat: repeat-y;
         }
         .grid {
           scroll-snap-align: start;
           display: grid;
-          grid-template-columns: 54px 50px 1fr;
+          grid-template-columns: 32px 41px 1fr;
         }
         .week {
           margin: 19px 0px 0px 8px;
+          text-align: center;
+          font-family: Roboto,sans-serif;
+          -webkit-font-smoothing: antialiased;
+          font-size: 0.85rem;
+          font-weight: 500;
         }
         .knob {
-          margin: 4px 0px;
+          margin: 8px 0px;
+          --mdc-icon-button-size: 38px;
           --foreground: var(--color-secondary-dark);
           --background: white;
         }
@@ -169,11 +176,29 @@ export class KMapTimeline extends connect(store, LitElement) {
         .mdc-card {
           margin: 6px 8px 6px 0px;
         }
-        .title {
+        .mdc-card > * {
+          display: block;
           margin: 12px
         }
-        .title:not(:first-of-type) {
-          margin-top: 0px
+        .mdc-card *:not(:first-child) {
+          margin-top: 0px;
+        }
+        a.link {
+          text-decoration: none !important;
+        }
+        a.link > * {
+          display: inline;
+        }
+        a > mwc-icon {
+          --mdc-icon-size: 20px;
+          vertical-align: text-top;
+          margin: -2px;
+        }
+        a > div > svg {
+          width: 18px;
+          height: 18px;
+          vertical-align: text-top;
+          margin: 0px -1px 0px -1px;
         }
       `];
   }
@@ -184,15 +209,43 @@ export class KMapTimeline extends connect(store, LitElement) {
         <aside>
             ${this._weeks.map((week) => html`
               <div class="grid">
-                <div class="week">SW&nbsp;${week.sw}</div>
+                <div class="week">SW<br/>${week.sw}</div>
                 <div class="knobs">
                   <mwc-icon-button id="${week.sw}" class="knob" @click="${this._markWeek}">${iconPointInTime}</mwc-icon-button>
                 </div>
                 <div class="right">
                   <div class="mdc-card">
-                    ${week.tops.map((top) => html`
-                      <a href="${(this.link(top))}" class="title mdc-card__primary-action">${top.replace("/", " → ").replace("*", "∗")}</a>
-                    `)}
+                    ${week.tops.map((top) => {
+                      switch (top[0]) {
+                        case 'card':
+                          return html`
+                            <a href="${(this._top(top[1]))}" class="link mdc-card__primary-action">
+                            <mwc-icon title="Wissenskarte">fullscreen</mwc-icon>
+                            <span>${top[1].replace("/", " → ")}</span>
+                            </a>
+                          `;
+                        case 'map':
+                          return html`
+                            <a href="${(this._map(top[1]))}" class="link mdc-card__primary-action">
+                            <mwc-icon title="Wissenslandkarte">open_in_new</mwc-icon>
+                            <span>${top[1] + " ∗"}</span>
+                            </a>
+                          `;
+                        case 'test':
+                          return html`
+                            <a href="${(this._test(top[1]))}" class="link mdc-card__primary-action">
+                                <span title="Tests">${iconTest}</span>
+                                <span>${top[1].replace("/", " → ")}</span>
+                                </a>
+                          `;
+                        case 'note':
+                          return html`
+                            <div class="title font-body">${top[1]}</div>
+                          `;
+                        default:
+                          return 'fehler';
+                      }
+                    })}
                   </div>
                 </div>
               </div>
@@ -201,13 +254,15 @@ export class KMapTimeline extends connect(store, LitElement) {
     `;
   }
 
-  private link(top: string) {
-    if (top.includes('*')) {
-      const pos = top.indexOf("/");
-      return "browser/" + this._selectedTimeline?.subject + '/' + top.substr(0, pos);
-    }
-    else {
-      return "browser/" + this._selectedTimeline?.subject + '/' + top.split("/").map(p => encodeURIComponent(p)).join("/");
-    }
+  private _top(top: string) {
+    return "browser/" + this._selectedTimeline?.subject + '/' + top.split("/").map(p => encodeURIComponent(p)).join("/");
+  }
+
+  private _map(top: string) {
+    return "browser/" + this._selectedTimeline?.subject + '/' + encodeURIComponent(top);
+  }
+
+  private _test(top: string) {
+    return "test/" + this._selectedTimeline?.subject + '/' + top.split("/").map(p => encodeURIComponent(p)).join("/");
   }
 }

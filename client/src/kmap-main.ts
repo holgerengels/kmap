@@ -80,7 +80,9 @@ export class KmapMain extends connect(store, LitElement) {
   private _loginPopup: KMapLoginPopup;
 
   set route(val: RoutingState) {
-    this._page = val.page;
+    if (val.page !== this._page) {
+      this._page = val.page
+    }
   }
 
   mapState(state: State) {
@@ -265,7 +267,7 @@ export class KmapMain extends connect(store, LitElement) {
       .drawer-list > a[selected] {
         color: var(--app-drawer-selected-color);
       }
-      .main-content {
+      main {
         width: 100%;
         height: 100%;
         overflow: auto;
@@ -355,7 +357,7 @@ export class KmapMain extends connect(store, LitElement) {
       </div>
     </div>
 
-    <div slot="appContent" class="main-content" role="main">
+    <main slot="appContent" role="main">
     ${this._instance ? html`
       <mwc-top-app-bar id="bar" dense>
         <mwc-icon-button icon="menu" slot="navigationIcon" @click="${() => this._drawerOpen = !this._drawerOpen}"></mwc-icon-button>
@@ -378,7 +380,7 @@ export class KmapMain extends connect(store, LitElement) {
         ${this._layers.includes('editor') ? html`<kmap-test-editor-add-fabs></kmap-test-editor-add-fabs>` : ''}
       ` : ''}
     ` : ''}
-    </div>
+    </main>
   </mwc-drawer>
 
   <kmap-instance-popup id="instance-popup"></kmap-instance-popup>
