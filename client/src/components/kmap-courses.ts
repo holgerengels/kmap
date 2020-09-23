@@ -107,6 +107,7 @@ export class KMapCourses extends connect(store, LitElement) {
     if (page === 'edit') {
       if (!this._selected) return;
 
+      this._editSubject = this._selected.subject;
       this._editName = this._selected.name;
       this._editStudents = this._selected.students.join(", ") || '';
       this._editCurriculum = this._selected.curriculum;
