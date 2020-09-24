@@ -65,9 +65,13 @@ export class KMapBrowser extends connect(store, LitElement) {
   private _selected: string = '';
   @property()
   private _highlighted: string[] = [];
+
   @property({reflect: true, type: Boolean})
   // @ts-ignore
   private timeline: boolean = false;
+  @property({reflect: true, type: Boolean})
+  // @ts-ignore
+  private wide: boolean = false;
 
   @query('#timeline')
   private _timeline: KMapTimeline;
@@ -84,6 +88,7 @@ export class KMapBrowser extends connect(store, LitElement) {
       _instance: state.app.instance,
       _userid: state.app.userid,
       _layers: state.shell.layers,
+      wide: !state.shell.narrow,
       _subject: state.maps.subject,
       _chapter: state.maps.chapter,
       _lines: state.maps.lines,
@@ -279,7 +284,7 @@ export class KMapBrowser extends connect(store, LitElement) {
           display: grid;
           grid-template-columns: 1fr;
         }
-        :host([timeline]) {
+        :host([timeline]):host([wide]) {
           grid-template-columns: 1fr 330px;
         }
         main {
@@ -322,6 +327,7 @@ export class KMapBrowser extends connect(store, LitElement) {
           margin: 0px 0px 8px 6px;
           padding: 4px 0px;
           line-height: 24px;
+          min-height: 12px;
           color: var(--color-darkgray);
         }
         .page {
@@ -400,9 +406,6 @@ export class KMapBrowser extends connect(store, LitElement) {
         </main>
         <main id="topic" class="page topic" ?active="${this._page === 'topic'}" @rated="${this._rated}">
             ${this._topicCard ? html`<kmap-knowledge-card .subject="${this._subject}" .chapter="${this._chapter}" .card="${this._topicCard}"></kmap-knowledge-card>` : ''}
-        </main>
-        <main id="search" class="page search" ?active="${this._page === 'search'}">
-            search
         </main>
         <kmap-timeline id="timeline" class="elevation-02" @touchstart="${this._swipeStart}" @touchmove="${this._swipeMove}" @touchend="${this._swipeEnd}"></kmap-timeline>
     `;
