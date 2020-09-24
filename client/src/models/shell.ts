@@ -47,7 +47,7 @@ export default createModel({
       return { ...state, messages: [] }
     },
     addLayer(state, layer: string) {
-      return { ...state, layers: [...state.layers, layer] }
+      return { ...state, layers: state.layers.includes(layer) ? state.layers : [...state.layers, layer] }
     },
     removeLayer(state, layer: string) {
       return { ...state, layers: state.layers.filter(m => m !== layer) }
