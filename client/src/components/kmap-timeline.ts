@@ -108,7 +108,7 @@ export class KMapTimeline extends connect(store, LitElement) {
       if (this._requirements)
         target.push(...this._requirements.tops.filter(top => top[0] === 'card' || top[0] === 'map').map(top => top[1]));
 
-      for (let i = 0; i < sw; i++) {
+      for (let i = 0; this._weeks[i].sw <= sw; i++) {
         target.push(...this._weeks[i].tops.filter(top => top[0] === 'card' || top[0] === 'map').map(top => top[1]));
       }
       this._target = target;
