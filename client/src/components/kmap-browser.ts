@@ -1,4 +1,4 @@
-import {LitElement, html, css, customElement, property} from 'lit-element';
+import {LitElement, html, css, customElement, property, query} from 'lit-element';
 import {connect, RoutingState} from '@captaincodeman/rdx';
 import {State, store} from "../store";
 
@@ -17,6 +17,8 @@ import {Card} from "../models/types";
 import {Connector} from "./svg-connector";
 import {iconTest} from "./icons";
 import {encode, urls} from "../urls";
+import {KMapTimeline} from "./kmap-timeline";
+import {throttle} from "../debounce";
 
 @customElement('kmap-browser')
 export class KMapBrowser extends connect(store, LitElement) {
@@ -66,6 +68,9 @@ export class KMapBrowser extends connect(store, LitElement) {
   @property({reflect: true, type: Boolean})
   // @ts-ignore
   private timeline: boolean = false;
+
+  @query('#timeline')
+  private _timeline: KMapTimeline;
 
   set route(val: RoutingState) {
     if (val.page === "browser") {
@@ -228,6 +233,17 @@ export class KMapBrowser extends connect(store, LitElement) {
       connector.clear();
       connector.setAttribute("faded", "true");
     }
+
+    if (changedProperties.has("timeline")) {
+      if (this.timeline) {
+        this._timeline.style.transform = "translateX(0px)";
+        this._timeline.style.opacity = "1";
+      }
+      else {
+        this._timeline.style.transform = "translateX(330px)";
+        this._timeline.style.opacity = "0";
+      }
+    }
   }
 
   _findCard(topic: string) {
@@ -264,24 +280,21 @@ export class KMapBrowser extends connect(store, LitElement) {
           grid-template-columns: 1fr;
         }
         :host([timeline]) {
-          grid-template-columns: 1fr 300px;
+          grid-template-columns: 1fr 330px;
         }
         main {
           overflow-x: hidden;
         }
         :host kmap-timeline {
-          opacity: 0;
           position: fixed;
           top: 0px;
-          padding-top: 48px;
-          right: -330px;
-          width: 330px;
           bottom: 0px;
-          transition: right 0.4s ease-in-out;
-        }
-        :host([timeline]) kmap-timeline {
-          opacity: 1;
+          width: 330px;
           right: 0px;
+          padding-top: 48px;
+          opacity: 0;
+          transform: translateX(330px);
+          transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out;
         }
         .scrollpane {
           display: flex;
@@ -391,7 +404,39 @@ export class KMapBrowser extends connect(store, LitElement) {
         <main id="search" class="page search" ?active="${this._page === 'search'}">
             search
         </main>
-        <kmap-timeline class="elevation-02"></kmap-timeline>
+        <kmap-timeline id="timeline" class="elevation-02" @touchstart="${this._swipeStart}" @touchmove="${this._swipeMove}" @touchend="${this._swipeEnd}"></kmap-timeline>
     `;
+  }
+
+  _swipeX?: number;
+
+  constructor() {
+    super();
+    this._swipeMove = throttle(this._swipeMove, 100, this);
+  }
+  _swipeStart(e: TouchEvent) {
+    this._swipeX = e.touches[0].pageX;
+    this._timeline.style.transition = "";
+  }
+  _swipeMove(e: TouchEvent) {
+    if (!this._swipeX) return;
+
+    if (e.touches[0].pageX > this._swipeX) {
+      this._timeline.style.transform = "translateX(" + (e.touches[0].pageX - this._swipeX) + "px)";
+    }
+    else
+      this._timeline.style.transform = "translateX(0px)";
+  }
+  _swipeEnd(e: TouchEvent) {
+    if (!this._swipeX) return;
+
+    if ((e.changedTouches[0].pageX - this._swipeX) > 100) {
+      store.dispatch.shell.removeLayer("timeline");
+    }
+    else {
+      this._timeline.style.transform = "translateX(0px)";
+    }
+    this._swipeX = undefined;
+    this._timeline.style.transition = "transform 0.4s ease-in-out, opacity 0.4s ease-in-out";
   }
 }
