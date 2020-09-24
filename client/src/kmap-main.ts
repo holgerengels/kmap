@@ -297,6 +297,9 @@ export class KmapMain extends connect(store, LitElement) {
           display: inline-flex;
           padding: 16px;
         }
+        pwa-install-button, pwa-install-button {
+          margin: 8px 0px;
+        }
       `,
     ];
   }
