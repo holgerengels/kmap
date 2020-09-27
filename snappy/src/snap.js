@@ -1,9 +1,11 @@
+var config = require('./config.json');
+
 const puppeteer = require('puppeteer');
 const http = require("http");
 const fs = require("fs").promises;
 
-const host = 'localhost';
-const port = 8001;
+const host = config.host;
+const port = config.port;
 
 let server;
 let browser;
@@ -20,9 +22,9 @@ let browser;
             const page = await browser.newPage();
             await page.setViewport({width: 400, height: 688,})
             await page.goto(path);
-            await page.screenshot({path: fileName, clip: {x: 0, y: 48, width: 400, height: 640}});
+            await page.screenshot({path: config.path + fileName, clip: {x: 0, y: 48, width: 400, height: 640}});
 
-            const content = await fs.readFile(fileName);
+            const content = await fs.readFile(config.path + fileName);
             res.setHeader("Content-Type", "image/png");
             res.setHeader("Content-Disposition", "attachment; filename=" + fileName);
             res.writeHead(200);
