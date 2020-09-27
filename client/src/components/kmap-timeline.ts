@@ -242,6 +242,13 @@ export class KMapTimeline extends connect(store, LitElement) {
                           return html`
                             <div class="title font-body">${top[1]}</div>
                           `;
+                        case 'link':
+                          return html`
+                            <a class="link mdc-card__primary-action" href="${top[1].split(' ')[0]}">
+                            <mwc-icon title="Wissenslandkarte">link</mwc-icon>
+                            <span>${top[1].split(' ').slice(1).join(' ')}</span>
+                            </a>
+                          `;
                         default:
                           return 'fehler';
                       }
