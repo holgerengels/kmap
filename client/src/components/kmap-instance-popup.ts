@@ -75,7 +75,7 @@ export class KMapInstancePopup extends connect(store, LitElement) {
   }
 
   _maybeEnter(event) {
-    if (event.keyCode === 13) {
+    if (event.key === "Enter") {
       event.preventDefault();
       this._chooseInstance();
     }

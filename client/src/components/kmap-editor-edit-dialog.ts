@@ -110,7 +110,7 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
   }
 
   updated(changedProperties) {
-    if (changedProperties.has('_card') && this._card) {
+    if (changedProperties.has('_card') && this._card !== undefined) {
       this._navigateAfterSave = store.state.maps.subject !== this._card.subject || store.state.maps.chapter !== this._card.chapter
         ? "/app/browser/" + this._card.subject + "/" + this._card.chapter
         : undefined;

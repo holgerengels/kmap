@@ -31,7 +31,7 @@ export class KMapEditorRenameDialog extends connect(store, LitElement) {
   }
 
   updated(changedProperties) {
-    if (changedProperties.has('_card') && this._card) {
+    if (changedProperties.has('_card') && this._card !== undefined) {
       if (!this._card.subject)
         this._card.subject = store.state.maps.subject;
       if (!this._card.chapter)
@@ -63,7 +63,7 @@ export class KMapEditorRenameDialog extends connect(store, LitElement) {
   }
 
   _maybeEnter(event) {
-    if (event.keyCode === 13 && this._valid) {
+    if (event.key === "Enter" && this._valid) {
       event.preventDefault();
       this._rename();
     }

@@ -55,7 +55,7 @@ export class KMapCourses extends connect(store, LitElement) {
     return {
       _subjects: state.subjects.subjects,
       _courses: state.courses.courses,
-      _selectedIndex: this._selected && state.courses.courses.includes(this._selected) ? state.courses.courses.indexOf(this._selected) : -1,
+      _selectedIndex: this._selected !== undefined && state.courses.courses.includes(this._selected) ? state.courses.courses.indexOf(this._selected) : -1,
     };
   }
 

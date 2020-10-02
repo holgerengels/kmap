@@ -22,7 +22,7 @@ export class KMapKnowledgeCardAttachment extends LitElement {
   private _isTarget?: string = undefined;
 
   updated(changedProperties) {
-    if (changedProperties.has("attachment") && this.attachment) {
+    if (changedProperties.has("attachment") && this.attachment !== undefined) {
       this._handler = this.getHandler(this.attachment.mime);
       this._mimeIcon = this.mimeIcon(this.attachment.mime);
       this._isDownload = this.attachment.type === "file" && this.attachment.mime !== "text/html" && this._supportsDownload ? this.attachment.file : undefined;

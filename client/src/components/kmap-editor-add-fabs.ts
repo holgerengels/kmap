@@ -157,7 +157,7 @@ export class KMapEditorAddFabs extends connect(store, LitElement) {
   }
 
   _maybeEnter(event) {
-    if (event.keyCode === 13 && this._valid) {
+    if (event.key === "Enter" && this._valid) {
       event.preventDefault();
       this._ok();
     }

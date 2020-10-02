@@ -97,8 +97,19 @@ export class KMapBrowser extends connect(store, LitElement) {
       _testTopics: state.tests.topics ? state.tests.topics.topics : [],
       _selected: state.maps.selected,
       _highlighted: state.maps.selectedDependencies,
-      timeline: state.shell.layers.includes('timeline') && state.courses.selectedTimeline,
+      timeline: state.shell.layers.includes('timeline') && state.courses.selectedTimeline !== undefined,
     };
+  }
+
+  protected firstUpdated() {
+    if (this.timeline) {
+      this._timeline.style.transform = "translateX(0px)";
+      this._timeline.style.opacity = "1";
+    }
+    else {
+      this._timeline.style.transform = "translateX(330px)";
+      this._timeline.style.opacity = "0";
+    }
   }
 
   updated(changedProperties) {
@@ -131,7 +142,7 @@ export class KMapBrowser extends connect(store, LitElement) {
     }
 
     if (changedProperties.has("_topicCard") || changedProperties.has("_chapterCard")) {
-      if (this._page === "map" && this._topicCard) {
+      if (this._page === "map" && this._topicCard !== undefined) {
         // @ts-ignore
         let nodes = this.shadowRoot.querySelectorAll('kmap-summary-card[key="' + this._topic + '"]');
         if (nodes.length !== 0) {
@@ -157,13 +168,13 @@ export class KMapBrowser extends connect(store, LitElement) {
       else {
         store.dispatch.shell.updateMeta({
           title: this._chapter,
-          description: this._chapterCard && this._chapterCard.summary ? this._chapterCard.summary : "Wissenslandkarte zum Kapitel " + this._chapter,
+          description: this._chapterCard !== undefined && this._chapterCard.summary ? this._chapterCard.summary : "Wissenslandkarte zum Kapitel " + this._chapter,
           keywords: [this._subject, this._chapter, ...this._topics || []],
         });
       }
     }
 
-    if (changedProperties.has("_page") && this._page === 'topic' && this._animFrom) {
+    if (changedProperties.has("_page") && this._page === 'topic' && this._animFrom !== undefined) {
       let that = this;
       setTimeout(function () {
         // @ts-ignore
@@ -297,8 +308,6 @@ export class KMapBrowser extends connect(store, LitElement) {
           width: 330px;
           right: 0px;
           padding-top: 48px;
-          opacity: 0;
-          transform: translateX(330px);
           transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out;
         }
         .scrollpane {

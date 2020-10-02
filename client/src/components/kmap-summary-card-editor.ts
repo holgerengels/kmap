@@ -88,7 +88,7 @@ export class KMapSummaryCardEditor extends connect(store, LitElement) {
       <mwc-button icon="edit" ?disabled="${!this._enabled}" @click="${this._showEdit}" title="editieren"></mwc-button>
       <mwc-button icon="label" ?disabled="${!this._enabled}" @click="${this._showRename}" title="umbenennen"></mwc-button>
       <mwc-button icon="delete" ?disabled="${!this._enabled}" @click="${this._showDelete}" title="löschen"></mwc-button>
-      ${this.card && this.card.annotations ? html`<div class="warn">${this.card.annotations}</div>` : ''}
+      ${this.card !== undefined && this.card.annotations ? html`<div class="warn">${this.card.annotations}</div>` : ''}
     `;
   }
 }
