@@ -39,6 +39,10 @@ public class RSSServlet extends JsonServlet {
         resp.setCharacterEncoding("utf-8");
 
         String subject = extractSubject(req);
+        Integer count = extractCount(req);
+        if (count == null)
+            count = 5;
+
         try {
             Server.CLIENT.set("root");
             XMLOutputFactory factory = XMLOutputFactory.newInstance();
@@ -68,7 +72,7 @@ public class RSSServlet extends JsonServlet {
             createNode(eventWriter, "pubDate", date_format.format(new Date()));
 
             if (subject != null) {
-                JsonArray array = couch.latest(subject, 5);
+                JsonArray array = couch.latest(subject, count);
                 for (JsonElement element : array) {
                     JsonObject card = (JsonObject) element;
                     eventWriter.add(eventFactory.createStartElement("", "", "item"));
@@ -98,6 +102,8 @@ public class RSSServlet extends JsonServlet {
                         }
                     }
 
+                    createNode(eventWriter, "enclosure", null, Map.of("url", "https://kmap.eu/snappy/" + encode(subject) + "/" + encode(chapter) + "/" + encode(topic), "type", "image/*"), false);
+
                     eventWriter.add(end);
                     eventWriter.add(eventFactory.createEndElement("", "", "item"));
                     eventWriter.add(end);
@@ -118,6 +124,13 @@ public class RSSServlet extends JsonServlet {
         } finally {
             Server.CLIENT.remove();
         }
+    }
+
+    private Integer extractCount(HttpServletRequest req) {
+        String count = req.getParameter("count");
+        if (count == null)
+            return null;
+        return "*".equals(count) ? Integer.MAX_VALUE : Integer.parseInt(count);
     }
 
     private String extractSubject(HttpServletRequest req) {
