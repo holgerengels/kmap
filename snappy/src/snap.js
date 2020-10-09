@@ -21,7 +21,8 @@ let browser;
             path = "https://kmap.eu/app/browser" + path;
             const page = await browser.newPage();
             await page.setViewport({width: 400, height: 688,})
-            await page.goto(path);
+            await page.goto(path, {waitUntil: 'networkidle0'});
+            await page.waitForTimeout(1000);
             await page.screenshot({path: config.path + fileName, clip: {x: 0, y: 48, width: 400, height: 640}});
 
             const content = await fs.readFile(config.path + fileName);
