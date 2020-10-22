@@ -250,6 +250,9 @@ export class KmapMain extends connect(store, LitElement) {
         --app-drawer-text-color: var(--app-light-text-color);
         --app-drawer-selected-color: #c67100;
       }
+      mwc-drawer[open] {
+        --mdc-top-app-bar-width: calc(100% - var(--mdc-drawer-width, 256px));
+      }
       .drawer-content {
         padding: 4px 16px;
       }
