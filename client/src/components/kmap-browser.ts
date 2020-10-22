@@ -10,14 +10,14 @@ import './kmap-login-button';
 import './kmap-summary-card';
 import './kmap-knowledge-card';
 import './kmap-browser-chapter-editor';
-import './kmap-timeline';
+import './kmap-timeline-aside';
 import './svg-connector';
 import {Line} from "../models/maps";
 import {Card} from "../models/types";
 import {Connector} from "./svg-connector";
 import {iconTest} from "./icons";
 import {encode, urls} from "../urls";
-import {KMapTimeline} from "./kmap-timeline";
+import {KMapTimelineAside} from "./kmap-timeline-aside";
 import {throttle} from "../debounce";
 
 @customElement('kmap-browser')
@@ -74,7 +74,7 @@ export class KMapBrowser extends connect(store, LitElement) {
   private wide: boolean = false;
 
   @query('#timeline')
-  private _timeline: KMapTimeline;
+  private _timeline: KMapTimelineAside;
 
   set route(val: RoutingState) {
     if (val.page === "browser") {
@@ -301,7 +301,7 @@ export class KMapBrowser extends connect(store, LitElement) {
         main {
           overflow-x: hidden;
         }
-        :host kmap-timeline {
+        :host kmap-timeline-aside {
           position: fixed;
           top: 0px;
           bottom: 0px;
@@ -416,7 +416,7 @@ export class KMapBrowser extends connect(store, LitElement) {
         <main id="topic" class="page topic" ?active="${this._page === 'topic'}" @rated="${this._rated}">
             ${this._topicCard ? html`<kmap-knowledge-card .subject="${this._subject}" .chapter="${this._chapter}" .card="${this._topicCard}"></kmap-knowledge-card>` : ''}
         </main>
-        <kmap-timeline id="timeline" class="elevation-02" @touchstart="${this._swipeStart}" @touchmove="${this._swipeMove}" @touchend="${this._swipeEnd}"></kmap-timeline>
+        <kmap-timeline-aside id="timeline" class="elevation-02" @touchstart="${this._swipeStart}" @touchmove="${this._swipeMove}" @touchend="${this._swipeEnd}"></kmap-timeline-aside>
     `;
   }
 

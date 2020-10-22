@@ -12,9 +12,11 @@ import '@material/mwc-select';
 import '@material/mwc-textarea';
 import '@material/mwc-textfield';
 import '@material/mwc-top-app-bar';
+import './kmap-curriculum-edit-dialog';
 import {Course} from "../models/courses";
 import {Subject} from "../models/subjects";
 import {TextArea} from "@material/mwc-textarea/mwc-textarea";
+import {KMapCurriculumEditDialog} from "./kmap-curriculum-edit-dialog";
 
 @customElement('kmap-courses')
 export class KMapCourses extends connect(store, LitElement) {
@@ -50,6 +52,9 @@ export class KMapCourses extends connect(store, LitElement) {
   private _newCurriculumField: TextArea;
   @query(`#editCurriculum`)
   private _editCurriculumField: TextArea;
+
+  @query('#ceditor')
+  private _ceditor: KMapCurriculumEditDialog;
 
   mapState(state: State) {
     return {
@@ -168,6 +173,14 @@ export class KMapCourses extends connect(store, LitElement) {
     this._page = '';
   }
 
+  _curriculumEditor() {
+    this._ceditor.edit(this._editCurriculum);
+  }
+
+  _curriculumEdited(e) {
+    this._editCurriculum = e.detail.curriculum;
+  }
+
   static get styles() {
     // language=CSS
     return [
@@ -262,8 +275,9 @@ export class KMapCourses extends connect(store, LitElement) {
             <mwc-textfield type="text" disabled .value=${this._editSubject}></mwc-textfield>
             <mwc-textfield type="text" disabled .value=${this._editName}></mwc-textfield>
             <mwc-textarea label="Schüler" required rows="7" helper="Komma- separierte Benutzerkennungen" .value=${this._editStudents} @change=${e => this._editStudents = e.target.value}></mwc-textarea>
-            <mwc-textarea id="editCurriculum" label="Lernplan" rows="7" validationMessage="Kein valides JSON" .value=${this._editCurriculum} @change=${e => this._editCurriculum = e.target.value}></mwc-textarea>
-            <mwc-button @click="${this._edit}">Speichern</mwc-button>
+            <mwc-textarea id="editCurriculum" label="Lernplan" rows="3" validationMessage="Kein valides JSON" .value=${this._editCurriculum} @change=${e => this._editCurriculum = e.target.value}></mwc-textarea>
+            <div><mwc-button @click="${this._curriculumEditor}">Lernplaneditor</mwc-button>
+            <mwc-button @click="${this._edit}">Speichern</mwc-button></div>
           </div>
           <div class="page" ?active="${this._page === 'delete'}">
             <label>Kurs löschen</label>
@@ -283,6 +297,7 @@ export class KMapCourses extends connect(store, LitElement) {
           </div>
         </div>
         <div class="space"></div>
+        <kmap-curriculum-edit-dialog id="ceditor" @edited="${this._curriculumEdited}"></kmap-curriculum-edit-dialog>
       </main>
     `;
   }

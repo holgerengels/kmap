@@ -16,6 +16,13 @@ export interface Timeline {
   curriculum: string,
 }
 
+export interface Week {
+  cw: number,
+  sw?: number,
+  tops: string[][],
+  holidays?: string,
+}
+
 export interface CoursesState {
   courses: Course[],
   selectedCourse?: Course,
