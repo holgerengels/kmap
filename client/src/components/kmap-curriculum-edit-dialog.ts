@@ -147,12 +147,12 @@ export class KMapCurriculumEditDialog extends connect(store, LitElement) {
     if (this._curriculum !== undefined && this._selectedIndex !== -1) {
       if (changedProperties.has("_weekCW"))
         this._curriculum[this._selectedIndex].cw = this._weekCW.match(/[0-9]{1,2}/) ? Number(this._weekCW) : 99;
-      if (changedProperties.has("_weekSW"))
-        this._curriculum[this._selectedIndex].sw = this._weekSW.match(/[0-9]{1,2}/) ? Number(this._weekSW) : undefined;
-      if (changedProperties.has("_weekHolidays"))
-        this._curriculum[this._selectedIndex].holidays = this._weekType === 'holidays' && this._weekHolidays ? this._weekHolidays : undefined;
-      if (changedProperties.has("_weekTops")) {
-        this._curriculum[this._selectedIndex].tops = this._weekTops && this._weekType !== 'holidays' ? this._weekTops.split(/\r?\n/).map(l => [l.split(":")[0].trim(), l.split(":")[1].trim()]) : [];
+      if (changedProperties.has("_weekSW") || changedProperties.has("_weekType"))
+        this._curriculum[this._selectedIndex].sw = (this._weekType !== 'holidays' && this._weekSW.match(/[0-9]{1,2}/)) ? Number(this._weekSW) : undefined;
+      if (changedProperties.has("_weekHolidays") || changedProperties.has("_weekType"))
+        this._curriculum[this._selectedIndex].holidays = (this._weekType === 'holidays' && this._weekHolidays) ? this._weekHolidays : undefined;
+      if (changedProperties.has("_weekTops") || changedProperties.has("_weekType")) {
+        this._curriculum[this._selectedIndex].tops = (this._weekType !== 'holidays' && this._weekTops) ? this._weekTops.split(/\r?\n/).map(l => [l.split(":")[0].trim(), l.split(":")[1].trim()]) : [];
       }
     }
   }

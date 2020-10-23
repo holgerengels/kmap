@@ -19,6 +19,9 @@ import {iconTest} from "./icons";
 import {encode, urls} from "../urls";
 import {KMapTimelineAside} from "./kmap-timeline-aside";
 import {throttle} from "../debounce";
+import {Timeline} from "../models/courses";
+
+type SideBarState = "hidden" | "collapsed" | "open";
 
 @customElement('kmap-browser')
 export class KMapBrowser extends connect(store, LitElement) {
@@ -66,15 +69,18 @@ export class KMapBrowser extends connect(store, LitElement) {
   @property()
   private _highlighted: string[] = [];
 
-  @property({reflect: true, type: Boolean})
-  // @ts-ignore
-  private timeline: boolean = false;
+  @property({reflect: true, type: String, attribute: "timeline-state"})
+  private timelineState: SideBarState = "hidden";
+
+  @property()
+  private _timeline: Timeline;
+
   @property({reflect: true, type: Boolean})
   // @ts-ignore
   private wide: boolean = false;
 
   @query('#timeline')
-  private _timeline: KMapTimelineAside;
+  private _timelineElement: KMapTimelineAside;
 
   set route(val: RoutingState) {
     if (val.page === "browser") {
@@ -97,19 +103,12 @@ export class KMapBrowser extends connect(store, LitElement) {
       _testTopics: state.tests.topics ? state.tests.topics.topics : [],
       _selected: state.maps.selected,
       _highlighted: state.maps.selectedDependencies,
-      timeline: state.shell.layers.includes('timeline') && state.courses.selectedTimeline !== undefined,
+      _timeline: state.shell.layers.includes('timeline') ? state.courses.selectedTimeline : undefined,
     };
   }
 
   protected firstUpdated() {
-    if (this.timeline) {
-      this._timeline.style.transform = "translateX(0px)";
-      this._timeline.style.opacity = "1";
-    }
-    else {
-      this._timeline.style.transform = "translateX(330px)";
-      this._timeline.style.opacity = "0";
-    }
+    this._sideBar(this.timelineState);
   }
 
   updated(changedProperties) {
@@ -250,15 +249,29 @@ export class KMapBrowser extends connect(store, LitElement) {
       connector.setAttribute("faded", "true");
     }
 
-    if (changedProperties.has("timeline")) {
-      if (this.timeline) {
-        this._timeline.style.transform = "translateX(0px)";
-        this._timeline.style.opacity = "1";
-      }
-      else {
-        this._timeline.style.transform = "translateX(330px)";
-        this._timeline.style.opacity = "0";
-      }
+    if (changedProperties.has("_timeline")) {
+      this.timelineState = this._timeline === undefined ? "hidden" : "open";
+    }
+    if (changedProperties.has("timelineState")) {
+      this._sideBar(this.timelineState);
+      this._timelineElement.open = this.timelineState !== "collapsed";
+    }
+  }
+
+  private _sideBar(state: SideBarState) {
+    switch (state) {
+      case "open":
+        this._timelineElement.style.transform = "translateX(0px)";
+        this._timelineElement.style.opacity = "1";
+        break;
+      case "hidden":
+        this._timelineElement.style.transform = "translateX(330px)";
+        this._timelineElement.style.opacity = "0";
+        break;
+      case "collapsed":
+        this._timelineElement.style.transform = "translateX(300px)";
+        this._timelineElement.style.opacity = "1";
+        break;
     }
   }
 
@@ -295,8 +308,11 @@ export class KMapBrowser extends connect(store, LitElement) {
           display: grid;
           grid-template-columns: 1fr;
         }
-        :host([timeline]):host([wide]) {
+        :host([timeline-state=open]):host([wide]) {
           grid-template-columns: 1fr 330px;
+        }
+        :host([timeline-state=collapsed]):host([wide]) {
+          grid-template-columns: 1fr 30px;
         }
         main {
           overflow-x: hidden;
@@ -416,7 +432,7 @@ export class KMapBrowser extends connect(store, LitElement) {
         <main id="topic" class="page topic" ?active="${this._page === 'topic'}" @rated="${this._rated}">
             ${this._topicCard ? html`<kmap-knowledge-card .subject="${this._subject}" .chapter="${this._chapter}" .card="${this._topicCard}"></kmap-knowledge-card>` : ''}
         </main>
-        <kmap-timeline-aside id="timeline" class="elevation-02" @touchstart="${this._swipeStart}" @touchmove="${this._swipeMove}" @touchend="${this._swipeEnd}"></kmap-timeline-aside>
+        <kmap-timeline-aside id="timeline" class="elevation-02" @touchstart="${this._swipeStart}" @touchmove="${this._swipeMove}" @touchend="${this._swipeEnd}" @open="${() => this.timelineState = 'open'}"></kmap-timeline-aside>
     `;
   }
 
@@ -428,27 +444,27 @@ export class KMapBrowser extends connect(store, LitElement) {
   }
   _swipeStart(e: TouchEvent) {
     this._swipeX = e.touches[0].pageX;
-    this._timeline.style.transition = "";
+    this._timelineElement.style.transition = "";
   }
   _swipeMove(e: TouchEvent) {
     if (!this._swipeX) return;
 
     if (e.touches[0].pageX > this._swipeX) {
-      this._timeline.style.transform = "translateX(" + (e.touches[0].pageX - this._swipeX) + "px)";
+      this._timelineElement.style.transform = "translateX(" + (e.touches[0].pageX - this._swipeX) + "px)";
     }
     else
-      this._timeline.style.transform = "translateX(0px)";
+      this._timelineElement.style.transform = "translateX(0px)";
   }
   _swipeEnd(e: TouchEvent) {
     if (!this._swipeX) return;
 
     if ((e.changedTouches[0].pageX - this._swipeX) > 100) {
-      store.dispatch.shell.removeLayer("timeline");
+      this.timelineState = "collapsed";
     }
     else {
-      this._timeline.style.transform = "translateX(0px)";
+      this.timelineState = "open";
     }
     this._swipeX = undefined;
-    this._timeline.style.transition = "transform 0.4s ease-in-out, opacity 0.4s ease-in-out";
+    this._timelineElement.style.transition = "transform 0.4s ease-in-out, opacity 0.4s ease-in-out";
   }
 }

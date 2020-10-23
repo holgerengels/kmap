@@ -5,6 +5,7 @@ import {State, store} from "../store";
 import './kmap-timeline';
 import {Timeline, Week} from "../models/courses";
 import {KMapTimeline} from "./kmap-timeline";
+import {elevationStyles} from "./kmap-styles";
 
 @customElement('kmap-timeline-aside')
 export class KMapTimelineAside extends connect(store, LitElement) {
@@ -17,6 +18,9 @@ export class KMapTimelineAside extends connect(store, LitElement) {
   @property()
   // @ts-ignore
   private _subject: string = '';
+
+  @property()
+  public open: boolean = true;
 
   @property()
   private _selectedTimeline?: Timeline;
@@ -75,12 +79,36 @@ export class KMapTimelineAside extends connect(store, LitElement) {
     return Math.floor(1 + 0.5 + (currentThursday.getTime() - firstThursday.getTime()) / 86400000/7);
   }
 
+  _open() {
+    this.dispatchEvent(new CustomEvent('open', {bubbles: true, composed: true}));
+  }
+
   static get styles() {
     // language=CSS
     return [
+      elevationStyles,
       css`
         :host {
           display: flex;
+        }
+        aside {
+          display: grid;
+        }
+        label, kmap-timeline {
+          transition: opacity .7s ease-in-out;
+        }
+        label {
+          position: absolute;
+          transform-origin: top left;
+          transform: rotate(-90deg) translate(-120px, 0px);
+          height: fit-content;
+          width: 110px;
+          padding: 5px;
+          text-align: center;
+          background-color: white;
+        }
+        [hidden] {
+          opacity: 0;
         }
       `];
   }
@@ -88,8 +116,9 @@ export class KMapTimelineAside extends connect(store, LitElement) {
   render() {
     // language=HTML
     return html`
-      <aside>
-        <kmap-timeline id="timeline" .curriculum="${this._curriculum}"></kmap-timeline>
+      <aside ?open="${this.open}">
+        <label class="elevation-02" ?hidden="${this.open}" @click="${this._open}">Lernplan</label>
+        <kmap-timeline id="timeline" ?hidden="${!this.open}" .curriculum="${this._curriculum}"></kmap-timeline>
       </aside>
     `;
   }
