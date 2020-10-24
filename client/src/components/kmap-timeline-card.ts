@@ -2,14 +2,6 @@ import {css, customElement, html, LitElement, property} from 'lit-element';
 
 import {colorStyles, fontStyles} from "./kmap-styles";
 import '@material/mwc-icon';
-import '@material/mwc-icon-button';
-import '@material/mwc-top-app-bar';
-import './kmap-login-button';
-import './kmap-summary-card';
-import './kmap-knowledge-card';
-import './kmap-browser-chapter-editor';
-import './kmap-timeline-card';
-import './svg-connector';
 import {cardStyles} from "../mdc.card.css";
 import {iconTest} from "./icons";
 

@@ -12,7 +12,11 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.Locale;
 
 import static kmap.JSON.string;
 
@@ -31,6 +35,10 @@ public class IndexServlet extends JsonServlet {
         String description = "KMap kartographiert Wissen mit Zusammenhang";
         String author = "KMap Team";
         String text = "";
+        String created = null;
+        String modified = null;
+        String section = null;
+        String keywords = null;
 
         try {
             Server.CLIENT.set(extractClient(req));
@@ -62,6 +70,10 @@ public class IndexServlet extends JsonServlet {
                             description = cardSummary != null ? cardSummary : description;
                             text = cardDescription != null ? cardDescription : cardSummary;
                             author = string(card, "author");
+                            created = date(card, "created");
+                            modified = date(card, "modified");
+                            section = title;
+                            keywords = string(card, "keywords");
                         }
                         Server.CLIENT.remove();
                     }
@@ -94,6 +106,22 @@ public class IndexServlet extends JsonServlet {
         string = string.replace("<meta ogtitle=\"\">", "<meta property=\"og:title\" content=\"" + title + "\">");
         string = string.replace("<meta ogdescription=\"\">", "<meta property=\"og:description\" content=\"" + description + "\">");
         string = string.replace("<meta author=\"\">", "<meta name=\"author\" content=\"" + author + "\">");
+        StringBuilder builder = new StringBuilder();
+        if (created != null)
+            builder.append("<meta name=\"article:pulished_time\" content=\"").append(created).append("\">");
+        if (modified != null)
+            builder.append("<meta name=\"article:modified_time\" content=\"").append(modified).append("\">");
+        if (section != null)
+            builder.append("<meta name=\"article:section\" content=\"").append(section).append("\">");
+        if (keywords != null)
+            builder.append("<meta name=\"article:tag\" content=\"").append(keywords).append("\">");
+        if (builder.length() > 0) {
+            builder.append("<meta name=\"article:author\" content=\"").append(author).append("\">");
+            string = string.replace("<meta type=\"\">", "<meta name=\"og:type\" content=\"article\">" + builder.toString());
+        }
+        else
+            string = string.replace("<meta type=\"\">", "<meta name=\"og:type\" content=\"website\">");
+
 
         // if (text == null) text = "";
         // string = string.replace("<ogtext></ogtext>", text);
@@ -103,6 +131,12 @@ public class IndexServlet extends JsonServlet {
         resp.setContentType("text/html");
         resp.setCharacterEncoding("utf-8");
         resp.getWriter().print(string);
+    }
+
+    DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+    private String date(JsonObject object, String name) {
+        JsonPrimitive primitive = object.getAsJsonPrimitive(name);
+        return primitive != null ? format.format(new Date(primitive.getAsLong())) : null;
     }
 
     private synchronized String file() throws IOException {
