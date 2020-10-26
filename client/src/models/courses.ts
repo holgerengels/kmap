@@ -232,19 +232,14 @@ export default createModel({
         const state = store.getState();
         if (state.app.roles.includes("teacher"))
           dispatch.courses.loadCourses();
+        if (state.app.roles.includes("teacher") || state.app.roles.includes("student"))
+          dispatch.courses.loadTimelines();
       },
       'app/receivedLogout': async function () {
         dispatch.courses.forget();
       },
       'app/chooseInstance': async function () {
         dispatch.courses.forget();
-      },
-      'shell/addLayer': async function () {
-        const state = store.getState();
-        if (state.shell.layers.includes("timeline")) {
-          dispatch.shell.addMessage("Die Timeline Funktion ist noch nicht fertig umgesetzt");
-          dispatch.courses.loadTimelines();
-        }
       },
     }
   }

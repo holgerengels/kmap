@@ -8,6 +8,7 @@ import { store, State } from './store'
 import '@material/mwc-button';
 import '@material/mwc-drawer';
 import '@material/mwc-icon-button';
+import '@material/mwc-icon-button-toggle';
 import '@material/mwc-snackbar';
 import '@material/mwc-switch';
 import 'pwa-helper-components/pwa-install-button';
@@ -39,6 +40,8 @@ import {KMapLoginPopup} from "./components/kmap-login-popup";
 import {KMapInstancePopup} from "./components/kmap-instance-popup";
 import {TopAppBar} from "@material/mwc-top-app-bar/mwc-top-app-bar";
 import {Meta} from "./models/shell";
+import {Timeline} from "./models/courses";
+import {timelineClosed, timelineOpen} from "./components/icons";
 
 // @ts-ignore
 const _standalone = (window.matchMedia('(display-mode: standalone)').matches) || (window.navigator.standalone) || document.referrer.includes('android-app://');
@@ -61,6 +64,9 @@ export class KmapMain extends connect(store, LitElement) {
   private _roles: string[] = [];
   @property()
   private _layers: string[] = [];
+
+  @property()
+  private _timelines: Timeline[] = [];
 
   @property()
   private _drawerOpen: boolean = false;
@@ -93,6 +99,7 @@ export class KmapMain extends connect(store, LitElement) {
       _userid: state.app.userid,
       _roles: state.app.roles,
       _layers: state.shell.layers,
+      _timelines: state.courses.timelines,
       _meta: state.shell.meta,
       _narrow: state.shell.narrow,
       _messages: state.shell.messages,
@@ -223,6 +230,13 @@ export class KmapMain extends connect(store, LitElement) {
       store.dispatch.shell.removeLayer(layer);
     else if (checked && !this._layers.includes(layer))
       store.dispatch.shell.addLayer(layer);
+  }
+
+  _toggleTimeline() {
+    if (store.state.courses.selectedTimeline)
+      store.dispatch.courses.unselectTimeline();
+    else
+      store.dispatch.courses.selectTimeline(this._timelines[0]);
   }
 
   _showLogin() {
@@ -367,9 +381,10 @@ export class KmapMain extends connect(store, LitElement) {
     ${this._instance ? html`
       <mwc-top-app-bar id="bar" dense>
         <mwc-icon-button icon="menu" slot="navigationIcon" @click="${() => this._drawerOpen = !this._drawerOpen}"></mwc-icon-button>
-        <mwc-icon-button icon="arrow_back" slot="navigationIcon" @click="${() => history.back()}" ?hidden="${!_standalone}"></mwc-icon-button>
+        <mwc-icon-button icon="arrow_back" slot="navigationIcon" @click="${history.back}" ?hidden="${!_standalone}"></mwc-icon-button>
         <h1 slot="title">${this._barTitle}</h1>
-        <kmap-login-button slot="actionItems" @click="${this._showLogin}"></kmap-login-button>
+        <mwc-icon-button-toggle slot="actionItems" @click="${this._toggleTimeline}" ?hidden="${this._timelines.length !== 1 || this._page !== 'browser'}" title="Wochenplan">${timelineOpen}${timelineClosed}</mwc-icon-button-toggle>
+        <kmap-login-button slot="actionItems" @click="${this._showLogin}" title="Anmeldung"></kmap-login-button>
       </mwc-top-app-bar>
 
       ${this._renderPage()}

@@ -103,7 +103,7 @@ export class KMapBrowser extends connect(store, LitElement) {
       _testTopics: state.tests.topics ? state.tests.topics.topics : [],
       _selected: state.maps.selected,
       _highlighted: state.maps.selectedDependencies,
-      _timeline: state.shell.layers.includes('timeline') ? state.courses.selectedTimeline : undefined,
+      _timeline: state.courses.selectedTimeline,
     };
   }
 
