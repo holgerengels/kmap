@@ -339,7 +339,7 @@ export class KmapMain extends connect(store, LitElement) {
           <mwc-switch ?checked="${this._layers.includes('dependencies')}" @change="${e => this._switchLayer('dependencies', e.target.checked)}"></mwc-switch>
         </mwc-formfield>
         ${this._roles.includes("teacher") ? html`
-          <mwc-formfield label="Timeline">
+          <mwc-formfield label="Wochenplan">
             <mwc-switch ?checked="${this._layers.includes('timeline')}" @change="${e => this._switchLayer('timeline', e.target.checked)}"></mwc-switch>
           </mwc-formfield>
           ${this._layers.includes('timeline') ? html`<kmap-timeline-selector></kmap-timeline-selector>` : ''}

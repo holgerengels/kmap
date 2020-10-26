@@ -11,6 +11,8 @@ import {Week} from "../models/courses";
 @customElement('kmap-timeline')
 export class KMapTimeline extends LitElement {
   @property()
+  private subject: string = '';
+  @property()
   private curriculum: Week[] = [];
   @property()
   private _sw: number = -1;
@@ -134,7 +136,7 @@ export class KMapTimeline extends LitElement {
               <mwc-icon-button id="${week.sw}" class="knob" @click="${this._markWeek}">${iconPointInTime}</mwc-icon-button>
             </div>
             <div class="right">
-              <kmap-timeline-card .tops="${week.tops}"></kmap-timeline-card>
+              <kmap-timeline-card .tops="${week.tops}" .subject="${this.subject}"></kmap-timeline-card>
             </div>
           </div>
         ` : html`

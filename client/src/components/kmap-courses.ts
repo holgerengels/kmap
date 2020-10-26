@@ -267,7 +267,7 @@ export class KMapCourses extends connect(store, LitElement) {
             </mwc-select>
             <mwc-textfield label="Name" type="text" required .value=${this._newName} @change=${e => this._newName = e.target.value}></mwc-textfield>
             <mwc-textarea label="Schüler" required rows="7" helper="Komma- separierte Benutzerkennungen" .value=${this._newStudents} @change=${e => this._newStudents = e.target.value}></mwc-textarea>
-            <mwc-textarea id="newCurriculum" label="Lernplan" rows="7" validationMessage="Kein valides JSON" .value=${this._newCurriculum} @change=${e => this._newCurriculum = e.target.value}></mwc-textarea>
+            <mwc-textarea id="newCurriculum" label="Wochenplan" rows="7" validationMessage="Kein valides JSON" .value=${this._newCurriculum} @change=${e => this._newCurriculum = e.target.value}></mwc-textarea>
             <mwc-button @click="${this._new}">Speichern</mwc-button>
           </div>
           <div class="page" ?active="${this._page === 'edit'}">
@@ -275,8 +275,8 @@ export class KMapCourses extends connect(store, LitElement) {
             <mwc-textfield type="text" disabled .value=${this._editSubject}></mwc-textfield>
             <mwc-textfield type="text" disabled .value=${this._editName}></mwc-textfield>
             <mwc-textarea label="Schüler" required rows="7" helper="Komma- separierte Benutzerkennungen" .value=${this._editStudents} @change=${e => this._editStudents = e.target.value}></mwc-textarea>
-            <mwc-textarea id="editCurriculum" label="Lernplan" rows="3" validationMessage="Kein valides JSON" .value=${this._editCurriculum} @change=${e => this._editCurriculum = e.target.value}></mwc-textarea>
-            <div><mwc-button @click="${this._curriculumEditor}">Lernplaneditor</mwc-button>
+            <mwc-textarea id="editCurriculum" label="Wochenplan" rows="3" validationMessage="Kein valides JSON" .value=${this._editCurriculum} @change=${e => this._editCurriculum = e.target.value}></mwc-textarea>
+            <div><mwc-button @click="${this._curriculumEditor}">Wochenplaneditor</mwc-button>
             <mwc-button @click="${this._edit}">Speichern</mwc-button></div>
           </div>
           <div class="page" ?active="${this._page === 'delete'}">
@@ -293,7 +293,7 @@ export class KMapCourses extends connect(store, LitElement) {
             <mwc-textfield type="text" disabled .value=${this._selected?.subject || ''}></mwc-textfield>
             <mwc-textfield type="text" disabled .value=${this._selected?.name || ''}></mwc-textfield>
             <mwc-textarea label="Schüler" disabled rows="3" .value=${this._selected?.students.join(", ") || ''}></mwc-textarea>
-            <mwc-textarea label="Lernplan" disabled rows="3" .value=${this._selected?.curriculum || ''}></mwc-textarea>
+            <mwc-textarea label="Wochenplan" disabled rows="3" .value=${this._selected?.curriculum || ''}></mwc-textarea>
           </div>
         </div>
         <div class="space"></div>

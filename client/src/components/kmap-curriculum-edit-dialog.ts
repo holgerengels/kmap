@@ -306,7 +306,7 @@ export class KMapCurriculumEditDialog extends connect(store, LitElement) {
   render() {
     // language=HTML
     return html`
-<mwc-dialog id="editDialog" heading="Lernplan Editor" @keydown="${this._captureKeys}" escapeKeyAction="">
+<mwc-dialog id="editDialog" heading="Wochenplan Editor" @keydown="${this._captureKeys}" escapeKeyAction="">
   ${this._curriculum !== undefined ? html`
     <mwc-tab-bar id="tabBar" @MDCTabBar:activated="${this._switchTab}">
       <mwc-tab label="Editor"></mwc-tab>

@@ -117,8 +117,8 @@ export class KMapTimelineAside extends connect(store, LitElement) {
     // language=HTML
     return html`
       <aside ?open="${this.open}">
-        <label class="elevation-02" ?hidden="${this.open}" @click="${this._open}">Lernplan</label>
-        <kmap-timeline id="timeline" ?hidden="${!this.open}" .curriculum="${this._curriculum}"></kmap-timeline>
+        <label class="elevation-02" ?hidden="${this.open}" @click="${this._open}">Wochenplan</label>
+        <kmap-timeline id="timeline" ?hidden="${!this.open}" .subject="${this._subject}" .curriculum="${this._curriculum}"></kmap-timeline>
       </aside>
     `;
   }
