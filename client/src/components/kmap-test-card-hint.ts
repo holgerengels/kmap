@@ -3,6 +3,7 @@ import {LitElement, html, css, customElement, property} from 'lit-element';
 import {fontStyles, colorStyles, elevationStyles} from "./kmap-styles";
 import {unsafeHTML} from "lit-html/directives/unsafe-html";
 import {math} from "../math";
+import {katexStyles} from "../katex-css";
 
 @customElement('kmap-test-card-hint')
 export class KMapTestCardHint extends LitElement {
@@ -31,6 +32,7 @@ export class KMapTestCardHint extends LitElement {
     return [
       fontStyles,
       colorStyles,
+      katexStyles,
       elevationStyles,
       css`
         :host {
