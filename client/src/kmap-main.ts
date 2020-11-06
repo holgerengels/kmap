@@ -42,6 +42,7 @@ import {TopAppBar} from "@material/mwc-top-app-bar/mwc-top-app-bar";
 import {Meta} from "./models/shell";
 import {Timeline} from "./models/courses";
 import {timelineClosed, timelineOpen} from "./components/icons";
+import {urls} from "./urls";
 
 // @ts-ignore
 const _standalone = (window.matchMedia('(display-mode: standalone)').matches) || (window.navigator.standalone) || document.referrer.includes('android-app://');
@@ -156,31 +157,35 @@ export class KmapMain extends connect(store, LitElement) {
       updateMetadata({ title: title, description: description, image: this._meta.image, keywords: this._meta.keywords });
       updateLd({
         "@context": "https://schema.org",
-        "@type": "Article",
-        "headline": title,
-        "name": title,
-        "description": description,
-        "mainEntityOfPage": window.location.href,
-        "image": this._meta.image ? [this._meta.image] : "https://kmap.eu/app/KMap-Logo%20small.png",
-        "datePublished": this._meta.modified ? new Date(this._meta.modified) : new Date(),
-        "dateModified": this._meta.modified ? new Date(this._meta.modified) : undefined,
-        "author": this._meta.author ? {
-          "@type": "Person",
-          "name": this._meta.author
-        } : {
-          "@type": "Organization",
-          "name": "KMap Team"
-        },
-        "publisher": {
-          "@type": "Organization",
-          "name": "KMap Team",
-          "email": "hengels@gmail.com",
-          "logo": {
-            "@type": "ImageObject",
-            "url": "https://kmap.eu/app/KMap-Logo%20small.png"
+        "@type": "WebPage",
+        "breadcrumb": this._meta.breadcrumbs ? this.breadCrumbsLd(this._meta.breadcrumbs) : undefined,
+        "mainEntity": {
+          "@type": "Article",
+          "headline": title,
+          "name": title,
+          "description": description,
+          "mainEntityOfPage": window.location.href,
+          "image": this._meta.image ? [this._meta.image] : "https://kmap.eu/app/KMap-Logo%20small.png",
+          "datePublished": this._meta.modified ? new Date(this._meta.modified) : new Date(),
+          "dateModified": this._meta.modified ? new Date(this._meta.modified) : undefined,
+          "author": this._meta.author ? {
+            "@type": "Person",
+            "name": this._meta.author
+          } : {
+            "@type": "Organization",
+            "name": "KMap Team"
+          },
+          "publisher": {
+            "@type": "Organization",
+            "name": "KMap Team",
+            "email": "hengels@gmail.com",
+            "logo": {
+              "@type": "ImageObject",
+              "url": "https://kmap.eu/app/KMap-Logo%20small.png"
+            }
           }
         }
-      })
+      });
     }
 
     if (changedProps.has('_page') && !this._layers.includes('editor'))
@@ -192,6 +197,40 @@ export class KmapMain extends connect(store, LitElement) {
         console.log(this._messages);
       }
     }
+  }
+
+  private breadCrumbsLd(path: string[]) {
+    let tests: boolean;
+    if (path[path.length-1] === 'tests') {
+      path.pop();
+      tests = true;
+    }
+    else
+      tests = false;
+
+    const items = path.map((v, i, a) => {
+      return {
+        "@type": "ListItem",
+        "position": i+1,
+        "name": v,
+        "item": urls.client + "browser/" + a.slice(0, i+1).map(p => encodeURIComponent(p)).join("/")
+      }
+    });
+    if (tests) {
+      items.push({
+        "@type": "ListItem",
+        "position": items.length + 1,
+        "name": "Test",
+        "item": urls.client + "test/" + path.map(p => encodeURIComponent(p)).join("/")
+      });
+    }
+
+    console.log(items);
+    return {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": items
+    };
   }
 
   private installOnErrorHandler() {

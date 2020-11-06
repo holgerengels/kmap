@@ -7,9 +7,10 @@ export interface Meta {
   description?: string,
   keywords?: string[],
   image?: string,
-  author?: string;
-  created?: number
-  modified?: number
+  author?: string,
+  created?: number,
+  modified?: number,
+  breadcrumbs?: string[],
 }
 export interface ShellState {
   meta: Meta,
@@ -80,7 +81,7 @@ export default createModel({
       },
 
       'routing/change': async function (routing: RoutingState) {
-        if (routing.page !== 'browser')
+        if (routing.page !== 'browser' && routing.page !== 'test')
           dispatch.shell.updateMeta({});
 
         if (routing.page === 'courses') {

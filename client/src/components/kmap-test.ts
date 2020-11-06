@@ -78,16 +78,19 @@ export class KmapTest extends connect(store, LitElement) {
       }
       let title = this._title;
       let description: string | undefined = undefined;
+      let breadcrumbs: string[] | undefined = undefined;
       if (this._subject && this._chapter) {
         if (this._topic) {
           title = "Aufgaben zum Thema " + this._chapter + " - " + this._topic;
+          breadcrumbs = [this._subject, this._chapter, this._topic, "tests"];
         }
         else {
           title = "Aufgaben zum Thema " + this._chapter;
+          breadcrumbs = [this._subject, this._chapter, "tests"];
         }
         description = "Ermittle Deinen Wissensstand mit Hilfe von interaktiven Aufgaben!";
       }
-      store.dispatch.shell.updateMeta({title: title, description: description});
+      store.dispatch.shell.updateMeta({title: title, description: description, breadcrumbs: breadcrumbs});
     }
   }
 

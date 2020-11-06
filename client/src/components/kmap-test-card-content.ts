@@ -63,7 +63,7 @@ export class KMapTestCardContent extends LitElement {
     this._answerFlex = "flex: " + (6 - balance);
   }
 
-  _math(code, setter) {
+  _math(code: string, setter) {
     if (code) {
       code = code.replace(/inline:([^"]*)/g, urls.server + "tests/" + this.subject + "/" + this.set + "/" + this.key + "/$1?instance=" + this.instance);
       code = code.replace(/<check\/>/g, "<input type='checkbox'/>");
