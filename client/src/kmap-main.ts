@@ -213,7 +213,7 @@ export class KmapMain extends connect(store, LitElement) {
         "@type": "ListItem",
         "position": i+1,
         "name": v,
-        "item": urls.client + "browser/" + a.slice(0, i+1).map(p => encodeURIComponent(p)).join("/")
+        "item": "https://kmap.eu" + urls.client + "browser/" + a.slice(0, i+1).map(p => encodeURIComponent(p)).join("/")
       }
     });
     if (tests) {
@@ -221,7 +221,7 @@ export class KmapMain extends connect(store, LitElement) {
         "@type": "ListItem",
         "position": items.length + 1,
         "name": "Test",
-        "item": urls.client + "test/" + path.map(p => encodeURIComponent(p)).join("/")
+        "item": "https://kmap.eu" + urls.client + "test/" + path.map(p => encodeURIComponent(p)).join("/")
       });
     }
 
