@@ -88,7 +88,8 @@ export class KmapTestExercise extends connect(store, LitElement) {
       }
     }
     for (var test of tests) {
-      if (!test.balance)
+      // @ts-ignore
+      if (test.balance === "")
         test.balance = 4;
     }
     this._tests = tests;

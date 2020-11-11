@@ -74,6 +74,7 @@
     "pwa-helper-components": "^0.2.10",
     "pwa-helpers": "^0.9.1",
     "reselect": "^4.0.0",
+    "mobile-drag-drop": "^2.3.0-rc.2",
     "resize-observer-polyfill": "^1.5.1",
     "web-animations-js": "^2.3.2"
   }

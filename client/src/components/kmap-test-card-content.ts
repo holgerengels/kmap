@@ -6,6 +6,9 @@ import {unsafeHTML} from "lit-html/directives/unsafe-html";
 import {math} from "../math";
 import {katexStyles} from "../katex-css";
 
+import './dnd-assign';
+import {DndAssign} from "./dnd-assign";
+
 @customElement('kmap-test-card-content')
 export class KMapTestCardContent extends LitElement {
   @property({type: String})
@@ -90,12 +93,17 @@ export class KMapTestCardContent extends LitElement {
       else
         input.value = '';
     }
+    var assigns = element.getElementsByTagName("dnd-assign");
+    for (const element of assigns) {
+      const assign: DndAssign = element as DndAssign;
+      assign.clear();
+    }
   }
 
   checkValues(): boolean {
+    var everythingCorrect = true;
     var element = this._answerElement;
     var inputs = element.getElementsByTagName("input");
-    var everythingCorrect = true;
 
     for (var i = 0; i < inputs.length; i++) {
       var input = inputs[i];
@@ -111,6 +119,14 @@ export class KMapTestCardContent extends LitElement {
       var correct = value == expected;
       everythingCorrect = everythingCorrect && correct;
       input.setAttribute("correction", correct ? "correct" : "incorrect");
+    }
+
+    var assigns = element.getElementsByTagName("dnd-assign");
+    for (const element of assigns) {
+      const assign: DndAssign = element as DndAssign;
+      everythingCorrect = everythingCorrect && assign.valid === true;
+      assign.setAttribute("correction", assign.valid ? "correct" : "incorrect");
+      assign.bark();
     }
     return everythingCorrect;
   }
@@ -129,6 +145,12 @@ export class KMapTestCardContent extends LitElement {
         input.value = expected;
 
       input.removeAttribute("correction");
+    }
+
+    var assigns = element.getElementsByTagName("dnd-assign");
+    for (const element of assigns) {
+      const assign: DndAssign = element as DndAssign;
+      assign.showAnswer();
     }
   }
 

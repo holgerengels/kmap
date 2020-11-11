@@ -129,7 +129,8 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
       this._topic    = this._test.topic || '';
       this._key      = this._test.key || '';
       this._level    = "" + (this._test.level || 1);
-      this._balance  = this._test.balance || 3;
+      // @ts-ignore
+      this._balance  = this._test.balance === "" ? 3 : this._test.balance;
       this._question = this._test.question || '';
       this._answer   = this._test.answer || '';
       this._hint     = this._test.hint || '';

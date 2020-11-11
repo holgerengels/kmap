@@ -13,6 +13,8 @@ import {Latest} from "../models/maps";
 import {Subject} from "../models/subjects";
 
 
+import './dnd-assign'
+
 @customElement('kmap-subjects')
 export class KMapSubjects extends connect(store, LitElement) {
   @property()
@@ -106,6 +108,15 @@ export class KMapSubjects extends connect(store, LitElement) {
         <div class="title">
             <label>Wähle ein Fach!</label>
         </div>
+        <dnd-assign>
+          <div slot="target">eins</div>
+          <div slot="target">zwei</div>
+          <div slot="target">drei</div>
+          <div slot="item">eins</div>
+          <div slot="item">zwei</div>
+          <div slot="item">drei</div>
+        </dnd-assign>
+
         ${this._subjects.map((subject) => html`
             <kmap-subject-card .subject="${subject}"></kmap-subject-card>
         `)}
