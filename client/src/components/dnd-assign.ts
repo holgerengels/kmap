@@ -99,7 +99,7 @@ export class DndAssign extends LitElement {
     moveItem(event)
 
     const drop = this._drop.bind(this);
-    document.addEventListener(upEvent, function _onUpEvent(e) {
+    document.addEventListener(upEvent, function _onUpEvent() {
       document.removeEventListener(moveEvent, onMoveEvent)
       document.removeEventListener(upEvent, _onUpEvent);
       document.body.removeChild(item);
@@ -255,11 +255,13 @@ export class DndAssign extends LitElement {
             ${this._drops.map((d, i) => this._renderCell(i, d, true))}
             ${this._drags.map((d, i) => this._renderCell(i, d, false))}
           ` : html`
-            ${this._items.map((x, i) => html`
+            ${this._items.map((x, i) => {
+              console.log(x);
+              return html`
               <div id="${i}" class="target">${unsafeHTML(this._targets[i])}</div>
               ${this._renderCell(i, this._drops[i], true)}
               ${this._renderCell(i, this._drags[i], false)}
-            `)}
+            `})}
           `
         }
       </div>
