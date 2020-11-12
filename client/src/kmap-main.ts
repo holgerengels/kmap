@@ -44,6 +44,45 @@ import {Timeline} from "./models/courses";
 import {timelineClosed, timelineOpen} from "./components/icons";
 import {urls} from "./urls";
 
+/*
+import MobileDragDrop from "mobile-drag-drop";
+
+function tryFindDraggableTarget(event) {
+  var cp = event.composedPath();
+  for (let o of cp) {
+    var el = o;
+    do {
+      if (el.draggable === false) {
+        continue;
+      }
+      if (el.getAttribute && el.getAttribute("draggable") === "true") {
+        return el;
+      }
+    } while ((el = el.parentNode) && el !== document.body);
+  }
+}
+
+function elementFromPoint(x, y) {
+  for (let o of this._path ) {
+    if (o.elementFromPoint) {
+      let el = o.elementFromPoint(x, y);
+      if (el) {
+        while (el.shadowRoot) {
+          el = el.shadowRoot.elementFromPoint(x, y);
+        }
+        return el;
+      }
+    }
+  }
+}
+
+function dragStartConditionOverride(event) {
+  this._path = event.composedPath();
+  return true;
+}
+MobileDragDrop.polyfill({ tryFindDraggableTarget: tryFindDraggableTarget, elementFromPoint: elementFromPoint, dragStartConditionOverride: dragStartConditionOverride});
+*/
+
 // @ts-ignore
 const _standalone = (window.matchMedia('(display-mode: standalone)').matches) || (window.navigator.standalone) || document.referrer.includes('android-app://');
 

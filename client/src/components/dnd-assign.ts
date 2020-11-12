@@ -23,6 +23,8 @@ export class DndAssign extends LitElement {
   public valid?: boolean;
   @property()
   private _bark: boolean = false;
+  private _sid?: string;
+  private _tid?: string;
 
   protected updated(changedProperties: PropertyValues) {
     if (changedProperties.has("_items")) {
@@ -46,37 +48,73 @@ export class DndAssign extends LitElement {
     this._items = childNodes.map((node) => node.innerHTML);
   }
 
-  _start(e) {
-    const target: HTMLElement = e.path[0];
-    target.classList.add("ghost");
-    e.dataTransfer.setData('text/plain', target.id);
-    e.dataTransfer.setData('text/html', target.innerHTML);
+  _start(event) {
+    let moveEvent, upEvent, getPageX, getPageY
+    if (event instanceof TouchEvent) {
+      moveEvent = "touchmove"
+      upEvent = "touchend"
+      getPageX = (e) => e.touches[0].pageX
+      getPageY = (e) => e.touches[0].pageY
+      event.preventDefault();
+    }
+    else {
+      moveEvent = "mousemove"
+      upEvent = "mouseup"
+      getPageX = (e) => e.pageX
+      getPageY = (e) => e.pageY
+    }
+
+    const drag = event.target;
+    this._sid = drag.id;
+    const containerX = drag.getBoundingClientRect().left + window.scrollX - getPageX(event);
+    const containerY = drag.getBoundingClientRect().top + window.scrollY - getPageY(event);
+    drag.classList.add("ghost");
+
+    const item = drag.cloneNode(true);
+    item.style.position = 'absolute';
+    item.style.zIndex = 2;
+    document.body.appendChild(item);
+
+    const moveItem = (event) => {
+      if (this.shadowRoot === null) return;
+
+      let itemAbsoluteLeft = getPageX(event);
+      let itemAbsoluteTop = getPageY(event);
+      item.style.left = itemAbsoluteLeft + containerX + 'px'
+      item.style.top = itemAbsoluteTop + containerY + 'px'
+      const elements = this.shadowRoot.elementsFromPoint(itemAbsoluteLeft, itemAbsoluteTop).filter(e => e.classList.contains("drop"));
+      const mark = elements.length === 1 ? elements[0] : undefined;
+      this._tid = mark ? mark.id : undefined;
+
+      this.shadowRoot.querySelectorAll(".drop").forEach(e => {
+        if (e === mark)
+          e.classList.add("hover");
+        else
+          e.classList.remove("hover");
+      });
+    }
+    const onMoveEvent = (event) => {
+      moveItem(event)
+    }
+    moveItem(event)
+
+    const drop = this._drop.bind(this);
+    document.addEventListener(upEvent, function _onUpEvent(e) {
+      document.removeEventListener(moveEvent, onMoveEvent)
+      document.removeEventListener(upEvent, _onUpEvent);
+      document.body.removeChild(item);
+
+      drag.classList.remove("ghost");
+      drop();
+    });
+    document.addEventListener(moveEvent, onMoveEvent)
   }
 
-  _end(e) {
-    const target: HTMLElement = e.path[0];
-    target.classList.remove("ghost");
-  }
-
-  _enter(e) {
-    e.preventDefault();
-    const target: HTMLElement = e.path[0];
-    target.classList.add("hover");
-  }
-
-  _leave(e) {
-    const target: HTMLElement = e.path[0];
-    target.classList.remove("hover");
-  }
-
-  _drop(e) {
+  _drop() {
+    if (!this._sid || !this._tid) return;
     if (!this.shadowRoot) return;
 
-    e.preventDefault();
-    const target: HTMLElement = e.path[0];
-    target.classList.remove("hover");
-
-    const sid = e.dataTransfer.getData("text/plain");
+    const sid = this._sid;
     // @ts-ignore
     const i = this.shadowRoot.getElementById(sid).getAttribute("content");
     // @ts-ignore
@@ -95,7 +133,7 @@ export class DndAssign extends LitElement {
       this._drags = lalas;
     }
 
-    const tid = target.id;
+    const tid = this._tid;
     const tt = tid.split("_")[0];
     const ti = tid.split("_")[1];
 
@@ -163,6 +201,8 @@ export class DndAssign extends LitElement {
           grid-gap: 8px;
           grid-template-rows: repeat(3, 1fr);
           grid-template-columns: repeat(3, 1fr);
+          cursor: pointer;
+          user-select: none;
         }
         div.drop {
           border: 2px solid lightgrey;
@@ -215,7 +255,6 @@ export class DndAssign extends LitElement {
             ${this._drops.map((d, i) => this._renderCell(i, d, true))}
             ${this._drags.map((d, i) => this._renderCell(i, d, false))}
           ` : html`
-            // @ts-ignore
             ${this._items.map((x, i) => html`
               <div id="${i}" class="target">${unsafeHTML(this._targets[i])}</div>
               ${this._renderCell(i, this._drops[i], true)}
@@ -229,8 +268,8 @@ export class DndAssign extends LitElement {
 
   private _renderCell(i: number, d: string, t: boolean) {
     return d === ""
-      ? html`<div class="drop" id="${t ? 'drop' : 'drag'}_${i}" ?correct="${t && this._bark && this._isCorrect(i)}" ?incorrect="${t && this._bark && !this._isCorrect(i)}" @dragenter="${this._enter}" @dragleave="${this._leave}" @dragover="${e => e.preventDefault()}" @drop="${this._drop}">&nbsp;</div>`
-      : html`<div class="drag" ?correct="${t && this._bark && this._isCorrect(i)}" ?incorrect="${t && this._bark && !this._isCorrect(i)}"><div id="${t ? 'drop' : 'drag'}_${i}" content="${this._items.indexOf(d)}" draggable="true" @dragstart="${this._start}" @dragend="${this._end}">${unsafeHTML(d)}</div></div>`;
+      ? html`<div class="drop" id="${t ? 'drop' : 'drag'}_${i}" ?correct="${t && this._bark && this._isCorrect(i)}" ?incorrect="${t && this._bark && !this._isCorrect(i)}">&nbsp;</div>`
+      : html`<div class="drag" ?correct="${t && this._bark && this._isCorrect(i)}" ?incorrect="${t && this._bark && !this._isCorrect(i)}"><div id="${t ? 'drop' : 'drag'}_${i}" content="${this._items.indexOf(d)}" @mousedown="${this._start}" @touchstart="${this._start}">${unsafeHTML(d)}</div></div>`;
   }
 }
 
