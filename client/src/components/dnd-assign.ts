@@ -10,6 +10,8 @@ export class DndAssign extends LitElement {
   @property()
   private orientation: "vertical" | "horizontal" = "vertical";
   @property()
+  private layout: string = "repeat(3, 1fr)";
+  @property()
   private _targets: string[] = [];
   @property()
   private _items: string[] = [];
@@ -204,17 +206,26 @@ export class DndAssign extends LitElement {
         .grid {
           display: grid;
           grid-gap: 8px;
-          grid-template-rows: repeat(3, 1fr);
-          grid-template-columns: repeat(3, 1fr);
           cursor: pointer;
           user-select: none;
         }
+        div.target {
+          display: grid;
+          align-items: center;
+          justify-items: center;
+        }
         div.drop {
+          display: grid;
+          align-items: center;
+          justify-items: center;
           border: 2px solid lightgrey;
           border-radius: 4px;
           transition: border-color .3s ease-in-out, opacity .3s ease-in-out;
         }
         div.drag {
+          display: grid;
+          align-items: center;
+          justify-items: center;
           border: 2px solid lightgrey;
           border-radius: 4px;
           transition: border-color .3s ease-in-out, opacity .3s ease-in-out;
@@ -242,11 +253,13 @@ export class DndAssign extends LitElement {
   render() {
     const styles = this.orientation === "vertical"
       ? {
-        gridTemplateRows: "repeat(3, 1fr)",
+        gridTemplateRows: this.layout,
         gridTemplateColumns: `repeat(${this._items.length}, 1fr)`,
+        //justifyItems: "center",
       } : {
         gridTemplateRows: `repeat(${this._items.length}, 1fr)`,
-        gridTemplateColumns: "repeat(3, 1fr)",
+        gridTemplateColumns: this.layout,
+        //alignItems: "center"
       }
     ;
     // language=HTML

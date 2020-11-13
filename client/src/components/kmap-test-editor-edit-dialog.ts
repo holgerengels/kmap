@@ -130,7 +130,7 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
       this._key      = this._test.key || '';
       this._level    = "" + (this._test.level || 1);
       // @ts-ignore
-      this._balance  = this._test.balance === "" ? 3 : this._test.balance;
+      this._balance  = this._test.balance === "" || this._test.balance === undefined ? 3 : this._test.balance;
       this._question = this._test.question || '';
       this._answer   = this._test.answer || '';
       this._hint     = this._test.hint || '';
@@ -334,10 +334,10 @@ ${this._test ? html`
       </mwc-select>
     <mwc-textfield s5 id="key" name="key" label="Titel" dense type="text" required disabled .value="${this._key}" @change="${e => this._key = e.target.value}" pattern="^([^/]*)$"></mwc-textfield>
     <mwc-textfield s1 id="level" name="level" label="Level" dense type="number" inputmode="numeric" min="1" max="3" step="1" .value="${this._level}" @change="${e => this._level = e.target.value}"></mwc-textfield>
-    <mwc-formfield s4 alignEnd spaceBetween label="Layout Verhältnis Frage : Antwort = ${this._balance} : ${6 - this._balance}">&nbsp;&nbsp;
+    <mwc-formfield s5 alignEnd spaceBetween label="Layout Verhältnis Frage : Antwort =&nbsp;${this._balance}&nbsp;:&nbsp;${6 - this._balance}">&nbsp;&nbsp;
       <mwc-slider id="balance" style="vertical-align:middle" .value="${this._balance}" pin markers step="1" min="0" max="5" @change=${e => this._balance = e.target.value}></mwc-slider>
     </mwc-formfield>
-    <div s2></div>
+    <div s1></div>
     <mwc-textarea s6 id="question" label="Frage" rows="4" .value=${this._question} @keyup="${this._setQuestion}"></mwc-textarea>
     <mwc-textarea s6 id="answer" label="Antwort" required rows="4" .value=${this._answer} @keyup="${this._setAnswer}"></mwc-textarea>
     <mwc-textarea s6 id="hint" label="Hinweis" rows="2" .value=${this._hint} @keyup="${this._setHint}"></mwc-textarea>
