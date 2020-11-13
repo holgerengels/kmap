@@ -40,12 +40,12 @@ export class DndAssign extends LitElement {
 
   _targetsChange(e) {
     const childNodes: Element[] = (e.target as HTMLSlotElement).assignedElements({flatten: true});
-    this._targets = childNodes.map((node) => node.innerHTML);
+    this._targets = childNodes.map((node) => node.outerHTML);
   }
 
   _itemsChange(e) {
     const childNodes: Element[] = (e.target as HTMLSlotElement).assignedElements({flatten: true});
-    this._items = childNodes.map((node) => node.innerHTML);
+    this._items = childNodes.map((node) => node.outerHTML);
   }
 
   _start(event) {
@@ -57,6 +57,8 @@ export class DndAssign extends LitElement {
       getPageY = (e) => e.touches[0].pageY
       event.preventDefault();
     }
+    else if (event.button === 2)
+        return;
     else {
       moveEvent = "mousemove"
       upEvent = "mouseup"
@@ -64,7 +66,7 @@ export class DndAssign extends LitElement {
       getPageY = (e) => e.pageY
     }
 
-    const drag = event.target;
+    const drag = event.target.closest("[content]");
     this._sid = drag.id;
     const containerX = drag.getBoundingClientRect().left + window.scrollX - getPageX(event);
     const containerY = drag.getBoundingClientRect().top + window.scrollY - getPageY(event);
@@ -99,14 +101,17 @@ export class DndAssign extends LitElement {
     moveItem(event)
 
     const drop = this._drop.bind(this);
-    document.addEventListener(upEvent, function _onUpEvent() {
+
+    const onUpEvent = (event) => {
       document.removeEventListener(moveEvent, onMoveEvent)
-      document.removeEventListener(upEvent, _onUpEvent);
+      document.removeEventListener(upEvent, onUpEvent);
       document.body.removeChild(item);
 
       drag.classList.remove("ghost");
       drop();
-    });
+      event.cancelBubble = true;
+    }
+    document.addEventListener(upEvent, onUpEvent);
     document.addEventListener(moveEvent, onMoveEvent)
   }
 
@@ -255,8 +260,7 @@ export class DndAssign extends LitElement {
             ${this._drops.map((d, i) => this._renderCell(i, d, true))}
             ${this._drags.map((d, i) => this._renderCell(i, d, false))}
           ` : html`
-            ${this._items.map((x, i) => {
-              console.log(x);
+            ${this._items.map((x, i) => { x;
               return html`
               <div id="${i}" class="target">${unsafeHTML(this._targets[i])}</div>
               ${this._renderCell(i, this._drops[i], true)}
@@ -271,7 +275,7 @@ export class DndAssign extends LitElement {
   private _renderCell(i: number, d: string, t: boolean) {
     return d === ""
       ? html`<div class="drop" id="${t ? 'drop' : 'drag'}_${i}" ?correct="${t && this._bark && this._isCorrect(i)}" ?incorrect="${t && this._bark && !this._isCorrect(i)}">&nbsp;</div>`
-      : html`<div class="drag" ?correct="${t && this._bark && this._isCorrect(i)}" ?incorrect="${t && this._bark && !this._isCorrect(i)}"><div id="${t ? 'drop' : 'drag'}_${i}" content="${this._items.indexOf(d)}" @mousedown="${this._start}" @touchstart="${this._start}">${unsafeHTML(d)}</div></div>`;
+      : html`<div class="drag" ?correct="${t && this._bark && this._isCorrect(i)}" ?incorrect="${t && this._bark && !this._isCorrect(i)}"><div id="${t ? 'drop' : 'drag'}_${i}" content="${this._items.indexOf(d)}" @mousedown="${this._start}" @touchstart="${this._start}"><style>${katexStyles}</style>${unsafeHTML(d)}</div></div>`;
   }
 }
 
