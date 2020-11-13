@@ -55,7 +55,6 @@ export class DndAssign extends LitElement {
       upEvent = "touchend"
       getPageX = (e) => e.touches[0].pageX
       getPageY = (e) => e.touches[0].pageY
-      event.preventDefault();
     }
     else if (event.button === 2)
         return;
@@ -65,6 +64,7 @@ export class DndAssign extends LitElement {
       getPageX = (e) => e.pageX
       getPageY = (e) => e.pageY
     }
+    event.preventDefault();
 
     const drag = event.target.closest("[content]");
     this._sid = drag.id;
