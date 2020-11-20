@@ -8,6 +8,8 @@ import {katexStyles} from "../katex-css";
 
 import './dnd-assign';
 import {DndAssign} from "./dnd-assign";
+import './dnd-fillin';
+import {DndFillin} from "./dnd-fillin";
 
 @customElement('kmap-test-card-content')
 export class KMapTestCardContent extends LitElement {
@@ -98,6 +100,11 @@ export class KMapTestCardContent extends LitElement {
       const assign: DndAssign = element as DndAssign;
       assign.clear();
     }
+    var fillins = element.getElementsByTagName("dnd-fillin");
+    for (const element of fillins) {
+      const fillin: DndFillin = element as DndFillin;
+      fillin.clear();
+    }
   }
 
   checkValues(): boolean {
@@ -127,6 +134,13 @@ export class KMapTestCardContent extends LitElement {
       everythingCorrect = everythingCorrect && assign.valid === true;
       assign.setAttribute("correction", assign.valid ? "correct" : "incorrect");
       assign.bark();
+    }
+    var fillins = element.getElementsByTagName("dnd-fillin");
+    for (const element of fillins) {
+      const fillin: DndFillin = element as DndFillin;
+      everythingCorrect = everythingCorrect && fillin.valid === true;
+      fillin.setAttribute("correction", fillin.valid ? "correct" : "incorrect");
+      fillin.bark();
     }
     return everythingCorrect;
   }
