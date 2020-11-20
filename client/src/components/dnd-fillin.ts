@@ -1,7 +1,7 @@
 import {LitElement, html, css, customElement, property, PropertyValues} from 'lit-element';
 import {colorStyles, elevationStyles, fontStyles} from "./kmap-styles";
 import {unsafeHTML} from "lit-html/directives/unsafe-html";
-import {styleMap} from "lit-html/directives/style-map";
+import {StyleInfo, styleMap} from "lit-html/directives/style-map";
 import {katexStyles} from "../katex-css";
 
 @customElement('dnd-fillin')
@@ -315,9 +315,13 @@ export class DndFillin extends LitElement {
   }
 
   render() {
-    const container = this.orientation === "vertical" ? { display: "flex", flexDirection: "column" } : { display: "flex", flexDirection: "row" };
-    const drags = this.orientation === "vertical" ? { display: "flex", flexFlow: "row wrap" } : { display: "flex", flexFlow: "column wrap" };
-    const drag = { minWidth: this.minWidth, minHeight: this.minHeight };
+    const container: StyleInfo = this.orientation === "vertical"
+      ? { display: "flex", flexDirection: "column" }
+      : { display: "flex", flexDirection: "row" };
+    const drags: StyleInfo = this.orientation === "vertical"
+      ? { display: "flex", flexFlow: "row wrap", marginTop: "8px"  }
+      : { display: "flex", flexFlow: "column wrap", marginLeft: "8px" };
+    const drag: StyleInfo = { minWidth: this.minWidth, minHeight: this.minHeight };
     // language=HTML
     return html`
       <slot name="template" @slotchange=${this._templateChange}></slot>
