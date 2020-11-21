@@ -82,7 +82,7 @@ export class KmapTestResults extends connect(store, LitElement) {
       var num = map.get(card.chapter + "." + card.topic);
       card.wrong = card.num;
       card.correct = num - card.num;
-      card.state = 4 - (card.num * 3 / num);
+      card.state = 4 - Math.round(card.num * 3 / num);
       if (card.state < 1)
         card.state = 1;
     }

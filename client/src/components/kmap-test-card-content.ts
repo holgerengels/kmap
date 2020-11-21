@@ -196,7 +196,7 @@ export class KMapTestCardContent extends LitElement {
           font-size: 0.95rem;
           font-weight: 400;
         }
-        .card-content img {
+        img {
           max-width: calc(100vw - 44px);
         }
         #question {

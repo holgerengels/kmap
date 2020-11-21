@@ -41,59 +41,13 @@ export class KmapTestExercise extends connect(store, LitElement) {
     if (!this._allTests)
       return;
 
-    var map = new Map();
     for (var test of this._allTests) {
-      var key = test.chapter + "." + test.topic;
-      var list = map.get(key);
-      if (!list) {
-        list = [];
-        map.set(key, list);
-      }
-      list.push(test);
-    }
-
-    map = new Map(
-      [...map]
-        .map(([k, v]) => [k, shuffleArray(v)])
-        .map(([k, v]) => [k, v.slice(0, v.length - v.length % 3)])
-    );
-    map = new Map(
-      [...map]
-        .filter(([, v]) => v.length >= 3)
-    );
-
-    let number = 0;
-    for (const list of map.values()) {
-      number += list.length;
-    }
-    var topics: string[] = [...map.keys()];
-
-    if (topics.length === 0)
-      return;
-
-    shuffleArray(topics);
-
-    var tests: Test[] = [];
-    for (var i = 0; i < number / 3 && topics.length > 0; i++) {
-      var r = Math.floor(Math.random() * Math.floor(map.size));
-      var key = topics[r];
-      var list = map.get(key);
-      shuffleArray(list);
-      tests.push(list.pop());
-      tests.push(list.pop());
-      tests.push(list.pop());
-      if (list.length < 3) {
-        map.delete(key);
-        topics.splice(topics.indexOf(key), 1);
-      }
-    }
-    for (var test of tests) {
       // @ts-ignore
-      if (test.balance === "")
+      if (test.balance === "" || test.balance === undefined)
         test.balance = 4;
     }
-    this._tests = tests;
 
+    this._tests = [...this._allTests];
     this._currentIndex = 0;
     this._currentTest = this._tests[0];
     store.dispatch.tests.clearResults();
@@ -154,12 +108,4 @@ export class KmapTestExercise extends connect(store, LitElement) {
   </div>
     `;
   }
-}
-
-function shuffleArray(array): [] {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-  return array;
 }

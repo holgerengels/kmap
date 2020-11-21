@@ -37,7 +37,7 @@ export class KmapTestChooser extends connect(store, LitElement) {
   @property()
   private _allTests?: string[] = undefined;
   @property()
-  private _maxNumber: number = 3;
+  private _maxNumber: number = -1;
 
   mapState(state: State) {
     return {
@@ -46,7 +46,7 @@ export class KmapTestChooser extends connect(store, LitElement) {
       _tree: state.tests.tree,
       _chaptersLoading: state.tests.loadingChapters || state.tests.loadingTree,
       _allTests: state.tests.tests,
-      _maxNumber: state.tests.tests ? state.tests.tests.length - state.tests.tests.length % 3 : -1,
+      _maxNumber: state.tests.tests ? state.tests.tests.length : -1,
     };
   }
 
@@ -139,7 +139,7 @@ export class KmapTestChooser extends connect(store, LitElement) {
       ${!this._chaptersLoading ? html`
         ${this._arrangedChapters ? html`
           <mwc-formfield>
-            <mwc-select label="Kapitel" required @change="${e => this._chapter = e.target.value.split(".").pop()}">
+            <mwc-select label="Kapitel" naturalMenuWidth required @change="${e => this._chapter = e.target.value.split(".").pop()}">
               ${this._arrangedChapters.map((chapter) => html`<mwc-list-item value="${chapter}">${chapter.replace(".", " - ")}</mwc-list-item>`)}
             </mwc-select>
           </mwc-formfield>

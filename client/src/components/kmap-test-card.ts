@@ -146,6 +146,7 @@ export class KMapTestCard extends connect(store, LitElement) {
   }
 
   _next() {
+    this._hintVisible = false;
     this._solutionVisible = false;
     this.dispatchEvent(new CustomEvent('next', {
       bubbles: true, composed: true, detail: {
