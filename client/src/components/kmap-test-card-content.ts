@@ -166,6 +166,11 @@ export class KMapTestCardContent extends LitElement {
       const assign: DndAssign = element as DndAssign;
       assign.showAnswer();
     }
+    var fillins = element.getElementsByTagName("dnd-fillin");
+    for (const element of fillins) {
+      const fillin: DndFillin = element as DndFillin;
+      fillin.showAnswer();
+    }
   }
 
   private canonicalize(value: string) {

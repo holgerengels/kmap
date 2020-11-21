@@ -51,15 +51,6 @@ export class DndFillin extends LitElement {
       }
       this._doubles = doubles;
     }
-    if (changedProperties.has("_order")) {
-      const order = "0123456789".split("");
-      for (const double of this._doubles) {
-        const cp = double.split("=");
-        order[cp[1]] = cp[0];
-      }
-      this.valid = this._order.join("") === order.join("").substr(0, this._order.length);
-      console.log(this.valid);
-    }
     if (changedProperties.has("_template")) {
       this.updateComplete.then(() => {
         // @ts-ignore
@@ -98,6 +89,37 @@ export class DndFillin extends LitElement {
         });
       });
     }
+    if (changedProperties.has("_order") || changedProperties.has("_bark")) {
+      const order = this._givenOrder();
+      var valid = true;
+      for (var i=0; i < this._order.length; i++) {
+        const currentValid = this._order[i] === order[i];
+        valid = valid && currentValid;
+
+        if (this._dropElements.length !== 0) {
+          if (currentValid && this._bark)
+            this._dropElements[i].setAttribute("correct", '');
+          else
+            this._dropElements[i].removeAttribute("correct");
+
+          if (!currentValid && this._bark)
+            this._dropElements[i].setAttribute("incorrect", '');
+          else
+            this._dropElements[i].removeAttribute("incorrect");
+        }
+      }
+      this.valid = valid;
+      console.log(this.valid);
+    }
+  }
+
+  private _givenOrder() {
+    const order = "0123456789".split("");
+    for (const double of this._doubles) {
+      const cp = double.split("=");
+      order[cp[1]] = cp[0];
+    }
+    return order.slice(0, this._items.length);
   }
 
   private createItemWrapper(item: string): HTMLElement {
@@ -249,6 +271,7 @@ export class DndFillin extends LitElement {
     }
     this._drags = lalas;
     this._drops = lolos;
+    this._order = this._givenOrder();
     this._bark = false;
   }
 

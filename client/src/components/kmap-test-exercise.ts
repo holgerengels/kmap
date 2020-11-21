@@ -47,7 +47,7 @@ export class KmapTestExercise extends connect(store, LitElement) {
         test.balance = 4;
     }
 
-    this._tests = [...this._allTests];
+    this._tests = shuffleArray([...this._allTests]);
     this._currentIndex = 0;
     this._currentTest = this._tests[0];
     store.dispatch.tests.clearResults();
@@ -108,4 +108,12 @@ export class KmapTestExercise extends connect(store, LitElement) {
   </div>
     `;
   }
+}
+
+function shuffleArray(array): [] {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
 }
