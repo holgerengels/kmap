@@ -10,8 +10,9 @@ export class DndFillin extends LitElement {
   @property()
   private orientation: "vertical" | "horizontal" = "vertical";
   @property()
-  private minWidth: string = "20px";
-  private minHeight: string = "20px";
+  private dropWidth: string = "20px";
+  @property()
+  private dropHeight: string = "20px";
   @property()
   private _template: string = '';
   @property()
@@ -57,8 +58,8 @@ export class DndFillin extends LitElement {
         this._dropElements = Array.from(this.shadowRoot.querySelectorAll(".template drop"));
         this._dropElements.forEach((d, i) => {
           d.id="drop_" + i;
-          d.style.minWidth = this.minWidth;
-          d.style.minHeight = this.minHeight;
+          d.style.minWidth = this.dropWidth;
+          d.style.minHeight = this.dropHeight;
           d.innerHTML = "&nbsp;";
         });
         // @ts-ignore
@@ -344,7 +345,7 @@ export class DndFillin extends LitElement {
     const drags: StyleInfo = this.orientation === "vertical"
       ? { display: "flex", flexFlow: "row wrap", marginTop: "8px"  }
       : { display: "flex", flexFlow: "column wrap", marginLeft: "8px" };
-    const drag: StyleInfo = { minWidth: this.minWidth, minHeight: this.minHeight };
+    const drag: StyleInfo = { minWidth: this.dropWidth, minHeight: this.dropHeight };
     // language=HTML
     return html`
       <slot name="template" @slotchange=${this._templateChange}></slot>

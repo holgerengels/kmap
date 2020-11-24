@@ -255,6 +255,11 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
       this._tabBar.activeIndex = this._tab === 'editor' ? 1 : 0;
   }
 
+  _copy(attachment: Attachment) {
+    if (attachment.file)
+      navigator.clipboard.writeText(`<img width="" height="" src="inline:${attachment.file}"/>`);
+  }
+
   static get styles() {
     // language=CSS
     return [
@@ -263,7 +268,8 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
       formStyles,
       css`
         mwc-dialog {
-          --mdc-dialog-max-width: 810px;
+          --mdc-dialog-min-width: calc(100vw - 64px);
+          --mdc-dialog-max-width: calc(100vw - 64px);
         }
         mwc-icon-button, mwc-button {
           vertical-align: middle
@@ -284,6 +290,9 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
           box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
           0 1px 5px 0 rgba(0, 0, 0, 0.12),
           0 3px 1px -2px rgba(0, 0, 0, 0.2);
+        }
+        .preview {
+          display: flex; justify-content: center; padding: 16px;
         }
         kmap-test-card {
           display: block;
@@ -320,40 +329,43 @@ export class KMapTestEditorEditDialog extends connect(store, LitElement) {
     return html`
 <mwc-dialog id="editDialog" heading="Test Editor" @keydown="${this._switchTab}">
 ${this._test ? html`
-  <validating-form @keydown="${this._captureEnter}" @validity="${e => this._valid = e.target.valid}">
-    <mwc-tab-bar id="tabBar" @MDCTabBar:activated="${this._switchTab}">
-      <mwc-tab label="Editor"></mwc-tab>
-      <mwc-tab label="Preview"></mwc-tab>
-    </mwc-tab-bar>
-    <div class="form" ?hidden="${this._tab === 'preview'}">
-      <mwc-select s3 required label="Kapitel" @change="${e => this._chapter = e.target.value}">
-        ${this._chapters.map((chapter) => html`<mwc-list-item value="${chapter}" ?selected="${chapter === this._chapter}">${chapter}</mwc-list-item>`)}
-      </mwc-select>
-      <mwc-select s3 required label="Thema" @change="${e => this._topic = e.target.value}">
-        ${this._topics.map((topic) => html`<mwc-list-item value="${topic}" ?selected="${topic === this._topic}">${topic}</mwc-list-item>`)}
-      </mwc-select>
-    <mwc-textfield s5 id="key" name="key" label="Titel" dense type="text" required disabled .value="${this._key}" @change="${e => this._key = e.target.value}" pattern="^([^/]*)$"></mwc-textfield>
-    <mwc-textfield s1 id="level" name="level" label="Level" dense type="number" inputmode="numeric" min="1" max="3" step="1" .value="${this._level}" @change="${e => this._level = e.target.value}"></mwc-textfield>
-    <mwc-formfield s5 alignEnd spaceBetween label="Layout Verhältnis Frage : Antwort =&nbsp;${this._balance}&nbsp;:&nbsp;${6 - this._balance}">&nbsp;&nbsp;
-      <mwc-slider id="balance" style="vertical-align:middle" .value="${this._balance}" pin markers step="1" min="0" max="5" @change=${e => this._balance = e.target.value}></mwc-slider>
-    </mwc-formfield>
-    <div s1></div>
-    <mwc-textarea s6 id="question" label="Frage" rows="4" .value=${this._question} @keyup="${this._setQuestion}"></mwc-textarea>
-    <mwc-textarea s6 id="answer" label="Antwort" required rows="4" .value=${this._answer} @keyup="${this._setAnswer}"></mwc-textarea>
-    <mwc-textarea s6 id="hint" label="Hinweis" rows="2" .value=${this._hint} @keyup="${this._setHint}"></mwc-textarea>
-    <mwc-textarea s6 id="solution" label="Lösungsweg" rows="4" .value=${this._solution} @keyup="${this._setSolution}"></mwc-textarea>
+  <mwc-tab-bar id="tabBar" @MDCTabBar:activated="${this._switchTab}">
+    <mwc-tab label="Editor"></mwc-tab>
+    <mwc-tab label="Preview"></mwc-tab>
+  </mwc-tab-bar>
+  <div ?hidden="${this._tab === 'preview'}">
+    <validating-form @keydown="${this._captureEnter}" @validity="${e => this._valid = e.target.valid}">
+      <div class="form">
+        <mwc-select s3 required label="Kapitel" @change="${e => this._chapter = e.target.value}">
+          ${this._chapters.map((chapter) => html`<mwc-list-item value="${chapter}" ?selected="${chapter === this._chapter}">${chapter}</mwc-list-item>`)}
+        </mwc-select>
+        <mwc-select s3 required label="Thema" @change="${e => this._topic = e.target.value}">
+          ${this._topics.map((topic) => html`<mwc-list-item value="${topic}" ?selected="${topic === this._topic}">${topic}</mwc-list-item>`)}
+        </mwc-select>
+        <mwc-textfield s5 id="key" name="key" label="Titel" dense type="text" required disabled .value="${this._key}" @change="${e => this._key = e.target.value}" pattern="^([^/]*)$"></mwc-textfield>
+        <mwc-textfield s1 id="level" name="level" label="Level" dense type="number" inputmode="numeric" min="1" max="3" step="1" .value="${this._level}" @change="${e => this._level = e.target.value}"></mwc-textfield>
+        <mwc-formfield s5 alignEnd spaceBetween label="Layout Verhältnis Frage : Antwort =&nbsp;${this._balance}&nbsp;:&nbsp;${6 - this._balance}">&nbsp;&nbsp;
+          <mwc-slider id="balance" style="vertical-align:middle" .value="${this._balance}" pin markers step="1" min="0" max="5" @change=${e => this._balance = e.target.value}></mwc-slider>
+        </mwc-formfield>
+        <div s1></div>
+        <mwc-textarea s6 id="question" label="Frage" rows="4" .value=${this._question} @keyup="${this._setQuestion}"></mwc-textarea>
+        <mwc-textarea s6 id="answer" label="Antwort" required rows="4" .value=${this._answer} @keyup="${this._setAnswer}"></mwc-textarea>
+        <mwc-textarea s6 id="hint" label="Hinweis" rows="2" .value=${this._hint} @keyup="${this._setHint}"></mwc-textarea>
+        <mwc-textarea s6 id="solution" label="Lösungsweg" rows="4" .value=${this._solution} @keyup="${this._setSolution}"></mwc-textarea>
+        <div s6 class="field values">
+          <label secondary>Werte (Checkboxen: true/false, Dezimalzahlen mit Punkt statt Komma)</label><br/>
 
-    <div s6 class="field values">
-      <label secondary>Werte (Checkboxen: true/false, Dezimalzahlen mit Punkt statt Komma)</label><br/>
+          ${this._values.map((value, i) => html`<input type="text" .value="${value}" @change="${e => this._values[i] = e.target.value}"/>`)}
+        </div>
+      </div>
+    </validating-form>
 
-      ${this._values.map((value, i) => html`<input type="text" .value="${value}" @change="${e => this._values[i] = e.target.value}"/>`)}
-    </div>
-
-    <div s6 class="attachments">
+    <div class="form">
+      <div s6 class="attachments">
       <label for="attachments">Materialien</label><br/>
       ${this._attachments.map((attachment) => html`
         <div class="form" style="grid-template-columns: 1fr 36px">
-          <div>
+          <div @click="${() => this._copy(attachment)}">
             <span>${attachment.file} (${attachment.mime})</span>
           </div>
           <mwc-icon-button icon="delete" @click="${() => this._deleteAttachment(attachment)}"></mwc-icon-button>
@@ -364,22 +376,24 @@ ${this._test ? html`
       <file-drop id="file" @filedrop="${e => this._attachmentFile = e.detail.file}"></file-drop>
       <mwc-icon-button class="add" icon="add_circle" @click="${this._addAttachment}"></mwc-icon-button>
     </div>
-</div>
-  </validating-form>
-<kmap-test-card hideHeader hideActions ?hidden="${this._tab === 'editor'}"
-    .subject="${this._subject}"
-    .set="${this._set}"
-    .chapter="${this._chapter}"
-    .topic="${this._topic}"
-    .key="${this._key}"
-    .level="${this._level}"
-    .balance="${this._balance}"
-    .question="${this._question}"
-    .answer="${this._answer}"
-    .hint="${this._hint}"
-    .solution="${this._solution}"
-    .num="1" .of="1">
-</kmap-test-card>
+    </div>
+  </div>
+  <div class="preview" ?hidden="${this._tab === 'editor'}">
+    <kmap-test-card hideHeader hideActions ?hintVisible="${this._hint}" ?solutionVisible="${this._solution}"
+        .subject="${this._subject}"
+        .set="${this._set}"
+        .chapter="${this._chapter}"
+        .topic="${this._topic}"
+        .key="${this._key}"
+        .level="${this._level}"
+        .balance="${this._balance}"
+        .question="${this._question}"
+        .answer="${this._answer}"
+        .hint="${this._hint}"
+        .solution="${this._solution}"
+        .num="1" .of="1">
+    </kmap-test-card>
+  </div>
 ` : ''}
 
   <mwc-button slot="secondaryAction" @click=${this._cancel}>Abbrechen</mwc-button>

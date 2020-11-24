@@ -75,10 +75,10 @@ export class KMapTestCard extends connect(store, LitElement) {
   @query('kmap-test-card-content')
   private _content: KMapTestCardContent;
 
-  @property()
-  private _hintVisible: boolean = false;
-  @property()
-  private _solutionVisible: boolean = false;
+  @property({type: Boolean, reflect: true})
+  private hintVisible: boolean = false;
+  @property({type: Boolean, reflect: true})
+  private solutionVisible: boolean = false;
 
   constructor() {
     super();
@@ -142,12 +142,12 @@ export class KMapTestCard extends connect(store, LitElement) {
     this.attempts = -1;
 
     if (this.solution)
-      this._solutionVisible = true;
+      this.solutionVisible = true;
   }
 
   _next() {
-    this._hintVisible = false;
-    this._solutionVisible = false;
+    this.hintVisible = false;
+    this.solutionVisible = false;
     this.dispatchEvent(new CustomEvent('next', {
       bubbles: true, composed: true, detail: {
         "subject": this.subject,
@@ -167,10 +167,10 @@ export class KMapTestCard extends connect(store, LitElement) {
   }
 
   _showHint() {
-    this._hintVisible = true;
+    this.hintVisible = true;
   }
   _hideHint() {
-    this._hintVisible = false;
+    this.hintVisible = false;
   }
 
   static get styles() {
@@ -263,7 +263,7 @@ export class KMapTestCard extends connect(store, LitElement) {
       <mwc-icon-button icon="feedback" title="Feedback" @click="${this._feedback}"></mwc-icon-button>
   </div>
 
-  <kmap-test-card-hint .hint="${this.hint}" ?hidden="${!this._hintVisible}">
+  <kmap-test-card-hint .hint="${this.hint}" ?hidden="${!this.hintVisible}">
     <mwc-button @click="${this._hideHint}">Ok</mwc-button>
   </kmap-test-card-hint>
 
@@ -278,7 +278,7 @@ export class KMapTestCard extends connect(store, LitElement) {
     .values="${this.values}">
   </kmap-test-card-content>
 
-  <kmap-test-card-solution .solution="${this.solution}" ?hidden="${!this._solutionVisible}" class="elevation-01"></kmap-test-card-solution>
+  <kmap-test-card-solution .solution="${this.solution}" ?hidden="${!this.solutionVisible}" class="elevation-01"></kmap-test-card-solution>
 
   ${!this.hideActions ? html`
     <div class="card-footer elevation-02" ?stacked="${this._narrow}">

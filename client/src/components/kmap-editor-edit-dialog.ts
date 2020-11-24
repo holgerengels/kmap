@@ -239,6 +239,11 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
       this._tabBar.activeIndex = this._tab === 'editor' ? 1 : 0;
   }
 
+  _copy(attachment: Attachment) {
+    if (attachment.file)
+      navigator.clipboard.writeText(`<img width="" height="" src="inline:${attachment.file}" alt=""/>`);
+  }
+
   static get styles() {
     // language=CSS
     return [
@@ -247,7 +252,8 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
       formStyles,
       css`
         mwc-dialog {
-          --mdc-dialog-max-width: 810px;
+          --mdc-dialog-min-width: calc(100vw - 64px);
+          --mdc-dialog-max-width: calc(100vw - 64px);
         }
         mwc-icon-button, mwc-button {
           vertical-align: middle
@@ -291,9 +297,9 @@ ${this._card ? html`
   <div ?hidden="${this._tab === 'preview'}">
     <validating-form @keydown="${this._captureEnter}" @validity="${e => this._valid = e.target.valid}">
       <div class="form">
-        <mwc-textfield s2 id="topic" name="topic" disabled label="Thema" dense type="text" .value="${this._card.topic !== '_' ? this._card.topic : "Allgemeines zu " + this._card.chapter}"></mwc-textfield>
+        <mwc-textfield s3 id="topic" name="topic" disabled label="Thema" dense type="text" .value="${this._card.topic !== '_' ? this._card.topic : "Allgemeines zu " + this._card.chapter}"></mwc-textfield>
         <mwc-textfield s2 ?hidden="${this._card.topic === '_'}" id="links" name="links" label="Verweist auf ..." dense type="text" .value="${this._links}" @change="${e => this._links = e.target.value}" pattern="[^/]*"></mwc-textfield>
-        <mwc-textfield s2 ?hidden="${this._card.topic === '_'}" id="priority" name="priority" label="Priorität" dense type="number" inputmode="numeric" min="0" step="1" .value="${this._priority}" @change="${e => this._priority = e.target.value}"></mwc-textfield>
+        <mwc-textfield s1 ?hidden="${this._card.topic === '_'}" id="priority" name="priority" label="Priorität" dense type="number" inputmode="numeric" min="0" step="1" .value="${this._priority}" @change="${e => this._priority = e.target.value}"></mwc-textfield>
         <mwc-textfield s5 ?hidden="${this._card.topic === '_'}" ?dialogInitialFocus="${this._card.topic !== '_'}" id="depends" label="Basiert auf ..." dense .value=${this._depends} @change="${e => this._depends = e.target.value}"></mwc-textfield>
         <mwc-textfield s1 ?hidden="${this._card.topic === '_'}" id="thumb" label="Thumbnail" dense .value=${this._thumb} @change="${e => this._thumb = e.target.value}"></mwc-textfield>
         <mwc-textfield s6 ?hidden="${this._card.topic === '_'}" id="keywords" label="Keywords" dense .value=${this._keywords} @change="${e => this._keywords = e.target.value}"></mwc-textfield>
@@ -306,7 +312,7 @@ ${this._card ? html`
       <label for="attachments">Materialien</label><br/>
       ${this._attachments.map((attachment) => html`
         <div class="form" style="grid-template-columns: 1fr 36px">
-          <div>
+          <div @click="${() => this._copy(attachment)}">
             <span>[${this._tag(attachment.tag)}] ${attachment.name}</span><br/>
             ${attachment.type === 'link' ? html`
               <span slot="secondary">${attachment.href}</span>
