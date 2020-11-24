@@ -32,7 +32,6 @@ export class DndFillin extends LitElement {
   @property()
   public valid?: boolean;
   @property()
-  // @ts-ignore
   private _bark: boolean = false;
   private _ci?: string;
   private _sid?: string;
@@ -127,7 +126,7 @@ export class DndFillin extends LitElement {
     const element = document.createElement("div");
     element.setAttribute("content", "" + this._items.indexOf(item))
     element.addEventListener("mousedown", this._start.bind(this));
-    element.addEventListener("touchdown", this._start.bind(this));
+    element.addEventListener("touchstart", this._start.bind(this));
     element.innerHTML = item;
     return element;
   }
@@ -303,6 +302,7 @@ export class DndFillin extends LitElement {
         :host {
           cursor: pointer;
           user-select: none;
+          touch-action: none;
         }
         drag, drop {
           display: inline-flex;

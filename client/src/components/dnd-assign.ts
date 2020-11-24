@@ -86,16 +86,11 @@ export class DndAssign extends LitElement {
       let itemAbsoluteTop = getPageY(event);
       item.style.left = itemAbsoluteLeft + containerX + 'px'
       item.style.top = itemAbsoluteTop + containerY + 'px'
-      const elements = this.shadowRoot.elementsFromPoint(itemAbsoluteLeft, itemAbsoluteTop).filter(e => e.classList.contains("drop"));
+      let elements = this.shadowRoot.elementsFromPoint(itemAbsoluteLeft, itemAbsoluteTop);
+      elements = elements.filter(e => e.tagName === "DROP");
       const mark = elements.length === 1 ? elements[0] : undefined;
       this._tid = mark ? mark.id : undefined;
-
-      this.shadowRoot.querySelectorAll(".drop").forEach(e => {
-        if (e === mark)
-          e.classList.add("hover");
-        else
-          e.classList.remove("hover");
-      });
+      this._hover(mark);
     }
     const onMoveEvent = (event) => {
       moveItem(event)
@@ -110,11 +105,24 @@ export class DndAssign extends LitElement {
       document.body.removeChild(item);
 
       drag.classList.remove("ghost");
+      this._hover();
+      drop();
       drop();
       event.cancelBubble = true;
     }
     document.addEventListener(upEvent, onUpEvent);
     document.addEventListener(moveEvent, onMoveEvent)
+  }
+
+  private _hover(mark?: Element) {
+    if (!this.shadowRoot) return;
+
+    this.shadowRoot.querySelectorAll("drop").forEach(e => {
+      if (e === mark)
+        e.classList.add("hover");
+      else
+        e.classList.remove("hover");
+    });
   }
 
   _drop() {
@@ -208,13 +216,14 @@ export class DndAssign extends LitElement {
           grid-gap: 8px;
           cursor: pointer;
           user-select: none;
+          touch-action: none;
         }
         div.target {
           display: grid;
           align-items: center;
           justify-items: center;
         }
-        div.drop {
+        drag, drop {
           display: grid;
           align-items: center;
           justify-items: center;
@@ -222,25 +231,17 @@ export class DndAssign extends LitElement {
           border-radius: 4px;
           transition: border-color .3s ease-in-out, opacity .3s ease-in-out;
         }
-        div.drag {
-          display: grid;
-          align-items: center;
-          justify-items: center;
-          border: 2px solid lightgrey;
-          border-radius: 4px;
-          transition: border-color .3s ease-in-out, opacity .3s ease-in-out;
-        }
-        div.hover {
+        .hover {
           border: 2px dashed green;
         }
-        div.ghost {
+        .ghost {
           opacity: .5;
         }
-        div[correct] {
+        [correct] {
           outline-style: solid;
           outline-color: var(--color-green);
         }
-        div[incorrect] {
+        [incorrect] {
           outline-style: solid;
           outline-color: var(--color-red);
         }
@@ -287,8 +288,8 @@ export class DndAssign extends LitElement {
 
   private _renderCell(i: number, d: string, t: boolean) {
     return d === ""
-      ? html`<div class="drop" id="${t ? 'drop' : 'drag'}_${i}" ?correct="${t && this._bark && this._isCorrect(i)}" ?incorrect="${t && this._bark && !this._isCorrect(i)}">&nbsp;</div>`
-      : html`<div class="drag" ?correct="${t && this._bark && this._isCorrect(i)}" ?incorrect="${t && this._bark && !this._isCorrect(i)}"><div id="${t ? 'drop' : 'drag'}_${i}" content="${this._items.indexOf(d)}" @mousedown="${this._start}" @touchstart="${this._start}"><style>${katexStyles}</style>${unsafeHTML(d)}</div></div>`;
+      ? html`<drop id="${t ? 'drop' : 'drag'}_${i}" ?correct="${t && this._bark && this._isCorrect(i)}" ?incorrect="${t && this._bark && !this._isCorrect(i)}">&nbsp;</drop>`
+      : html`<drag ?correct="${t && this._bark && this._isCorrect(i)}" ?incorrect="${t && this._bark && !this._isCorrect(i)}"><div id="${t ? 'drop' : 'drag'}_${i}" content="${this._items.indexOf(d)}" @mousedown="${this._start}" @touchstart="${this._start}"><style>${katexStyles}</style>${unsafeHTML(d)}</div></drag>`;
   }
 }
 
