@@ -98,6 +98,16 @@ export class KmapTest extends connect(store, LitElement) {
     store.dispatch.routing.replace('/app/test');
   }
 
+  _goBack() {
+    let path = "/app/";
+    if (this._subject)
+      path += "browser/" + encodeURIComponent(this._subject);
+    if (this._chapter)
+      path += "/" + encodeURIComponent(this._chapter);
+
+    store.dispatch.routing.replace(path);
+  }
+
   _goResults() {
     store.dispatch.routing.replace('/app/test/results');
   }
@@ -149,7 +159,7 @@ export class KmapTest extends connect(store, LitElement) {
         `}
       </div>
       <div class="buttons">
-        <mwc-button ?hidden="${this._page === 'chooser'}" @click="${this._goChoose}">Aufgabenauswahl</mwc-button>
+        <mwc-button ?hidden="${this._page !== 'exercise'}" @click="${this._goBack}">Zurück</mwc-button>
         <div style="flex: 1 0 auto"></div>
         <mwc-button ?hidden="${this._page === 'results' || this._results.length === 0}" @click="${this._goResults}">Auswertung</mwc-button>
       </div>
