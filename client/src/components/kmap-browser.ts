@@ -402,7 +402,7 @@ export class KMapBrowser extends connect(store, LitElement) {
               ${this._chapterCard.dependencies ? html`
                 <div>
                   <b>Voraussetzung für das Kapitel ${this._chapter}:</b> ${this._chapterCard.dependencies.map((depend) => html`
-                    <a href="/app/browser/${encode(this._subject, depend)}" title="${(depend.includes('/') ? 'Wissenskarte ': 'Wissenslandkarte ') + depend}">${depend}</a>&nbsp;
+                    <a href="/app/browser/${encode(this._subject, ...depend.split('/'))}" title="${(depend.includes('/') ? 'Wissenskarte ': 'Wissenslandkarte ') + depend}">${depend}</a>&nbsp;
                   `)}
                 </div>
               ` : ''}
