@@ -52,7 +52,7 @@ export class KMapSummaryCardRating extends connect(store, LitElement) {
       colorStyles,
       css`
         :host {
-          display: contents;
+          display: flex;
         }
       `
     ];

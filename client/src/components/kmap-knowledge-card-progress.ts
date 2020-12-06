@@ -16,8 +16,6 @@ export class KMapKnowledgeCardProgress extends LitElement {
       css`
         :host {
           display: block;
-          padding: 12px;
-          transition: background-color .5s ease-in-out;
         }
         img {
           max-width: calc(100vw - 44px);

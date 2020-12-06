@@ -133,8 +133,7 @@ export class KmapTest extends connect(store, LitElement) {
           max-width: 800px;
         }
         .page {
-          display: block;
-          padding: 8px;
+          display: flex;
           flex: 1 1 auto;
         }
         kmap-test-editor-scroller {

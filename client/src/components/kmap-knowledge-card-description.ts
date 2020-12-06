@@ -68,8 +68,6 @@ export class KMapKnowledgeCardDescription extends LitElement {
       css`
         :host {
           display: block;
-          padding: 12px;
-          transition: background-color .5s ease-in-out;
           font-family: Roboto,sans-serif;
           -webkit-font-smoothing: antialiased;
           font-size: 0.95rem;

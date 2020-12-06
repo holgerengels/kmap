@@ -39,8 +39,12 @@ export class KMapTestCardHint extends LitElement {
           display: contents;
         }
         #hint {
-          padding: 12px 12px 4px 12px;
-          background-color: white;
+          padding: 8px 16px 0px 16px;
+          font-size: .875rem;
+          line-height: 1.25rem;
+          font-weight: 400;
+          letter-spacing: .0178571429em;
+          color: var(--color-darkgray);
         }
         slot {
           display: flex;
@@ -51,8 +55,8 @@ export class KMapTestCardHint extends LitElement {
 
   render() {
     return html`
-      <div id="hint" class="elevation-02">
-        <div>${unsafeHTML(this._hint)}</div>
+      <div id="hint">
+        <p>${unsafeHTML(this._hint)}</p>
         <slot></slot>
       </div>
     `;

@@ -90,6 +90,7 @@ export class KMapTimelineAside extends connect(store, LitElement) {
       css`
         :host {
           display: flex;
+          background-color: white;
         }
         aside {
           display: grid;

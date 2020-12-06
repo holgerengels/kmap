@@ -44,45 +44,6 @@ import {Timeline} from "./models/courses";
 import {timelineClosed, timelineOpen} from "./components/icons";
 import {urls} from "./urls";
 
-/*
-import MobileDragDrop from "mobile-drag-drop";
-
-function tryFindDraggableTarget(event) {
-  var cp = event.composedPath();
-  for (let o of cp) {
-    var el = o;
-    do {
-      if (el.draggable === false) {
-        continue;
-      }
-      if (el.getAttribute && el.getAttribute("draggable") === "true") {
-        return el;
-      }
-    } while ((el = el.parentNode) && el !== document.body);
-  }
-}
-
-function elementFromPoint(x, y) {
-  for (let o of this._path ) {
-    if (o.elementFromPoint) {
-      let el = o.elementFromPoint(x, y);
-      if (el) {
-        while (el.shadowRoot) {
-          el = el.shadowRoot.elementFromPoint(x, y);
-        }
-        return el;
-      }
-    }
-  }
-}
-
-function dragStartConditionOverride(event) {
-  this._path = event.composedPath();
-  return true;
-}
-MobileDragDrop.polyfill({ tryFindDraggableTarget: tryFindDraggableTarget, elementFromPoint: elementFromPoint, dragStartConditionOverride: dragStartConditionOverride});
-*/
-
 // @ts-ignore
 const _standalone = (window.matchMedia('(display-mode: standalone)').matches) || (window.navigator.standalone) || document.referrer.includes('android-app://');
 
@@ -125,6 +86,11 @@ export class KmapMain extends connect(store, LitElement) {
   // @ts-ignore
   private _loginPopup: KMapLoginPopup;
 
+  @query('#bar')
+  private _bar: TopAppBar;
+  @query('#main')
+  private _main: HTMLElement;
+
   set route(val: RoutingState) {
     if (val.page !== this._page) {
       this._page = val.page
@@ -150,12 +116,7 @@ export class KmapMain extends connect(store, LitElement) {
   firstUpdated(changedProperties) {
     updateMetadata({ title: "KMap", description: "KMap kartographiert Wissen mit Zusammenhang", image: window.location.origin + "/app/KMap-Logo.png", keywords: undefined });
 
-    if (this.shadowRoot) {
-      const bar: TopAppBar | null = this.shadowRoot.querySelector("mwc-top-app-bar");
-      const main: HTMLElement | null = this.shadowRoot.querySelector(".main-content");
-      if (bar && main)
-        bar.scrollTarget = main;
-    }
+    this._bar.scrollTarget = this._main;
 
     store.dispatch.shell.clearMessages();
     if (!window.location.host.includes("localhost")) {
@@ -235,6 +196,10 @@ export class KmapMain extends connect(store, LitElement) {
         //this._snackbar.open();
         console.log(this._messages);
       }
+    }
+
+    if (changedProps.has("_drawerOpen")) {
+      store.dispatch.shell.updateDrawerOpen(this._drawerOpen);
     }
   }
 
@@ -342,9 +307,6 @@ export class KmapMain extends connect(store, LitElement) {
         --app-drawer-text-color: var(--app-light-text-color);
         --app-drawer-selected-color: #c67100;
       }
-      mwc-drawer[open][type=dismissible] {
-        --mdc-top-app-bar-width: calc(100% - var(--mdc-drawer-width, 256px));
-      }
       .drawer-content {
         padding: 4px 16px;
       }
@@ -366,6 +328,7 @@ export class KmapMain extends connect(store, LitElement) {
         width: 100%;
         height: 100%;
         overflow: auto;
+        scroll-snap-type: y mandatory;
       }
       [hidden] {
         display: none !important;
@@ -455,39 +418,39 @@ export class KmapMain extends connect(store, LitElement) {
       </div>
     </div>
 
-    <main slot="appContent" role="main">
-    ${this._instance ? html`
-      <mwc-top-app-bar id="bar" dense>
-        <mwc-icon-button icon="menu" slot="navigationIcon" @click="${() => this._drawerOpen = !this._drawerOpen}"></mwc-icon-button>
-        <mwc-icon-button icon="arrow_back" slot="navigationIcon" @click="${history.back}" ?hidden="${!_standalone}"></mwc-icon-button>
-        <h1 slot="title">${this._barTitle}</h1>
-        <mwc-icon-button-toggle slot="actionItems" @click="${this._toggleTimeline}" ?hidden="${this._timelines.length !== 1 || this._page !== 'browser'}" title="Wochenplan">${timelineOpen}${timelineClosed}</mwc-icon-button-toggle>
-        <kmap-login-button slot="actionItems" @click="${this._showLogin}" title="Anmeldung"></kmap-login-button>
-      </mwc-top-app-bar>
+    <main id="main" slot="appContent" role="main">
+      ${this._instance ? html`
+        <mwc-top-app-bar id="bar" dense>
+          <mwc-icon-button icon="menu" slot="navigationIcon" @click="${() => this._drawerOpen = !this._drawerOpen}"></mwc-icon-button>
+          <mwc-icon-button icon="arrow_back" slot="navigationIcon" @click="${history.back}" ?hidden="${!_standalone}"></mwc-icon-button>
+          <h1 slot="title">${this._barTitle}</h1>
+          <mwc-icon-button-toggle slot="actionItems" @click="${this._toggleTimeline}" ?hidden="${this._timelines.length !== 1 || this._page !== 'browser'}" title="Wochenplan">${timelineOpen}${timelineClosed}</mwc-icon-button-toggle>
+          <kmap-login-button slot="actionItems" @click="${this._showLogin}" title="Anmeldung"></kmap-login-button>
+        </mwc-top-app-bar>
 
-      ${this._renderPage()}
-
-      ${this._page === 'home' || this._page === 'browser' ? html`
-          ${this._layers.includes('editor') ? html`<kmap-editor-edit-dialog></kmap-editor-edit-dialog>` : ''}
-          ${this._layers.includes('editor') ? html`<kmap-editor-rename-dialog></kmap-editor-rename-dialog>` : ''}
-          ${this._layers.includes('editor') ? html`<kmap-editor-delete-dialog></kmap-editor-delete-dialog>` : ''}
-          ${this._layers.includes('editor') ? html`<kmap-editor-add-fabs></kmap-editor-add-fabs>` : ''}
-        ` : ''}
-      ${this._page === 'test' ? html`
-        ${this._layers.includes('editor') ? html`<kmap-test-editor-edit-dialog></kmap-test-editor-edit-dialog>` : ''}
-        ${this._layers.includes('editor') ? html`<kmap-test-editor-delete-dialog></kmap-test-editor-delete-dialog>` : ''}
-        ${this._layers.includes('editor') ? html`<kmap-test-editor-add-fabs></kmap-test-editor-add-fabs>` : ''}
+        ${this._renderPage()}
       ` : ''}
-    ` : ''}
     </main>
   </mwc-drawer>
+
+  ${this._page === 'home' || this._page === 'browser' ? html`
+      ${this._layers.includes('editor') ? html`<kmap-editor-edit-dialog></kmap-editor-edit-dialog>` : ''}
+      ${this._layers.includes('editor') ? html`<kmap-editor-rename-dialog></kmap-editor-rename-dialog>` : ''}
+      ${this._layers.includes('editor') ? html`<kmap-editor-delete-dialog></kmap-editor-delete-dialog>` : ''}
+      ${this._layers.includes('editor') ? html`<kmap-editor-add-fabs></kmap-editor-add-fabs>` : ''}
+  ` : ''}
+  ${this._page === 'test' ? html`
+    ${this._layers.includes('editor') ? html`<kmap-test-editor-edit-dialog></kmap-test-editor-edit-dialog>` : ''}
+    ${this._layers.includes('editor') ? html`<kmap-test-editor-delete-dialog></kmap-test-editor-delete-dialog>` : ''}
+    ${this._layers.includes('editor') ? html`<kmap-test-editor-add-fabs></kmap-test-editor-add-fabs>` : ''}
+  ` : ''}
 
   <kmap-instance-popup id="instance-popup"></kmap-instance-popup>
   <kmap-login-popup id="login-popup"></kmap-login-popup>
 
   ${this._messages.map((message, i) => html`
       <mwc-snackbar id="snackbar" labeltext="${message}" ?open="${i === 0}" style="bottom: 100px"></mwc-snackbar>
-`)}
+  `)}
 `;
   }
 }

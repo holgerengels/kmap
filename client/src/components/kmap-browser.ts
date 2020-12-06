@@ -20,6 +20,7 @@ import {encode, urls} from "../urls";
 import {KMapTimelineAside} from "./kmap-timeline-aside";
 import {throttle} from "../debounce";
 import {Timeline} from "../models/courses";
+import {StyleInfo, styleMap} from "lit-html/directives/style-map";
 
 type SideBarState = "hidden" | "collapsed" | "open";
 
@@ -44,6 +45,8 @@ export class KMapBrowser extends connect(store, LitElement) {
   private _topicCard?: Card = undefined;
   @property()
   private _lines: Line[] = [];
+  @property()
+  private _maxCols: number = 0;
   @property()
   private _topics?: string[] = undefined;
   @property()
@@ -77,6 +80,10 @@ export class KMapBrowser extends connect(store, LitElement) {
 
   @property({reflect: true, type: Boolean})
   // @ts-ignore
+  private drawerOpen: boolean = false;
+
+  @property({reflect: true, type: Boolean})
+  // @ts-ignore
   private wide: boolean = false;
 
   @query('#timeline')
@@ -95,6 +102,7 @@ export class KMapBrowser extends connect(store, LitElement) {
       _userid: state.app.userid,
       _layers: state.shell.layers,
       wide: !state.shell.narrow,
+      drawerOpen: state.shell.drawerOpen && !state.shell.narrow,
       _subject: state.maps.subject,
       _chapter: state.maps.chapter,
       _lines: state.maps.lines,
@@ -113,13 +121,16 @@ export class KMapBrowser extends connect(store, LitElement) {
 
   updated(changedProperties) {
     if (changedProperties.has("_lines")) {
+      var cols = 0;
       var topics: string[] = [];
       for (let line of this._lines) {
+        cols = Math.max(cols, line.cards.length)
         for (let card of line.cards) {
           topics.push(card.topic);
         }
       }
       this._topics = topics;
+      this._maxCols = cols;
     }
     if (changedProperties.has('_topic') || changedProperties.has("_lines")) {
       if (!this._topic) {
@@ -309,15 +320,13 @@ export class KMapBrowser extends connect(store, LitElement) {
         :host {
           display: grid;
           grid-template-columns: 1fr;
+          padding: 16px;
         }
         :host([timeline-state=open]):host([wide]) {
           grid-template-columns: 1fr 330px;
         }
         :host([timeline-state=collapsed]):host([wide]) {
           grid-template-columns: 1fr 30px;
-        }
-        main {
-          overflow-x: hidden;
         }
         :host kmap-timeline-aside {
           position: fixed;
@@ -328,46 +337,29 @@ export class KMapBrowser extends connect(store, LitElement) {
           padding-top: 48px;
           transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out;
         }
-        .scrollpane {
-          display: flex;
-          -webkit-overflow-scrolling: touch;
-          outline: none;
-          overflow-x: scroll;
-          margin-top: 2px;
-          scroll-snap-type: x mandatory;
+        .chapter-card {
+          grid-column: 1 / -1;
+          width: min(100%, calc(100vw - 32px));
+          justify-self: left;
+          background-color: white;
         }
-        .scrollpane:hover::-webkit-scrollbar-thumb {
-          background-color: var(--color-mediumgray);
+        :host([draweropen]) .chapter-card {
+          width: min(100%, calc(100vw - var(--mdc-drawer-width, 256px) - 32px));
+          min-width: 300px;
         }
-        .scrollpane::-webkit-scrollbar {
-          width: 8px;
-          height: 8px;
-        }
-        .scrollpane::-webkit-scrollbar-thumb {
-          transition: background-color;
-          border-radius: 10px;
-        }
-        .scrollpane > kmap-summary-card {
-          scroll-snap-align: center;
-        }
-        .chapter-line {
-          margin: 0px 0px 8px 6px;
-          padding: 4px 0px;
-          line-height: 24px;
-          min-height: 12px;
-          color: var(--color-darkgray);
-        }
-        .page {
+        .cards {
           display: none;
-          padding: 8px;
+          grid-gap: 16px;
         }
-        .page[active] {
-          display: block;
+        .cards[active] {
+          display: grid;
         }
-        a.tests {
-          position: relative;
-          --mdc-icon-size: 20px;
-          vertical-align: sub;
+        .cards [first] {
+          grid-column-start: 1;
+        }
+        .button {
+          text-transform: uppercase;
+          margin-left: 8px;
         }
         [hidden] {
           display: none !important;
@@ -383,61 +375,74 @@ export class KMapBrowser extends connect(store, LitElement) {
   }
 
   render() {
+    const gridStyles: StyleInfo = {
+      gridTemplateColumns: "repeat(" + this._maxCols + ", 300px)",
+    }
     // language=HTML
     return html`
-        <main id="map" class="page map" ?active="${this._page === 'map'}" @rated="${this._rated}">
-          ${this._layers.includes('dependencies') ? html`
-            <svg-connector id="connector"></svg-connector>
-          ` : ''}
-          ${this._chapterCard ? html`
-            <div class="chapter-line font-body">
-              <a href="/app/browser/${encode(this._subject, this._chapter, '_')}" title="Wissenskarte ${this._chapter}"><mwc-icon style="float: right">fullscreen</mwc-icon></a>
-              ${this._chapterCard.links ? html`
-                <div>
-                  <b>Zurück zu</b> ${this._chapterCard.links.split("/").map((backlink) => html`
-                    <a href="/app/browser/${encode(this._subject, backlink)}" title="Wissenslandkarte ${backlink}">${backlink}</a>&nbsp;
-                  `)}
-                </div>
-              ` : ''}
-              ${this._chapterCard.dependencies ? html`
-                <div>
-                  <b>Voraussetzung für das Kapitel ${this._chapter}:</b> ${this._chapterCard.dependencies.map((depend) => html`
-                    <a href="/app/browser/${encode(this._subject, ...depend.split('/'))}" title="${(depend.includes('/') ? 'Wissenskarte ': 'Wissenslandkarte ') + depend}">${depend}</a>&nbsp;
-                  `)}
-                </div>
-              ` : ''}
-              ${this._layers.includes('summaries') && this._chapterCard.summary ? html`
-                <div>
-                  ${this._chapterCard.summary}
-                </div>
-              ` : ''}
-              ${this._hasTests && this._page === "map" ? html`
-                <div>
-                  <b>Aufgaben zum Kapitel</b>
-                  <a href="/app/test/${encode(this._subject, this._chapter)}" class="tests" title="Aufgaben zum Kapitel ${this._chapter}">${iconTest}</a>
-                </div>
-              ` : ''}
-            </div>
-          ` : ''}
-          ${this._layers.includes('editor') ? html`
-             <kmap-browser-chapter-editor .subject="${this._subject}" .chapter="${this._chapter}" .chapterCard="${this._chapterCard}"></kmap-browser-chapter-editor>
-           ` : ''
-          }
-          ${this._lines.map((line) => html`
-            <div class="scrollpane">
-              ${line.cards.map((card) => html`
-                <kmap-summary-card .subject="${this._subject}" .chapter="${this._chapter}" .card="${card}" ?faded="${this._faded}" key="${card.topic}"></kmap-summary-card>
-              `)}
-            </div>
+      ${this._layers.includes('dependencies') ? html`
+        <svg-connector id="connector"></svg-connector>
+      ` : '' }
+
+      <div ?active="${this._page === 'map'}" @rated="${this._rated}" class="cards" style="${styleMap(gridStyles)}">
+        ${this._chapterCard ? this._renderChapterCard() : ''}
+        ${this._lines.map((line) => html`
+          ${line.cards.map((card, index) => html`
+            <kmap-summary-card ?first="${index === 0}" .subject="${this._subject}" .chapter="${this._chapter}" .card="${card}" ?faded="${this._faded}" key="${card.topic}"></kmap-summary-card>
           `)}
-        </main>
-        <main id="topic" class="page topic" ?active="${this._page === 'topic'}" @rated="${this._rated}">
-            ${this._topicCard ? html`<kmap-knowledge-card .subject="${this._subject}" .chapter="${this._chapter}" .card="${this._topicCard}"></kmap-knowledge-card>` : ''}
-        </main>
-        <kmap-timeline-aside id="timeline" class="elevation-02" @touchstart="${this._swipeStart}" @touchmove="${this._swipeMove}" @touchend="${this._swipeEnd}" @open="${() => this.timelineState = 'open'}"></kmap-timeline-aside>
+        `)}
+      </div>
+
+      ${this._topicCard ? html`
+        <kmap-knowledge-card ?axxxctive="${this._page === 'topic'}" @rated="${this._rated}" .subject="${this._subject}" .chapter="${this._chapter}" .card="${this._topicCard}"></kmap-knowledge-card>
+      ` : '' }
+      <kmap-timeline-aside id="timeline" class="elevation-02" @touchstart="${this._swipeStart}" @touchmove="${this._swipeMove}" @touchend="${this._swipeEnd}" @open="${() => this.timelineState = 'open'}"></kmap-timeline-aside>
     `;
   }
 
+  _renderChapterCard() {
+    return this._chapterCard ? html`
+      <kmap-card class="chapter-card">
+        ${this._chapterCard.links ? html`
+          <kmap-card-text>
+            <b>Zurück zu</b> ${this._chapterCard.links.split("/").map((backlink) => html`
+              <a href="/app/browser/${encode(this._subject, backlink)}" title="Wissenslandkarte ${backlink}">${backlink}</a>&nbsp;
+            `)}
+          </kmap-card-text>
+        ` : html`
+          <kmap-card-text>
+            <b>Zurück zum </b> <a href="/app/" title="Wissenslandkarte">Start</a>
+          </kmap-card-text>
+        ` }
+        ${this._chapterCard.dependencies ? html`
+          <kmap-card-text>
+            <b>Voraussetzung für das Kapitel ${this._chapter}:</b> ${this._chapterCard.dependencies.map((depend) => html`
+              <a href="/app/browser/${encode(this._subject, ...depend.split('/'))}" title="${(depend.includes('/') ? 'Wissenskarte ': 'Wissenslandkarte ') + depend}">${depend}</a>&nbsp;
+            `)}
+          </kmap-card-text>
+        ` : '' }
+        ${this._layers.includes('summaries') && this._chapterCard.summary ? html`
+          <kmap-card-spacer></kmap-card-spacer>
+          <kmap-card-text>
+            ${this._chapterCard.summary}
+          </kmap-card-text>
+          <kmap-card-spacer></kmap-card-spacer>
+        ` : '' }
+        ${this._layers.includes('editor') ? html`
+          <kmap-card-text>
+            <kmap-browser-chapter-editor .subject="${this._subject}" .chapter="${this._chapter}" .chapterCard="${this._chapterCard}"></kmap-browser-chapter-editor>
+          </kmap-card-text>
+        ` : '' }
+
+        ${this._chapterCard.description ? html`
+          <a class="button" slot="button" href="/app/browser/${encode(this._subject, this._chapter, '_')}" title="Wissenskarte ${this._chapter}">Mehr</a>
+        ` : ''}
+        ${this._hasTests ? html`
+          <a slot="icon" href="${'/app/test/' + encode(this._subject, this._chapter)}" title="Aufgaben zum Kapitel ${this._chapter}" style="display: flex; padding-right: 8px; --foreground: var(--color-darkgray)">${iconTest}</a>
+        ` : '' }
+      </kmap-card>
+    ` : '';
+  }
   _swipeX?: number;
 
   constructor() {

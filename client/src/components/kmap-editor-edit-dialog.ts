@@ -14,7 +14,6 @@ import '@material/mwc-tab';
 import '@material/mwc-tab-bar';
 import '@material/mwc-textarea';
 import '@material/mwc-textfield';
-import './kmap-summary-card-summary';
 import './kmap-knowledge-card-description';
 import './file-drop';
 import './validating-form';

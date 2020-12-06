@@ -80,7 +80,10 @@ export class KmapTestExercise extends connect(store, LitElement) {
       colorStyles,
       css`
         :host {
-          display: contents;
+          display: flex;
+        }
+        kmap-test-card {
+          margin: 16px;
         }
       `];
   }
@@ -88,7 +91,6 @@ export class KmapTestExercise extends connect(store, LitElement) {
   render() {
     // language=HTML
     return html`
-  <div>
     ${this._currentTest ? html`
       <kmap-test-card id="test-card" @next="${this._next}"
         .subject="${this._currentTest.subject}"
@@ -105,7 +107,6 @@ export class KmapTestExercise extends connect(store, LitElement) {
         .values="${this._currentTest.values}"
         .balance="${this._currentTest.balance}"></kmap-test-card>`
       : ''}
-  </div>
     `;
   }
 }

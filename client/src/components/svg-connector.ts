@@ -89,7 +89,8 @@ export class Connector extends LitElement {
   }
 
   render() {
-    const parent = this.parentElement as HTMLElement;
+    const parent = this.offsetParent as HTMLElement;
+    console.log(this._connections)
     //language=SVG
     return svg`
       <svg style="position:absolute;left:0px;top:0px" width="${parent.clientWidth}" height="${parent.clientHeight}">

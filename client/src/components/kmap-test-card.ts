@@ -3,10 +3,10 @@ import {connect} from '@captaincodeman/rdx';
 import {State, store} from "../store";
 
 import {encode} from '../urls';
-import {STATE_COLORS} from './state-colors';
-import {fontStyles, colorStyles, elevationStyles} from "./kmap-styles";
+import {fontStyles, colorStyles} from "./kmap-styles";
 import '@material/mwc-icon';
 import '@material/mwc-button';
+import "./kmap-card";
 import "./kmap-test-card-content";
 import "./kmap-test-card-hint";
 import "./kmap-test-card-solution";
@@ -20,8 +20,6 @@ export class KMapTestCard extends connect(store, LitElement) {
   private _instance: string = '';
   @property({type: String})
   private _userid: string = '';
-  @property()
-  private _narrow: boolean = false;
 
   @property({type: String})
   private key: string = '';
@@ -59,11 +57,6 @@ export class KMapTestCard extends connect(store, LitElement) {
   @property({type: Number})
   private attempts: number = 0;
 
-  @property({type: Boolean})
-  private hideHeader: boolean = false;
-  @property({type: Boolean})
-  private hideActions: boolean = false;
-
   @query('#blinky')
   // @ts-ignore
   private _blinky: HTMLElement;
@@ -80,26 +73,11 @@ export class KMapTestCard extends connect(store, LitElement) {
   @property({type: Boolean, reflect: true})
   private solutionVisible: boolean = false;
 
-  constructor() {
-    super();
-    this._colorize("0");
-  }
-
   mapState(state: State) {
     return {
       _instance: state.app.instance,
       _userid: state.app.userid,
-      _narrow: state.shell.narrow,
     };
-  }
-
-  _colorize(rate) {
-    let _opaque = STATE_COLORS[rate][0];
-    let _light = STATE_COLORS[rate][1];
-    let _lightest = STATE_COLORS[rate][2];
-    this.style.setProperty('--color-opaque', _opaque);
-    this.style.setProperty('--color-light', _light);
-    this.style.setProperty('--color-lightest', _lightest);
   }
 
   _levelText(level: number) {
@@ -141,8 +119,10 @@ export class KMapTestCard extends connect(store, LitElement) {
     this.sent = true;
     this.attempts = -1;
 
-    if (this.solution)
+    if (this.solution) {
       this.solutionVisible = true;
+      this.hintVisible = false;
+    }
   }
 
   _next() {
@@ -168,6 +148,7 @@ export class KMapTestCard extends connect(store, LitElement) {
 
   _showHint() {
     this.hintVisible = true;
+    this.solutionVisible = false;
   }
   _hideHint() {
     this.hintVisible = false;
@@ -178,66 +159,13 @@ export class KMapTestCard extends connect(store, LitElement) {
     return [
       fontStyles,
       colorStyles,
-      elevationStyles,
       css`
         :host {
-          --color-opaque: #f5f5f5;
-          --color-light: #e0e0e0;
-          --color-lightest: #9e9e9e;
-
-          display: block;
-          box-sizing: border-box;
-          max-width: 800px;
-          border-radius: 4px;
-          box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
-          0 1px 5px 0 rgba(0, 0, 0, 0.12),
-          0 3px 1px -2px rgba(0, 0, 0, 0.2);
-          color: var(--color-darkgray);
-        }
-
-        .card-header {
-          padding: 8px 12px;
-          color: black;
-          background-color: var(--color-opaque);
           display: flex;
-          flex-direction: row;
-          justify-content: space-between;
-          border-top-left-radius: 4px;
-          border-top-right-radius: 4px;
         }
-        .card-header a {
-          color: white;
+        kmap-card {
+          background-color: white;
         }
-        .card-header mwc-icon-button {
-          color: white;
-          vertical-align: middle;
-          --mdc-icon-button-size: 20px;
-          --mdc-icon-size: 20px;
-        }
-        .card-header mwc-icon {
-          vertical-align: middle;
-          --mdc-icon-size: 1.2em;
-        }
-        .card-footer {
-          color: var(--color-darkgray);
-          background-color: var(--color-light);
-          transition: background-color .5s ease-in-out;
-          padding: 8px 12px;
-          font-size: 0px;
-          line-height: 0px;
-          display: flex;
-          flex-direction: row;
-          justify-content: space-between;
-          border-bottom-left-radius: 4px;
-          border-bottom-right-radius: 4px;
-        }
-        .card-footer[stacked] {
-          flex-wrap: wrap;
-        }
-        .card-footer a {
-          color: black;
-        }
-
         [hidden] {
           display: none !important;
         }
@@ -255,41 +183,35 @@ export class KMapTestCard extends connect(store, LitElement) {
   }
 
   render() {
+    // language=HTML
     return html`
-  <div class="card-header elevation-04" ?hidden="${this.hideHeader}">
-      <span>Aufgabe ${this.num + 1} von ${this.of} (${this._levelText(this.level)})</span>
-      <div style="flex: 1 0 auto"></div>
-      <a href="/app/browser/${encode(this.subject, this.chapter, this.topic)}" id="blinky">Wissenskarte ansehen <mwc-icon>open_in_new</mwc-icon></a>&nbsp;
-      <mwc-icon-button icon="feedback" title="Feedback" @click="${this._feedback}"></mwc-icon-button>
-  </div>
+      <kmap-card header="Aufgabe ${this.num + 1} von ${this.of} (${this._levelText(this.level)})">
+        <kmap-test-card-content
+          .instance="${this._instance}"
+          .subject="${this.subject}"
+          .set="${this.set}"
+          .key="${this.key}"
+          .question="${this.question}"
+          .answer="${this.answer}"
+          .balance="${this.balance}"
+          .values="${this.values}">
+        </kmap-test-card-content>
 
-  <kmap-test-card-hint .hint="${this.hint}" ?hidden="${!this.hintVisible}">
-    <mwc-button @click="${this._hideHint}">Ok</mwc-button>
-  </kmap-test-card-hint>
+        <kmap-card-divider ?hidden="${!this.hintVisible}"></kmap-card-divider>
+        <kmap-test-card-hint .hint="${this.hint}" ?hidden="${!this.hintVisible}"></kmap-test-card-hint>
 
-  <kmap-test-card-content class="elevation-01"
-    .instance="${this._instance}"
-    .subject="${this.subject}"
-    .set="${this.set}"
-    .key="${this.key}"
-    .question="${this.question}"
-    .answer="${this.answer}"
-    .balance="${this.balance}"
-    .values="${this.values}">
-  </kmap-test-card-content>
+        <kmap-card-divider ?hidden="${!this.solutionVisible}"></kmap-card-divider>
+        <kmap-test-card-solution .solution="${this.solution}" ?hidden="${!this.solutionVisible}"></kmap-test-card-solution>
 
-  <kmap-test-card-solution .solution="${this.solution}" ?hidden="${!this.solutionVisible}" class="elevation-01"></kmap-test-card-solution>
+        <mwc-button slot="button" @click="${this._showAnswer}">Antwort zeigen</mwc-button>
+        <mwc-button slot="button" @click="${this._showHint}" ?hidden="${!this.hint}">Tipp</mwc-button>
+        <mwc-button slot="button" @click="${this._sendAnswer}" ?hidden="${this.sent}">Antwort abschicken</mwc-button>
+        <mwc-button slot="button" @click="${this._next}" ?hidden="${!this.correct}">Weiter</mwc-button>
+        <a slot="icon" href="/app/browser/${encode(this.subject, this.chapter, this.topic)}" id="blinky"><mwc-icon title="Wissenskarte">help_outline</mwc-icon></a>&nbsp;
+        <mwc-icon-button slot="icon" icon="feedback" title="Feedback" @click="${this._feedback}"></mwc-icon-button>
+      </kmap-card>
 
-  ${!this.hideActions ? html`
-    <div class="card-footer elevation-02" ?stacked="${this._narrow}">
-        <mwc-button @click="${this._showAnswer}">Richtige Antwort zeigen</mwc-button>
-        <mwc-button @click="${this._showHint}" ?hidden="${!this.hint}">Tipp</mwc-button>
-        <div style="flex: 1 0 auto"></div>
-        <mwc-button @click="${this._sendAnswer}" ?hidden="${this.sent}">Antwort abschicken</mwc-button>
-        <mwc-button @click="${this._next}" ?hidden="${!this.correct}">Weiter</mwc-button>
-    </div>`
-      : ''}
-  <kmap-feedback id="feedbackDialog" .subject="${this.subject}" .chapter="${this.chapter}" .topic="${this.topic}" .test="${this.key}"></kmap-feedback>
+      <kmap-feedback id="feedbackDialog" .subject="${this.subject}" .chapter="${this.chapter}" .topic="${this.topic}" .test="${this.key}"></kmap-feedback>
     `;
   }
 }

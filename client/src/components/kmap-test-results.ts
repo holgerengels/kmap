@@ -116,18 +116,19 @@ export class KmapTestResults extends connect(store, LitElement) {
       elevationStyles,
       css`
         :host {
-          display: contents;
-        }
-        .box {
-          padding: 8px;
-          background-color: whitesmoke;
+          display: flex;
+          flex-direction: column;
+          padding: 16px;
         }
         .result-cards {
           display: flex;
           flex-wrap: wrap;
         }
         kmap-test-result-card {
-          margin: 16px;
+          margin-right: 16px;
+        }
+        kmap-test-result-card:last-child {
+          margin-right: 0;
         }
         mwc-icon {
           vertical-align: middle;
@@ -139,28 +140,25 @@ export class KmapTestResults extends connect(store, LitElement) {
   render() {
     // language=HTML
     return html`
-  <div class="box elevation-01">
     ${this._summary ? html`
       <label>Ergebnis</label>
-      <br/><br/>
       <label class="secondary">${this._summary.achievedPoints} von ${this._summary.achievablePoints} Punkten</label>
-      <br/><br/>
+              <br/>
       <label ?hidden="${this._results.length > 0 && this._summary.hasCards}">Top! Das hast Du drauf!</label>
       <label ?hidden="${!this._summary.hasCards}">Folgende Themen solltest Du dir nochmal anschauen!</label>
-      <div class="result-cards" ?hidden="${!this._summary.hasCards}" @rated="${this._rated}">
         <br/>
+      <div class="result-cards" ?hidden="${!this._summary.hasCards}" @rated="${this._rated}">
         ${this._summary.cards.map((card) => html`
           <kmap-test-result-card .card="${card}" .state="${card.state}">
             <a slot="actions-fullscreen" href="/app/browser/${card.subject}/${card.chapter}/${card.topic}"><mwc-icon>open-in-new"></mwc-icon></a>
           </kmap-test-result-card>
         `)}
       </div>
-      <br/>
+        <br/>
       <label class="secondary" ?hidden="${!this._summary.hasCards}">Wenn Du auf die
         <svg viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet" focusable="false" style="pointer-events: none; display: inline; width: 16px; height: 16px;"><g><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"></path></g></svg>
         klickst, wird die jeweilige Bewertung entsprechend als Selbsteinschätzung übernommen.
       </label>
-      <br/><br/>
       <label class="secondary" ?hidden="${!this._summary.hasCards}">Wenn Du auf
         <svg viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet" focusable="false" style="pointer-events: none; display: inline; width: 16px; height: 16px;"><g><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"></path></g></svg>
         klickst, kommst Du zur Themenkarte.

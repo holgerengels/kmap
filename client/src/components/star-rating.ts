@@ -4,6 +4,9 @@ import '@material/mwc-icon';
 @customElement('star-rating')
 export class StarRating extends LitElement {
 
+  @property()
+  private crossposition: "before" | "behind" = 'behind';
+
   @property({type: Number})
   private rate: number = 0;
 
@@ -50,6 +53,7 @@ export class StarRating extends LitElement {
         mwc-icon {
           pointer-events: all;
         }
+        [hidden] { display: none!important; }
         `
     ];
   }
@@ -57,8 +61,9 @@ export class StarRating extends LitElement {
   render() {
     //language=HTML
     return html`
-        <mwc-icon class="cross" @click="${this._clicked}" value="0">close</mwc-icon>
+        <mwc-icon ?hidden="${this.crossposition === 'before'}" class="cross" @click="${this._clicked}" value="0">close</mwc-icon>
         <mwc-icon ?filled="${this.rate >= 4}" @click="${this._clicked}" value="4">done</mwc-icon><mwc-icon ?filled="${this.rate >= 3}" @click="${this._clicked}" value="3">done</mwc-icon><mwc-icon ?filled="${this.rate >= 2}" @click="${this._clicked}" value="2">done</mwc-icon><mwc-icon ?filled="${this.rate >= 1}" @click="${this._clicked}" value="1">done</mwc-icon>
+        <mwc-icon ?hidden="${this.crossposition === 'behind'}" class="cross" @click="${this._clicked}" value="0">close</mwc-icon>
     `;
   }
 }

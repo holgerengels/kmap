@@ -4,6 +4,7 @@ import {State, store} from "../store";
 
 import {colorStyles, fontStyles} from "./kmap-styles";
 import '@material/mwc-icon-button';
+import '@material/mwc-icon-button-toggle';
 import '@material/mwc-top-app-bar';
 import './kmap-login-button';
 import './kmap-subject-card';
@@ -11,9 +12,6 @@ import './kmap-randomtest-card';
 import {Random, Test} from "../models/tests";
 import {Latest} from "../models/maps";
 import {Subject} from "../models/subjects";
-
-
-//import './dnd-fillin'
 
 @customElement('kmap-subjects')
 export class KMapSubjects extends connect(store, LitElement) {
@@ -57,46 +55,25 @@ export class KMapSubjects extends connect(store, LitElement) {
       colorStyles,
       css`
         :host {
-          display: contents;
+          display: flex;
+          flex-direction: column;
+          padding: 8px 8px;
         }
-        .board {
-          height: auto;
-          outline: none;
-          padding: 8px;
-          padding-bottom: 36px;
+        :host > * {
+          margin-top: 8px;
+          margin-bottom: 8px;
         }
         .title {
-          margin: 0px 0px 8px 6px;
-          padding: 4px 0px;
           color: var(--color-darkgray);
+          margin-left: 8px;
         }
-        kmap-subject-card {
-          display: inline-block;
-          margin-bottom: 16px;
-          vertical-align: top;
-        }
-        kmap-randomtest-card {
-          margin-left: 6px;
-          display: block;
-          margin-bottom: 16px;
-        }
-        .scrollpane {
+        .cards {
           display: flex;
-          -webkit-overflow-scrolling: touch;
-          outline: none;
-          overflow-x: scroll;
-          margin-top: 2px;
+          flex-direction: row;
         }
-        .scrollpane:hover::-webkit-scrollbar-thumb {
-          background-color: var(--color-mediumgray);
-        }
-        .scrollpane::-webkit-scrollbar {
-          width: 8px;
-          height: 8px;
-        }
-        .scrollpane::-webkit-scrollbar-thumb {
-          transition: background-color;
-          border-radius: 10px;
+        .cards > * {
+          margin-left: 8px;
+          margin-right: 8px;
         }
       `];
   }
@@ -104,21 +81,22 @@ export class KMapSubjects extends connect(store, LitElement) {
   render() {
     // language=HTML
     return html`
-      <main id="content" class="board" tabindex="0">
         <div class="title">
             <label>Wähle ein Fach!</label>
         </div>
 
-        ${this._subjects.map((subject) => html`
-            <kmap-subject-card .subject="${subject}"></kmap-subject-card>
-        `)}
-
-        ${ this._latestCards && this._latestCards.cards ? html`
-        <div class="title">
-            <label>Neueste Änderungen</label><br/>
-            <span>.. von Wissenskarten aus allen Bereichen ..</label>
+        <div class="cards">
+          ${this._subjects.map((subject) => html`
+              <kmap-subject-card .subject="${subject}"></kmap-subject-card>
+          `)}
         </div>
-          <div class="scrollpane">
+
+        ${this._latestCards && this._latestCards.cards ? html`
+          <div class="title">
+            <label style="line-height: 200%">Neueste Änderungen</label><br/>
+            <label>.. von Wissenskarten aus allen Bereichen ..</label>
+          </div>
+          <div class="cards">
             ${this._latestCards.cards.map((card) => html`
               <kmap-summary-card .subject="${card.subject}" .chapter="${card.chapter}" .card="${card}" key="${card.topic}"></kmap-summary-card>
             `)}
@@ -128,22 +106,23 @@ export class KMapSubjects extends connect(store, LitElement) {
         ${this._currentTest ? html`
           <div class="title">
             <label style="line-height: 200%">Teste Dein Wissen!</label><br/>
-            <span>.. anhand dreier zufällig ausgewählter Aufgaben ..</label>
+            <label secondary>.. anhand dreier zufällig ausgewählter Aufgaben ..</label>
           </div>
 
-          <kmap-randomtest-card @next="${this._next}"
-            .subject="${this._currentTest.subject}"
-            .set="${this._currentTest.set}"
-            .chapter="${this._currentTest.chapter}"
-            .topic="${this._currentTest.topic}"
-            .key="${this._currentTest.key}"
-            .level="${this._currentTest.level}"
-            .question="${this._currentTest.question}"
-            .answer="${this._currentTest.answer}"
-            .values="${this._currentTest.values}"
-            .balance="${this._currentTest.balance}"
-            .last="${this._index === 2}"></kmap-randomtest-card>
-        ` : ''}
-      </main>
+          <div class="cards">
+            <kmap-randomtest-card @next="${this._next}"
+              .subject="${this._currentTest.subject}"
+              .set="${this._currentTest.set}"
+              .chapter="${this._currentTest.chapter}"
+              .topic="${this._currentTest.topic}"
+              .key="${this._currentTest.key}"
+              .level="${this._currentTest.level}"
+              .question="${this._currentTest.question}"
+              .answer="${this._currentTest.answer}"
+              .values="${this._currentTest.values}"
+              .balance="${this._currentTest.balance}"
+              .last="${this._index === 2}"></kmap-randomtest-card>
+          </div>
+        ` : '' }
 `;}
 }

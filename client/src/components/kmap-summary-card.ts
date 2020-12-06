@@ -1,30 +1,22 @@
-import {LitElement, html, css, customElement, property, queryAsync} from 'lit-element';
-import { connect } from '@captaincodeman/rdx';
+import {css, customElement, html, LitElement, property} from 'lit-element';
+import {connect} from '@captaincodeman/rdx';
 import {State, store} from "../store";
 
 import {StyleInfo, styleMap} from "lit-html/directives/style-map";
 import '@material/mwc-icon';
-import '@material/mwc-ripple/mwc-ripple';
-import {Ripple} from '@material/mwc-ripple/mwc-ripple.js';
-//import {RippleHandlers} from '@material/mwc-ripple/ripple-handlers.js';
-import './kmap-summary-card-summary';
+import './kmap-card';
 import './kmap-summary-card-averages';
 import './kmap-summary-card-editor';
 import './kmap-summary-card-rating';
 import './kmap-summary-card-ratecolors';
-import {STATE_COLORS} from './state-colors';
-import {fontStyles, colorStyles, elevationStyles} from "./kmap-styles";
-import {encode, urls} from "../urls";
-import {ifDefined} from "lit-html/directives/if-defined";
-import {classMap} from "lit-html/directives/class-map";
+import {colorStyles, elevationStyles, fontStyles} from "./kmap-styles";
+import {encode} from "../urls";
 import {Card} from "../models/types";
 import {iconTest} from "./icons";
 
 @customElement('kmap-summary-card')
 export class KMapSummaryCard extends connect(store, LitElement) {
 
-  @property()
-  private _instance: string = '';
   @property()
   private _userid: string = '';
   @property({type: String})
@@ -46,17 +38,13 @@ export class KMapSummaryCard extends connect(store, LitElement) {
   @property()
   private _layers: string[] = [];
   @property()
-  private _colorStyles: StyleInfo = { "--color-rated":  "--color-darkgray", "--color-unrated": "--color-lightgray" };
-  @property()
-  private _thumbStyles?: StyleInfo = undefined;
+  private _colorStyles: StyleInfo = { backgroundColor: "white" };
   @property()
   private _hasTests: boolean = false;
   @property()
   private _topics: string[] = [];
   @property()
   private _selectedDependencies: string[] = [];
-
-  @queryAsync('mwc-ripple') ripple!: Promise<Ripple|null>;
 
   constructor() {
     super();
@@ -81,12 +69,14 @@ export class KMapSummaryCard extends connect(store, LitElement) {
   updated(changedProperties) {
     if (changedProperties.has("card") && this.card !== undefined) {
       this._key = this.card.links ? this.card.links : this.chapter + "." + this.card.topic;
+      /*
       this._thumbStyles = this.card.thumb !== undefined ? {
         "background-image": `url('${urls.server}${encode("data", this.subject, this.chapter, this.card.topic, this.card.thumb)}?instance=${this._instance}')`,
         "background-position": "center",
         "background-size": "contain",
         "background-repeat": "no-repeat",
       } : undefined;
+      */
     }
 
     if (changedProperties.has("card") || changedProperties.has("_topics"))
@@ -103,13 +93,9 @@ export class KMapSummaryCard extends connect(store, LitElement) {
   }
 
   _colorize(rate) {
-    let _opaque = STATE_COLORS[rate][0];
-    let _light = STATE_COLORS[rate][1];
-    let _lightest = STATE_COLORS[rate][2];
-    this.style.setProperty('--color-opaque', _opaque);
-    this.style.setProperty('--color-light', _light);
-    this.style.setProperty('--color-lightest', _lightest);
-    this._colorStyles = { "--color-rated":  _opaque, "--color-unrated": _lightest };
+    this._colorStyles = {
+      backgroundColor: rate !== 0 ? "hsl(" + 120 * (rate - 1) / 4 + ", 100%, 90%)" : "white",
+    };
   }
 
   _colorizeEvent() {
@@ -130,7 +116,7 @@ export class KMapSummaryCard extends connect(store, LitElement) {
     this._colorize(source ? source.getState() : 0);
   }
 
-  _clicked() {
+  _hovered() {
     if (this.card == undefined) return;
 
     if (store.state.maps.selected === this.card.topic)
@@ -146,155 +132,72 @@ export class KMapSummaryCard extends connect(store, LitElement) {
       colorStyles,
       elevationStyles,
       css`
-        :host {
-          display: flex;
-          flex-direction: column;
-          --color-opaque: #f5f5f5;
-          --color-light: #e0e0e0;
-          --color-lightest: #9e9e9e;
-        }
-        :host div.card {
+        kmap-card {
           transition: opacity .1s ease-in-out;
           opacity: 1.0;
         }
-        :host([faded]) div.card {
+        :host([faded]) kmap-card {
           opacity: 0.0;
         }
-        div.card {
-          vertical-align: top;
-          margin: 6px;
-          margin-top: 0px;
-          display: flex;
-          flex-direction: column;
-          box-sizing: border-box;
+        kmap-card {
           width: 300px;
-          border-radius: 4px;
-          color: var(--color-darkgray);
+          background-color: white;
+          transition: background-color 280ms cubic-bezier(0.4, 0, 0.2, 1), opacity 280ms cubic-bezier(0.4, 0, 0.2, 1);
         }
-        div.card[thumb] {
-          min-height: 134px;
-          transition: opacity 1s ease-in-out;
+        kmap-card[selected] {
         }
-        div.card[selected] {
-          filter: saturate(1.5) brightness(.8);
+        kmap-card[highlighted] {
+          box-shadow: 0px 3px 3px -2px rgba(0, 0, 0, 0.2),0px 3px 4px 0px rgba(0, 0, 0, 0.14),0px 1px 8px 0px rgba(0, 0, 0, 0.12);
         }
-        div.card[highlighted] {
-          filter: saturate(1.5) brightness(.8);
-        }
-        div.card[grayedOut] {
+        kmap-card[grayedOut] {
           filter: grayscale(.5);
           opacity: .5;
-        }
-        .card-header, .card-footer {
-          transition: background-color .5s ease-in-out;
-          padding: 4px 8px;
-          display: flex;
-          flex-direction: row;
-          justify-content: space-between;
-        }
-        .card-header {
-          color: black;
-          background-color: var(--color-opaque);
-          border-top-left-radius: 4px;
-          border-top-right-radius: 4px;
-        }
-        .card-footer {
-          color: var(--color-darkgray);
-          background-color: var(--color-light);
-          border-bottom-left-radius: 4px;
-          border-bottom-right-radius: 4px;
-        }
-        .card-header span, .card-footer span { align-self: center; }
-        .card-header a, .card-footer a { height: 24px; color: black; display: block }
-        .card-footer a { color: var(--color-darkgray); }
-        div.card[thumb] > kmap-summary-card-summary {
-          height: 54px;
         }
       `];
   }
 
   render() {
-    // language=CSS
     if (this.card === undefined)
       return html`card undefined`;
     else
+      // language=HTML
       return html`
-<div
-    class="${classMap({"card": true, "elevation-02": !this.selected && !this.highlighted, "elevation-05": this.selected || this.highlighted})}"
-    style=${ifDefined(this._thumbStyles ? styleMap(this._thumbStyles) : undefined)}
-    ?thumb="${this.card.thumb}"
-    @click="${this._clicked}" ?selected="${this.selected}" ?highlighted="${this.highlighted}" ?grayedOut="${this.grayedOut}"
-          >
-  <mwc-ripple></mwc-ripple>
-  <div class="card-header font-body">
-    <span>${this.card.topic}</span>
-    <div style="flex: 1 0 auto"></div>
-    ${this.card.links ? html`
-        <a href="/app/browser/${encode(this.subject, this.card.links)}" title="Wissenslandkarte ${this.card.links}" alt="Wissenslandkarte ${this.card.links}"><mwc-icon style="--mdc-icon-size: 20px; margin:2px 0px">open_in_new</mwc-icon></a>
-    ` : html`
-        <a href="/app/browser/${encode(this.subject, this.chapter, this.card.topic)}" title="Wissenskarte ${this.card.topic}" alt="Wissenskarte ${this.card.topic}"><mwc-icon>fullscreen</mwc-icon></a>
-    `}
-  </div>
-  ${this._layers.includes('summaries')
-      ? html`
-      <kmap-summary-card-summary .key="${this._key}" .summary="${this.card.summary}" @statecolor="${this._colorizeEvent}"></kmap-summary-card-summary>
-    ` : ''
-    }
-  ${this._layers.includes('averages')
-      ? html`
-      <kmap-summary-card-averages id="averages" .key="${this._key}" @statecolor="${this._colorizeEvent}"></kmap-summary-card-summary>
-    ` : ''
-    }
-  ${this._layers.includes('editor')
-      ? html`
-      <kmap-summary-card-editor id="editor" .key="${this._key}" .card="${this.card}" @statecolor="${this._colorizeEvent}"></kmap-summary-card-editor>
-    ` : ''
-    }
-  ${!this._layers.includes('averages') ? html`
-      <kmap-summary-card-ratecolors id="rating" .key="${this._key}" @statecolor="${this._colorizeEvent}"></kmap-summary-card-ratecolors>
-  ` : ''}
-  <div class="card-footer font-body">
-        ${!this.card.links && !this._layers.includes('averages') ? html`
-          <kmap-summary-card-rating .key="${this._key}" style=${styleMap(this._colorStyles)}></kmap-summary-card-rating>
-        ` : '' }
+        <kmap-card primaryLink="${this._link()}" primaryLinkTitle="${this._linkTitle()}" header="${this.card.topic}" subheader="${this._layers.includes("summaries") && this.card.summary ? this.card.summary : ''}"
+                @hover="${this._hovered}" ?selected="${this.selected}" ?highlighted="${this.highlighted}" ?grayedOut="${this.grayedOut}"
+                style=${styleMap(this._colorStyles)}>
+          <div slot="plane" class="marker top"></div>
+          <div slot="plane" class="marker bottom"></div>
+          ${this._layers.includes('averages') ? html`
+            <kmap-card-element>
+              <kmap-summary-card-averages id="averages" .key="${this._key}" @statecolor="${this._colorizeEvent}"></kmap-summary-card-averages>
+            </kmap-card-element>
+          ` : '' }
+          ${this._layers.includes('editor') ? html`
+            <kmap-card-element>
+              <kmap-summary-card-editor id="editor" .key="${this._key}" .card="${this.card}" @statecolor="${this._colorizeEvent}"></kmap-summary-card-editor>
+            </kmap-card-element>
+          ` : '' }
+          ${!this._layers.includes('averages') ? html`
+            <kmap-summary-card-ratecolors id="rating" .key="${this._key}" @statecolor="${this._colorizeEvent}"></kmap-summary-card-ratecolors>
+          ` : ''}
 
-      <div style="flex: 1 0 auto; height: 24px"></div>
-      ${this._hasTests ? html`
-        <a href="/app/test/${encode(this.subject, this.chapter, this.card.topic)}" title="Aufgaben zum Thema ${this.card.topic}" alt="Aufgaben zum Thema ${this.card.topic}" style="display: flex; flex-flow: column; justify-content: space-around">${iconTest}</a>
-      ` : ''}
-  </div>
-    </div>
+          ${!this.card.links && !this._layers.includes('averages') ? html`
+            <kmap-summary-card-rating slot="button" .key="${this._key}" style="padding-left: 8px"></kmap-summary-card-rating>
+          ` : '' }
+          ${this._hasTests ? html`
+            <a slot="icon" href="${'/app/test/' + encode(this.subject, this.chapter, this.card.topic)}" title="Aufgaben zum Thema ${this.card.topic}" style="display: flex; padding-right: 8px; --foreground: var(--color-darkgray)">${iconTest}</a>
+          ` : '' }
+        </kmap-card>
     `;
   }
 
-  /*
-  protected rippleHandlers: RippleHandlers = new RippleHandlers(() => {
-    return this.ripple;
-  });
-
-  @eventOptions({passive: true})
-  private handleRippleActivate(evt?: Event) {
-    this.rippleHandlers.startPress(evt);
+  _link() {
+    if (this.card === undefined) return "";
+    return this.card.links ? '/app/browser/' + encode(this.subject, this.card.links) : '/app/browser/' + encode(this.subject, this.chapter, this.card.topic)
   }
 
-  private handleRippleDeactivate() {
-    this.rippleHandlers.endPress();
+  _linkTitle() {
+    if (this.card === undefined) return "";
+    return this.card.links ? 'Wissenslandkarte ' + this.card.links : 'Wissenskarte ' + this.card.topic;
   }
-
-  private handleRippleMouseEnter() {
-    this.rippleHandlers.startHover();
-  }
-
-  private handleRippleMouseLeave() {
-    this.rippleHandlers.endHover();
-  }
-
-  private handleRippleFocus() {
-    this.rippleHandlers.startFocus();
-  }
-
-  private handleRippleBlur() {
-    this.rippleHandlers.endFocus();
-  }
-   */
 }

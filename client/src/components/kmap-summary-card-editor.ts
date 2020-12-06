@@ -63,12 +63,6 @@ export class KMapSummaryCardEditor extends connect(store, LitElement) {
       css`
         :host {
           display: block;
-          background-color: var(--color-lightest);
-          transition: background-color .5s ease-in-out;
-          font-family: Roboto,sans-serif;
-          -webkit-font-smoothing: antialiased;
-          font-size: 0.95rem;
-          font-weight: 500;
         }
         mwc-button[disabled] {
           pointer-events: none;

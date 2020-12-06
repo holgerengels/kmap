@@ -190,8 +190,7 @@ export class KMapTestCardContent extends LitElement {
       css`
         .katex { font-size: 1.2em; }
         :host {
-          padding: 12px;
-          background-color: var(--color-lightest);
+          padding: 8px 16px;
           transition: background-color .5s ease-in-out;
           display: flex;
           flex-direction: row;
@@ -206,6 +205,13 @@ export class KMapTestCardContent extends LitElement {
         }
         #question {
           margin-right: 16px;
+        }
+        #question, #answer {
+          font-size: .875rem;
+          line-height: 1.25rem;
+          font-weight: 400;
+          letter-spacing: .0178571429em;
+          color: var(--color-darkgray);
         }
         input {
           margin: 0.5em;

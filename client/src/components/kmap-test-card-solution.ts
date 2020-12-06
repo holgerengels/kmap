@@ -39,15 +39,19 @@ export class KMapTestCardsolution extends LitElement {
           display: contents;
         }
         #solution {
-          padding: 12px 12px 12px 12px;
-          background-color: white;
+          padding: 8px 16px 0px 16px;
+          font-size: .875rem;
+          line-height: 1.25rem;
+          font-weight: 400;
+          letter-spacing: .0178571429em;
+          color: var(--color-darkgray);
         }
       `];
   }
 
   render() {
     return html`
-      <div id="solution" class="elevation-02">
+      <div id="solution">
         <div>${unsafeHTML(this._solution)}</div>
         <slot></slot>
       </div>

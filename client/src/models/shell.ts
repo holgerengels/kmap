@@ -62,24 +62,6 @@ export default createModel({
         window.setTimeout(() => dispatch.shell.removeMessage(payload), 3000);
         dispatch.shell.addMessage(payload);
       },
-      async addLayer(layer: string) {
-        if (layer === 'editor') {
-          await import('../components/kmap-module-selector');
-          await import('../components/kmap-editor-add-fabs');
-          await import('../components/kmap-editor-delete-dialog');
-          await import('../components/kmap-editor-edit-dialog');
-          await import('../components/kmap-editor-rename-dialog');
-
-          await import('../components/kmap-set-selector');
-          await import('../components/kmap-test-editor-add-fabs');
-          await import('../components/kmap-test-editor-delete-dialog');
-          await import('../components/kmap-test-editor-edit-dialog');
-        }
-        else if (layer === 'averages') {
-          await import('../components/kmap-course-selector');
-        }
-      },
-
       'routing/change': async function (routing: RoutingState) {
         if (routing.page !== 'browser' && routing.page !== 'test')
           dispatch.shell.updateMeta({});
@@ -94,6 +76,24 @@ export default createModel({
         }
       },
 
+      'app/receivedLogin': async function () {
+        const state = store.getState();
+        if (state.app.roles.includes("teacher") || state.app.roles.includes("admin")) {
+          console.log("loading components")
+          await import('../components/kmap-module-selector');
+          await import('../components/kmap-editor-add-fabs');
+          await import('../components/kmap-editor-delete-dialog');
+          await import('../components/kmap-editor-edit-dialog');
+          await import('../components/kmap-editor-rename-dialog');
+
+          await import('../components/kmap-set-selector');
+          await import('../components/kmap-test-editor-add-fabs');
+          await import('../components/kmap-test-editor-delete-dialog');
+          await import('../components/kmap-test-editor-edit-dialog');
+
+          await import('../components/kmap-course-selector');
+        }
+      },
       'app/receivedLogout': async function () {
         dispatch.shell.removeLayer("averages");
         dispatch.shell.removeLayer("editor");

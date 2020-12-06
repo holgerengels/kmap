@@ -38,7 +38,7 @@ h6 {
   font-size: 0.85rem;
   font-weight: 500;
 }
-p, .font-body, td, dd {
+p, .font-body, td, dd, .secondary {
   font-family: Roboto,sans-serif;
   -webkit-font-smoothing: antialiased;
   font-size: 0.95rem;
@@ -50,7 +50,7 @@ p {
 h1:first-child, h2:first-child, h3:first-child, h4:first-child, h5:first-child, p:first-child {
   margin-top: 0px;
 }
-figcaption, .secondary {
+figcaption {
   font-family: Roboto,sans-serif;
   -webkit-font-smoothing: antialiased;
   font-size: 0.85rem;
@@ -76,7 +76,7 @@ export const colorStyles: CSSResult = css`
 h1, h2, h3, h4, p, th, td, .color-content-text, :host {
   color: var(--color-darkgray);
 }
-.secondary, label {
+span.secondary, label {
   color: var(--color-mediumgray);
 }
 hr {

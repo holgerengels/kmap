@@ -1,11 +1,11 @@
 import {LitElement, html, css, customElement, property, query} from 'lit-element';
 import { connect } from '@captaincodeman/rdx';
 import {State, store} from "../store";
-import {STATE_COLORS} from './state-colors';
 
 import {StyleInfo, styleMap} from 'lit-html/directives/style-map.js';
 import '@material/mwc-icon';
 import './star-rating';
+import './kmap-card'
 import './kmap-knowledge-card-summary';
 import './kmap-knowledge-card-depends';
 import './kmap-knowledge-card-progress';
@@ -48,12 +48,11 @@ export class KMapKnowledgeCard extends connect(store, LitElement) {
   @property()
   private _exercises: Attachment[] = [];
   @property()
-  private _colorStyles: StyleInfo = { "--color-rated":  "--color-darkgray", "--color-unrated": "--color-lightgray" };
+  private _colorStyles: StyleInfo = { backgroundColor: "white" };
   @property()
   private _hasTests: boolean = false;
   @property()
   private _topics: string[] = [];
-
   @property()
   private _rates: object = {};
 
@@ -64,7 +63,7 @@ export class KMapKnowledgeCard extends connect(store, LitElement) {
 
   constructor() {
     super();
-    this._colorize("0");
+    this._colorize(0);
   }
 
   mapState(state: State) {
@@ -88,13 +87,7 @@ export class KMapKnowledgeCard extends connect(store, LitElement) {
   }
 
   _colorize(rate) {
-    let _opaque = STATE_COLORS[rate][0];
-    let _light = STATE_COLORS[rate][1];
-    let _lightest = STATE_COLORS[rate][2];
-    this.style.setProperty('--color-opaque', _opaque);
-    this.style.setProperty('--color-light', _light);
-    this.style.setProperty('--color-lightest', _lightest);
-    this._colorStyles = { "--color-rated":  _opaque, "--color-unrated": _lightest };
+    this._colorStyles = { backgroundColor: rate !== 0 ? "hsl(" + 120 * (rate-1)/4 + ", 100%, 90%)" : "white" };
   }
 
   _rated(e) {
@@ -174,45 +167,29 @@ export class KMapKnowledgeCard extends connect(store, LitElement) {
       fontStyles,
       colorStyles,
       css`
-        :host {
-          display: block;
-          --color-opaque: #f5f5f5;
-          --color-light: #e0e0e0;
-          --color-lightest: #9e9e9e;
-
-          box-sizing: border-box;
-          width: 100%;
-          border-radius: 4px;
-          box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
-          0 1px 5px 0 rgba(0, 0, 0, 0.12),
-          0 3px 1px -2px rgba(0, 0, 0, 0.2);
-          color: var(--color-darkgray);
+        kmap-card {
+          transition: opacity .1s ease-in-out;
+          opacity: 1.0;
         }
-        .card-header, .card-footer {
-          transition: background-color .5s ease-in-out;
-          padding: 4px 8px;
-          display: flex;
-          flex-direction: row;
-          justify-content: space-between;
+        :host([faded]) kmap-card {
+          opacity: 0.0;
         }
-        .card-header {
-          color: black;
-          background-color: var(--color-opaque);
-          border-top-left-radius: 4px;
-          border-top-right-radius: 4px;
-        }
-        .card-footer {
-          color: var(--color-darkgray);
-          background-color: var(--color-light);
-          border-bottom-left-radius: 4px;
-          border-bottom-right-radius: 4px;
+        kmap-card {
+          max-width: 804px;
+          background-color: white;
+          border: 2px solid white;
+          transition: background-color 280ms cubic-bezier(0.4, 0, 0.2, 1), border-color 280ms cubic-bezier(0.4, 0, 0.2, 1), opacity 280ms cubic-bezier(0.4, 0, 0.2, 1);
         }
         h2 {
-          margin: unset; color: unset; font-size: 0.95rem; font-weight: 400;
+          font-size: 1.0rem;
+          line-height: 1.5rem;
+          font-weight: 500;
+          letter-spacing: .0125em;
         }
-        .card-header h2, .card-footer span { align-self: center; }
-        .card-header a, .card-footer a { height: 24px; color: black; display: block }
-        .card-footer a { color: var(--color-darkgray); }
+        .button {
+          text-transform: uppercase;
+          margin-left: 8px;
+        }
         .attachments {
           display: flex;
           flex-direction: row;
@@ -224,15 +201,6 @@ export class KMapKnowledgeCard extends connect(store, LitElement) {
           align-content: start;
           margin: 12px;
         }
-        .button {
-          margin-left: 6px;
-          --mdc-icon-button-size: 22px;
-          --mdc-icon-size: 20px;
-          color: var(--color-darkgray);
-          display: flex;
-          flex-flow: column;
-          justify-content: space-around;
-        }
         [hidden] {
           display: none;
         }
@@ -240,105 +208,121 @@ export class KMapKnowledgeCard extends connect(store, LitElement) {
   }
 
   render() {
-    // language=CSS
     if (this.card === undefined)
       return html`card undefined`;
     else
+      // language=HTML
       return html`
-  <div class="card-header font-body">
-      <h2>${this.card.topic !== "_" ? this.card.topic : this.chapter}</h2>
-      <div style="flex: 1 0 auto"></div>
-      <a href="/app/browser/${encode(this.subject, this.chapter)}" title="Wissenslandkarte ${this.chapter}"><mwc-icon>fullscreen_exit</mwc-icon></a>
-  </div>
-  <kmap-knowledge-card-depends
-      .subject="${this.subject}"
-      .dependencies="${this.card.dependencies}"
-      ?hidden="${!this.card.dependencies || this.card.dependencies.length === 0}">
-  </kmap-knowledge-card-depends>
-    ${this.card.links ? html`
-  <kmap-knowledge-card-progress
-      .progressNum="${this.progressNum}"
-      .progressOf="${this.progressOf}">
-  </kmap-knowledge-card-progress>
-    ` : ''}
-    ${this.card.summary ? html`
-      <kmap-knowledge-card-summary summary="${this.card.summary}"></kmap-knowledge-card-summary>
-    ` : ''}
-  <kmap-knowledge-card-description
-      .instance="${this._instance}"
-      .subject="${this.subject}"
-      .chapter="${this.chapter}"
-      .topic="${this.card.topic}"
-      .description="${this.card.description}"
-      .links="${this.card.links}"
-      .progressNum="${this.progressNum}"
-      .progressOf="${this.progressOf}">
-  </kmap-knowledge-card-description>
+      <kmap-card style=${styleMap(this._colorStyles)}>
+        <kmap-card-text type="header">
+          <h2>${this.card.topic !== "_" ? this.card.topic : this.chapter}</h2>
+        </kmap-card-text>
 
-  <div class="attachments font-body">
-      ${this._explanations && this._explanations.length > 0
-      ? html`<div>
-              <b>Erklärungen</b>
-              ${this._explanations.map((attachment) => html`
-                  <kmap-knowledge-card-attachment .instance="${this._instance}" .attachment="${attachment}"></kmap-knowledge-card-attachment>
-              `)}
-              </div>
-          `
-      : html``
-    }
-      ${this._examples && this._examples.length > 0
-      ? html`<div>
-              <b>Beispiele</b>
-              ${this._examples.map((attachment) => html`
-                  <kmap-knowledge-card-attachment .instance="${this._instance}" .attachment="${attachment}"></kmap-knowledge-card-attachment>
-              `)}
-              </div>
-          `
-      : html``
-    }
-      ${this._ideas && this._ideas.length > 0
-      ? html`<div>
-              <b>Vorstellung</b>
-              ${this._ideas.map((attachment) => html`
-                  <kmap-knowledge-card-attachment .instance="${this._instance}" .attachment="${attachment}"></kmap-knowledge-card-attachment>
-              `)}
-              </div>
-          `
-      : html``
-    }
-      ${this._usages && this._usages.length > 0
-      ? html`<div>
-              <b>Anwendungen</b>
-              ${this._usages.map((attachment) => html`
-                  <kmap-knowledge-card-attachment .instance="${this._instance}" .attachment="${attachment}"></kmap-knowledge-card-attachment>
-              `)}
-              </div>
-          `
-      : html``
-    }
-      ${this._exercises && this._exercises.length > 0
-      ? html`<div>
-              <b>Übungen</b>
-              ${this._exercises.map((attachment) => html`
-                  <kmap-knowledge-card-attachment .instance="${this._instance}" .attachment="${attachment}"></kmap-knowledge-card-attachment>
-              `)}
-              </div>
-          `
-      : html``
-    }
-  </div>
-  <div class="card-footer">
-    ${this.card.links
-      ? html`<a slot="footer" href="/app/browser/${encode(this.subject, this.card.links)}"><mwc-icon>open_in_new</mwc-icon></a>`
-      : html`<star-rating .rate="${this.state}" @clicked="${this._rated}" style=${styleMap(this._colorStyles)}></star-rating>`
-    }
-      <div style="flex: 1 0 auto; height: 24px"></div>
-      <mwc-icon-button class="button" icon="share" title="Teilen..." ?hidden="${typeof navigator['share'] !== 'function'}" @click="${this._share}"></mwc-icon-button>
-      ${this._hasTests ? html`
-        <a class="button" href="/app/test/${encode(this.subject, this.chapter, this.card.topic)}" title="Aufgaben" style="display: flex">${iconTest}</a>
-      ` : ''}
-      <mwc-icon-button class="button" icon="feedback" title="Feedback" @click="${this._feedback}"></mwc-icon-button>
-  </div>
+        ${this.card.dependencies && this.card.dependencies.length !== 0 ? html`
+          <kmap-card-text>
+            <kmap-knowledge-card-depends
+                .subject="${this.subject}"
+                .dependencies="${this.card.dependencies}"
+                ?hidden="${!this.card.dependencies || this.card.dependencies.length === 0}">
+            </kmap-knowledge-card-depends>
+            <kmap-card-spacer></kmap-card-spacer>
+          </kmap-card-text>
+        ` : '' }
+
+        ${this.card.links ? html`
+          <kmap-card-element>
+            <kmap-knowledge-card-progress
+                .progressNum="${this.progressNum}"
+                .progressOf="${this.progressOf}">
+            </kmap-knowledge-card-progress>
+          </kmap-card-element>
+        ` : ''}
+
+        ${this.card.summary ? html`
+          <kmap-card-text>
+            <kmap-knowledge-card-summary summary="${this.card.summary}"></kmap-knowledge-card-summary>
+          </kmap-card-text>
+          <kmap-card-divider></kmap-card-divider>
+        ` : '' }
+        <kmap-card-text>
+          <kmap-knowledge-card-description
+              .instance="${this._instance}"
+              .subject="${this.subject}"
+              .chapter="${this.chapter}"
+              .topic="${this.card.topic}"
+              .description="${this.card.description}"
+              .links="${this.card.links}"
+              .progressNum="${this.progressNum}"
+              .progressOf="${this.progressOf}">
+          </kmap-knowledge-card-description>
+        </kmap-card-text>
+        ${this.card.attachments.length !== 0 ? html`
+        <div class="attachments font-body">
+            ${this._explanations && this._explanations.length > 0
+            ? html`<div>
+                    <b>Erklärungen</b>
+                    ${this._explanations.map((attachment) => html`
+                        <kmap-knowledge-card-attachment .instance="${this._instance}" .attachment="${attachment}"></kmap-knowledge-card-attachment>
+                    `)}
+                    </div>
+                `
+            : html``
+          }
+            ${this._examples && this._examples.length > 0
+            ? html`<div>
+                    <b>Beispiele</b>
+                    ${this._examples.map((attachment) => html`
+                        <kmap-knowledge-card-attachment .instance="${this._instance}" .attachment="${attachment}"></kmap-knowledge-card-attachment>
+                    `)}
+                    </div>
+                `
+            : html``
+          }
+            ${this._ideas && this._ideas.length > 0
+            ? html`<div>
+                    <b>Vorstellung</b>
+                    ${this._ideas.map((attachment) => html`
+                        <kmap-knowledge-card-attachment .instance="${this._instance}" .attachment="${attachment}"></kmap-knowledge-card-attachment>
+                    `)}
+                    </div>
+                `
+            : html``
+          }
+            ${this._usages && this._usages.length > 0
+            ? html`<div>
+                    <b>Anwendungen</b>
+                    ${this._usages.map((attachment) => html`
+                        <kmap-knowledge-card-attachment .instance="${this._instance}" .attachment="${attachment}"></kmap-knowledge-card-attachment>
+                    `)}
+                    </div>
+                `
+            : html``
+          }
+            ${this._exercises && this._exercises.length > 0
+            ? html`<div>
+                    <b>Übungen</b>
+                    ${this._exercises.map((attachment) => html`
+                        <kmap-knowledge-card-attachment .instance="${this._instance}" .attachment="${attachment}"></kmap-knowledge-card-attachment>
+                    `)}
+                    </div>
+                `
+            : html``
+          }
+        </div>
+        ` : '' }
+
+          <a class="button" slot="button" href="/app/browser/${encode(this.subject, this.chapter)}" title="Wissenslandkarte ${this.chapter}">Zurück</a>
+
+          ${!this.card.links && false ? html`
+            <star-rating slot="button" .rate="${this.state}" @clicked="${this._rated}"></star-rating>
+          ` : '' }
+          ${this._hasTests ? html`
+            <a slot="icon" href="${'/app/test/' + encode(this.subject, this.chapter, this.card.topic)}" title="Aufgaben zum Thema ${this.card.topic}" style="display: flex; padding-right: 8px; --foreground: var(--color-darkgray)">${iconTest}</a>
+          ` : '' }
+           <mwc-icon-button slot="icon" icon="share" title="Teilen..." ?hidden="${typeof navigator['share'] !== 'function'}" @click="${this._share}"></mwc-icon-button>
+           <mwc-icon-button slot="icon" icon="feedback" title="Feedback" @click="${this._feedback}"></mwc-icon-button>
+         </kmap-card>
+
   <kmap-feedback id="feedbackDialog" .subject="${this.subject}" .chapter="${this.chapter}" .topic="${this.card.topic}"></kmap-feedback>
     `;
   }

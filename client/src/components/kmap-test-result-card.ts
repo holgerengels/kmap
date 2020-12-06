@@ -4,7 +4,6 @@ import {State, store} from "../store";
 
 
 import {StyleInfo, styleMap} from 'lit-html/directives/style-map.js';
-import { STATE_COLORS } from './state-colors';
 import '@material/mwc-icon';
 import './star-rating';
 import {colorStyles, fontStyles} from "./kmap-styles";
@@ -28,11 +27,11 @@ export class KMapTestResultCard extends connect(store, LitElement) {
   private _rateModified: boolean = false;
 
   @property()
-  private _colorStyles: StyleInfo = { "--color-rated":  "--color-darkgray", "--color-unrated": "--color-lightgray" };
+  private _colorStyles: StyleInfo = { backgroundColor: "white" };
 
   constructor() {
     super();
-    this._colorize("0");
+    this._colorize(0);
   }
 
   mapState(state: State) {
@@ -71,13 +70,9 @@ export class KMapTestResultCard extends connect(store, LitElement) {
   }
 
   _colorize(rate) {
-    let _opaque = STATE_COLORS[rate][0];
-    let _light = STATE_COLORS[rate][1];
-    let _lightest = STATE_COLORS[rate][2];
-    this.style.setProperty('--color-opaque', _opaque);
-    this.style.setProperty('--color-light', _light);
-    this.style.setProperty('--color-lightest', _lightest);
-    this._colorStyles = { "--color-rated":  _opaque, "--color-unrated": _lightest };
+    this._colorStyles = {
+      backgroundColor: rate !== 0 ? "hsl(" + 120 * (rate - 1) / 4 + ", 100%, 90%)" : "white",
+    };
   }
 
   _rated(e) {
@@ -96,50 +91,16 @@ export class KMapTestResultCard extends connect(store, LitElement) {
       fontStyles,
       colorStyles,
       css`
-        :host {
-          --color-opaque: #f5f5f5;
-          --color-light: #e0e0e0;
-          --color-lightest: #9e9e9e;
-
-          display: inline-block;
-          box-sizing: border-box;
+        kmap-card {
           width: 300px;
-          border-radius: 4px;
-          box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
-          0 1px 5px 0 rgba(0, 0, 0, 0.12),
-          0 3px 1px -2px rgba(0, 0, 0, 0.2);
-          color: var(--color-darkgray);
+          background-color: white;
+          transition: background-color 280ms cubic-bezier(0.4, 0, 0.2, 1), opacity 280ms cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .card-header {
-          padding: 8px 12px;
-          color: black;
-          background-color: var(--color-opaque);
-          border-top-left-radius: 4px;
-          border-top-right-radius: 4px;
+        .content {
+          padding: 16px 16px 8px 16px;
         }
-        .card-content {
-          padding: 8px;
-          background-color: var(--color-lightest);
-          transition: background-color .5s ease-in-out;
-        }
-        .card-footer {
-          color: var(--color-darkgray);
-          background-color: var(--color-light);
-          transition: background-color .5s ease-in-out;
-          padding: 4px 8px;
-          font-size: 0px;
-          line-height: 0px;
-          display: flex;
-          flex-direction: row;
-          justify-content: space-between;
-          border-bottom-left-radius: 4px;
-          border-bottom-right-radius: 4px;
-        }
-        .card-footer a {
-          color: var(--color-darkgray);
-        }
-        .card-content mwc-icon {
-          vertical-align: bottom;
+        .content mwc-icon {
+          vertical-align: sub;
           padding-left: 16px;
           padding-right: 16px;
         }
@@ -154,18 +115,16 @@ export class KMapTestResultCard extends connect(store, LitElement) {
 
   render() {
     return this.card !== undefined ? html`
-        <div class="card-header">
-          <span>${this.card.chapter} → ${this.card.topic}</span>
+      <kmap-card header="${this.card.chapter} → ${this.card.topic}"
+            primaryLink="/app/browser/${encode(this.card.subject, this.card.chapter, this.card.topic)}"
+            primaryLinkTitle="${'Wissenskarte ' + this.card.topic}"
+            style=${styleMap(this._colorStyles)}>
+        <div class="content">
+          <mwc-icon class="correct">thumb_up</mwc-icon> ${this.card.correct} richtig<br/><br/>
+          <mwc-icon class="wrong">thumb_down</mwc-icon> ${this.card.wrong} falsch<br/>
         </div>
-        <div class="card-content">
-            <mwc-icon class="correct">thumb_up</mwc-icon> ${this.card.correct} richtig<br/><br/>
-            <mwc-icon class="wrong">thumb_down</mwc-icon> ${this.card.wrong} falsch<br/>
-        </div>
-        <div class="card-footer">
-            <star-rating .rate="${this._state}" @clicked="${this._rated}" style=${styleMap(this._colorStyles)}></star-rating>
-            <div slot="footer" style="flex: 1 0 auto"></div>
-            <a slot="footer" href="/app/browser/${encode(this.card.subject, this.card.chapter, this.card.topic)}"><mwc-icon>open_in_new</mwc-icon></a>
-        </div>
-    ` : html``;
+       <star-rating slot="button" .rate="${this._state}" @clicked="${this._rated}" style="padding-left: 8px"></star-rating>
+      </kmap-card>
+    ` : '';
   }
 }

@@ -1,9 +1,8 @@
-import {LitElement, html, css, customElement, property} from 'lit-element';
+import {LitElement, html, customElement, property} from 'lit-element';
 
-import '@material/mwc-icon';
-import {STATE_COLORS} from './state-colors';
-import {fontStyles, colorStyles} from "./kmap-styles";
 import {Subject} from "../models/subjects";
+import './kmap-card';
+import {StyleInfo, styleMap} from "lit-html/directives/style-map";
 
 @customElement('kmap-subject-card')
 export class KMapSubjectCard extends LitElement {
@@ -25,9 +24,13 @@ export class KMapSubjectCard extends LitElement {
   // @ts-ignore
   private _progressPercent: number = 0;
 
+  @property()
+  // @ts-ignore
+  private _colorStyles: StyleInfo = { backgroundColor: "white" };
+
   constructor() {
     super();
-    this._colorize("0");
+    this._colorize(0);
   }
 
   /*
@@ -39,12 +42,9 @@ export class KMapSubjectCard extends LitElement {
    */
 
   _colorize(rate) {
-    let _opaque = STATE_COLORS[rate][0];
-    let _light = STATE_COLORS[rate][1];
-    let _lightest = STATE_COLORS[rate][2];
-    this.style.setProperty('--color-opaque', _opaque);
-    this.style.setProperty('--color-light', _light);
-    this.style.setProperty('--color-lightest', _lightest);
+    this._colorStyles = {
+      backgroundColor: rate !== 0 ? "hsl(" + 120 * (rate - 1) / 4 + ", 100%, 90%)" : "white",
+    };
   }
 
   updated(changedProperties) {
@@ -73,71 +73,12 @@ export class KMapSubjectCard extends LitElement {
     return value !== undefined ? value : 0;
   }
 
-  static get styles() {
-    // language=CSS
-    return [
-      fontStyles,
-      colorStyles,
-      css`
-        :host {
-          display: block;
-          --color-opaque: #f5f5f5;
-          --color-light: var(--color-mediumgray);
-          --color-lightest: #e0e0e0;
-        }
-        div.card {
-          vertical-align: top;
-          margin: 6px;
-          margin-top: 0px;
-          display: inline-block;
-          box-sizing: border-box;
-          width: 300px;
-          border-radius: 4px;
-          box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
-          0 1px 5px 0 rgba(0, 0, 0, 0.12),
-          0 4px 1px -2px rgba(0, 0, 0, 0.2);
-          color: var(--color-darkgray);
-        }
-        .card-header, .card-footer, .card-content {
-          transition: background-color .5s ease-in-out;
-          padding: 4px 8px;
-          display: flex;
-          flex-direction: row;
-          justify-content: space-between;
-        }
-        .card-header {
-          color: black;
-          background-color: var(--color-opaque);
-          border-top-left-radius: 4px;
-          border-top-right-radius: 4px;
-        }
-        .card-footer {
-          color: var(--color-darkgray);
-          background-color: var(--color-light);
-          border-bottom-left-radius: 4px;
-          border-bottom-right-radius: 4px;
-        }
-        .card-header span, .card-footer span { align-self: center; }
-        .card-header a, .card-footer a { height: 24px; color: black; display: block }
-        .card-footer a { color: var(--color-darkgray); }
-      `];
-  }
-
   render() {
-    return html`
-      ${this.subject ? html`
-<div class="card">
-  <div class="card-header font-body">
-    <span>${this.subject.name}</span>
-    <div style="flex: 1 0 auto"></div>
-    <a href="/app/browser/${this.subject.name}/${this.subject.name}" title="Wissenslandkarte ${this.subject.name}" alt="Wissenslandkarte ${this.subject.name}"><mwc-icon style="--mdc-icon-size: 20px; margin:2px 0px">open_in_new</mwc-icon></a>
-  </div>
-  <div class="card-content font-body">${this.subject.count} Wissenskarten</div>
-  <div class="card-footer font-body">
-      <div style="flex: 1 0 auto; height: 24px"></div>
-  </div>
-  </div>
-  ` : ''}
-    `;
+    return this.subject ? html`
+      <kmap-card header="${this.subject.name}" subheader="${this.subject.count} Wissenskarten"
+          primaryLink="/app/browser/${this.subject.name}/${this.subject.name}" primaryLinkTitle="Wissenslandkarte ${this.subject.name}"
+          style=${styleMap(this._colorStyles)}>
+      </kmap-card>
+    ` : '';
   }
 }
