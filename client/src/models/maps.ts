@@ -288,7 +288,7 @@ export default createModel({
           dispatch.maps.error);
       },
 
-      'routing/change': async function (routing: RoutingState) {
+      'routing/change': async function (routing: RoutingState<string>) {
         switch (routing.page) {
           case 'browser':
             dispatch.maps.load({subject: routing.params["subject"], chapter: routing.params["chapter"]});
@@ -301,7 +301,7 @@ export default createModel({
       },
       'app/chooseInstance': async function () {
         const state = store.getState();
-        const routing: RoutingState = state.routing;
+        const routing: RoutingState<string> = state.routing;
         if (routing.page === 'browser')
           dispatch.maps.load({subject: routing.params["subject"], chapter: routing.params["chapter"]});
         else

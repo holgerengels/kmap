@@ -62,7 +62,7 @@ export default createModel({
         window.setTimeout(() => dispatch.shell.removeMessage(payload), 3000);
         dispatch.shell.addMessage(payload);
       },
-      'routing/change': async function (routing: RoutingState) {
+      'routing/change': async function (routing: RoutingState<string>) {
         if (routing.page !== 'browser' && routing.page !== 'test')
           dispatch.shell.updateMeta({});
 

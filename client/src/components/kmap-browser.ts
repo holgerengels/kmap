@@ -89,7 +89,7 @@ export class KMapBrowser extends connect(store, LitElement) {
   @query('#timeline')
   private _timelineElement: KMapTimelineAside;
 
-  set route(val: RoutingState) {
+  set route(val: RoutingState<string>) {
     if (val.page === "browser") {
       this._topic = val.params.topic ? decodeURIComponent(val.params.topic) : '';
     }

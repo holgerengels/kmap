@@ -91,7 +91,7 @@ export class KmapMain extends connect(store, LitElement) {
   @query('#main')
   private _main: HTMLElement;
 
-  set route(val: RoutingState) {
+  set route(val: RoutingState<string>) {
     if (val.page !== this._page) {
       this._page = val.page
     }

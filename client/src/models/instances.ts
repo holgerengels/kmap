@@ -182,7 +182,7 @@ export default createModel({
           dispatch.instances.error);
       },
 
-      'routing/change': async function (routing: RoutingState) {
+      'routing/change': async function (routing: RoutingState<string>) {
         switch (routing.page) {
           case 'content-manager':
             document.title = "KMap - Content Manager";

@@ -60,7 +60,7 @@ export default createModel({
         }
       },
 
-      'routing/change': async function (routing: RoutingState) {
+      'routing/change': async function (routing: RoutingState<string>) {
         switch (routing.page) {
           case 'home':
             document.title = "KMap - Knowledge Map";

@@ -242,14 +242,14 @@ export default createModel({
           dispatch.contentSets.error);
       },
 
-      'routing/change': async function (routing: RoutingState) {
+      'routing/change': async function (routing: RoutingState<string>) {
         const state = store.getState();
         if (state.app.roles.includes("teacher") && (routing.page === 'content-manager' || routing.page === 'test'))
           dispatch.contentSets.load();
       },
       'app/receivedLogin': async function () {
         const state = store.getState();
-        const routing: RoutingState = state.routing;
+        const routing: RoutingState<string> = state.routing;
         if (state.app.roles.includes("teacher") && (routing.page === 'content-manager' || routing.page === 'test'))
           dispatch.contentSets.load();
       },

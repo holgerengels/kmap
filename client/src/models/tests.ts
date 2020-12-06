@@ -343,7 +343,7 @@ export default createModel({
       'maps/subjectChanged': async function () {
         dispatch.tests.loadTopics();
       },
-      'routing/change': async function (routing: RoutingState) {
+      'routing/change': async function (routing: RoutingState<string>) {
         switch (routing.page) {
           case 'test':
             dispatch.tests.loadTests({
@@ -369,7 +369,7 @@ export default createModel({
       },
       'app/chooseInstance': async function () {
         const state = store.getState();
-        const routing: RoutingState = state.routing;
+        const routing: RoutingState<string> = state.routing;
         if (routing.page === 'test')
           dispatch.tests.loadTests({
             subject: routing.params["subject"],

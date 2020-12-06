@@ -33,7 +33,7 @@ export class KmapTest extends connect(store, LitElement) {
   @property()
   private _results: string[] = [];
 
-  set route(val: RoutingState) {
+  set route(val: RoutingState<string>) {
     if (val.page === "test") {
       if (val.params.results)
         this._noRoute = 'results';

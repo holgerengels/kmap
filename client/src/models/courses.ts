@@ -222,7 +222,7 @@ export default createModel({
           dispatch.courses.error);
       },
 
-      'routing/change': async function (routing: RoutingState) {
+      'routing/change': async function (routing: RoutingState<string>) {
         switch (routing.page) {
           case 'courses':
             document.title = "KMap - Kurse";
