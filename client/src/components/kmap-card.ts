@@ -67,7 +67,6 @@ export class KMapCard extends LitElement {
     const hasPrimary = this._primaryElements.length !== 0 || this.header !== undefined || this.subHeader !== undefined;
     const hasSecondary = this._secondaryElements.length !== 0;
     const hasActions = (this._buttonElements.length + this._iconElements.length) !== 0;
-    console.log(hasPrimary + " " + hasSecondary + " " + hasActions)
     this._primaryStyles = { paddingTop: hasPrimary ? "16px" : "0", paddingBottom: hasPrimary && !hasSecondary && !hasActions ? "16px" : "0" };
     this._secondaryStyles = { paddingTop: !hasPrimary && hasSecondary ? "16px" : "0", paddingBottom: !hasActions && hasSecondary ? "16px" : "0" };
     this._actionStyles = { minHeight: hasActions ? "52px" : "0", padding: hasActions ? "8px" : "0" };
