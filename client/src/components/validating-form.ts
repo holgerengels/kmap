@@ -14,7 +14,7 @@ export class ValidatingForm extends LitElement {
 
   _slotchange() {
     this._validates = this.querySelectorAll('[required],[pattern]');
-    console.log(this._validates)
+    //console.log(this._validates)
   }
 
   reset() {

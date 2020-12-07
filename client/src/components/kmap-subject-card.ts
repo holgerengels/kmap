@@ -1,4 +1,4 @@
-import {LitElement, html, customElement, property} from 'lit-element';
+import {LitElement, html, customElement, property, css} from 'lit-element';
 
 import {Subject} from "../models/subjects";
 import './kmap-card';
@@ -72,6 +72,16 @@ export class KMapSubjectCard extends LitElement {
     let value = this._states[key];
     return value !== undefined ? value : 0;
   }
+
+  static get styles() {
+    // language=CSS
+    return css`
+      kmap-card {
+        width: 300px;
+      }
+    `;
+  }
+
 
   render() {
     return this.subject ? html`

@@ -20,18 +20,6 @@ import './components/kmap-test';
 import './components/kmap-instance-popup';
 import './components/kmap-login-popup';
 import './components/kmap-timeline-selector';
-//import './components/kmap-course-selector';
-//import './components/kmap-courses';
-//import './components/kmap-content-manager';
-//import './components/kmap-module-selector';
-//import './components/kmap-editor-edit-dialog';
-//import './components/kmap-editor-rename-dialog';
-//import './components/kmap-editor-delete-dialog';
-//import './components/kmap-editor-add-fabs';
-//import './components/kmap-set-selector';
-//import './components/kmap-test-editor-add-fabs';
-//import './components/kmap-test-editor-edit-dialog';
-//import './components/kmap-test-editor-delete-dialog';
 import './components/share-facebook';
 
 import {fontStyles, colorStyles} from "./components/kmap-styles";
@@ -116,7 +104,7 @@ export class KmapMain extends connect(store, LitElement) {
   firstUpdated(changedProperties) {
     updateMetadata({ title: "KMap", description: "KMap kartographiert Wissen mit Zusammenhang", image: window.location.origin + "/app/KMap-Logo.png", keywords: undefined });
 
-    this._bar.scrollTarget = this._main;
+      this._bar.scrollTarget = this._main;
 
     store.dispatch.shell.clearMessages();
     if (!window.location.host.includes("localhost")) {
@@ -372,7 +360,7 @@ export class KmapMain extends connect(store, LitElement) {
     ]</span>
     <div class="drawer-content">
       <nav class="drawer-list">
-        <a ?selected="${this._page === 'home'}" href="/app/">Start</a>
+        <a ?selected="${this._page === 'home'}" href="/app/">Startseite</a>
         ${this._roles.includes("teacher") ? html`
           <a ?selected="${this._page === 'test'}" href="/app/test">Test</a>
         ` : ''}
@@ -419,17 +407,15 @@ export class KmapMain extends connect(store, LitElement) {
     </div>
 
     <main id="main" slot="appContent" role="main">
-      ${this._instance ? html`
-        <mwc-top-app-bar id="bar" dense>
-          <mwc-icon-button icon="menu" slot="navigationIcon" @click="${() => this._drawerOpen = !this._drawerOpen}"></mwc-icon-button>
-          <mwc-icon-button icon="arrow_back" slot="navigationIcon" @click="${history.back}" ?hidden="${!_standalone}"></mwc-icon-button>
-          <h1 slot="title">${this._barTitle}</h1>
-          <mwc-icon-button-toggle slot="actionItems" @click="${this._toggleTimeline}" ?hidden="${this._timelines.length !== 1 || this._page !== 'browser'}" title="Wochenplan">${timelineOpen}${timelineClosed}</mwc-icon-button-toggle>
-          <kmap-login-button slot="actionItems" @click="${this._showLogin}" title="Anmeldung"></kmap-login-button>
-        </mwc-top-app-bar>
+      <mwc-top-app-bar id="bar" dense>
+        <mwc-icon-button icon="menu" slot="navigationIcon" @click="${() => this._drawerOpen = !this._drawerOpen}"></mwc-icon-button>
+        <mwc-icon-button icon="arrow_back" slot="navigationIcon" @click="${history.back}" ?hidden="${!_standalone}"></mwc-icon-button>
+        <h1 slot="title">${this._barTitle}</h1>
+        <mwc-icon-button-toggle slot="actionItems" @click="${this._toggleTimeline}" ?hidden="${this._timelines.length !== 1 || this._page !== 'browser'}" title="Wochenplan">${timelineOpen}${timelineClosed}</mwc-icon-button-toggle>
+        <kmap-login-button slot="actionItems" @click="${this._showLogin}" title="Anmeldung"></kmap-login-button>
+      </mwc-top-app-bar>
 
-        ${this._renderPage()}
-      ` : ''}
+      ${this._renderPage()}
     </main>
   </mwc-drawer>
 

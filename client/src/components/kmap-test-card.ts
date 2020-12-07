@@ -164,6 +164,7 @@ export class KMapTestCard extends connect(store, LitElement) {
           display: flex;
         }
         kmap-card {
+          max-width: 800px;
           background-color: white;
         }
         [hidden] {
