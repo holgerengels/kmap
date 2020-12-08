@@ -69,11 +69,10 @@ export class KMapSubjects extends connect(store, LitElement) {
         }
         .cards {
           display: flex;
-          flex-direction: row;
+          flex-flow: row wrap;
         }
         .cards > * {
-          margin-left: 8px;
-          margin-right: 8px;
+          margin: 8px;
         }
       `];
   }

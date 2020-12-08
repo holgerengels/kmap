@@ -237,6 +237,9 @@ export class KmapMain extends connect(store, LitElement) {
   }
 
   _renderPage() {
+    if (!this._instance)
+      return '';
+
     switch (this._page) {
       case 'home':
         return html`<kmap-subjects class="page"></kmap-subjects>`;
