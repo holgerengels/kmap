@@ -371,6 +371,12 @@ export class KMapBrowser extends connect(store, LitElement) {
         svg-connector[faded] {
           opacity: 0;
         }
+        @media print {
+          .print-hide { display: none }
+        }
+        @media not print {
+          .print-show { display: none }
+        }
       `];
   }
 
@@ -404,13 +410,13 @@ export class KMapBrowser extends connect(store, LitElement) {
     return this._chapterCard ? html`
       <kmap-card class="chapter-card">
         ${this._chapterCard.links ? html`
-          <kmap-card-text>
+          <kmap-card-text class="print-hide">
             <b>Zurück zu</b> ${this._chapterCard.links.split("/").map((backlink) => html`
               <a href="/app/browser/${encode(this._subject, backlink)}" title="Wissenslandkarte ${backlink}">${backlink}</a>&nbsp;
             `)}
           </kmap-card-text>
         ` : html`
-          <kmap-card-text>
+          <kmap-card-text class="print-hide">
             <b>Zurück zum </b> <a href="/app/" title="Wissenslandkarte">Start</a>
           </kmap-card-text>
         ` }
@@ -438,7 +444,7 @@ export class KMapBrowser extends connect(store, LitElement) {
           <a class="button" slot="button" href="/app/browser/${encode(this._subject, this._chapter, '_')}" title="Wissenskarte ${this._chapter}">Mehr</a>
         ` : ''}
         ${this._hasTests ? html`
-          <a slot="icon" href="${'/app/test/' + encode(this._subject, this._chapter)}" title="Aufgaben zum Kapitel ${this._chapter}" style="display: flex; padding-right: 8px; --foreground: var(--color-darkgray)">${iconTest}</a>
+          <a slot="icon" href="${'/app/test/' + encode(this._subject, this._chapter)}" title="Aufgaben zum Kapitel ${this._chapter}" style="display: flex; padding-right: 8px; --foreground: var(--color-darkgray)"><span class="print-show">→ Gemischte Aufgaben&nbsp;</span>${iconTest}</a>
         ` : '' }
       </kmap-card>
     ` : '';

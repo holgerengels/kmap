@@ -26,7 +26,7 @@ export default createModel({
     narrow: false,
     drawerOpen: false,
     messages: [],
-    layers: ["summaries"],
+    layers: ["summaries", "ratings"],
   },
   reducers: {
     updateMeta(state, meta: Meta) {

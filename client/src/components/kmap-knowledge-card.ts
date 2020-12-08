@@ -230,12 +230,12 @@ export class KMapKnowledgeCard extends connect(store, LitElement) {
         ` : '' }
 
         ${this.card.links ? html`
-          <kmap-card-element>
+          <kmap-card-text>
             <kmap-knowledge-card-progress
                 .progressNum="${this.progressNum}"
                 .progressOf="${this.progressOf}">
             </kmap-knowledge-card-progress>
-          </kmap-card-element>
+          </kmap-card-text>
         ` : ''}
 
         ${this.card.summary ? html`

@@ -319,7 +319,11 @@ export class KmapMain extends connect(store, LitElement) {
         width: 100%;
         height: 100%;
         overflow: auto;
+        scrollbar-width: thin;
         scroll-snap-type: y mandatory;
+      }
+      main::-webkit-scrollbar {
+        width: 12px;
       }
       [hidden] {
         display: none !important;
@@ -380,6 +384,9 @@ export class KmapMain extends connect(store, LitElement) {
         <label section>Layer ein-/ausblenden</label>
         <mwc-formfield label="Kurztexte">
           <mwc-switch ?checked="${this._layers.includes('summaries')}" @change="${e => this._switchLayer('summaries', e.target.checked)}"></mwc-switch>
+        </mwc-formfield>
+        <mwc-formfield label="Selbsteinschätzungen">
+          <mwc-switch ?checked="${this._layers.includes('ratings')}" @change="${e => this._switchLayer('ratings', e.target.checked)}"></mwc-switch>
         </mwc-formfield>
         <mwc-formfield label="Pfeile">
           <mwc-switch ?checked="${this._layers.includes('dependencies')}" @change="${e => this._switchLayer('dependencies', e.target.checked)}"></mwc-switch>

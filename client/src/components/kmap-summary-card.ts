@@ -153,6 +153,9 @@ export class KMapSummaryCard extends connect(store, LitElement) {
           filter: grayscale(.5);
           opacity: .5;
         }
+        @media not print {
+          .print-show { display: none }
+        }
       `];
   }
 
@@ -181,11 +184,11 @@ export class KMapSummaryCard extends connect(store, LitElement) {
             <kmap-summary-card-ratecolors id="rating" .key="${this._key}" @statecolor="${this._colorizeEvent}"></kmap-summary-card-ratecolors>
           ` : ''}
 
-          ${!this.card.links && !this._layers.includes('averages') ? html`
+          ${this._layers.includes('ratings') && !this.card.links && !this._layers.includes('averages') ? html`
             <kmap-summary-card-rating slot="button" .key="${this._key}" style="padding-left: 8px"></kmap-summary-card-rating>
           ` : '' }
           ${this._hasTests ? html`
-            <a slot="icon" href="${'/app/test/' + encode(this.subject, this.chapter, this.card.topic)}" title="Aufgaben zum Thema ${this.card.topic}" style="display: flex; padding-right: 8px; --foreground: var(--color-darkgray)">${iconTest}</a>
+            <a slot="icon" href="${'/app/test/' + encode(this.subject, this.chapter, this.card.topic)}" title="Aufgaben zum Thema ${this.card.topic}" style="display: flex; padding-right: 8px; --foreground: var(--color-darkgray)"><span class="print-show">→ Aufgaben&nbsp;</span>${iconTest}</a>
           ` : '' }
         </kmap-card>
     `;
