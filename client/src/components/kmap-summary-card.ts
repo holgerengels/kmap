@@ -188,7 +188,7 @@ export class KMapSummaryCard extends connect(store, LitElement) {
             <kmap-summary-card-rating slot="button" .key="${this._key}" style="padding-left: 8px"></kmap-summary-card-rating>
           ` : '' }
           ${this._hasTests ? html`
-            <a slot="icon" href="${'/app/test/' + encode(this.subject, this.chapter, this.card.topic)}" title="Aufgaben zum Thema ${this.card.topic}" style="display: flex; padding-right: 8px; --foreground: var(--color-darkgray)"><span class="print-show">→ Aufgaben&nbsp;</span>${iconTest}</a>
+            <a slot="icon" href="${'/app/test/' + encode(this.subject, this.chapter, this.card.topic)}" title="Aufgaben zum Thema ${this.card.topic}" style="display: flex; padding-right: 8px; --foreground: var(--color-darkgray)"><span class="print-show">Aufgaben →&nbsp;</span>${iconTest}</a>
           ` : '' }
         </kmap-card>
     `;

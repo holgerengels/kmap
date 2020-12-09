@@ -444,7 +444,7 @@ export class KMapBrowser extends connect(store, LitElement) {
           <a class="button" slot="button" href="/app/browser/${encode(this._subject, this._chapter, '_')}" title="Wissenskarte ${this._chapter}">Mehr</a>
         ` : ''}
         ${this._hasTests ? html`
-          <a slot="icon" href="${'/app/test/' + encode(this._subject, this._chapter)}" title="Aufgaben zum Kapitel ${this._chapter}" style="display: flex; padding-right: 8px; --foreground: var(--color-darkgray)"><span class="print-show">→ Gemischte Aufgaben&nbsp;</span>${iconTest}</a>
+          <a slot="icon" href="${'/app/test/' + encode(this._subject, this._chapter)}" title="Aufgaben zum Kapitel ${this._chapter}" style="display: flex; padding-right: 8px; --foreground: var(--color-darkgray)"><span class="print-show">Gemischte Aufgaben →&nbsp;</span>${iconTest}</a>
         ` : '' }
       </kmap-card>
     ` : '';

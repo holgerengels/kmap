@@ -93,7 +93,7 @@ export class KMapSubjects extends connect(store, LitElement) {
         ${this._latestCards && this._latestCards.cards ? html`
           <div class="title">
             <label style="line-height: 200%">Neueste Änderungen</label><br/>
-            <label>.. von Wissenskarten aus allen Bereichen ..</label>
+            <label secondary>.. von Wissenskarten aus allen Bereichen ..</label>
           </div>
           <div class="cards">
             ${this._latestCards.cards.map((card) => html`
