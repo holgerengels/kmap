@@ -29,10 +29,12 @@ public class States {
         CouchDbClient client = getClient();
         try {
             JsonObject states = client.find(JsonObject.class, user + "." + subject);
-            states.entrySet().forEach(entry -> {
+            states.entrySet().stream().filter(entry -> !"_id".equals(entry.getKey()) && !"_rev".equals(entry.getKey())).forEach(entry -> {
                 JsonElement value = entry.getValue();
                 if (value.isJsonPrimitive() && value.getAsJsonPrimitive().isNumber() && value.getAsInt() == 5)
                     entry.setValue(new JsonPrimitive(4));
+                if (value.isJsonPrimitive() && value.getAsJsonPrimitive().isString())
+                    entry.setValue(new JsonPrimitive(value.getAsNumber()));
             });
             return states;
         }
