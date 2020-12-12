@@ -4,9 +4,20 @@ import {fontStyles, colorStyles, elevationStyles} from "./kmap-styles";
 import {unsafeHTML} from "lit-html/directives/unsafe-html";
 import {math} from "../math";
 import {katexStyles} from "../katex-css";
+import {urls} from "../urls";
 
 @customElement('kmap-test-card-hint')
 export class KMapTestCardHint extends LitElement {
+  @property({type: String})
+  private instance: string = '';
+
+  @property({type: String})
+  private subject: string = '';
+  @property({type: String})
+  private set: string = '';
+  @property({type: String})
+  private key: string = '';
+
   @property({type: String})
   private hint: string = '';
   @property()
@@ -19,8 +30,9 @@ export class KMapTestCardHint extends LitElement {
     }
   }
 
-  _math(code, setter) {
+  _math(code: string, setter) {
     if (code) {
+      code = code.replace(/inline:([^"]*)/g, urls.server + "tests/" + this.subject + "/" + this.set + "/" + this.key + "/$1?instance=" + this.instance);
       math(code, setter);
     }
     else

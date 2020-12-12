@@ -199,10 +199,24 @@ export class KMapTestCard extends connect(store, LitElement) {
         </kmap-test-card-content>
 
         <kmap-card-divider ?hidden="${!this.hintVisible}"></kmap-card-divider>
-        <kmap-test-card-hint .hint="${this.hint}" ?hidden="${!this.hintVisible}"></kmap-test-card-hint>
+        <kmap-test-card-hint
+          .instance="${this._instance}"
+          .subject="${this.subject}"
+          .set="${this.set}"
+          .key="${this.key}"
+          .hint="${this.hint}"
+           ?hidden="${!this.hintVisible}">
+        </kmap-test-card-hint>
 
         <kmap-card-divider ?hidden="${!this.solutionVisible}"></kmap-card-divider>
-        <kmap-test-card-solution .solution="${this.solution}" ?hidden="${!this.solutionVisible}"></kmap-test-card-solution>
+        <kmap-test-card-solution
+          .instance="${this._instance}"
+          .subject="${this.subject}"
+          .set="${this.set}"
+          .key="${this.key}"
+          .solution="${this.solution}"
+           ?hidden="${!this.solutionVisible}">
+        </kmap-test-card-solution>
 
         <mwc-button slot="button" @click="${this._showAnswer}">Antwort zeigen</mwc-button>
         <mwc-button slot="button" @click="${this._showHint}" ?hidden="${!this.hint}">Tipp</mwc-button>
