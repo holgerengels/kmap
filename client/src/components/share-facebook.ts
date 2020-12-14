@@ -1,11 +1,9 @@
-import {LitElement, html, css, customElement, query} from 'lit-element';
+import {LitElement, html, css, customElement} from 'lit-element';
 import '@material/mwc-icon';
 import {fontStyles} from "./kmap-styles";
 
 @customElement('share-facebook')
 export class ShareFacebook extends LitElement {
-  @query('a')
-  private _a: HTMLAnchorElement;
 
   static get styles() {
     // language=CSS
@@ -41,16 +39,14 @@ export class ShareFacebook extends LitElement {
       `];
   }
 
-  _share() {
-    this._a.href = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(document.location.href);
-    this._a.click();
+  _href() {
+    return 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(document.location.href);
   }
 
   render() {
     //language=HTML
     return html`
-      <a @click="${this._share}" title="Auf Facebook teilen"><img src="/facebook.svg" width="16" height="16" alt="f"/><h6>teilen</h6></a>
-      <a style="display:none"/>
+      <a href="${this._href()}" title="Auf Facebook teilen"><img src="/facebook.svg" width="16" height="16" alt="f"/><h6>teilen</h6></a>
     `;
   }
 }

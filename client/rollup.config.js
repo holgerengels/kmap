@@ -54,6 +54,7 @@ export default merge(baseConfig, {
     copy({
       targets: [
         {src: 'favicon.ico', dest: 'dist'},
+        {src: 'robots.txt', dest: 'dist'},
         {src: '*.png', dest: 'dist'},
         {src: '*.svg', dest: 'dist'},
         {src: '*.css', dest: 'dist'},
