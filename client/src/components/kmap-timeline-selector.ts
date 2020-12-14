@@ -1,4 +1,4 @@
-import {LitElement, html, customElement, property} from 'lit-element';
+import {LitElement, html, customElement, property, css} from 'lit-element';
 import { connect } from '@captaincodeman/rdx';
 import {State, store} from "../store";
 
@@ -39,6 +39,9 @@ export class KMapTimelineSelector extends connect(store, LitElement) {
     return [
       fontStyles,
       colorStyles,
+      css`
+        mwc-list { --mdc-list-vertical-padding: 0px; }
+      `
     ];
   }
 

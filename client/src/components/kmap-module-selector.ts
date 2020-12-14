@@ -1,4 +1,4 @@
-import {LitElement, html, customElement, property} from 'lit-element';
+import {LitElement, html, customElement, property, css} from 'lit-element';
 import {connect} from '@captaincodeman/rdx';
 import {State, store} from "../store";
 
@@ -36,7 +36,10 @@ export class KMapModuleSelector extends connect(store, LitElement) {
     // language=CSS
     return [
       fontStyles,
-      colorStyles
+      colorStyles,
+      css`
+        mwc-list { --mdc-list-vertical-padding: 0px; }
+      `
     ];
   }
 

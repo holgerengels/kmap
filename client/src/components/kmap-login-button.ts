@@ -32,10 +32,6 @@ export class KMapLoginButton extends connect(store, LitElement) {
     return pos !== -1 ? userid[pos+1].toUpperCase() + userid[0].toUpperCase() : userid[0].toUpperCase();
   }
 
-  _click() {
-    this.dispatchEvent(new CustomEvent('lclick', {bubbles: true, composed: true}));
-  }
-
   static get styles() {
     // language=CSS
     return [
@@ -73,8 +69,8 @@ export class KMapLoginButton extends connect(store, LitElement) {
   render() {
     // language=HTML
     return html`
-<div class="fab font-body" @click="${this._click}" ?hidden="${!this._userid}"><span>${this._initials}</span></div>
-<div class="fab" @click="${this._click}" ?hidden="${this._userid}"><mwc-icon>person_outline</mwc-icon></div>
+<div class="fab font-body" ?hidden="${!this._userid}"><span>${this._initials}</span></div>
+<div class="fab" ?hidden="${this._userid}"><mwc-icon>person_outline</mwc-icon></div>
     `;
   }
 }

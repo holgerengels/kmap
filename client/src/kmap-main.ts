@@ -17,15 +17,15 @@ import 'pwa-helper-components/pwa-update-available';
 import './components/kmap-subjects';
 import './components/kmap-browser';
 import './components/kmap-test';
-import './components/kmap-instance-popup';
-import './components/kmap-login-popup';
+//import './components/kmap-instance-popup';
+//import './components/kmap-login-popup';
 import './components/kmap-timeline-selector';
 import './components/share-facebook';
 
 import {fontStyles, colorStyles} from "./components/kmap-styles";
 import {Snackbar} from "@material/mwc-snackbar/mwc-snackbar";
-import {KMapLoginPopup} from "./components/kmap-login-popup";
-import {KMapInstancePopup} from "./components/kmap-instance-popup";
+//import {KMapLoginPopup} from "./components/kmap-login-popup";
+//import {KMapInstancePopup} from "./components/kmap-instance-popup";
 import {TopAppBar} from "@material/mwc-top-app-bar/mwc-top-app-bar";
 import {Meta} from "./models/shell";
 import {Timeline} from "./models/courses";
@@ -273,11 +273,17 @@ export class KmapMain extends connect(store, LitElement) {
       store.dispatch.courses.selectTimeline(this._timelines[0]);
   }
 
-  _showLogin() {
+  async _showLogin() {
+    if (customElements.get('kmap-login-popup') === undefined) {
+      await import('./components/kmap-login-popup');
+    }
     this._loginPopup.show();
   }
 
-  _showChooseInstance() {
+  async _showChooseInstance() {
+    if (customElements.get('kmap-instance-popup') === undefined) {
+      await import('./components/kmap-instance-popup');
+    }
     this._instancePopup.show();
   }
 
@@ -298,16 +304,21 @@ export class KmapMain extends connect(store, LitElement) {
         --app-drawer-text-color: var(--app-light-text-color);
         --app-drawer-selected-color: #c67100;
       }
-      .drawer-content {
-        padding: 4px 16px;
+      mwc-drawer {
+        --mdc-theme-surface: white;
       }
       .drawer-list {
         display: flex;
         flex-direction: column;
-        padding: 0px 8px;
       }
-      .drawer-list > a, .drawer-list > mwc-formfield, label {
+      .drawer-list > * {
+        margin: 8px 16px;
+      }
+      .drawer-list > .nomargin {
         margin: 8px 0px;
+      }
+      .drawer-lists > :first-child {
+        margin-top: 0;
       }
       .drawer-list > a {
         color: var(--app-drawer-text-color);
@@ -315,6 +326,37 @@ export class KmapMain extends connect(store, LitElement) {
       .drawer-list > a[selected] {
         color: var(--app-drawer-selected-color);
       }
+      .cc-fb {
+        margin: 16px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-evenly;
+      }
+      span[slot=subtitle] {
+        display: flex;
+        align-content: center;
+      }
+      span[slot=subtitle] > * {
+        margin-right: 8px;
+      }
+      hr {
+        height: 0;
+        margin: 8px 0px;
+        border-top: none;
+        border-right: none;
+        border-left: none;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+      }
+      mwc-icon-button[icon="polymer"] {
+        --mdc-icon-size: 18px;
+        --mdc-icon-button-size: 18px;
+        transition: color ease-in-out .3s;
+      }
+      span:hover mwc-icon-button[icon="polymer"] {
+        color: var(--color-primary-dark);
+      }
+
       main {
         width: 100%;
         height: 100%;
@@ -328,30 +370,8 @@ export class KmapMain extends connect(store, LitElement) {
       [hidden] {
         display: none !important;
       }
-        span[slot=subtitle] {
-          display: flex;
-          align-content: center;
-        }
-        span[slot=subtitle] > * {
-          margin-right: 8px;
-        }
         h1 {
           margin: unset; color: unset;
-        }
-      mwc-icon-button[icon="polymer"] {
-        --mdc-icon-size: 18px;
-        --mdc-icon-button-size: 18px;
-        transition: color ease-in-out .3s;
-      }
-      span:hover mwc-icon-button[icon="polymer"] {
-        color: var(--color-primary-dark);
-      }
-        share-facebook, a[rel=license] {
-          display: inline-flex;
-          padding: 16px;
-        }
-        pwa-install-button, pwa-install-button {
-          margin: 8px 0px;
         }
       `,
     ];
@@ -362,59 +382,8 @@ export class KmapMain extends connect(store, LitElement) {
     return html`
   <mwc-drawer id="drawer" hasheader type="${this._narrow ? 'modal' : 'dismissible'}" ?open="${this._drawerOpen}" @MDCDrawer:closed="${() => this._drawerOpen = false}">
     <span slot="title">Knowledge Map</span>
-    <span slot="subtitle">[<span>&nbsp;<b>Instanz:</b> ${this._instance}</span>
-        <mwc-icon-button icon="polymer" class="secondary" @click="${this._showChooseInstance}" title="Instanz wechseln"></mwc-icon-button>
-    ]</span>
-    <div class="drawer-content">
-      <nav class="drawer-list">
-        <a ?selected="${this._page === 'home'}" href="/app/">Startseite</a>
-        ${this._roles.includes("teacher") ? html`
-          <a ?selected="${this._page === 'test'}" href="/app/test">Test</a>
-        ` : ''}
-        <a ?selected="${this._page === 'courses'}" ?disabled="${!this._roles.includes("teacher")}" href="/app/courses">Kurse</a>
-        <a ?selected="${this._page === 'content-manager'}" ?disabled="${!this._roles.includes("teacher")}" href="/app/content-manager">Content Manager</a>
-        <a href="/app/browser/Hilfe/Hilfe">Hilfe</a>
-        <a href="/app/browser/Hilfe/Hilfe/Impressum">Impressum</a>
-        <pwa-install-button><mwc-button outlined style="--mdc-theme-primary: var(--color-secondary-dark);">App installieren</mwc-button></pwa-install-button>
-        <pwa-update-available><mwc-button outlined style="--mdc-theme-primary: var(--color-secondary-dark);">App aktualisieren</mwc-button></pwa-update-available>
-      </nav>
-      <!--googleoff: all-->
-      <hr/>
-      <nav class="drawer-list">
-        <label section>Layer ein-/ausblenden</label>
-        <mwc-formfield label="Kurztexte">
-          <mwc-switch ?checked="${this._layers.includes('summaries')}" @change="${e => this._switchLayer('summaries', e.target.checked)}"></mwc-switch>
-        </mwc-formfield>
-        <mwc-formfield label="Selbsteinschätzungen">
-          <mwc-switch ?checked="${this._layers.includes('ratings')}" @change="${e => this._switchLayer('ratings', e.target.checked)}"></mwc-switch>
-        </mwc-formfield>
-        <mwc-formfield label="Pfeile">
-          <mwc-switch ?checked="${this._layers.includes('dependencies')}" @change="${e => this._switchLayer('dependencies', e.target.checked)}"></mwc-switch>
-        </mwc-formfield>
-        ${this._roles.includes("teacher") ? html`
-          <mwc-formfield label="Wochenplan">
-            <mwc-switch ?checked="${this._layers.includes('timeline')}" @change="${e => this._switchLayer('timeline', e.target.checked)}"></mwc-switch>
-          </mwc-formfield>
-          ${this._layers.includes('timeline') ? html`<kmap-timeline-selector></kmap-timeline-selector>` : ''}
-          <mwc-formfield label="Mittelwerte">
-            <mwc-switch ?checked="${this._layers.includes('averages')}" @change="${e => this._switchLayer('averages', e.target.checked)}"></mwc-switch>
-          </mwc-formfield>
-          ${this._layers.includes('averages') ? html`<kmap-course-selector></kmap-course-selector>` : ''}
-          <mwc-formfield label="Editor">
-            <mwc-switch ?checked="${this._layers.includes('editor')}" @change="${e => this._switchLayer('editor', e.target.checked)}"></mwc-switch>
-          </mwc-formfield>
-          ${this._layers.includes('editor') ? html`
-            ${this._page === 'home' || this._page === 'browser' ? html`<kmap-module-selector></kmap-module-selector>` : ''}
-            ${this._page === 'test' ? html`<kmap-set-selector></kmap-set-selector>` : ''}
-          ` : ''}
-        ` : ''}
-      </nav>
-      <!--googleon: all-->
-      <div style="display: flex; align-items: center">
-        <a class="license" rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/deed.de"><img src="//i.creativecommons.org/l/by-sa/4.0/88x31.png" alt="CC BY-SA 4.0"></a>
-        <share-facebook></share-facebook>
-      </div>
-    </div>
+    <span slot="subtitle">[<span>&nbsp;<b>Instanz:</b> ${this._instance}</span><mwc-icon-button icon="polymer" @click="${this._showChooseInstance}" title="Instanz wechseln"></mwc-icon-button>]</span>
+    ${this._renderDrawer()}
 
     <main id="main" slot="appContent" role="main">
       <mwc-top-app-bar id="bar" dense>
@@ -448,6 +417,60 @@ export class KmapMain extends connect(store, LitElement) {
       <mwc-snackbar id="snackbar" labeltext="${message}" ?open="${i === 0}" style="bottom: 100px"></mwc-snackbar>
   `)}
 `;
+  }
+
+  _renderDrawer() {
+    return html`
+      <nav class="drawer-list">
+        <a ?selected="${this._page === 'home'}" href="/app/">Startseite</a>
+        ${this._roles.includes("teacher") ? html`
+          <a ?selected="${this._page === 'test'}" href="/app/test">Test</a>
+        ` : ''}
+        <a ?selected="${this._page === 'courses'}" ?disabled="${!this._roles.includes("teacher")}" href="/app/courses">Kurse</a>
+        <a ?selected="${this._page === 'content-manager'}" ?disabled="${!this._roles.includes("teacher")}" href="/app/content-manager">Content Manager</a>
+        <a href="/app/browser/Hilfe/Hilfe">Hilfe</a>
+        <a href="/app/browser/Hilfe/Hilfe/Impressum">Impressum</a>
+        <pwa-install-button><mwc-button outlined style="--mdc-theme-primary: var(--color-secondary-dark);">App installieren</mwc-button></pwa-install-button>
+        <pwa-update-available><mwc-button outlined style="--mdc-theme-primary: var(--color-secondary-dark);">App aktualisieren</mwc-button></pwa-update-available>
+      </nav>
+      <!--googleoff: all-->
+      <hr/>
+      <nav class="drawer-list">
+        <label section>Layer ein-/ausblenden</label>
+        <mwc-formfield label="Kurztexte">
+          <mwc-switch ?checked="${this._layers.includes('summaries')}" @change="${e => this._switchLayer('summaries', e.target.checked)}"></mwc-switch>
+        </mwc-formfield>
+        <mwc-formfield label="Selbsteinschätzungen">
+          <mwc-switch ?checked="${this._layers.includes('ratings')}" @change="${e => this._switchLayer('ratings', e.target.checked)}"></mwc-switch>
+        </mwc-formfield>
+        <mwc-formfield label="Pfeile">
+          <mwc-switch ?checked="${this._layers.includes('dependencies')}" @change="${e => this._switchLayer('dependencies', e.target.checked)}"></mwc-switch>
+        </mwc-formfield>
+        ${this._roles.includes("teacher") ? html`
+          <mwc-formfield label="Wochenplan">
+            <mwc-switch ?checked="${this._layers.includes('timeline')}" @change="${e => this._switchLayer('timeline', e.target.checked)}"></mwc-switch>
+          </mwc-formfield>
+          ${this._layers.includes('timeline') ? html`<kmap-timeline-selector class="nomargin"></kmap-timeline-selector>` : ''}
+          <mwc-formfield label="Mittelwerte">
+            <mwc-switch ?checked="${this._layers.includes('averages')}" @change="${e => this._switchLayer('averages', e.target.checked)}"></mwc-switch>
+          </mwc-formfield>
+          ${this._layers.includes('averages') ? html`<kmap-course-selector class="nomargin"></kmap-course-selector>` : ''}
+          <mwc-formfield label="Editor">
+            <mwc-switch ?checked="${this._layers.includes('editor')}" @change="${e => this._switchLayer('editor', e.target.checked)}"></mwc-switch>
+          </mwc-formfield>
+          ${this._layers.includes('editor') ? html`
+            ${this._page === 'home' || this._page === 'browser' ? html`<kmap-module-selector class="nomargin"></kmap-module-selector>` : ''}
+            ${this._page === 'test' ? html`<kmap-set-selector class="nomargin"></kmap-set-selector>` : ''}
+          ` : ''}
+        ` : ''}
+      </nav>
+      <hr/>
+      <!--googleon: all-->
+      <div class="cc-fb">
+        <a class="license" rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/deed.de"><img src="//i.creativecommons.org/l/by-sa/4.0/88x31.png" alt="CC BY-SA 4.0"></a>
+        <share-facebook></share-facebook>
+      </div>
+    `;
   }
 }
 

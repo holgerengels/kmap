@@ -1,4 +1,4 @@
-import {LitElement, html, customElement, property} from 'lit-element';
+import {LitElement, html, customElement, property, css} from 'lit-element';
 import {connect} from '@captaincodeman/rdx';
 import {State, store} from "../store";
 
@@ -46,7 +46,10 @@ export class KMapSetSelector extends connect(store, LitElement) {
     // language=CSS
     return [
       fontStyles,
-      colorStyles
+      colorStyles,
+      css`
+        mwc-list { --mdc-list-vertical-padding: 0px; }
+      `
     ];
   }
 
@@ -55,7 +58,7 @@ export class KMapSetSelector extends connect(store, LitElement) {
     return html`
         <mwc-list>
           ${this._sets.map((set, i) => html`
-            <mwc-list-item ?activated="${this._selectedIndex === i}" @click="${() => this._select(i)}">
+            <mwc-list-item ?activated="${this._selectedIndex === i}" @click="${() => this._select(i)}" title="${set.subject} - ${set.set}">
               <span>${set.subject} - ${set.set}</span>
             </mwc-list-item>
           `)}
