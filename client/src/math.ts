@@ -13,14 +13,14 @@ export function math(code: string, setter: (string) => void) {
   for (let i=0; i < segments.length; i+=2) {
     const text = segments[i];
     var ascii = segments[i+1];
-    var inline = false
-    if (ascii.startsWith("\\inline\\")) {
-      ascii = ascii.substr("\\inline\\".length)
-      inline = true;
+    var display = false
+    if (ascii.startsWith("\\display\\")) {
+      ascii = ascii.substr("\\display\\".length)
+      display = true;
     }
     let tex = parser.parse(ascii);
     tex = tex.replace(/\\color/g, "\\textcolor");
-    if (!inline)
+    if (display)
       tex = "\\displaystyle " + tex;
     const math = katex.renderToString(tex, { output: "html", throwOnError: false, trust: true, displayMode: false });
     buffer += text;
