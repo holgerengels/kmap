@@ -33,7 +33,7 @@ import {timelineClosed, timelineOpen} from "./components/icons";
 import {urls} from "./urls";
 
 // @ts-ignore
-const _standalone = (window.matchMedia('(display-mode: standalone)').matches) || (window.navigator.standalone) || document.referrer.includes('android-app://');
+//const _standalone = (window.matchMedia('(display-mode: standalone)').matches) || (window.navigator.standalone) || document.referrer.includes('android-app://');
 
 @customElement('kmap-main')
 export class KmapMain extends connect(store, LitElement) {
@@ -388,7 +388,6 @@ export class KmapMain extends connect(store, LitElement) {
     <main id="main" slot="appContent" role="main">
       <mwc-top-app-bar id="bar" dense>
         <mwc-icon-button icon="menu" slot="navigationIcon" @click="${() => this._drawerOpen = !this._drawerOpen}"></mwc-icon-button>
-        <mwc-icon-button icon="arrow_back" slot="navigationIcon" @click="${history.back}" ?hidden="${!_standalone}"></mwc-icon-button>
         <h1 slot="title">${this._barTitle}</h1>
         <mwc-icon-button-toggle slot="actionItems" @click="${this._toggleTimeline}" ?hidden="${this._timelines.length !== 1 || this._page !== 'browser'}" title="Wochenplan">${timelineOpen}${timelineClosed}</mwc-icon-button-toggle>
         <kmap-login-button slot="actionItems" @click="${this._showLogin}" title="Anmeldung"></kmap-login-button>
