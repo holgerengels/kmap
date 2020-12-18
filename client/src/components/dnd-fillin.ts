@@ -143,7 +143,7 @@ export class DndFillin extends LitElement {
 
   _start(event) {
     let moveEvent, upEvent, getPageX, getPageY
-    if (event instanceof TouchEvent) {
+    if (window.TouchEvent && event instanceof TouchEvent) {
       moveEvent = "touchmove"
       upEvent = "touchend"
       getPageX = (e) => e.touches[0].pageX
