@@ -177,7 +177,6 @@ export class KMapKnowledgeCard extends connect(store, LitElement) {
         kmap-card {
           max-width: 800px;
           background-color: white;
-          border: 2px solid white;
           transition: background-color 280ms cubic-bezier(0.4, 0, 0.2, 1), border-color 280ms cubic-bezier(0.4, 0, 0.2, 1), opacity 280ms cubic-bezier(0.4, 0, 0.2, 1);
         }
         h2 {

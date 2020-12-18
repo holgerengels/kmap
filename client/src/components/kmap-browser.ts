@@ -321,6 +321,11 @@ export class KMapBrowser extends connect(store, LitElement) {
           display: grid;
           grid-template-columns: 1fr;
           padding: 16px;
+          --content-width: 100vw;
+        }
+        :host([draweropen]) {
+          min-width: 300px;
+          --content-width: calc(100vw - var(--mdc-drawer-width, 256px));
         }
         :host([timeline-state=open]):host([wide]) {
           grid-template-columns: 1fr 330px;

@@ -361,11 +361,10 @@ export class KmapMain extends connect(store, LitElement) {
         width: 100%;
         height: 100%;
         overflow: auto;
+        scrollbar-color: var(--color-mediumgray);
         scrollbar-width: thin;
+        scroll-behavior: smooth;
         scroll-snap-type: y mandatory;
-      }
-      main::-webkit-scrollbar {
-        width: 12px;
       }
       [hidden] {
         display: none !important;

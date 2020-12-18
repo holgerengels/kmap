@@ -73,9 +73,6 @@ export class KMapKnowledgeCardDescription extends LitElement {
           font-size: 0.95rem;
           font-weight: 400;
         }
-        img {
-          max-width: calc(100vw - 44px);
-        }
         a {
           color: var(--color-opaque);
           text-decoration: none;
@@ -90,16 +87,16 @@ export class KMapKnowledgeCardDescription extends LitElement {
           flex-wrap: wrap;
           margin: -8px;
         }
+        img {
+          max-width: calc(var(--content-width, 100vw) - 64px);
+        }
         box {
-          flex: 0 1 auto;
+          flex: 0 1 0px;
           margin: 8px;
         }
         growbox {
-          flex: 1 1 400px;
+          flex: 1 1 300px;
           margin: 8px;
-        }
-        box img {
-          max-width: calc(100vw - 44px);
         }
         calculation {
           display: grid;
