@@ -193,12 +193,10 @@ export class KMapKnowledgeCard extends connect(store, LitElement) {
           display: flex;
           flex-direction: row;
           flex-wrap: wrap;
-          margin-top: 12px;
-          margin-bottom: 12px;
         }
         .attachments > div {
           align-content: start;
-          margin: 12px;
+          margin: 16px;
         }
         [hidden] {
           display: none;

@@ -17,14 +17,6 @@ export class KMapKnowledgeCardProgress extends LitElement {
         :host {
           display: block;
         }
-        a {
-          color: var(--color-opaque);
-          text-decoration: none;
-          font-weight: bold;
-        }
-        a:hover {
-          text-decoration: underline;
-        }
       `
     ];
   }

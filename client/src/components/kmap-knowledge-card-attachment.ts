@@ -3,6 +3,7 @@ import {urls} from '../urls';
 
 import '@material/mwc-icon';
 import {Attachment} from "../models/types";
+import {fontStyles} from "./kmap-styles";
 
 @customElement('kmap-knowledge-card-attachment')
 export class KMapKnowledgeCardAttachment extends LitElement {
@@ -69,16 +70,10 @@ export class KMapKnowledgeCardAttachment extends LitElement {
   static get styles() {
     // language=CSS
     return [
+      fontStyles,
       css`
-            a {
-                text-decoration: none;
-                color: inherit
-            }
-            a:hover {
-                text-decoration: underline;
-            }
             p {
-                margin-top: 16px;
+                margin-top: 16px !important;
                 margin-bottom: 0px;
             }
             mwc-icon {
@@ -105,7 +100,7 @@ export class KMapKnowledgeCardAttachment extends LitElement {
     }
     else if (this.attachment.type === "link")
       return html `
-            <a href="${this.attachment.href}" target="_blank" rel="external noopener">${this.attachment.name}</a>
+            <a href="${this.attachment.href}" target="_blank" rel="external noopener">${this.attachment.name} <mwc-icon>open_in_new</mwc-icon></a>
         `;
     else if (this._handler && this._isTarget)
       return html `

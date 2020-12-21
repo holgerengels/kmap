@@ -73,14 +73,6 @@ export class KMapKnowledgeCardDescription extends LitElement {
           font-size: 0.95rem;
           font-weight: 400;
         }
-        a {
-          color: var(--color-opaque);
-          text-decoration: none;
-          font-weight: bold;
-        }
-        a:hover {
-          text-decoration: underline;
-        }
         container {
           display: flex;
           flex-direction: row;

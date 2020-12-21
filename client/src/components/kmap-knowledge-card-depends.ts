@@ -17,14 +17,6 @@ export class KMapKnowledgeCardDepends extends LitElement {
         :host {
           display: block;
         }
-        a {
-          color: var(--color-opaque);
-          text-decoration: none;
-          font-weight: bold;
-        }
-        a:hover {
-          text-decoration: underline;
-        }
         a:not(:last-child):after {
             content: ", ";
         }
@@ -37,7 +29,7 @@ export class KMapKnowledgeCardDepends extends LitElement {
     ${this.dependencies && this.dependencies.length > 0
       ? html`
           <b>Voraussetzungen:</b> ${this.dependencies.map((depend) => html`
-              &nbsp;<a href="/app/browser/${this.subject}/${depend}"
+              <a href="/app/browser/${this.subject}/${depend}"
               title="${(depend.includes('/') ? 'Wissenskarte ': 'Wissenslandkarte ') + depend}">${depend.replace(/\//, " → ")}</a>
           `)}
         `
