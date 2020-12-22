@@ -1,7 +1,7 @@
 import {createModel, RoutingState} from '@captaincodeman/rdx';
 import {Store} from '../store';
 import {endpoint, fetchjson} from "../endpoint";
-import {urls} from "../urls";
+import {encode, urls} from "../urls";
 import {Card, Path} from "./types";
 
 const defaults: object = {
@@ -26,10 +26,12 @@ export interface Latest {
 }
 
 export interface MapState {
-  subject: string,
-  chapter: string,
+  subject?: string,
+  chapter?: string,
+  topic?: string,
   lines: Line[],
   chapterCard?: Card,
+  topicCard?: Card,
   timestamp: number,
   loading: boolean,
   error: string,
@@ -50,10 +52,9 @@ export interface MapState {
 
 export default createModel({
   state: <MapState>{
-    subject: "",
-    chapter: "",
     lines: [],
     chapterCard: undefined,
+    topicCard: undefined,
     timestamp: -1,
     loading: false,
     error: "",
@@ -94,6 +95,18 @@ export default createModel({
         lines: payload.lines,
         chapterCard: payload.chapterCard,
         loading: false,
+      };
+    },
+    setTopic(state, topic: string | undefined) {
+      return {
+        ...state,
+        topic: topic
+      };
+    },
+    setTopicCard(state, topicCard: Card | undefined) {
+      return {
+        ...state,
+        topicCard: topicCard
       };
     },
     subjectChanged(state) {
@@ -159,8 +172,8 @@ export default createModel({
         ...state, cardForEdit: {
           ...defaults,
           ...cardForEdit,
-          subject: state.subject,
-          chapter: state.chapter,
+          subject: state.subject || '',
+          chapter: state.chapter || '',
         }
       }
     },
@@ -193,7 +206,7 @@ export default createModel({
     return {
       async load(path: Path) {
         const state = store.getState();
-        const oldSubject: string = state.maps.subject;
+        const oldSubject: string | undefined = state.maps.subject;
 
         if (state.maps.subject === path.subject && state.maps.chapter === path.chapter) {
           console.warn("reloading map " + path.subject + " " + path.chapter);
@@ -291,13 +304,65 @@ export default createModel({
       'routing/change': async function (routing: RoutingState<string>) {
         switch (routing.page) {
           case 'browser':
-            dispatch.maps.load({subject: routing.params["subject"], chapter: routing.params["chapter"]});
+            await dispatch.maps.load({subject: routing.params["subject"], chapter: routing.params["chapter"]});
             document.title = "KMap - " + (routing.params["topic"] ? decodeURIComponent(routing.params["topic"]) : decodeURIComponent(routing.params["chapter"]));
+            let topic = routing.params["topic"];
+            topic = topic ? decodeURIComponent(topic) : undefined;
+            dispatch.maps.setTopic(topic);
             break;
           case 'home':
             dispatch.maps.loadLatest("Mathematik");
             break;
         }
+      },
+      'maps/received': async function () {
+        const state = store.getState();
+
+        var topics: string[] = [];
+        if (!state.maps.topic) {
+          dispatch.maps.setTopicCard(undefined);
+        }
+        else if (state.maps.topic === "_") {
+          dispatch.maps.setTopicCard(state.maps.chapterCard);
+        }
+        else {
+          let lala: Card | undefined = undefined;
+          for (let line of state.maps.lines) {
+            for (let card of line.cards) {
+              topics.push(card.topic);
+              if (card.topic === state.maps.topic)
+                lala = card;
+            }
+          }
+          dispatch.maps.setTopicCard(lala);
+        }
+        if (state.maps.topicCard) {
+          const subject = state.maps.subject || '';
+          const chapter = state.maps.chapter || '';
+          const topic = state.maps.topic || '';
+          dispatch.shell.updateMeta({
+            title: chapter, detail: state.maps.topicCard.topic, description: state.maps.topicCard.summary,
+            image: state.maps.topicCard.thumb ?
+              `${urls.server}${encode("data", subject, chapter, topic, state.maps.topicCard.thumb)}?instance=${state.app.instance}`
+              : undefined,
+            created: state.maps.topicCard.created,
+            modified: state.maps.topicCard.modified,
+            author: state.maps.topicCard.author,
+            keywords: [subject, chapter, topic, ...(state.maps.topicCard.keywords ? state.maps.topicCard.keywords.split(",").map(k => k.trim()) : [])],
+            breadcrumbs: [subject, chapter, topic]
+          });
+        }
+        else {
+          const subject = state.maps.subject || '';
+          const chapter = state.maps.chapter || '';
+          dispatch.shell.updateMeta({
+            title: chapter,
+            description: state.maps.chapterCard !== undefined && state.maps.chapterCard.summary ? state.maps.chapterCard.summary : "Wissenslandkarte zum Kapitel " + chapter,
+            keywords: [subject, chapter, ...topics],
+            breadcrumbs: [subject, chapter]
+          });
+        }
+
       },
       'app/chooseInstance': async function () {
         const state = store.getState();

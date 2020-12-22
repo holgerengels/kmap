@@ -16,7 +16,7 @@ import {Line} from "../models/maps";
 import {Card} from "../models/types";
 import {Connector} from "./svg-connector";
 import {iconTest} from "./icons";
-import {encode, urls} from "../urls";
+import {encode} from "../urls";
 import {KMapTimelineAside} from "./kmap-timeline-aside";
 import {throttle} from "../debounce";
 import {Timeline} from "../models/courses";
@@ -27,8 +27,6 @@ type SideBarState = "hidden" | "collapsed" | "open";
 @customElement('kmap-browser')
 export class KMapBrowser extends connect(store, LitElement) {
 
-  @property()
-  private _instance: string = '';
   @property()
   private _userid: string = '';
   @property()
@@ -47,8 +45,6 @@ export class KMapBrowser extends connect(store, LitElement) {
   private _lines: Line[] = [];
   @property()
   private _maxCols: number = 0;
-  @property()
-  private _topics?: string[] = undefined;
   @property()
   private _hasTests: boolean = false;
   @property()
@@ -98,7 +94,6 @@ export class KMapBrowser extends connect(store, LitElement) {
   mapState(state: State) {
     return {
       route: state.routing,
-      _instance: state.app.instance,
       _userid: state.app.userid,
       _layers: state.shell.layers,
       wide: !state.shell.narrow,
@@ -107,6 +102,7 @@ export class KMapBrowser extends connect(store, LitElement) {
       _chapter: state.maps.chapter,
       _lines: state.maps.lines,
       _chapterCard: state.maps.chapterCard,
+      _topicCard: state.maps.topicCard,
       _loading: state.maps.loading,
       _testTopics: state.tests.topics ? state.tests.topics.topics : [],
       _selected: state.maps.selected,
@@ -122,33 +118,10 @@ export class KMapBrowser extends connect(store, LitElement) {
   updated(changedProperties) {
     if (changedProperties.has("_lines")) {
       var cols = 0;
-      var topics: string[] = [];
       for (let line of this._lines) {
         cols = Math.max(cols, line.cards.length)
-        for (let card of line.cards) {
-          topics.push(card.topic);
-        }
       }
-      this._topics = topics;
       this._maxCols = cols;
-    }
-    if (changedProperties.has('_topic') || changedProperties.has("_lines")) {
-      if (!this._topic) {
-        this._topicCard = undefined;
-      }
-      else if (this._topic === "_") {
-        this._topicCard = this._chapterCard;
-      }
-      else if (this._topic && this._lines) {
-        let lala: Card | undefined = undefined;
-        for (let line of this._lines) {
-          for (let card of line.cards) {
-            if (card.topic === this._topic)
-              lala = card;
-          }
-        }
-        this._topicCard = lala;
-      }
     }
 
     if (changedProperties.has("_topicCard") || changedProperties.has("_chapterCard")) {
@@ -163,27 +136,6 @@ export class KMapBrowser extends connect(store, LitElement) {
         }
       }
       this._page = this._topicCard ? "topic" : "map";
-
-      if (this._topicCard) {
-        store.dispatch.shell.updateMeta({title: this._chapter, detail: this._topicCard.topic, description: this._topicCard.summary,
-          image: this._topicCard.thumb ?
-            `${urls.server}${encode("data", this._subject, this._chapter, this._topic, this._topicCard.thumb)}?instance=${this._instance}`
-            : undefined,
-          created: this._topicCard.created,
-          modified: this._topicCard.modified,
-          author: this._topicCard.author,
-          keywords: [this._subject, this._chapter, this._topicCard.topic, ...(this._topicCard.keywords ? this._topicCard.keywords.split(",").map(k => k.trim()) : [])],
-          breadcrumbs: [this._subject, this._chapter, this._topicCard.topic]
-        });
-      }
-      else {
-        store.dispatch.shell.updateMeta({
-          title: this._chapter,
-          description: this._chapterCard !== undefined && this._chapterCard.summary ? this._chapterCard.summary : "Wissenslandkarte zum Kapitel " + this._chapter,
-          keywords: [this._subject, this._chapter, ...this._topics || []],
-          breadcrumbs: [this._subject, this._chapter]
-        });
-      }
     }
 
     if (changedProperties.has("_page") && this._page === 'topic' && this._animFrom !== undefined) {
@@ -320,8 +272,10 @@ export class KMapBrowser extends connect(store, LitElement) {
         :host {
           display: grid;
           grid-template-columns: 1fr;
-          padding: 16px;
           --content-width: 100vw;
+        }
+        :host([wide]) {
+          padding: 16px;
         }
         :host([draweropen]) {
           min-width: 300px;
@@ -344,9 +298,12 @@ export class KMapBrowser extends connect(store, LitElement) {
         }
         .chapter-card {
           grid-column: 1 / -1;
-          width: min(100%, calc(100vw - 32px));
+          width: min(100%, 100vw);
           justify-self: left;
           background-color: white;
+        }
+        :host([wide]) .chapter-card {
+          width: min(100%, calc(100vw - 32px));
         }
         :host([draweropen]) .chapter-card {
           width: min(100%, calc(100vw - var(--mdc-drawer-width, 256px) - 32px));
@@ -405,7 +362,7 @@ export class KMapBrowser extends connect(store, LitElement) {
       </div>
 
       ${this._topicCard ? html`
-        <kmap-knowledge-card ?axxxctive="${this._page === 'topic'}" @rated="${this._rated}" .subject="${this._subject}" .chapter="${this._chapter}" .card="${this._topicCard}"></kmap-knowledge-card>
+        <kmap-knowledge-card @rated="${this._rated}" .subject="${this._subject}" .chapter="${this._chapter}" .card="${this._topicCard}"></kmap-knowledge-card>
       ` : '' }
       <kmap-timeline-aside id="timeline" class="elevation-02" @touchstart="${this._swipeStart}" @touchmove="${this._swipeMove}" @touchend="${this._swipeEnd}" @open="${() => this.timelineState = 'open'}"></kmap-timeline-aside>
     `;

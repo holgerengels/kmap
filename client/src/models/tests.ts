@@ -1,5 +1,5 @@
 import {createModel, RoutingState} from '@captaincodeman/rdx';
-import { Store } from '../store';
+import {Store} from '../store';
 import {endpoint, fetchjson} from "../endpoint";
 import {urls} from "../urls";
 import {Attachment, Path} from "./types";
@@ -346,18 +346,42 @@ export default createModel({
       'routing/change': async function (routing: RoutingState<string>) {
         switch (routing.page) {
           case 'test':
+            let subject = routing.params["subject"];
+            let chapter = routing.params["chapter"];
+            let topic = routing.params["topic"];
+
             dispatch.tests.loadTests({
               subject: routing.params["subject"],
               chapter: routing.params["chapter"],
               topic: routing.params["topic"]
             });
 
-            if (routing.params["chapter"])
+            if (chapter)
               document.title = "KMap - Aufgaben bearbeiten";
             else if (routing.params["results"])
               document.title = "KMap - Aufgaben auswerten";
             else
               document.title = "KMap - Aufgaben wählen";
+
+            subject = subject ? decodeURIComponent(subject) : undefined;
+            chapter = chapter ? decodeURIComponent(chapter) : undefined;
+            topic = topic ? decodeURIComponent(topic) : undefined;
+
+            let title = document.title;
+            let description: string | undefined = undefined;
+            let breadcrumbs: string[] | undefined = undefined;
+            if (subject && chapter) {
+              if (topic) {
+                title = "Aufgaben zum Thema " + chapter + " - " + topic;
+                breadcrumbs = [subject, chapter, topic, "tests"];
+              }
+              else {
+                title = "Aufgaben zum Thema " + chapter;
+                breadcrumbs = [subject, chapter, "tests"];
+              }
+              description = "Ermittle Deinen Wissensstand mit Hilfe von interaktiven Aufgaben!";
+            }
+            dispatch.shell.updateMeta({title: title, description: description, breadcrumbs: breadcrumbs});
             break;
           case 'browser':
             dispatch.tests.loadTopics();

@@ -21,15 +21,11 @@ export class KmapTest extends connect(store, LitElement) {
   @property()
   private _layers: string[] = [];
   @property()
-  private _title: string = 'Test - Aufgabenbereich wählen';
-  @property()
   private _noRoute?: string = 'chooser';
   @property()
   private _subject: string = '';
   @property()
   private _chapter: string = '';
-  @property()
-  private _topic: string = '';
   @property()
   private _results: string[] = [];
 
@@ -43,7 +39,6 @@ export class KmapTest extends connect(store, LitElement) {
         this._noRoute = undefined;
         this._subject = val.params.subject;
         this._chapter = val.params.chapter ? decodeURIComponent(val.params.chapter) : '';
-        this._topic = val.params.topic ? decodeURIComponent(val.params.topic) : '';
       }
     }
   }
@@ -62,35 +57,6 @@ export class KmapTest extends connect(store, LitElement) {
         this._page = this._noRoute;
       else
         this._page = "exercise";
-    }
-
-    if (changedProperties.has("_page")) {
-      switch (this._page) {
-        case 'chooser':
-          this._title = "Test - Aufgabenbereich wählen";
-          break;
-        case 'exercise':
-          this._title = "Test - Aufgaben bearbeiten";
-          break;
-        case 'results':
-          this._title = "Test - Auswertung";
-          break;
-      }
-      let title = this._title;
-      let description: string | undefined = undefined;
-      let breadcrumbs: string[] | undefined = undefined;
-      if (this._subject && this._chapter) {
-        if (this._topic) {
-          title = "Aufgaben zum Thema " + this._chapter + " - " + this._topic;
-          breadcrumbs = [this._subject, this._chapter, this._topic, "tests"];
-        }
-        else {
-          title = "Aufgaben zum Thema " + this._chapter;
-          breadcrumbs = [this._subject, this._chapter, "tests"];
-        }
-        description = "Ermittle Deinen Wissensstand mit Hilfe von interaktiven Aufgaben!";
-      }
-      store.dispatch.shell.updateMeta({title: title, description: description, breadcrumbs: breadcrumbs});
     }
   }
 

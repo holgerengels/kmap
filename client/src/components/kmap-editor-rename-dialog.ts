@@ -33,9 +33,9 @@ export class KMapEditorRenameDialog extends connect(store, LitElement) {
   updated(changedProperties) {
     if (changedProperties.has('_card') && this._card !== undefined) {
       if (!this._card.subject)
-        this._card.subject = store.state.maps.subject;
+        this._card.subject = store.state.maps.subject || '';
       if (!this._card.chapter)
-        this._card.chapter = store.state.maps.chapter;
+        this._card.chapter = store.state.maps.chapter || '';
 
       this._newName = '';
       this._renameDialog.show();

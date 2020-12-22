@@ -17,15 +17,11 @@ import 'pwa-helper-components/pwa-update-available';
 import './components/kmap-subjects';
 import './components/kmap-browser';
 import './components/kmap-test';
-//import './components/kmap-instance-popup';
-//import './components/kmap-login-popup';
 import './components/kmap-timeline-selector';
 import './components/share-facebook';
 
 import {fontStyles, colorStyles} from "./components/kmap-styles";
 import {Snackbar} from "@material/mwc-snackbar/mwc-snackbar";
-//import {KMapLoginPopup} from "./components/kmap-login-popup";
-//import {KMapInstancePopup} from "./components/kmap-instance-popup";
 import {TopAppBar} from "@material/mwc-top-app-bar/mwc-top-app-bar";
 import {Meta} from "./models/shell";
 import {Timeline} from "./models/courses";
@@ -136,6 +132,7 @@ export class KmapMain extends connect(store, LitElement) {
 
   updated(changedProps) {
     if (changedProps.has('_meta')) {
+      console.log(this._meta);
       const barTitle = this._meta.title || _title.get(this._page);
       const title = this._meta.detail ? this._meta.title  + " - " + this._meta.detail : this._meta.title;
       const docTitle = title || _title.get(this._page);
@@ -217,7 +214,6 @@ export class KmapMain extends connect(store, LitElement) {
       });
     }
 
-    console.log(items);
     return {
       "@context": "https://schema.org",
       "@type": "BreadcrumbList",
@@ -360,6 +356,7 @@ export class KmapMain extends connect(store, LitElement) {
       main {
         width: 100%;
         height: 100%;
+        box-sizing: border-box;
         overflow: auto;
         scrollbar-color: var(--color-mediumgray);
         scrollbar-width: thin;

@@ -308,7 +308,7 @@ export class KMapKnowledgeCard extends connect(store, LitElement) {
         </div>
         ` : '' }
 
-          <a class="button" slot="button" href="/app/browser/${encode(this.subject, this.chapter)}" title="Wissenslandkarte ${this.chapter}">Zurück</a>
+          <a class="button" slot="button" href="/app/browser/${encode(this.subject, this.chapter)}" title="Wissenslandkarte ${this.chapter}"><mwc-icon>expand_less</mwc-icon></a>
 
           ${!this.card.links && false ? html`
             <star-rating slot="button" .rate="${this.state}" @clicked="${this._rated}"></star-rating>

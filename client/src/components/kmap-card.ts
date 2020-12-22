@@ -278,6 +278,7 @@ export class KMapCardSpacer extends LitElement {
     // language=CSS
     return css`
         :host {
+          display: block;
           height: 8px;
         }
       `;
