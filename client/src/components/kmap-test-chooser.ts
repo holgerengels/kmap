@@ -1,5 +1,5 @@
-import {LitElement, html, css, customElement, property} from 'lit-element';
-import { connect } from '@captaincodeman/rdx';
+import {html, css, customElement, property} from 'lit-element';
+import {Connected} from "./connected";
 import {State, store} from "../store";
 
 import '@material/mwc-button';
@@ -16,7 +16,7 @@ import {colorStyles, elevationStyles, fontStyles} from "./kmap-styles";
 import {Subject} from "../models/subjects";
 
 @customElement('kmap-test-chooser')
-export class KmapTestChooser extends connect(store, LitElement) {
+export class KmapTestChooser extends Connected {
   @property()
   private _subjects: Subject[] = [];
   @property()

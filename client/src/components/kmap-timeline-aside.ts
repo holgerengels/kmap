@@ -1,5 +1,5 @@
-import {css, customElement, html, LitElement, property, query} from 'lit-element';
-import {connect} from '@captaincodeman/rdx';
+import {css, customElement, html, property, query} from 'lit-element';
+import {Connected} from "./connected";
 import {State, store} from "../store";
 
 import './kmap-timeline';
@@ -8,7 +8,7 @@ import {KMapTimeline} from "./kmap-timeline";
 import {elevationStyles} from "./kmap-styles";
 
 @customElement('kmap-timeline-aside')
-export class KMapTimelineAside extends connect(store, LitElement) {
+export class KMapTimelineAside extends Connected {
   @property()
   // @ts-ignore
   private _instance: string = '';

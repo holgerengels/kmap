@@ -1,9 +1,9 @@
-import {LitElement, html, customElement, property} from 'lit-element';
-import { connect } from '@captaincodeman/rdx';
-import {State, store} from "../store";
+import {html, customElement, property} from 'lit-element';
+import {Connected} from "./connected";
+import {State} from "../store";
 
 @customElement('kmap-summary-card-ratecolors')
-export class KMapSummaryCardRateColors extends connect(store, LitElement) {
+export class KMapSummaryCardRateColors extends Connected {
 
   @property({type: String})
   private key: string = '';

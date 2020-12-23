@@ -1,5 +1,5 @@
-import {css, customElement, html, LitElement, property} from 'lit-element';
-import {connect} from '@captaincodeman/rdx';
+import {css, customElement, html, property} from 'lit-element';
+import {Connected} from "./connected";
 import {State, store} from "../store";
 
 import {StyleInfo, styleMap} from "lit-html/directives/style-map";
@@ -15,7 +15,7 @@ import {Card} from "../models/types";
 import {iconTest} from "./icons";
 
 @customElement('kmap-summary-card')
-export class KMapSummaryCard extends connect(store, LitElement) {
+export class KMapSummaryCard extends Connected {
 
   @property()
   private _userid: string = '';

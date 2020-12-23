@@ -1,6 +1,6 @@
-import {css, customElement, html, LitElement, property, query} from 'lit-element';
-import {connect} from '@captaincodeman/rdx';
-import {State, store} from "../store";
+import {css, customElement, html, property, query} from 'lit-element';
+import {Connected} from "./connected";
+import {State} from "../store";
 
 import '@material/mwc-button';
 import '@material/mwc-dialog';
@@ -25,7 +25,7 @@ import {Menu} from "@material/mwc-menu/mwc-menu";
 import {TabBar} from "@material/mwc-tab-bar/mwc-tab-bar";
 
 @customElement('kmap-curriculum-edit-dialog')
-export class KMapCurriculumEditDialog extends connect(store, LitElement) {
+export class KMapCurriculumEditDialog extends Connected {
   @property()
   private _tab: string = 'editor';
 

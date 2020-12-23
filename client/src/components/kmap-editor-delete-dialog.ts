@@ -1,5 +1,5 @@
-import {LitElement, html, css, customElement, property, query} from 'lit-element';
-import {connect} from '@captaincodeman/rdx';
+import {html, css, customElement, property, query} from 'lit-element';
+import {Connected} from "./connected";
 import {State, store} from "../store";
 
 import '@material/mwc-button';
@@ -9,7 +9,7 @@ import {Dialog} from "@material/mwc-dialog/mwc-dialog";
 import {Card} from "../models/types";
 
 @customElement('kmap-editor-delete-dialog')
-export class KMapEditorDeleteDialog extends connect(store, LitElement) {
+export class KMapEditorDeleteDialog extends Connected {
   @property()
   private _card?: Card = undefined;
 
@@ -42,9 +42,10 @@ export class KMapEditorDeleteDialog extends connect(store, LitElement) {
     const card: Card = this._card;
 
     store.dispatch.maps.deleteTopic(card);
-    window.setTimeout(function(subject, chapter) {
-      store.dispatch.maps.load({subject: subject, chapter: chapter});
-    }.bind(undefined, card.subject, card.chapter), 1000);
+    window.setTimeout(function() {
+      store.dispatch.maps.forget();
+      store.dispatch.maps.load();
+    }, 1000);
   }
 
   _cancel() {

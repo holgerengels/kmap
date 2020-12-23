@@ -1,6 +1,6 @@
-import {LitElement, html, css, customElement, property, query} from 'lit-element';
-import {connect} from '@captaincodeman/rdx';
-import {State, store} from "../store";
+import {html, css, customElement, property, query} from 'lit-element';
+import {Connected} from "./connected";
+import {State} from "../store";
 
 import {encode} from '../urls';
 import {fontStyles, colorStyles} from "./kmap-styles";
@@ -14,7 +14,7 @@ import "./kmap-feedback";
 import {KMapTestCardContent} from "./kmap-test-card-content";
 
 @customElement('kmap-randomtest-card')
-export class KMapRandomTestCard extends connect(store, LitElement) {
+export class KMapRandomTestCard extends Connected {
   @property({type: String})
   private _instance: string = '';
 

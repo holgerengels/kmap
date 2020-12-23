@@ -1,5 +1,5 @@
-import {LitElement, html, css, customElement, property} from 'lit-element';
-import { connect } from '@captaincodeman/rdx';
+import {html, css, customElement, property} from 'lit-element';
+import {Connected} from "./connected";
 import {State, store} from "../store";
 
 import '@material/mwc-button';
@@ -8,7 +8,7 @@ import {Module} from "../models/contentMaps";
 import {Card} from "../models/types";
 
 @customElement('kmap-summary-card-editor')
-export class KMapSummaryCardEditor extends connect(store, LitElement) {
+export class KMapSummaryCardEditor extends Connected {
 
   @property()
   private _subject: string = '';

@@ -1,5 +1,5 @@
-import {LitElement, html, css, customElement, property} from 'lit-element';
-import {connect} from '@captaincodeman/rdx';
+import {html, css, customElement, property} from 'lit-element';
+import {Connected} from "./connected";
 import {State, store} from "../store";
 
 import {colorStyles, elevationStyles, fontStyles} from "./kmap-styles";
@@ -13,7 +13,7 @@ import '@material/mwc-textfield';
 import {Instance} from "../models/instances";
 
 @customElement('kmap-content-manager-instances')
-export class KMapContentManagerInstances extends connect(store, LitElement) {
+export class KMapContentManagerInstances extends Connected {
   @property()
   private _instances: Instance[] = [];
   @property()

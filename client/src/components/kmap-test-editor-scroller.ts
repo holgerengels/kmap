@@ -1,5 +1,5 @@
-import {LitElement, html, css, customElement, property} from 'lit-element';
-import {connect} from '@captaincodeman/rdx';
+import {html, css, customElement, property} from 'lit-element';
+import {Connected} from "./connected";
 import {State, store} from "../store";
 
 import {fontStyles, colorStyles, elevationStyles} from "./kmap-styles";
@@ -8,7 +8,7 @@ import {Test} from "../models/tests";
 
 
 @customElement('kmap-test-editor-scroller')
-export class KMapTestEditorScroller extends connect(store, LitElement) {
+export class KMapTestEditorScroller extends Connected {
   @property()
   private _tests: Test[] = [];
   @property()

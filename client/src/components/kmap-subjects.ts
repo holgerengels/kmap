@@ -1,6 +1,6 @@
-import {LitElement, html, css, customElement, property} from 'lit-element';
-import { connect } from '@captaincodeman/rdx';
-import {State, store} from "../store";
+import {html, css, customElement, property} from 'lit-element';
+import {Connected} from "./connected";
+import {State} from "../store";
 
 import {colorStyles, fontStyles} from "./kmap-styles";
 import '@material/mwc-icon-button';
@@ -14,7 +14,7 @@ import {Latest} from "../models/maps";
 import {Subject} from "../models/subjects";
 
 @customElement('kmap-subjects')
-export class KMapSubjects extends connect(store, LitElement) {
+export class KMapSubjects extends Connected {
   @property()
   private _subjects: Subject[] = [];
   @property()

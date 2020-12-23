@@ -1,5 +1,5 @@
-import {LitElement, html, css, customElement, property} from 'lit-element';
-import {connect} from '@captaincodeman/rdx';
+import {html, css, customElement, property} from 'lit-element';
+import {Connected} from "./connected";
 import {State, store} from "../store";
 
 import {colorStyles, fontStyles, elevationStyles,} from "./kmap-styles";
@@ -13,7 +13,7 @@ import '@material/mwc-textfield';
 import {Feedback} from "../models/feedback";
 
 @customElement('kmap-content-manager-feedback')
-export class KMapContentManagerFeedback extends connect(store, LitElement) {
+export class KMapContentManagerFeedback extends Connected {
   @property()
   private _issues: Feedback[] = [];
   @property()

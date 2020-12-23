@@ -227,7 +227,7 @@ export default createModel({
           return;
 
         // @ts-ignore
-        if (!state.topics || state.topics.subject !== subject) {
+        if (!state.tests.topics || state.tests.topics.subject !== subject) {
           dispatch.tests.requestTopics();
           fetchjson(`${urls.server}tests?topics=all&subject=${subject}`, endpoint.get(state),
             (json) => {
@@ -340,9 +340,6 @@ export default createModel({
           dispatch.tests.error);
       },
 
-      'maps/subjectChanged': async function () {
-        dispatch.tests.loadTopics();
-      },
       'routing/change': async function (routing: RoutingState<string>) {
         switch (routing.page) {
           case 'test':

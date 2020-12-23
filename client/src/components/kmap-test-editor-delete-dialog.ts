@@ -1,5 +1,5 @@
-import {LitElement, html, css, customElement, property, query} from 'lit-element';
-import {connect} from '@captaincodeman/rdx';
+import {html, css, customElement, property, query} from 'lit-element';
+import {Connected} from "./connected";
 import {State, store} from "../store";
 
 import {colorStyles, fontStyles} from "./kmap-styles";
@@ -11,7 +11,7 @@ import {Dialog} from "@material/mwc-dialog/mwc-dialog";
 import {Test} from "../models/tests";
 
 @customElement('kmap-test-editor-delete-dialog')
-export class KMapTestEditorDeleteDialog extends connect(store, LitElement) {
+export class KMapTestEditorDeleteDialog extends Connected {
   @property()
   private _test?: Test = undefined;
 

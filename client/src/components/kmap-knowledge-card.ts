@@ -1,5 +1,5 @@
-import {LitElement, html, css, customElement, property, query} from 'lit-element';
-import { connect } from '@captaincodeman/rdx';
+import {html, css, customElement, property, query} from 'lit-element';
+import {Connected} from "./connected";
 import {State, store} from "../store";
 
 import {StyleInfo, styleMap} from 'lit-html/directives/style-map.js';
@@ -19,7 +19,7 @@ import {iconTest} from "./icons";
 import {encode} from "../urls";
 
 @customElement('kmap-knowledge-card')
-export class KMapKnowledgeCard extends connect(store, LitElement) {
+export class KMapKnowledgeCard extends Connected {
 
   @property()
   private _instance: string = '';

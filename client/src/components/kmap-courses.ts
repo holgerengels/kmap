@@ -1,5 +1,5 @@
-import {LitElement, html, css, customElement, property, query} from 'lit-element';
-import {connect} from '@captaincodeman/rdx';
+import {html, css, customElement, property, query} from 'lit-element';
+import {Connected} from "./connected";
 import {State, store} from "../store";
 
 import {colorStyles, fontStyles} from "./kmap-styles";
@@ -19,7 +19,7 @@ import {TextArea} from "@material/mwc-textarea/mwc-textarea";
 import {KMapCurriculumEditDialog} from "./kmap-curriculum-edit-dialog";
 
 @customElement('kmap-courses')
-export class KMapCourses extends connect(store, LitElement) {
+export class KMapCourses extends Connected {
   @property()
   private _subjects: Subject[] = [];
 

@@ -1,10 +1,10 @@
-import {LitElement, html, css, customElement, property} from 'lit-element';
-import {connect} from '@captaincodeman/rdx';
+import {html, css, customElement, property} from 'lit-element';
 import {State, store} from "../store";
 
 import '@material/mwc-button';
 import {colorStyles, fontStyles} from "./kmap-styles";
 import {Card} from "../models/types";
+import {Connected} from "./connected";
 
 interface Module {
   subject: string,
@@ -12,7 +12,7 @@ interface Module {
 }
 
 @customElement('kmap-browser-chapter-editor')
-export class KMapBrowserChapterEditor extends connect(store, LitElement) {
+export class KMapBrowserChapterEditor extends Connected {
   @property({type: String})
   private subject: string = '';
   @property({type: String})

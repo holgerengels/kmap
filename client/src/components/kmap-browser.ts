@@ -1,5 +1,5 @@
-import {LitElement, html, css, customElement, property, query} from 'lit-element';
-import {connect, RoutingState} from '@captaincodeman/rdx';
+import {html, css, customElement, property, query} from 'lit-element';
+import {RoutingState} from '@captaincodeman/rdx';
 import {State, store} from "../store";
 
 import {colorStyles, elevationStyles, fontStyles} from "./kmap-styles";
@@ -21,11 +21,12 @@ import {KMapTimelineAside} from "./kmap-timeline-aside";
 import {throttle} from "../debounce";
 import {Timeline} from "../models/courses";
 import {StyleInfo, styleMap} from "lit-html/directives/style-map";
+import {Connected} from "./connected";
 
 type SideBarState = "hidden" | "collapsed" | "open";
 
 @customElement('kmap-browser')
-export class KMapBrowser extends connect(store, LitElement) {
+export class KMapBrowser extends Connected {
 
   @property()
   private _userid: string = '';

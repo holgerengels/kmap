@@ -2,7 +2,7 @@ import {createModel, RoutingState} from '@captaincodeman/rdx';
 import {Store} from '../store';
 import {endpoint, fetchjson} from "../endpoint";
 import {encode, urls} from "../urls";
-import {Card, Path} from "./types";
+import {Card} from "./types";
 
 const defaults: object = {
   summary: '',
@@ -29,6 +29,7 @@ export interface MapState {
   subject?: string,
   chapter?: string,
   topic?: string,
+  loaded?: string,
   lines: Line[],
   chapterCard?: Card,
   topicCard?: Card,
@@ -73,6 +74,15 @@ export default createModel({
     latestTimestamp: -1,
   },
   reducers: {
+    'routing/change'(state, routing: RoutingState<string>) {
+      return routing.page === 'browser' ? {
+        ...state,
+        subject: routing.params["subject"] ? decodeURIComponent(routing.params["subject"]) : undefined,
+        chapter: routing.params["chapter"] ? decodeURIComponent(routing.params["chapter"]) : undefined,
+        topic: routing.params["topic"] ? decodeURIComponent(routing.params["topic"]) : undefined,
+      }
+      : state;
+    },
     selectCard(state, card: Card) {
       return { ...state, selected: card.topic, selectedDependencies: card.dependencies || [] }
     },
@@ -90,17 +100,10 @@ export default createModel({
     },
     received(state, payload: MapState) {
       return { ...state,
-        subject: payload.subject,
-        chapter: payload.chapter,
         lines: payload.lines,
+        loaded: "" + state.subject + state.chapter,
         chapterCard: payload.chapterCard,
         loading: false,
-      };
-    },
-    setTopic(state, topic: string | undefined) {
-      return {
-        ...state,
-        topic: topic
       };
     },
     setTopicCard(state, topicCard: Card | undefined) {
@@ -117,6 +120,7 @@ export default createModel({
         subject: '',
         chapter: '',
         lines: [],
+        loaded: undefined,
         chapterCard: undefined,
         cardForEdit: undefined,
         cardForRename: undefined,
@@ -204,25 +208,25 @@ export default createModel({
   effects(store: Store) {
     const dispatch = store.getDispatch();
     return {
-      async load(path: Path) {
+      async load() {
         const state = store.getState();
-        const oldSubject: string | undefined = state.maps.subject;
+        const load = "" + state.maps.subject + state.maps.chapter;
+        if (!state.maps.subject || !state.maps.chapter) return;
 
-        if (state.maps.subject === path.subject && state.maps.chapter === path.chapter) {
-          console.warn("reloading map " + path.subject + " " + path.chapter);
+        if (state.maps.loaded !== load) {
+          console.log("reloading map " + state.maps.subject + " " + state.maps.chapter);
+          dispatch.maps.unselectCard();
+          dispatch.maps.request();
+          fetchjson(`${urls.server}data?subject=${encodeURIComponent(state.maps.subject)}&load=${encodeURIComponent(state.maps.chapter)}`, endpoint.get(state),
+            (json) => {
+              dispatch.maps.received(json);
+              dispatch.maps.setTopicCard(topicCard(state));
+            },
+            dispatch.app.handleError,
+            dispatch.maps.error);
         }
-
-        dispatch.maps.request();
-        fetchjson(`${urls.server}data?subject=${path.subject}&load=${path.chapter}`, endpoint.get(state),
-          (json) => {
-            dispatch.maps.received(json);
-            dispatch.maps.unselectCard();
-            if (path.subject !== oldSubject) {
-              dispatch.maps.subjectChanged();
-            }
-          },
-          dispatch.app.handleError,
-          dispatch.maps.error);
+        else
+          dispatch.maps.setTopicCard(topicCard(state));
       },
 
       async loadLatest(subject: string) {
@@ -304,38 +308,16 @@ export default createModel({
       'routing/change': async function (routing: RoutingState<string>) {
         switch (routing.page) {
           case 'browser':
-            await dispatch.maps.load({subject: routing.params["subject"], chapter: routing.params["chapter"]});
-            document.title = "KMap - " + (routing.params["topic"] ? decodeURIComponent(routing.params["topic"]) : decodeURIComponent(routing.params["chapter"]));
-            let topic = routing.params["topic"];
-            topic = topic ? decodeURIComponent(topic) : undefined;
-            dispatch.maps.setTopic(topic);
+            await dispatch.maps.load();
             break;
           case 'home':
             dispatch.maps.loadLatest("Mathematik");
             break;
         }
       },
-      'maps/received': async function () {
+      'maps/setTopicCard': async function () {
         const state = store.getState();
 
-        var topics: string[] = [];
-        if (!state.maps.topic) {
-          dispatch.maps.setTopicCard(undefined);
-        }
-        else if (state.maps.topic === "_") {
-          dispatch.maps.setTopicCard(state.maps.chapterCard);
-        }
-        else {
-          let lala: Card | undefined = undefined;
-          for (let line of state.maps.lines) {
-            for (let card of line.cards) {
-              topics.push(card.topic);
-              if (card.topic === state.maps.topic)
-                lala = card;
-            }
-          }
-          dispatch.maps.setTopicCard(lala);
-        }
         if (state.maps.topicCard) {
           const subject = state.maps.subject || '';
           const chapter = state.maps.chapter || '';
@@ -353,6 +335,13 @@ export default createModel({
           });
         }
         else {
+          var topics: string[] = [];
+          for (let line of state.maps.lines) {
+            for (let card of line.cards) {
+              topics.push(card.topic);
+            }
+          }
+
           const subject = state.maps.subject || '';
           const chapter = state.maps.chapter || '';
           dispatch.shell.updateMeta({
@@ -368,7 +357,7 @@ export default createModel({
         const state = store.getState();
         const routing: RoutingState<string> = state.routing;
         if (routing.page === 'browser')
-          dispatch.maps.load({subject: routing.params["subject"], chapter: routing.params["chapter"]});
+          dispatch.maps.load();
         else
           dispatch.maps.forget();
       },
@@ -386,3 +375,20 @@ export default createModel({
     }
   }
 })
+
+function topicCard(state): Card | undefined
+{
+  if (!state.maps.topic) {
+    return undefined;
+  } else if (state.maps.topic === "_") {
+    return state.maps.chapterCard;
+  } else {
+    for (let line of state.maps.lines) {
+      for (let card of line.cards) {
+        if (card.topic === state.maps.topic)
+          return card;
+      }
+    }
+    return undefined;
+  }
+}

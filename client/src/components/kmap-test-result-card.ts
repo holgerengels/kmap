@@ -1,6 +1,6 @@
-import {LitElement, html, css, customElement, property} from 'lit-element';
-import { connect } from '@captaincodeman/rdx';
-import {State, store} from "../store";
+import {html, css, customElement, property} from 'lit-element';
+import {Connected} from "./connected";
+import {State} from "../store";
 
 
 import {StyleInfo, styleMap} from 'lit-html/directives/style-map.js';
@@ -11,7 +11,7 @@ import {TestResult} from "../models/tests";
 import {encode} from "../urls";
 
 @customElement('kmap-test-result-card')
-export class KMapTestResultCard extends connect(store, LitElement) {
+export class KMapTestResultCard extends Connected {
   @property()
   private _userid: string = '';
 

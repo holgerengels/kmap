@@ -1,12 +1,12 @@
-import {LitElement, html, css, customElement, property} from 'lit-element';
-import { connect } from '@captaincodeman/rdx';
-import {State, store} from "../store";
+import {html, css, customElement, property} from 'lit-element';
+import {Connected} from "./connected";
+import {State} from "../store";
 
 import '@material/mwc-icon';
 import {fontStyles, colorStyles} from "./kmap-styles";
 
 @customElement('kmap-login-button')
-export class KMapLoginButton extends connect(store, LitElement) {
+export class KMapLoginButton extends Connected {
   @property()
   private _userid: string = '';
   @property()

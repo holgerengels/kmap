@@ -1,5 +1,5 @@
-import {LitElement, html, css, customElement, property, query} from 'lit-element';
-import {connect} from '@captaincodeman/rdx';
+import {html, css, customElement, property, query} from 'lit-element';
+import {Connected} from "./connected";
 import {State, store} from "../store";
 
 import '@material/mwc-button';
@@ -28,7 +28,7 @@ import {Attachment, Card} from "../models/types";
 import {FileDrop} from "./file-drop";
 
 @customElement('kmap-editor-edit-dialog')
-export class KMapEditorEditDialog extends connect(store, LitElement) {
+export class KMapEditorEditDialog extends Connected {
   @property()
   private _instance: string = '';
 
@@ -156,13 +156,15 @@ export class KMapEditorEditDialog extends connect(store, LitElement) {
     console.log(card);
 
     store.dispatch.maps.saveTopic(card);
-    window.setTimeout(function (subject, chapter, navigateAfterSafe) {
+    window.setTimeout(function (navigateAfterSafe) {
       if (navigateAfterSafe) {
         store.dispatch.routing.replace(navigateAfterSafe);
       }
-      else
-        store.dispatch.maps.load({subject: subject, chapter: chapter});
-    }.bind(undefined, card.subject, card.chapter, this._navigateAfterSave), 1000);
+      else {
+        store.dispatch.maps.forget();
+        store.dispatch.maps.load();
+      }
+    }.bind(undefined, this._navigateAfterSave), 1000);
 
     store.dispatch.uploads.clearUploads();
   }

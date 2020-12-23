@@ -1,5 +1,5 @@
-import {LitElement, html, customElement, property, css} from 'lit-element';
-import {connect} from '@captaincodeman/rdx';
+import {html, customElement, property, css} from 'lit-element';
+import {Connected} from "./connected";
 import {State, store} from "../store";
 
 import '@material/mwc-list/mwc-list';
@@ -8,7 +8,7 @@ import {fontStyles, colorStyles} from "./kmap-styles";
 import {Set} from "../models/contentSets";
 
 @customElement('kmap-set-selector')
-export class KMapSetSelector extends connect(store, LitElement) {
+export class KMapSetSelector extends Connected {
   @property()
   private _sets: Set[] = [];
   @property()

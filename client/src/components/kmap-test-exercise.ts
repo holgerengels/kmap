@@ -1,5 +1,5 @@
-import {LitElement, html, css, customElement, property, query} from 'lit-element';
-import { connect } from '@captaincodeman/rdx';
+import {html, css, customElement, property, query} from 'lit-element';
+import {Connected} from "./connected";
 import {State, store} from "../store";
 
 import '@material/mwc-button';
@@ -10,7 +10,7 @@ import {Test} from "../models/tests";
 import {KMapTestCard} from "./kmap-test-card";
 
 @customElement('kmap-test-exercise')
-export class KmapTestExercise extends connect(store, LitElement) {
+export class KmapTestExercise extends Connected {
   @property()
   private _allTests?: Test[] = undefined;
   @property()

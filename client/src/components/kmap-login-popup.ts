@@ -1,5 +1,5 @@
-import {LitElement, html, css, customElement, query, property} from 'lit-element';
-import { connect } from '@captaincodeman/rdx';
+import {html, css, customElement, query, property} from 'lit-element';
+import {Connected} from "./connected";
 import {State, store} from "../store";
 
 import '@material/mwc-button';
@@ -14,7 +14,7 @@ import {Instance} from "../models/instances";
 import {DatalistTextField} from "./datalist-textfield";
 
 @customElement('kmap-login-popup')
-export class KMapLoginPopup extends connect(store, LitElement) {
+export class KMapLoginPopup extends Connected {
   @property()
   private _instances: Instance[] = [];
   @property()

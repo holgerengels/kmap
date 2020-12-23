@@ -1,6 +1,6 @@
-import {LitElement, html, css, customElement, property} from 'lit-element';
-import {connect} from '@captaincodeman/rdx';
-import {State, store} from "../store";
+import {html, css, customElement, property} from 'lit-element';
+import {Connected} from "./connected";
+import {State} from "../store";
 
 import '@material/mwc-dialog';
 import '@material/mwc-icon-button';
@@ -14,7 +14,7 @@ import './kmap-content-manager-sets';
 import {colorStyles, fontStyles} from "./kmap-styles";
 
 @customElement('kmap-content-manager')
-export class KMapContentManager extends connect(store, LitElement) {
+export class KMapContentManager extends Connected {
   @property()
   private _roles: string[] = [];
 

@@ -1,5 +1,5 @@
-import {LitElement, html, css, customElement, property, query} from 'lit-element';
-import {connect} from '@captaincodeman/rdx';
+import {html, css, customElement, property, query} from 'lit-element';
+import {Connected} from "./connected";
 import {State, store} from "../store";
 
 import '@material/mwc-button';
@@ -13,7 +13,7 @@ import {Dialog} from "@material/mwc-dialog/mwc-dialog";
 import {Card} from "../models/types";
 
 @customElement('kmap-editor-add-fabs')
-export class KMapEditorAddFabs extends connect(store, LitElement) {
+export class KMapEditorAddFabs extends Connected {
   @property()
   private _currentModule: string = '';
   @property()

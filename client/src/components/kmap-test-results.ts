@@ -1,5 +1,5 @@
-import {LitElement, html, css, customElement, property} from 'lit-element';
-import { connect } from '@captaincodeman/rdx';
+import {html, css, customElement, property} from 'lit-element';
+import {Connected} from "./connected";
 import {State, store} from "../store";
 
 import '@material/mwc-button';
@@ -17,7 +17,7 @@ interface Summary {
 }
 
 @customElement('kmap-test-results')
-export class KmapTestResults extends connect(store, LitElement) {
+export class KmapTestResults extends Connected {
   @property()
   private _userid: string = '';
 

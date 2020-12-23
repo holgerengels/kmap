@@ -1,5 +1,5 @@
-import {LitElement, html, css, customElement, property, query} from 'lit-element';
-import {connect} from '@captaincodeman/rdx';
+import {html, css, customElement, property, query} from 'lit-element';
+import {Connected} from "./connected";
 import {State, store} from "../store";
 
 import '@material/mwc-button';
@@ -26,7 +26,7 @@ import {Test} from "../models/tests";
 import {Attachment, Upload} from "../models/types";
 
 @customElement('kmap-test-editor-edit-dialog')
-export class KMapTestEditorEditDialog extends connect(store, LitElement) {
+export class KMapTestEditorEditDialog extends Connected {
   @property()
   private _allTopics?: string[] = undefined;
   @property()
