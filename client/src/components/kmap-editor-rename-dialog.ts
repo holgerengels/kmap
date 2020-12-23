@@ -53,7 +53,6 @@ export class KMapEditorRenameDialog extends Connected {
 
     store.dispatch.maps.renameTopic(card);
     window.setTimeout(function() {
-      store.dispatch.maps.forget();
       store.dispatch.maps.load();
     }, 1000);
   }

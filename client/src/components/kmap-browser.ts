@@ -275,9 +275,6 @@ export class KMapBrowser extends Connected {
           grid-template-columns: 1fr;
           --content-width: 100vw;
         }
-        :host([wide]) {
-          padding: 16px;
-        }
         :host([draweropen]) {
           min-width: 300px;
           --content-width: calc(100vw - var(--mdc-drawer-width, 256px));
@@ -311,6 +308,7 @@ export class KMapBrowser extends Connected {
           min-width: 300px;
         }
         .cards {
+          margin: 16px;
           display: none;
           grid-gap: 16px;
         }
@@ -319,6 +317,9 @@ export class KMapBrowser extends Connected {
         }
         .cards [first] {
           grid-column-start: 1;
+        }
+        :host([wide]) kmap-knowledge-card {
+          margin: 16px;
         }
         .button {
           text-transform: uppercase;

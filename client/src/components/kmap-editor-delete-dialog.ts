@@ -43,7 +43,6 @@ export class KMapEditorDeleteDialog extends Connected {
 
     store.dispatch.maps.deleteTopic(card);
     window.setTimeout(function() {
-      store.dispatch.maps.forget();
       store.dispatch.maps.load();
     }, 1000);
   }

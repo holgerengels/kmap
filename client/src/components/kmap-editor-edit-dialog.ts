@@ -161,7 +161,6 @@ export class KMapEditorEditDialog extends Connected {
         store.dispatch.routing.replace(navigateAfterSafe);
       }
       else {
-        store.dispatch.maps.forget();
         store.dispatch.maps.load();
       }
     }.bind(undefined, this._navigateAfterSave), 1000);

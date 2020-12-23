@@ -132,19 +132,19 @@ export default createModel({
       return { ...state, deleting: true };
     },
     receivedDeleteTopic(state) {
-      return { ...state, deleting: false, cardForDelete: undefined };
+      return { ...state, deleting: false, cardForDelete: undefined, loaded: undefined };
     },
     requestRenameTopic(state) {
       return { ...state, deleting: true };
     },
     receivedRenameTopic(state) {
-      return { ...state, deleting: false, cardForRename: undefined };
+      return { ...state, deleting: false, cardForRename: undefined, loaded: undefined };
     },
     requestSaveTopic(state) {
       return { ...state, deleting: true };
     },
     receivedSaveTopic(state) {
-      return { ...state, deleting: false, cardForEdit: undefined };
+      return { ...state, deleting: false, cardForEdit: undefined, loaded: undefined };
     },
 
     requestAllTopics(state) {
