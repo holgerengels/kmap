@@ -296,15 +296,14 @@ export class KMapBrowser extends Connected {
         }
         .chapter-card {
           grid-column: 1 / -1;
-          width: min(calc(100% + 16px), 100vw);
+          width: min(calc(100% + 32px), 100vw);
           justify-self: left;
           background-color: white;
           margin: -16px -16px 0px -16px;
           border-radius: 0;
-          border-bottom-right-radius: 4px;
         }
         :host([draweropen]) .chapter-card {
-          width: min(calc(100% + 16px), calc(100vw - var(--mdc-drawer-width, 256px)));
+          width: min(calc(100% + 32px), calc(100vw - var(--mdc-drawer-width, 256px)));
           min-width: 300px;
         }
         .cards {
@@ -346,7 +345,7 @@ export class KMapBrowser extends Connected {
 
   render() {
     const gridStyles: StyleInfo = {
-      gridTemplateColumns: "repeat(" + this._maxCols + ", 300px)",
+      gridTemplateColumns: "repeat(" + this._maxCols + ", 300px) 1fr",
     }
     // language=HTML
     return html`
