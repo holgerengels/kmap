@@ -296,15 +296,15 @@ export class KMapBrowser extends Connected {
         }
         .chapter-card {
           grid-column: 1 / -1;
-          width: min(100%, 100vw);
+          width: min(calc(100% + 16px), 100vw);
           justify-self: left;
           background-color: white;
-        }
-        :host([wide]) .chapter-card {
-          width: min(100%, calc(100vw - 32px));
+          margin: -16px -16px 0px -16px;
+          border-radius: 0;
+          border-bottom-right-radius: 4px;
         }
         :host([draweropen]) .chapter-card {
-          width: min(100%, calc(100vw - var(--mdc-drawer-width, 256px) - 32px));
+          width: min(calc(100% + 16px), calc(100vw - var(--mdc-drawer-width, 256px)));
           min-width: 300px;
         }
         .cards {
