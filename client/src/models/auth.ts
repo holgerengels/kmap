@@ -1,4 +1,4 @@
-import { createModel } from '@captaincodeman/rdx'
+import {createModel} from '@captaincodeman/rdx'
 import { State, Store } from '../store'
 import { createSelector } from 'reselect'
 import { authLoader } from '../firebase'
@@ -9,8 +9,8 @@ export type User = import('firebase').UserInfo
 export type Credential = import('firebase').OAuthCredential
 
 export interface AuthState {
-  user: User | null
-  statusKnown: boolean
+  user: User | null,
+  statusKnown: boolean,
 }
 
 export default createModel({
@@ -47,33 +47,45 @@ export default createModel({
       },
 
       async init() {
-        const auth = await authLoader
-
-        auth.onAuthStateChanged(async user => {
-          console.log("onAuthStateChanged");
-          console.log(user);
-          if (user) {
-            console.log(user);
-            dispatch.auth.signedIn(user)
-          } else {
-            dispatch.auth.signedOut()
-          }
-        });
-        auth.onIdTokenChanged(async user => {
-          console.log("onIdTokenChanged");
-          console.log(user);
-          if (auth.currentUser !== null) {
-            const token = await auth.currentUser.getIdToken();
-            console.log(token);
-            dispatch.app.login({userid: user.uid, password: token});
-          } else {
-            dispatch.app.logout();
-          }
-        });
+        const state = store.getState();
+        if (state.app.instance === "root")
+          initialize(store);
+      },
+      'app/chooseInstance': async function () {
+        const state = store.getState();
+        if (state.app.instance === "root")
+          initialize(store);
       },
     }
   }
 })
+
+async function initialize(store: Store) {
+  const dispatch = store.getDispatch();
+  const auth = await authLoader
+
+  auth.onAuthStateChanged(async user => {
+    console.log("onAuthStateChanged");
+    console.log(user);
+    if (user) {
+      console.log(user);
+      dispatch.auth.signedIn(user)
+    } else {
+      dispatch.auth.signedOut()
+    }
+  });
+  auth.onIdTokenChanged(async user => {
+    console.log("onIdTokenChanged");
+    console.log(user);
+    if (auth.currentUser !== null) {
+      const token = await auth.currentUser.getIdToken();
+      console.log(token);
+      dispatch.app.login({userid: user.uid, password: token});
+    } else {
+      dispatch.app.logout();
+    }
+  });
+}
 
 function providerFromName(name: string) {
   switch (name) {
