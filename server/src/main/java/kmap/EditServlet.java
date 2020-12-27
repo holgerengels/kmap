@@ -4,11 +4,11 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonPrimitive;
 import org.apache.commons.io.IOUtils;
 
-import javax.servlet.ServletException;
-import javax.servlet.annotation.MultipartConfig;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Part;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Part;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
