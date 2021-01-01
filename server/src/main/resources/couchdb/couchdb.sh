@@ -3,23 +3,23 @@
 STATUS=`curl -LI -u $AUTH http://localhost:5984/$INST-map -o /dev/null -w '%{http_code}\n' -s`
 if [ $STATUS == '404' ] ; then
         echo "create databases .."
-        echo ".. create $AUTH-map .."
+        echo ".. create $INST-map .."
         ./create-map.sh
-        echo ".. create $AUTH-state .."
+        echo ".. create $INST-state .."
         ./create-state
-        echo ".. create $AUTH-test .."
+        echo ".. create $INST-test .."
         ./create-test.sh
-        echo ".. create $AUTH-course .."
+        echo ".. create $INST-course .."
         ./create-course.sh
-        echo ".. create $AUTH-feedback .."
+        echo ".. create $INST-feedback .."
         ./create-feedback
-elif
+else
         echo "update databases .."
-        echo ".. update $AUTH-map .."
+        echo ".. update $INST-map .."
         ./update-map.sh
-        echo ".. update $AUTH-test .."
+        echo ".. update $INST-test .."
         ./update-test.sh
-        echo ".. update $AUTH-course .."
+        echo ".. update $INST-course .."
         ./update-course.sh
 fi
 echo ".. done"
