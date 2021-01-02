@@ -140,19 +140,19 @@ curl -X PUT -u $1 http://localhost:5984/$2-test/_design/test -d @design-test.jso
             try (CloseableHttpResponse ignored = httpClient.execute(put, context)){ System.out.println("created " + name + "-course"); }
 
             put = new HttpPut(url() + name + "-map/_design/net");
-            entity = new InputStreamEntity(Files.newInputStream(Paths.get(getProperty("kmap.designDocs") + "design-map.json")));
+            entity = new InputStreamEntity(Files.newInputStream(Paths.get(getProperty("kmap.designDocs") + "couchdb/design-map.json")));
             entity.setContentType("application/json");
             put.setEntity(entity);
             try (CloseableHttpResponse ignored = httpClient.execute(put, context)){ System.out.println("design " + name + "-map"); }
 
             put = new HttpPut(url() + name + "-test/_design/test");
-            entity = new InputStreamEntity(Files.newInputStream(Paths.get(getProperty("kmap.designDocs") + "design-test.json")));
+            entity = new InputStreamEntity(Files.newInputStream(Paths.get(getProperty("kmap.designDocs") + "couchdb/design-test.json")));
             entity.setContentType("application/json");
             put.setEntity(entity);
             try (CloseableHttpResponse ignored = httpClient.execute(put, context)){ System.out.println("design " + name + "-test"); }
 
             put = new HttpPut(url() + name + "-course/_design/course");
-            entity = new InputStreamEntity(Files.newInputStream(Paths.get(getProperty("kmap.designDocs") + "design-course.json")));
+            entity = new InputStreamEntity(Files.newInputStream(Paths.get(getProperty("kmap.designDocs") + "couchdb/design-course.json")));
             entity.setContentType("application/json");
             put.setEntity(entity);
             try (CloseableHttpResponse ignored = httpClient.execute(put, context)){ System.out.println("design " + name + "-course"); }

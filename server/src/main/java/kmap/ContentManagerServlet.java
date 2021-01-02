@@ -17,9 +17,7 @@ import java.nio.charset.StandardCharsets;
  * Created by holger on 09.05.16.
  */
 @MultipartConfig(
-        fileSizeThreshold = 1024 * 1024,
-        maxFileSize = 1024 * 1024 * 5,
-        maxRequestSize = 1024 * 1024 * 5 * 5
+        fileSizeThreshold = 1024 * 1024
 )
 public class ContentManagerServlet
     extends JsonServlet

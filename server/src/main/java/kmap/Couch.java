@@ -507,28 +507,24 @@ public class Couch extends Server {
     }
 
     private void debugLinks(String subject, Map<String, String> links) {
-        String fileName = properties.getProperty("debug.chapterLinks");
-        if (fileName != null) {
-            try {
-                Files.write(Paths.get(fileName),
+        String fileName = "/tmp/chapter-links.csv";
+        try {
+            Files.write(Paths.get(fileName),
                     links.entrySet().stream().map(entry -> "\"" + subject + "." + entry.getKey() + "\", \"" + entry.getValue() + "\"").collect(Collectors.toList()));
-            }
-            catch (IOException e) {
-                e.printStackTrace();
-            }
+        }
+        catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
     private void debugDeps(String subject, MultiMap<String, String> deps) {
-        String fileName = properties.getProperty("debug.chapterDeps");
-        if (fileName != null) {
-            try {
-                Files.write(Paths.get(fileName),
+        String fileName = "/tmp/chapter-deps.csv";
+        try {
+            Files.write(Paths.get(fileName),
                     deps.entrySet().stream().map(entry -> "\"" + subject + "." + entry.getKey() + "\", \"" + entry.getValue() + "\"").collect(Collectors.toList()));
-            }
-            catch (IOException e) {
-                e.printStackTrace();
-            }
+        }
+        catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
