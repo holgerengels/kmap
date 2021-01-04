@@ -462,7 +462,7 @@ export class KmapMain extends connect(store, LitElement) {
       <hr/>
       <!--googleon: all-->
       <div class="cc-fb">
-        <a class="license" rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/deed.de"><img width="88" height="31" src="/cc-by-sa.png" alt="CC BY-SA 4.0"></a>
+        <a class="license" rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/deed.de"><img width="88" height="31" src="./cc-by-sa.png" alt="CC BY-SA 4.0"></a>
         <share-facebook></share-facebook>
       </div>
     `;

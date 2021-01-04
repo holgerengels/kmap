@@ -68,7 +68,7 @@ export default merge(baseConfig, {
     generateSW({
       swDest: 'dist/sw.js',
       globDirectory: 'dist/',
-      globPatterns: ['**/*.{html,js,css,png,svg}', 'app/fonts/*'],
+      globPatterns: ['**/*.{html,js,css,png,svg,woff2}'],
       navigateFallback: '/index.html',
       navigateFallbackDenylist: [/geogebra.html/],
     }),
