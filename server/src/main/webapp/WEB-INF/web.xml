@@ -11,6 +11,9 @@
     <servlet>
         <servlet-name>edit</servlet-name>
         <servlet-class>kmap.EditServlet</servlet-class>
+        <multipart-config>
+            <file-size-threshold>52428800</file-size-threshold>
+        </multipart-config>
     </servlet>
 
     <servlet>
