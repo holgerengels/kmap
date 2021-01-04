@@ -16,6 +16,9 @@
     <servlet>
         <servlet-name>content</servlet-name>
         <servlet-class>kmap.ContentManagerServlet</servlet-class>
+        <multipart-config>
+            <file-size-threshold>52428800</file-size-threshold>
+        </multipart-config>
     </servlet>
 
     <servlet>
