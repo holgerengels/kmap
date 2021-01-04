@@ -5,6 +5,7 @@
       <configuration>
         <descriptors>
           <deploymentDescriptor name="context.xml" url="file://$MODULE_DIR$/src/main/webapp/META-INF/context.xml" />
+          <deploymentDescriptor name="jetty-web.xml" url="file://$MODULE_DIR$/src/main/webapp/WEB-INF/jetty-web.xml" />
           <deploymentDescriptor name="web.xml" url="file://$MODULE_DIR$/src/main/webapp/WEB-INF/web.xml" />
         </descriptors>
         <webroots>
@@ -32,12 +33,6 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-server:11.0.0" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.jetty.toolchain:jetty-jakarta-servlet-api:5.0.1" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-http:11.0.0" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-util:11.0.0" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-io:11.0.0" level="project" />
-    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:2.0.0-alpha1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: jakarta.servlet:jakarta.servlet-api:5.0.0" level="project" />
     <orderEntry type="library" name="Maven: com.google.code.gson:gson:2.8.5" level="project" />
     <orderEntry type="library" name="Maven: es.indaba:lightcouch:0.2.6" level="project" />
@@ -106,6 +101,7 @@
     <orderEntry type="library" name="Maven: com.google.guava:guava:26.0-android" level="project" />
     <orderEntry type="library" name="Maven: org.checkerframework:checker-compat-qual:2.5.2" level="project" />
     <orderEntry type="library" name="Maven: org.codehaus.mojo:animal-sniffer-annotations:1.14" level="project" />
+    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.25" level="project" />
     <orderEntry type="library" name="Maven: io.netty:netty-codec-http:4.1.34.Final" level="project" />
     <orderEntry type="library" name="Maven: io.netty:netty-common:4.1.34.Final" level="project" />
     <orderEntry type="library" name="Maven: io.netty:netty-buffer:4.1.34.Final" level="project" />
