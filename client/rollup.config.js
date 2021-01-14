@@ -53,9 +53,14 @@ export default merge(baseConfig, {
     }),
     copy({
       targets: [
-        {src: 'res/*', dest: 'dist'},
         {src: 'src/icons/*', dest: 'dist'},
         {src: 'fonts/*', dest: 'dist/fonts'},
+        {src: 'favicon.ico', dest: 'dist'},
+        {src: 'robots.txt', dest: 'dist'},
+        {src: '*.css', dest: 'dist'},
+        {src: 'manifest.json', dest: 'dist'},
+        {src: 'browserconfig.xml', dest: 'dist'},
+        {src: 'geogebra.html', dest: 'dist'},
       ],
       flatten: false,
     }),
