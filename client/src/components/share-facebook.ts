@@ -46,7 +46,7 @@ export class ShareFacebook extends LitElement {
   render() {
     //language=HTML
     return html`
-      <a href="${this._href()}" title="Auf Facebook teilen"><img src="./facebook.svg" width="16" height="16" alt="f"/><h6>teilen</h6></a>
+      <a href="${this._href()}" title="Auf Facebook teilen"><img src="icons/facebook.svg" width="16" height="16" alt="f"/><h6>teilen</h6></a>
     `;
   }
 }

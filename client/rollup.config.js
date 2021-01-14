@@ -54,6 +54,7 @@ export default merge(baseConfig, {
     copy({
       targets: [
         {src: 'res/*', dest: 'dist'},
+        {src: 'src/icons/*', dest: 'dist/icons'},
         {src: 'fonts/*', dest: 'dist/fonts'},
       ],
       flatten: false,
