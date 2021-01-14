@@ -28,6 +28,13 @@ public class IndexServlet extends JsonServlet {
     public void init() throws ServletException {
         super.init();
         couch = new Couch(properties);
+        try {
+            Path path = Paths.get(getServletContext().getRealPath(properties.getProperty("kmap.index", "index.html")));
+            file = IOUtils.toString(new InputStreamReader(Files.newInputStream(path), StandardCharsets.UTF_8));
+        }
+        catch (IOException e) {
+            throw new ServletException(e);
+        }
     }
 
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -101,7 +108,7 @@ public class IndexServlet extends JsonServlet {
             Server.CLIENT.remove();
         }
 
-        String string = file();
+        String string = file;
         string = string.replace("<title>KMap</title>", "<title>" + title + "</title>");
         string = string.replace("<meta ogtitle=\"\">", "<meta property=\"og:title\" content=\"" + title + "\">");
         string = string.replace("<meta ogdescription=\"\">", "<meta property=\"og:description\" content=\"" + description + "\">");
@@ -137,13 +144,5 @@ public class IndexServlet extends JsonServlet {
     private String date(JsonObject object, String name) {
         JsonPrimitive primitive = object.getAsJsonPrimitive(name);
         return primitive != null ? format.format(new Date(primitive.getAsLong())) : null;
-    }
-
-    private synchronized String file() throws IOException {
-        if (file == null) {
-            Path path = Paths.get(properties.getProperty("kmap.index"));
-            file = IOUtils.toString(new InputStreamReader(Files.newInputStream(path), StandardCharsets.UTF_8));
-        }
-        return file;
     }
 }
