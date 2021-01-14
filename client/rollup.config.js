@@ -53,17 +53,10 @@ export default merge(baseConfig, {
     }),
     copy({
       targets: [
-        {src: 'favicon.ico', dest: 'dist'},
-        {src: 'robots.txt', dest: 'dist'},
-        {src: '*.png', dest: 'dist'},
-        {src: '*.svg', dest: 'dist'},
-        {src: '*.css', dest: 'dist'},
-        {src: 'manifest.json', dest: 'dist'},
-        {src: 'browserconfig.xml', dest: 'dist'},
-        {src: 'geogebra.html', dest: 'dist'},
+        {src: 'res/*', dest: 'dist'},
         {src: 'fonts/*', dest: 'dist/fonts'},
       ],
-      flatten: false
+      flatten: false,
     }),
     generateSW({
       swDest: 'dist/sw.js',
