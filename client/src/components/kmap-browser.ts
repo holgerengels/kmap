@@ -1,5 +1,4 @@
 import {html, css, customElement, property, query} from 'lit-element';
-import {RoutingState} from '@captaincodeman/rdx';
 import {State, store} from "../store";
 
 import {colorStyles, elevationStyles, fontStyles} from "./kmap-styles";
@@ -39,6 +38,7 @@ export class KMapBrowser extends Connected {
   @property()
   private _chapterCard?: Card = undefined;
   @property()
+  // @ts-ignore
   private _topic: string = '';
   @property()
   private _topicCard?: Card = undefined;
@@ -86,21 +86,16 @@ export class KMapBrowser extends Connected {
   @query('#timeline')
   private _timelineElement: KMapTimelineAside;
 
-  set route(val: RoutingState<string>) {
-    if (val.page === "browser") {
-      this._topic = val.params.topic ? decodeURIComponent(val.params.topic) : '';
-    }
-  }
-
   mapState(state: State) {
     return {
-      route: state.routing,
       _userid: state.app.userid,
       _layers: state.shell.layers,
       wide: !state.shell.narrow,
       drawerOpen: state.shell.drawerOpen && !state.shell.narrow,
       _subject: state.maps.subject,
       _chapter: state.maps.chapter,
+      _topic: state.maps.topic,
+      _page: state.maps.topic ? "topic" : "map",
       _lines: state.maps.lines,
       _chapterCard: state.maps.chapterCard,
       _topicCard: state.maps.topicCard,
@@ -123,20 +118,6 @@ export class KMapBrowser extends Connected {
         cols = Math.max(cols, line.cards.length)
       }
       this._maxCols = cols;
-    }
-
-    if (changedProperties.has("_topicCard") || changedProperties.has("_chapterCard")) {
-      if (this._page === "map" && this._topicCard !== undefined) {
-        // @ts-ignore
-        let nodes = this.shadowRoot.querySelectorAll('kmap-summary-card[key="' + this._topic + '"]');
-        if (nodes.length !== 0) {
-          let scard = nodes[0];
-          this._animFrom = scard.getBoundingClientRect();
-          console.log("from");
-          console.log(this._animFrom);
-        }
-      }
-      this._page = this._topicCard ? "topic" : "map";
     }
 
     if (changedProperties.has("_page") && this._page === 'topic' && this._animFrom !== undefined) {
@@ -263,6 +244,11 @@ export class KMapBrowser extends Connected {
     }
   }
 
+  _hover(e) {
+    console.log(e.target)
+    this._animFrom = e.target.getBoundingClientRect();
+  }
+
   static get styles() {
     // language=CSS
     return [
@@ -357,7 +343,7 @@ export class KMapBrowser extends Connected {
         ${this._chapterCard ? this._renderChapterCard() : ''}
         ${this._lines.map((line) => html`
           ${line.cards.map((card, index) => html`
-            <kmap-summary-card ?first="${index === 0}" .subject="${this._subject}" .chapter="${this._chapter}" .card="${card}" ?faded="${this._faded}" key="${card.topic}"></kmap-summary-card>
+            <kmap-summary-card @mouseenter="${this._hover}" ?first="${index === 0}" .subject="${this._subject}" .chapter="${this._chapter}" .card="${card}" ?faded="${this._faded}" key="${card.topic}"></kmap-summary-card>
           `)}
         `)}
       </div>
