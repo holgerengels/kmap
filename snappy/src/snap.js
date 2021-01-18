@@ -11,7 +11,7 @@ let server;
 let browser;
 
 (async () => {
-    browser = await puppeteer.launch({args: ['--disable-dev-shm-usage'] });
+    browser = await puppeteer.launch({args: ['--disable-dev-shm-usage', '--no-sandbox'] });
 
     const requestListener = async function (req, res) {
         try {
