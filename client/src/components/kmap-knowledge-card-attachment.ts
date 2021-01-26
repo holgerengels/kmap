@@ -35,13 +35,13 @@ export class KMapKnowledgeCardAttachment extends LitElement {
     switch (mime) {
       case "application/vnd.geogebra.file":
       case "application/vnd.geogebra-classic.file":
-        return "/geogebra.html?path=" + urls.server;
+        return "/app/geogebra.html?path=" + urls.server;
       case "application/vnd.geogebra-3d.file":
-        return "/geogebra.html?app=3d&path=" + urls.server;
+        return "/app/geogebra.html?app=3d&path=" + urls.server;
       case "application/vnd.geogebra-graphing.file":
-        return "/geogebra.html?app=graphing&path=" + urls.server;
+        return "/app/geogebra.html?app=graphing&path=" + urls.server;
       case "application/vnd.geogebra-geometry.file":
-        return "/geogebra.html?app=geometry&path=" + urls.server;
+        return "/app/geogebra.html?app=geometry&path=" + urls.server;
       default:
         return "";
     }
