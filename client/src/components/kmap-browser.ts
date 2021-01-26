@@ -245,7 +245,6 @@ export class KMapBrowser extends Connected {
   }
 
   _hover(e) {
-    console.log(e.target)
     this._animFrom = e.target.getBoundingClientRect();
   }
 
