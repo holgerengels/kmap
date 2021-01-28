@@ -94,6 +94,9 @@ export default createModel({
     },
     request(state) {
       return { ...state, loading: true,
+        lines: [],
+        chapterCard: undefined,
+        topicCard: undefined,
         timestamp: Date.now(),
         error: "",
       };
