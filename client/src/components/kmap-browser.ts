@@ -348,7 +348,7 @@ export class KMapBrowser extends Connected {
       </div>
 
       ${this._topicCard ? html`
-        <kmap-knowledge-card @rated="${this._rated}" .subject="${this._subject}" .chapter="${this._chapter}" .card="${this._topicCard}"></kmap-knowledge-card>
+        <kmap-knowledge-card @rated="${this._rated}" .card="${this._topicCard}"></kmap-knowledge-card>
       ` : '' }
       <kmap-timeline-aside id="timeline" class="elevation-02" @touchstart="${this._swipeStart}" @touchmove="${this._swipeMove}" @touchend="${this._swipeEnd}" @open="${() => this.timelineState = 'open'}"></kmap-timeline-aside>
     `;

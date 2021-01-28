@@ -19,10 +19,6 @@ export class KMapSummaryCard extends Connected {
 
   @property()
   private _userid: string = '';
-  @property({type: String})
-  private subject: string = '';
-  @property({type: String})
-  private chapter: string = '';
   @property({type: Object})
   private card?: Card;
   @property()
@@ -60,15 +56,15 @@ export class KMapSummaryCard extends Connected {
       _selectedDependencies: state.maps.selectedDependencies,
       selected: this.card !== undefined && state.maps.selected === this.card.topic,
       grayedOut:  this.card !== undefined && state.maps.targeted
-        && !(state.maps.targeted.includes(this.chapter + "/" + this.card.topic)
-          || state.maps.targeted.includes(this.chapter)
+        && !(state.maps.targeted.includes(this.card.chapter + "/" + this.card.topic)
+          || state.maps.targeted.includes(this.card.chapter)
           || (this.card.links && state.maps.targeted.filter(t => t.startsWith(this.card?.links || "!!!")).length > 0))
     };
   }
 
   updated(changedProperties) {
     if (changedProperties.has("card") && this.card !== undefined) {
-      this._key = this.card.links ? this.card.links : this.chapter + "." + this.card.topic;
+      this._key = this.card.links ? this.card.links : this.card.chapter + "." + this.card.topic;
       /*
       this._thumbStyles = this.card.thumb !== undefined ? {
         "background-image": `url('${urls.server}${encode("data", this.subject, this.chapter, this.card.topic, this.card.thumb)}?instance=${this._instance}')`,
@@ -80,15 +76,15 @@ export class KMapSummaryCard extends Connected {
     }
 
     if (changedProperties.has("card") || changedProperties.has("_topics"))
-      this._hasTests = this.card !== undefined && this._topics.includes(this.chapter + "." + this.card.topic);
+      this._hasTests = this.card !== undefined && this._topics.includes(this.card.chapter + "." + this.card.topic);
 
     if (changedProperties.has("_userid") || changedProperties.has("_layers") || changedProperties.has("_key"))
       this._colorizeEvent( );
 
     if (changedProperties.has("_selectedDependencies")) {
-      this.highlighted= this.card?.links
+      this.highlighted = this.card?.links
         ? this._selectedDependencies.includes(this.card.links)
-        : this._selectedDependencies.includes(this.chapter + "/" + this.card?.topic);
+        : this._selectedDependencies.includes(this.card?.chapter + "/" + this.card?.topic);
     }
   }
 
@@ -188,7 +184,7 @@ export class KMapSummaryCard extends Connected {
             <kmap-summary-card-rating slot="button" .key="${this._key}" style="padding-left: 8px"></kmap-summary-card-rating>
           ` : '' }
           ${this._hasTests ? html`
-            <a slot="icon" href="${'/app/test/' + encode(this.subject, this.chapter, this.card.topic)}" title="Aufgaben zum Thema ${this.card.topic}" style="display: flex; padding-right: 8px; --foreground: var(--color-darkgray)"><span class="print-show">Aufgaben →&nbsp;</span>${iconTest}</a>
+            <a slot="icon" href="${'/app/test/' + encode(this.card.subject, this.card.chapter, this.card.topic)}" title="Aufgaben zum Thema ${this.card.topic}" style="display: flex; padding-right: 8px; --foreground: var(--color-darkgray)"><span class="print-show">Aufgaben →&nbsp;</span>${iconTest}</a>
           ` : '' }
         </kmap-card>
     `;
@@ -196,7 +192,7 @@ export class KMapSummaryCard extends Connected {
 
   _link() {
     if (this.card === undefined) return "";
-    return this.card.links ? '/app/browser/' + encode(this.subject, this.card.links) : '/app/browser/' + encode(this.subject, this.chapter, this.card.topic)
+    return this.card.links ? '/app/browser/' + encode(this.card.subject, this.card.links) : '/app/browser/' + encode(this.card.subject, this.card.chapter, this.card.topic)
   }
 
   _linkTitle() {

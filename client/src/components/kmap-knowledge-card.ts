@@ -25,10 +25,6 @@ export class KMapKnowledgeCard extends Connected {
   private _instance: string = '';
   @property()
   private _userid: string = '';
-  @property({type: String})
-  private subject: string = '';
-  @property({type: String})
-  private chapter: string = '';
   @property({type: Object})
   private card?: Card;
   @property({type: Number})
@@ -83,7 +79,7 @@ export class KMapKnowledgeCard extends Connected {
       this.divideAttachments(this.card ? this.card.attachments : []);
 
     if (changedProperties.has("card") || changedProperties.has("_topics"))
-      this._hasTests = this.card !== undefined && this._topics.includes(this.chapter + "." + this.card.topic);
+      this._hasTests = this.card !== undefined && this._topics.includes(this.card.chapter + "." + this.card.topic);
   }
 
   _colorize(rate) {
@@ -92,13 +88,13 @@ export class KMapKnowledgeCard extends Connected {
 
   _rated(e) {
     if (this.card === undefined) return;
-    let key = this.chapter + "." + this.card.topic;
+    let key = this.card.chapter + "." + this.card.topic;
     this.dispatchEvent(new CustomEvent('rated', { bubbles: true, composed: true, detail: {key: key, rate: e.detail.rate}}));
   }
 
   _rating() {
     if (this.card !== undefined && this._rates) {
-      let key = this.chapter + "." + this.card.topic;
+      let key = this.card.chapter + "." + this.card.topic;
       this.state = this._getStateValue(key);
       this.progressNum = this._getStateValue(key + "*");
       this.progressOf = this._getStateValue(key + "#");
@@ -157,7 +153,7 @@ export class KMapKnowledgeCard extends Connected {
     // @ts-ignore
     navigator.share({
       title: "KMap",
-      text: this.chapter + " - " + this.card.topic,
+      text: this.card.chapter + " - " + this.card.topic,
       url: document.location.href,
     })  }
 
@@ -212,13 +208,13 @@ export class KMapKnowledgeCard extends Connected {
       return html`
       <kmap-card style=${styleMap(this._colorStyles)}>
         <kmap-card-text type="header">
-          <h2>${this.card.topic !== "_" ? this.card.topic : this.chapter}</h2>
+          <h2>${this.card.topic !== "_" ? this.card.topic : this.card.chapter}</h2>
         </kmap-card-text>
 
         ${this.card.dependencies && this.card.dependencies.length !== 0 ? html`
           <kmap-card-text>
             <kmap-knowledge-card-depends
-                .subject="${this.subject}"
+                .subject="${this.card.subject}"
                 .dependencies="${this.card.dependencies}"
                 ?hidden="${!this.card.dependencies || this.card.dependencies.length === 0}">
             </kmap-knowledge-card-depends>
@@ -244,8 +240,8 @@ export class KMapKnowledgeCard extends Connected {
         <kmap-card-text>
           <kmap-knowledge-card-description
               .instance="${this._instance}"
-              .subject="${this.subject}"
-              .chapter="${this.chapter}"
+              .subject="${this.card.subject}"
+              .chapter="${this.card.chapter}"
               .topic="${this.card.topic}"
               .description="${this.card.description}"
               .links="${this.card.links}"
@@ -308,19 +304,19 @@ export class KMapKnowledgeCard extends Connected {
         </div>
         ` : '' }
 
-          <a class="button" slot="button" href="/app/browser/${encode(this.subject, this.chapter)}" title="Wissenslandkarte ${this.chapter}"><mwc-icon>expand_less</mwc-icon></a>
+          <a class="button" slot="button" href="/app/browser/${encode(this.card.subject, this.card.chapter)}" title="Wissenslandkarte ${this.card.chapter}"><mwc-icon>expand_less</mwc-icon></a>
 
           ${!this.card.links && false ? html`
             <star-rating slot="button" .rate="${this.state}" @clicked="${this._rated}"></star-rating>
           ` : '' }
           ${this._hasTests ? html`
-            <a slot="icon" href="${'/app/test/' + encode(this.subject, this.chapter, this.card.topic)}" title="Aufgaben zum Thema ${this.card.topic}" style="display: flex; padding-right: 8px; --foreground: var(--color-darkgray)">${iconTest}</a>
+            <a slot="icon" href="${'/app/test/' + encode(this.card.subject, this.card.chapter, this.card.topic)}" title="Aufgaben zum Thema ${this.card.topic}" style="display: flex; padding-right: 8px; --foreground: var(--color-darkgray)">${iconTest}</a>
           ` : '' }
            <mwc-icon-button slot="icon" icon="share" title="Teilen..." ?hidden="${typeof navigator['share'] !== 'function'}" @click="${this._share}"></mwc-icon-button>
            <mwc-icon-button slot="icon" icon="feedback" title="Feedback" @click="${this._feedback}"></mwc-icon-button>
          </kmap-card>
 
-  <kmap-feedback id="feedbackDialog" .subject="${this.subject}" .chapter="${this.chapter}" .topic="${this.card.topic}"></kmap-feedback>
+  <kmap-feedback id="feedbackDialog" .subject="${this.card.subject}" .chapter="${this.card.chapter}" .topic="${this.card.topic}"></kmap-feedback>
     `;
   }
 }
