@@ -103,7 +103,7 @@ export default createModel({
     },
     received(state, payload: MapState) {
       return { ...state,
-        lines: payload.lines,
+        lines: complete(payload.lines, state.subject || '', state.chapter || ''),
         loaded: "" + state.subject + state.chapter,
         chapterCard: payload.chapterCard,
         loading: false,
@@ -394,4 +394,14 @@ function topicCard(state): Card | undefined
     }
     return undefined;
   }
+}
+
+function complete(lines: Line[], subject: string, chapter: string): Line[] {
+  for (let line of lines) {
+    for (let card of line.cards) {
+      card.subject = subject;
+      card.chapter = chapter;
+    }
+  }
+  return lines;
 }
