@@ -103,7 +103,7 @@ export default createModel({
     },
     received(state, payload: MapState) {
       return { ...state,
-        lines: complete(payload.lines, state.subject || '', state.chapter || ''),
+        lines: payload.lines,
         loaded: "" + state.subject + state.chapter,
         chapterCard: payload.chapterCard,
         loading: false,
@@ -222,14 +222,17 @@ export default createModel({
           dispatch.maps.request();
           fetchjson(`${urls.server}data?subject=${encodeURIComponent(state.maps.subject)}&load=${encodeURIComponent(state.maps.chapter)}`, endpoint.get(state),
             (json) => {
-              dispatch.maps.received(json);
-              dispatch.maps.setTopicCard(topicCard(state));
+              const mapState = json;
+              mapState.topic = state.maps.topic;
+              complete(mapState);
+              dispatch.maps.received(mapState);
+              dispatch.maps.setTopicCard(topicCard(mapState));
             },
             dispatch.app.handleError,
             dispatch.maps.error);
         }
         else
-          dispatch.maps.setTopicCard(topicCard(state));
+          dispatch.maps.setTopicCard(topicCard(state.maps));
       },
 
       async loadLatest(subject: string) {
@@ -379,16 +382,16 @@ export default createModel({
   }
 })
 
-function topicCard(state): Card | undefined
+function topicCard(state: MapState): Card | undefined
 {
-  if (!state.maps.topic) {
+  if (!state.topic) {
     return undefined;
-  } else if (state.maps.topic === "_") {
-    return state.maps.chapterCard;
+  } else if (state.topic === "_") {
+    return state.chapterCard;
   } else {
-    for (let line of state.maps.lines) {
+    for (let line of state.lines) {
       for (let card of line.cards) {
-        if (card.topic === state.maps.topic)
+        if (card.topic === state.topic)
           return card;
       }
     }
@@ -396,12 +399,20 @@ function topicCard(state): Card | undefined
   }
 }
 
-function complete(lines: Line[], subject: string, chapter: string): Line[] {
-  for (let line of lines) {
+function complete(state: MapState) {
+  if (!state.subject)
+    throw new Error("subject not given");
+  if (!state.chapter)
+    throw new Error("chapter not given");
+
+  for (let line of state.lines) {
     for (let card of line.cards) {
-      card.subject = subject;
-      card.chapter = chapter;
+      card.subject = state.subject;
+      card.chapter = state.chapter;
     }
   }
-  return lines;
+  if (state.chapterCard) {
+    state.chapterCard.subject = state.subject;
+    state.chapterCard.chapter = state.chapter;
+  }
 }
