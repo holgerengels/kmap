@@ -75,6 +75,7 @@ public class Authentication {
                         JsonServlet.sendError(request, response, HttpServletResponse.SC_NOT_ACCEPTABLE, "invalid credentials");
                 }
                 catch (Exception e) {
+                    e.printStackTrace();
                     JsonServlet.sendError(request, response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
                 }
             }
