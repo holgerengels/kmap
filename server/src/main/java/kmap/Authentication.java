@@ -31,18 +31,20 @@ public class Authentication {
         if (!csvs.containsKey(Server.CLIENT.get())) {
             Path path = Paths.get(properties.getProperty("auth.csv") + Server.CLIENT.get() + "-users.csv");
             if (Files.exists(path)) {
+                System.out.println("instance csv: " + path + " - added");
                 try {
                     CSVReader reader = new CSVReader(Files.newBufferedReader(path));
                     Map<String, Account> csv = new HashMap<>();
                     reader.forEach(line -> csv.put(line[0], new Account(line)));
                     csvs.put(Server.CLIENT.get(), csv);
-                }
-                catch (IOException e) {
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
-            else
+            else {
                 csvs.put(Server.CLIENT.get(), null);
+                System.out.println("instance csv: " + path + " - does not exist");
+            }
         }
         return csvs.get(Server.CLIENT.get());
     }
