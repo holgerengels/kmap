@@ -26,6 +26,7 @@ import {throttle} from "../debounce";
 import {Upload} from "../models/types";
 import {Attachment, Card} from "../models/types";
 import {FileDrop} from "./file-drop";
+import {styleMap} from "lit-html/directives/style-map.js";
 
 @customElement('kmap-editor-edit-dialog')
 export class KMapEditorEditDialog extends Connected {
@@ -58,6 +59,8 @@ export class KMapEditorEditDialog extends Connected {
   private _attachmentTag: string = '';
   @property()
   private _attachmentName: string = '';
+  @property()
+  private _attachmentMime: string = '';
   @property()
   private _attachmentHref: string = '';
   @property()
@@ -116,6 +119,7 @@ export class KMapEditorEditDialog extends Connected {
 
       this._attachmentTag = '';
       this._attachmentName = '';
+      this._attachmentMime = '';
       this._attachmentHref = '';
       this._attachmentFile = undefined;
       this._summary = this._card.summary;
@@ -185,7 +189,7 @@ export class KMapEditorEditDialog extends Connected {
   _addAttachment() {
     if (!this._card) return;
 
-    if (!this._attachmentName || !(this._attachmentHref || this._attachmentFile)) {
+    if (!this._attachmentName || !(this._attachmentHref || (this._attachmentFile && this._attachmentMime))) {
       store.dispatch.shell.showMessage("unvollständig!");
       return;
     }
@@ -202,7 +206,7 @@ export class KMapEditorEditDialog extends Connected {
         tag: this._attachmentTag,
         name: this._attachmentName,
         file: this._attachmentFile.name,
-        mime: this._attachmentFile.type,
+        mime: this._attachmentMime,
         type: "file",
       }];
       console.log("upload file");
@@ -211,6 +215,7 @@ export class KMapEditorEditDialog extends Connected {
 
     this._attachmentTag = '';
     this._attachmentName = '';
+    this._attachmentMime = '';
     this._attachmentHref = '';
     this._attachmentFile = undefined;
     this._attachmentForm.reset();
@@ -286,6 +291,13 @@ export class KMapEditorEditDialog extends Connected {
   }
 
   render() {
+    const styles = this._attachmentType === "link"
+      ? {
+        gridTemplateColumns: "1fr 1fr 36px 2fr 36px"
+      } : {
+        gridTemplateColumns: "1fr 1fr 36px 1fr 1fr 36px"
+      };
+
     // language=HTML
     return html`
 <mwc-dialog id="editDialog" heading="Editor" @keydown="${this._switchTab}">
@@ -325,7 +337,7 @@ ${this._card ? html`
       `)}
     </div>
     <validating-form id="attachmentForm" @validity="${e => this._attachmentValid = e.target.valid}">
-      <div class="form" style="grid-template-columns: 1fr 1fr 36px 1fr 36px" @dragover="${() => this._attachmentType = 'file'}">
+      <div class="form" style="${styleMap(styles)}" @dragover="${() => this._attachmentType = 'file'}">
         <mwc-select id="tag" label="Tag" .value="${this._attachmentTag}" @change="${e => this._attachmentTag = e.target.value}">
           <mwc-list-item value="">Kein Tag</mwc-list-item>
           ${Array.from(_tags).map(([key, value]) => html`
@@ -336,6 +348,7 @@ ${this._card ? html`
         <mwc-icon-button-toggle ?on="${this._attachmentType === 'file'}" onIcon="attachment" offIcon="link" @MDCIconButtonToggle:change="${e => this._attachmentType = e.detail.isOn ? 'file' : 'link'}"></mwc-icon-button-toggle>
         <mwc-textfield ?hidden="${this._attachmentType === "file"}" id="href" type="url" label="Link" .value="${this._attachmentHref}" @change="${e => this._attachmentHref = e.target.value}"></mwc-textfield>
         <file-drop ?hidden="${this._attachmentType === "link"}" id="file" @filedrop="${this._fileDrop}"></file-drop>
+        <mwc-textfield ?hidden="${this._attachmentType === "link"}" id="mime" type="text" label="MimeType" .value="${this._attachmentMime}" @change="${e => this._attachmentMime = e.target.value}"></mwc-textfield>
         <mwc-icon-button class="add" icon="add_circle" @click="${this._addAttachment}"></mwc-icon-button>
       </div>
     </validating-form>
@@ -361,6 +374,9 @@ ${this._card ? html`
     this._attachmentFile = e.detail.file as File;
     if (this._attachmentName === "") {
       this._attachmentName = this._attachmentFile.name.includes(".") ? this._attachmentFile.name.substr(0, this._attachmentFile.name.lastIndexOf(".")) : this._attachmentFile.name;
+    }
+    if (this._attachmentMime === "") {
+      this._attachmentMime = this._attachmentFile.type;
     }
   }
 
