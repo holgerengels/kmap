@@ -98,9 +98,9 @@ export class KmapMain extends connect(store, LitElement) {
 
   // @ts-ignore
   firstUpdated(changedProperties) {
-    updateMetadata({ title: "KMap", description: "KMap kartographiert Wissen mit Zusammenhang", image: window.location.origin + "/app/KMap-Logo.png", keywords: undefined });
+    updateMetadata({ title: "KMap", description: "KMap kartographiert Wissen mit Zusammenhang", image: window.location.origin + "/app/icons/KMap-Logo-cropped.png", keywords: undefined });
 
-      this._bar.scrollTarget = this._main;
+    this._bar.scrollTarget = this._main;
 
     store.dispatch.shell.clearMessages();
     if (!window.location.host.includes("localhost")) {
@@ -150,7 +150,7 @@ export class KmapMain extends connect(store, LitElement) {
           "name": title,
           "description": description,
           "mainEntityOfPage": window.location.href,
-          "image": this._meta.image ? [this._meta.image] : "https://kmap.eu/app/KMap-Logo%20small.png",
+          "image": this._meta.image ? [this._meta.image] : "https://kmap.eu/app/icons/KMap-Logo-cropped.png",
           "datePublished": this._meta.modified ? new Date(this._meta.modified) : new Date(),
           "dateModified": this._meta.modified ? new Date(this._meta.modified) : undefined,
           "author": this._meta.author ? {
@@ -166,7 +166,7 @@ export class KmapMain extends connect(store, LitElement) {
             "email": "hengels@gmail.com",
             "logo": {
               "@type": "ImageObject",
-              "url": "https://kmap.eu/app/KMap-Logo%20small.png"
+              "url": "https://kmap.eu/app/icons/KMap-Logo-cropped.png"
             }
           }
         }
