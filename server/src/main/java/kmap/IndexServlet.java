@@ -29,7 +29,7 @@ public class IndexServlet extends JsonServlet {
         super.init();
         couch = new Couch(properties);
         try {
-            Path path = Paths.get(getServletContext().getRealPath(properties.getProperty("kmap.index", "index.html")));
+            Path path = Paths.get(getServletContext().getRealPath(properties.getProperty("kmap.index", "/index.html")));
             file = IOUtils.toString(new InputStreamReader(Files.newInputStream(path), StandardCharsets.UTF_8));
         }
         catch (IOException e) {
