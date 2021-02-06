@@ -16,6 +16,7 @@ let browser;
     const requestListener = async function (req, res) {
         try {
             let path = req.url;
+            path = path.substr("snappy/".length);
             let fileName = decodeURIComponent(path.split("/").pop()) + ".png";
             console.log("snap " + path);
             path = "https://kmap.eu/app/browser" + path;
@@ -32,6 +33,7 @@ let browser;
             res.end(content);
         }
         catch (err) {
+            console.log(err);
             res.writeHead(500);
             res.end(err);
         }
