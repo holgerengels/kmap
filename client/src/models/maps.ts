@@ -226,13 +226,32 @@ export default createModel({
               mapState.topic = state.maps.topic;
               complete(mapState);
               dispatch.maps.received(mapState);
-              dispatch.maps.setTopicCard(topicCard(mapState));
+              if (mapState.lines.length === 0) {
+                dispatch.shell.showMessage("Die Wissenslandkarte " + mapState.subject + " → " + mapState.chapter + " existiert nicht!");
+                dispatch.maps.setTopicCard(undefined);
+              }
+              else {
+                try {
+                  dispatch.maps.setTopicCard(topicCard(mapState));
+                }
+                catch (e) {
+                  dispatch.maps.setTopicCard(undefined);
+                  dispatch.shell.showMessage("Die Wissenskarte " + mapState.subject + " → " + mapState.chapter + " → " + mapState.topic + " existiert nicht!");
+                }
+              }
             },
             dispatch.app.handleError,
             dispatch.maps.error);
         }
-        else
-          dispatch.maps.setTopicCard(topicCard(state.maps));
+        else {
+          try {
+            dispatch.maps.setTopicCard(topicCard(state.maps));
+          }
+          catch (e) {
+            dispatch.maps.setTopicCard(undefined);
+            dispatch.shell.showMessage("Die Wissenskarte " + state.maps.subject + " → " + state.maps.chapter + " → " + state.maps.topic + " existiert nicht!");
+          }
+        }
       },
 
       async loadLatest(subject: string) {
@@ -395,7 +414,7 @@ function topicCard(state: MapState): Card | undefined
           return card;
       }
     }
-    return undefined;
+    throw new Error("unknown topic " + state.topic);
   }
 }
 
