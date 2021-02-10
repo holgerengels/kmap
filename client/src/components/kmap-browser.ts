@@ -109,6 +109,20 @@ export class KMapBrowser extends Connected {
 
   protected firstUpdated() {
     this._sideBar(this.timelineState);
+
+    console.log("register timeline touch listeners ..");
+    var supportsPassive = false;
+    try {
+      var opts = Object.defineProperty({}, 'passive', { get: function() { supportsPassive = true; } });
+      // @ts-ignore
+      window.addEventListener("testPassive", null, opts);
+      // @ts-ignore
+      window.removeEventListener("testPassive", null, opts);
+    } catch (e) {}
+    console.log("passive supported: " + supportsPassive);
+    this._timelineElement.addEventListener('touchstart', this._swipeStart, supportsPassive ? { passive: true } : false);
+    this._timelineElement.addEventListener('touchmove', this._swipeMove, supportsPassive ? { passive: true } : false);
+    this._timelineElement.addEventListener('touchend', this._swipeEnd);
   }
 
   updated(changedProperties) {
@@ -350,7 +364,7 @@ export class KMapBrowser extends Connected {
       ${this._topicCard ? html`
         <kmap-knowledge-card @rated="${this._rated}" .card="${this._topicCard}"></kmap-knowledge-card>
       ` : '' }
-      <kmap-timeline-aside id="timeline" class="elevation-02" @touchstart="${this._swipeStart}" @touchmove="${this._swipeMove}" @touchend="${this._swipeEnd}" @open="${() => this.timelineState = 'open'}"></kmap-timeline-aside>
+      <kmap-timeline-aside id="timeline" class="elevation-02" @open="${() => this.timelineState = 'open'}"></kmap-timeline-aside>
     `;
   }
 

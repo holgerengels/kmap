@@ -84,7 +84,7 @@ export class KMapTimeline extends LitElement {
           height: 100%;
           overflow-y: auto;
           scroll-snap-type: y mandatory;
-          background-image: url(/app/1x1.svg);
+          background-image: url(icons/1x1.svg);
           background-position-x: 50px;
           background-repeat: repeat-y;
         }
