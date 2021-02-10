@@ -20,6 +20,7 @@ import java.util.Locale;
 
 import static kmap.JSON.string;
 
+// http://jetty:8080/server/index/browser/Mathematik/Differentialrechnung/Differenzierbarkeit
 public class IndexServlet extends JsonServlet {
     private Couch couch;
     private String file;

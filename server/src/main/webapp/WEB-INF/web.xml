@@ -122,10 +122,6 @@
         <url-pattern>/sitemap/*</url-pattern>
     </servlet-mapping>
 
-    <welcome-file-list>
-        <welcome-file>index.html</welcome-file>
-    </welcome-file-list>
-
     <!--session-config>
         <cookie-config>
             <http-only>true</http-only>
