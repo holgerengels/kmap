@@ -80,6 +80,13 @@ export class KMapSubjects extends Connected {
   render() {
     // language=HTML
     return html`
+        <div class="title font-body" style="var(--color-mediumgray);">
+          <p>
+            KMap kartographiert Wissen auf übersichtlichen Wissenslandkarten. So kann man sofort erkennen, wie alles
+            zusammenhängt und wo welches Wissen vorausgesetzt wird. Durch Einfärben der Wissenskarten kann man seinen
+            Lernfortschritt sichtbar machen. So weiß man immer, wo man steht.
+          </p>
+        </div>
         <div class="title">
             <label>Wähle ein Fach!</label>
         </div>
