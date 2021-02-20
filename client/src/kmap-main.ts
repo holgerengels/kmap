@@ -151,7 +151,7 @@ export class KmapMain extends connect(store, LitElement) {
           "description": description,
           "mainEntityOfPage": window.location.href,
           "image": this._meta.image ? [this._meta.image] : "https://kmap.eu/app/icons/KMap-Logo-cropped.png",
-          "datePublished": this._meta.modified ? new Date(this._meta.modified) : new Date(),
+          "datePublished": this._meta.created ? new Date(this._meta.created) : new Date(),
           "dateModified": this._meta.modified ? new Date(this._meta.modified) : undefined,
           "author": this._meta.author ? {
             "@type": "Person",
@@ -482,7 +482,7 @@ const updateMetadata = ({ title, description, image, keywords }) => {
   setMetaTag('name', 'description', description);
   setMetaTag('property', 'og:description', description);
   setMetaTag('property', 'og:image', image);
-  setMetaTag('name', 'keywords', keywords ? keywords.join(", ") : undefined);
+  setMetaTag('name', 'keywords', keywords ? keywords.join(", ") : "Schule, Wissen, Wissenslandkarte, Lernen, Lernfortschritt");
   setMetaTag('property', 'og:url', window.location.href);
 };
 
