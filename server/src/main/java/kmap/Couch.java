@@ -585,6 +585,7 @@ public class Couch extends Server {
         Integer length = null;
         InputStream in = null;
         if (attachments != null) {
+            System.out.println("loadAttachment = " + dirs);
             JsonObject attachment = attachments.getAsJsonObject(dirs[3]);
             if (attachment != null) {
                 type = string(attachment, "content_type");
