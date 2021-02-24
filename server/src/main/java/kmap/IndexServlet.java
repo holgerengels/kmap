@@ -56,8 +56,8 @@ public class IndexServlet extends JsonServlet {
             if (pathInfo != null) {
                 String[] path = pathInfo.substring(1).split("/");
                 System.out.println("path = " + Arrays.asList(path));
-                String page = path[0];
                 if (path.length == 3 || path.length == 4) {
+                    String page = path[0];
                     String subject = path[1];
                     String chapter = path[2];
 
