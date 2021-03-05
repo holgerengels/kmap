@@ -305,6 +305,9 @@ export class KMapBrowser extends Connected {
           width: min(calc(100% + 32px), calc(100vw - var(--mdc-drawer-width, 256px)));
           min-width: 300px;
         }
+        .depends a:not(:last-child):after {
+          content: ", ";
+        }
         .cards {
           margin: 16px;
           display: none;
@@ -383,9 +386,9 @@ export class KMapBrowser extends Connected {
           </kmap-card-text>
         ` }
         ${this._chapterCard.dependencies ? html`
-          <kmap-card-text>
+          <kmap-card-text class="depends">
             <b>Voraussetzung für das Kapitel ${this._chapter}:</b> ${this._chapterCard.dependencies.map((depend) => html`
-              <a href="/app/browser/${encode(this._subject, ...depend.split('/'))}" title="${(depend.includes('/') ? 'Wissenskarte ': 'Wissenslandkarte ') + depend}">${depend}</a>&nbsp;
+              <a href="/app/browser/${encode(this._subject, ...depend.split('/'))}" title="${(depend.includes('/') ? 'Wissenskarte ': 'Wissenslandkarte ') + depend}">${depend.replace(/\//, " → ")}</a>&nbsp;
             `)}
           </kmap-card-text>
         ` : '' }
