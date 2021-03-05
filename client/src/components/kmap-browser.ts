@@ -388,7 +388,7 @@ export class KMapBrowser extends Connected {
         ${this._chapterCard.dependencies ? html`
           <kmap-card-text class="depends">
             <b>Voraussetzung für das Kapitel ${this._chapter}:</b> ${this._chapterCard.dependencies.map((depend) => html`
-              <a href="/app/browser/${encode(this._subject, ...depend.split('/'))}" title="${(depend.includes('/') ? 'Wissenskarte ': 'Wissenslandkarte ') + depend}">${depend.replace(/\//, " → ")}</a>&nbsp;
+              <a href="/app/browser/${encode(this._subject, ...depend.split('/'))}" title="${(depend.includes('/') ? 'Wissenskarte ': 'Wissenslandkarte ') + depend}">${depend.replace(/\//, " → ")}</a>
             `)}
           </kmap-card-text>
         ` : '' }
