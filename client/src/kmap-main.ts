@@ -149,7 +149,7 @@ export class KmapMain extends connect(store, LitElement) {
           "headline": title,
           "name": title,
           "description": description,
-          "keywords": this._meta.keywords?.join(", "),
+          "keywords": this._meta.keywords ? this._meta.keywords.join(", ") : "",
           "mainEntityOfPage": window.location.href,
           "image": this._meta.image ? [this._meta.image] : "https://kmap.eu/app/icons/KMap-Logo-cropped.png",
           "datePublished": this._meta.created ? new Date(this._meta.created) : new Date(),
