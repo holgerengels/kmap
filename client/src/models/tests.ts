@@ -378,7 +378,7 @@ export default createModel({
               }
               description = "Ermittle Deinen Wissensstand mit Hilfe von interaktiven Aufgaben!";
             }
-            dispatch.shell.updateMeta({title: title, description: description, breadcrumbs: breadcrumbs});
+            dispatch.shell.updateMeta({title: title, description: description, breadcrumbs: breadcrumbs, about: [subject], type: ["Lernkontrolle"] });
             break;
           case 'browser':
             dispatch.tests.loadTopics();

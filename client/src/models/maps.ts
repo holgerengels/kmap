@@ -356,7 +356,9 @@ export default createModel({
             modified: state.maps.topicCard.modified,
             author: state.maps.topicCard.author,
             keywords: [subject, chapter, topic, ...(state.maps.topicCard.keywords ? state.maps.topicCard.keywords.split(",").map(k => k.trim()) : [])],
-            breadcrumbs: [subject, chapter, topic]
+            breadcrumbs: [subject, chapter, topic],
+            about: [subject],
+            type: ["Text"]
           });
         }
         else {
@@ -373,7 +375,9 @@ export default createModel({
             title: chapter,
             description: state.maps.chapterCard !== undefined && state.maps.chapterCard.summary ? state.maps.chapterCard.summary : "Wissenslandkarte zum Kapitel " + chapter,
             keywords: [subject, chapter, ...topics],
-            breadcrumbs: [subject, chapter]
+            breadcrumbs: [subject, chapter],
+            about: [subject],
+            type: ["Karte"]
           });
         }
 

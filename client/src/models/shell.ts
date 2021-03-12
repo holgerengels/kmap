@@ -11,6 +11,8 @@ export interface Meta {
   created?: number,
   modified?: number,
   breadcrumbs?: string[],
+  about?: string[],
+  type?: string[],
 }
 export interface ShellState {
   meta: Meta,
