@@ -13,6 +13,7 @@ export interface Meta {
   breadcrumbs?: string[],
   about?: string[],
   type?: string[],
+  thumb?: string,
 }
 export interface ShellState {
   meta: Meta,

@@ -175,6 +175,7 @@ export class KmapMain extends connect(store, LitElement) {
           "audience": ["Lerner/in"],
           "about": this._meta.about,
           "learningResourceType": this._meta.type,
+          "thumbnailUrl": this._meta.thumb,
         }
       });
     }

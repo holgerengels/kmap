@@ -358,7 +358,8 @@ export default createModel({
             keywords: [subject, chapter, topic, ...(state.maps.topicCard.keywords ? state.maps.topicCard.keywords.split(",").map(k => k.trim()) : [])],
             breadcrumbs: [subject, chapter, topic],
             about: [subject],
-            type: ["Text"]
+            type: ["Text"],
+            thumb: `${urls.server}${encode("snappy", subject, chapter, topic)}`
           });
         }
         else {
