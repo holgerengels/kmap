@@ -1,5 +1,9 @@
-# www.robotstxt.org/
+# kmap.eu/
 
 # Allow crawling of all content
 User-agent: *
 Disallow:
+
+Sitemap: https://kmap.eu/server/sitemap/Mathematik
+Sitemap: https://kmap.eu/server/sitemap/Physik
+Sitemap: https://kmap.eu/server/sitemap/Hilfe
