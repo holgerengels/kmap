@@ -359,7 +359,7 @@ export default createModel({
             breadcrumbs: [subject, chapter, topic],
             about: [subject],
             type: ["Text"],
-            thumb: `${urls.server}${encode("snappy", subject, chapter, topic)}`
+            thumb: `${urls.snappy}${encode(subject, chapter, topic)}`
           });
         }
         else {
