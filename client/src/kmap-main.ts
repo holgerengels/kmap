@@ -247,6 +247,8 @@ export class KmapMain extends connect(store, LitElement) {
         return html`<kmap-subjects class="page"></kmap-subjects>`;
       case 'browser':
         return html`<kmap-browser class="page"></kmap-browser>`;
+      case 'exercise':
+        return html`<kmap-exercise class="page"></kmap-exercise>`;
       case 'test':
         return html`<kmap-test class="page"></kmap-test>`;
       case 'courses':

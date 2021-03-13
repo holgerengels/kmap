@@ -3,202 +3,56 @@ import {Store} from '../store';
 import {endpoint, fetchjson} from "../endpoint";
 import {encode, urls} from "../urls";
 import {Card} from "./types";
+import {Test} from "./tests";
 
-const defaults: object = {
-  summary: '',
-  description: '',
-  thumb: '',
-  links: '',
-  depends: [],
-  attachments: []
-};
-
-export interface Line {
-  cards: Card[],
-}
-interface AllTopics {
-  subject: string,
-  topics: string[],
-}
-export interface Latest {
-  subject?: string,
-  cards: Card[],
-}
-
-export interface MapState {
+export interface ExerciseState {
   subject?: string,
   chapter?: string,
   topic?: string,
-  loaded?: string,
-  lines: Line[],
-  chapterCard?: Card,
-  topicCard?: Card,
-  timestamp: number,
+  key?: string,
+  test?: Test,
   loading: boolean,
   error: string,
-  selected: string,
-  selectedDependencies: string[],
-  targeted: string[],
-  deleting: boolean,
-  renaming: boolean,
-  saving: boolean,
-  allTopics?: AllTopics,
-  loadingAllTopics: boolean,
-  cardForEdit?: Card,
-  cardForRename?: Partial<Card>,
-  cardForDelete?: Partial<Card>,
-  latest?: Latest,
-  latestTimestamp: number,
 }
 
 export default createModel({
-  state: <MapState>{
-    lines: [],
-    chapterCard: undefined,
-    topicCard: undefined,
-    timestamp: -1,
+  state: <ExerciseState>{
     loading: false,
     error: "",
-    selected: "",
-    selectedDependencies: [],
-    targeted: [],
-    deleting: false,
-    renaming: false,
-    saving: false,
-    loadingAllTopics: false,
-    cardForEdit: undefined,
-    cardForRename: undefined,
-    cardForDelete: undefined,
-    latest: undefined,
-    loadingLatest: false,
-    latestTimestamp: -1,
   },
   reducers: {
     'routing/change'(state, routing: RoutingState<string>) {
-      return routing.page === 'browser' ? {
+      return routing.page === 'exercise' ? {
         ...state,
         subject: routing.params["subject"] ? decodeURIComponent(routing.params["subject"]) : undefined,
         chapter: routing.params["chapter"] ? decodeURIComponent(routing.params["chapter"]) : undefined,
         topic: routing.params["topic"] ? decodeURIComponent(routing.params["topic"]) : undefined,
+        key: routing.params["key"] ? decodeURIComponent(routing.params["key"]) : undefined,
       }
       : state;
     },
-    selectCard(state, card: Card) {
-      return { ...state, selected: card.topic, selectedDependencies: card.dependencies || [] }
-    },
-    unselectCard(state) {
-      return { ...state, selected: "", selectedDependencies: [] }
-    },
-    setTargeted(state, targeted) {
-      return { ...state, targeted: targeted }
-    },
     request(state) {
       return { ...state, loading: true,
-        lines: [],
-        chapterCard: undefined,
-        topicCard: undefined,
-        timestamp: Date.now(),
+        test: undefined,
         error: "",
       };
     },
-    received(state, payload: MapState) {
+    received(state, test: Test) {
       return { ...state,
-        lines: payload.lines,
-        loaded: "" + state.subject + state.chapter,
-        chapterCard: payload.chapterCard,
+        test: test,
         loading: false,
       };
-    },
-    setTopicCard(state, topicCard: Card | undefined) {
-      return {
-        ...state,
-        topicCard: topicCard
-      };
-    },
-    subjectChanged(state) {
-      return { ...state};
     },
     forget(state) {
       return { ...state,
         subject: undefined,
         chapter: undefined,
         topic: undefined,
-        lines: [],
-        loaded: undefined,
-        chapterCard: undefined,
-        cardForEdit: undefined,
-        cardForRename: undefined,
-        cardForDelete: undefined,
+        key: undefined,
+        test: undefined,
+        loading: false,
+        error: '',
       };
-    },
-
-    requestDeleteTopic(state) {
-      return { ...state, deleting: true };
-    },
-    receivedDeleteTopic(state) {
-      return { ...state, deleting: false, cardForDelete: undefined, loaded: undefined };
-    },
-    requestRenameTopic(state) {
-      return { ...state, deleting: true };
-    },
-    receivedRenameTopic(state) {
-      return { ...state, deleting: false, cardForRename: undefined, loaded: undefined };
-    },
-    requestSaveTopic(state) {
-      return { ...state, deleting: true };
-    },
-    receivedSaveTopic(state) {
-      return { ...state, deleting: false, cardForEdit: undefined, loaded: undefined };
-    },
-
-    requestAllTopics(state) {
-      return { ...state, loadingAllTopics: true, error: "" };
-    },
-    receivedAllTopics(state, payload: AllTopics) {
-      return { ...state,
-        allTopics: payload,
-        loadingAllTopics: false,
-      };
-    },
-
-    requestLatest(state) {
-      return { ...state, loadingLatest: true,
-        latestTimestamp: Date.now(),
-        latest: undefined,
-        error: "",
-      };
-    },
-    receivedLatest(state, payload: Latest) {
-      return { ...state,
-        latest: payload,
-        loadingLatest: false,
-      };
-    },
-
-    setCardForEdit(state, cardForEdit: Card) {
-      return {
-        ...state, cardForEdit: {
-          ...defaults,
-          ...cardForEdit,
-          subject: state.subject || '',
-          chapter: state.chapter || '',
-        }
-      }
-    },
-    unsetCardForEdit(state) {
-      return { ...state, cardForEdit: undefined }
-    },
-    setCardForRename(state, cardForRename: Partial<Card>) {
-      return { ...state, cardForRename: cardForRename }
-    },
-    unsetCardForRename(state) {
-      return { ...state, cardForRename: undefined }
-    },
-    setCardForDelete(state, cardForDelete: Partial<Card>) {
-      return { ...state, cardForDelete: cardForDelete }
-    },
-    unsetCardForDelete(state) {
-      return { ...state, cardForDelete: undefined }
     },
 
     error(state, message) {
