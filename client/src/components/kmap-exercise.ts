@@ -1,7 +1,6 @@
 import {css, customElement, html, property} from 'lit-element';
-import {Connected} from "./connected";
-import {RoutingState} from '@captaincodeman/rdx';
-import {State, store} from "../store";
+import {Connected, store} from "./connected";
+import {State} from "../store";
 
 import '@material/mwc-button';
 import '@material/mwc-icon';
@@ -9,74 +8,26 @@ import '@material/mwc-icon-button';
 import '@material/mwc-formfield';
 import '@material/mwc-slider';
 import '@material/mwc-top-app-bar';
-import './kmap-test-chooser';
-import './kmap-test-exercise';
-import './kmap-test-results';
-import './kmap-test-editor-scroller';
+import './kmap-exercise-card';
 import {colorStyles, fontStyles} from "./kmap-styles";
+import {Test} from "../models/tests";
+import {encodePath} from "../urls";
 
 @customElement('kmap-exercise')
 export class KMapExercise extends Connected {
   @property()
-  private _page: string = 'chooser';
-  @property()
-  private _layers: string[] = [];
-  @property()
-  private _noRoute?: string = 'chooser';
-  @property()
-  private _subject: string = '';
-  @property()
-  private _chapter: string = '';
-  @property()
-  private _results: string[] = [];
-
-  set route(val: RoutingState<string>) {
-    if (val.page === "test") {
-      if (val.params.results)
-        this._noRoute = 'results';
-      else if (!val.params.subject)
-        this._noRoute = 'chooser';
-      else {
-        this._noRoute = undefined;
-        this._subject = val.params.subject;
-        this._chapter = val.params.chapter ? decodeURIComponent(val.params.chapter) : '';
-      }
-    }
-  }
+  private _test?: Test;
 
   mapState(state: State) {
     return {
-      route: state.routing,
-      _layers: state.shell.layers,
-      _results: state.tests.results,
+      _test: state.exercises.test,
     };
   }
 
-  updated(changedProperties) {
-    if (changedProperties.has("_noRoute")) {
-      if (this._noRoute)
-        this._page = this._noRoute;
-      else
-        this._page = "exercise";
-    }
-  }
+  _more() {
+    if (this._test === undefined) return;
 
-  _goChoose() {
-    store.dispatch.routing.replace('/app/test');
-  }
-
-  _goBack() {
-    let path = "/app/";
-    if (this._subject)
-      path += "browser/" + encodeURIComponent(this._subject);
-    if (this._chapter)
-      path += "/" + encodeURIComponent(this._chapter);
-
-    store.dispatch.routing.replace(path);
-  }
-
-  _goResults() {
-    store.dispatch.routing.replace('/app/test/results');
+    store.dispatch.routing.push("/app/" + encodePath("test", this._test.subject, this._test.chapter, this._test.topic));
   }
 
   static get styles() {
@@ -88,10 +39,6 @@ export class KMapExercise extends Connected {
         :host {
           display: contents;
         }
-        div.modules {
-          display: flex;
-          flex-flow: column;
-        }
         div.buttons {
           padding: 8px 16px;
           display: flex;
@@ -99,12 +46,8 @@ export class KMapExercise extends Connected {
           justify-content: space-between;
           max-width: 800px;
         }
-        .page {
-          display: flex;
-          flex: 1 1 auto;
-        }
-        kmap-test-editor-scroller {
-          flex: 1 1 auto;
+        kmap-exercise-card {
+          margin: 16px;
         }
         [hidden] {
           display: none;
@@ -115,20 +58,26 @@ export class KMapExercise extends Connected {
   render() {
     // language=HTML
     return html`
-      <div class="modules" @end="${this._goResults}">
-        ${!this._layers.includes('editor') ? html`
-            ${this._page === 'chooser' ? html`<kmap-test-chooser id="chooser" class="page"></kmap-test-chooser>` : ''}
-            ${this._page === 'exercise' ? html`<kmap-test-exercise id="exercise" class="page"></kmap-test-exercise>` : ''}
-            ${this._page === 'results' ? html`<kmap-test-results id="results" class="page"></kmap-test-results>` : ''}
-        `: html`
-          <kmap-test-editor-scroller id="editor" ?hidden="${!this._layers.includes('editor')}"></kmap-test-editor-scroller>
-        `}
-      </div>
+      ${this._test ? html`
+        <kmap-exercise-card
+          .subject="${this._test.subject}"
+          .set="${this._test.set}"
+          .chapter="${this._test.chapter}"
+          .topic="${this._test.topic}"
+          .key="${this._test.key}"
+          .level="${this._test.level}"
+          .question="${this._test.question}"
+          .answer="${this._test.answer}"
+          .values="${this._test.values}"
+          .balance="${this._test.balance}"
+        "></kmap-exercise-card>
+      ` : ''}
+
       <div class="buttons">
-        <mwc-button ?hidden="${this._page !== 'exercise'}" @click="${this._goBack}">Zurück</mwc-button>
-        <div style="flex: 1 0 auto"></div>
-        <mwc-button ?hidden="${this._page === 'results' || this._results.length === 0}" @click="${this._goResults}">Auswertung</mwc-button>
+        <!--div style="flex: 1 0 auto"></div-->
+        <mwc-button @click="${this._more}">Ähnliche Aufgaben</mwc-button>
       </div>
+
     `;
   }
 }

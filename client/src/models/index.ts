@@ -10,6 +10,7 @@ export { default as courses } from './courses';
 export { default as contentMaps } from './contentMaps';
 export { default as contentSets } from './contentSets';
 export { default as tests } from './tests';
+export { default as exercises } from './exercises';
 export { default as uploads } from './uploads';
 export { default as testUploads } from './testUploads';
 export { default as feedback } from './feedback';

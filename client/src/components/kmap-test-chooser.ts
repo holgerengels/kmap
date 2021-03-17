@@ -14,6 +14,7 @@ import '@material/mwc-top-app-bar';
 import '@material/menu-surface';
 import {colorStyles, elevationStyles, fontStyles} from "./kmap-styles";
 import {Subject} from "../models/subjects";
+import {count, Topics} from "../models/tests";
 
 @customElement('kmap-test-chooser')
 export class KmapTestChooser extends Connected {
@@ -27,6 +28,8 @@ export class KmapTestChooser extends Connected {
   private _chapters?: string[] = undefined;
   @property()
   private _chaptersLoading: boolean = false;
+  @property()
+  private _testTopics?: Topics;
 
   @property()
   private _arrangedChapters: string[] = [];
@@ -35,9 +38,7 @@ export class KmapTestChooser extends Connected {
   private _chapter: string = '';
 
   @property()
-  private _allTests?: string[] = undefined;
-  @property()
-  private _maxNumber: number = -1;
+  private _maxNumber?: number;
 
   mapState(state: State) {
     return {
@@ -45,8 +46,7 @@ export class KmapTestChooser extends Connected {
       _chapters: state.tests.chapters ? state.tests.chapters.chapters : [],
       _tree: state.tests.tree,
       _chaptersLoading: state.tests.loadingChapters || state.tests.loadingTree,
-      _allTests: state.tests.tests,
-      _maxNumber: state.tests.tests ? state.tests.tests.length : -1,
+      _testTopics: state.tests.topics,
     };
   }
 
@@ -56,7 +56,6 @@ export class KmapTestChooser extends Connected {
       store.dispatch.tests.loadTree(this._subject);
       this._chapter = '';
       this._arrangedChapters = [];
-      this._allTests = undefined;
     }
 
     if ((changedProperties.has("_chapters") || changedProperties.has("_tree")))
@@ -64,21 +63,10 @@ export class KmapTestChooser extends Connected {
 
     if (changedProperties.has("_chapter")) {
       if (this._chapter)
-        store.dispatch.tests.loadTests({subject: this._subject, chapter: this._chapter});
+        this._maxNumber = this._testTopics !== undefined ? count(this._testTopics, this._chapter) : undefined;
       else
-        this._allTests = undefined;
+        this._maxNumber = undefined;
     }
-  }
-
-  stateChanged() {
-    /*
-    var topics = [];
-    for (var test of this._allTests) {
-      if (!topics.includes(test.chapter + "." + test.topic))
-        topics.push(test.chapter + "." + test.topic);
-    }
-    this.topics = topics;
-     */
   }
 
   arrange(chapters?: string[], tree?: string[]) {
@@ -151,8 +139,8 @@ export class KmapTestChooser extends Connected {
       ` : '' }
     </div>
     <br/><br/>
-    <label ?hidden="${!this._chapter || !this._allTests}">Anzahl Aufgaben: ${this._maxNumber}&nbsp;&nbsp;&nbsp; ⟶ </label>
-    <mwc-button @click="${this._start}" ?disabled="${!this._allTests}">Starten</mwc-button>
+    <label ?hidden="${!this._chapter || !this._maxNumber}">Anzahl Aufgaben: ${this._maxNumber}&nbsp;&nbsp;&nbsp; ⟶ </label>
+    <mwc-button @click="${this._start}" ?disabled="${!this._maxNumber}">Starten</mwc-button>
   </div>
     `;
   }

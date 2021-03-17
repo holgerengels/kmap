@@ -66,11 +66,20 @@ public class Tests {
 
     public JsonArray loadTopics(String subject) {
         View view = getClient().view("test/topics")
-            .key(subject)
-            .reduce(false);
+            .startKey(subject, "\u0000")
+            .endKey(subject, "\uffff")
+            .groupLevel(3)
+            .reduce(true);
         List<JsonObject> objects = view.query(JsonObject.class);
         JsonArray array = new JsonArray();
-        objects.stream().map(o -> o.getAsJsonPrimitive("value").getAsString()).distinct().forEach(array::add);
+        objects.stream().map(o -> {
+            JsonArray key = o.getAsJsonArray("key");
+            JsonObject object = new JsonObject();
+            object.addProperty("chapter", key.get(1).getAsString());
+            object.addProperty("topic", key.get(2).getAsString());
+            object.addProperty("count", o.get("value").getAsNumber());
+            return object;
+        }).distinct().forEach(array::add);
         return array;
     }
 
@@ -137,13 +146,24 @@ public class Tests {
         return array;
     }
 
+    public JsonObject loadTestByKey(String subject, String chapter, String topic, String key) {
+        View view = getClient().view("test/byChapterTopicKey")
+            .key(subject, chapter, topic, key)
+            .reduce(false)
+            .includeDocs(true);
+        List<JsonObject> objects = view.query(JsonObject.class);
+        JsonObject object = objects.get(0);
+        JsonObject _attachments = object.getAsJsonObject("_attachments");
+        object.add("attachments", amendAttachments(_attachments));
+        return object;
+    }
+
     public JsonArray loadRandomTests(String subject) {
         JsonArray topics = loadTopics(subject);
         if (topics.size() < 3)
             return topics;
-        String topic = topics.get(new Random().nextInt(topics.size())).getAsString();
-        String[] split = topic.split("\\.");
-        JsonArray array = loadTestsByTopic(subject, split[0], split[1]);
+        JsonObject object = (JsonObject) topics.get(new Random().nextInt(topics.size()));
+        JsonArray array = loadTestsByTopic(subject, JSON.string(object, "chapter"), JSON.string(object, "topic"));
         JsonArray three = new JsonArray();
         Random random = new Random();
         IntStream.range(0, 3).mapToObj(i -> array.remove(random.nextInt(array.size()))).forEach(three::add);
@@ -230,6 +250,21 @@ public class Tests {
                     return "delete:" + pos;
                 }
             }
+            return "reload:";
+        }
+        else if (object.has("rename")) {
+            JsonObject rename = (JsonObject)object.get("rename");
+            String chapter = string(rename, "chapter");
+            String topic = string(rename, "topic");
+            String key = string(rename, "key");
+            String name = string(object, "name");
+            assert chapter != null;
+            assert topic != null;
+            assert key != null;
+            assert name != null;
+            JsonObject existing = loadTestByKey(subject, chapter, topic, key);
+            existing.addProperty("key", name);
+            client.update(existing);
             return "reload:";
         }
         else {

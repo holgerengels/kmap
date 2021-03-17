@@ -224,10 +224,10 @@ export class KMapEditorAddFabs extends Connected {
         <validating-form id="addForm" @keyup="${this._maybeEnter}" @validity="${e => this._valid = e.target.valid}">
           <label>${this._explanation()}</label>
           <br/>
-        <mwc-textfield label="Fach" type="text" .value="${this._subject}" @change="${e => {this._subject = e.target.value; this._chapter = this._subject}}" ?disabled="${this._mode !== 'subject'}" required pattern="^([^/]*)$"></mwc-textfield>
-        <mwc-textfield label="Modul" type="text" .value="${this._module}" @change="${e => this._module = e.target.value}" ?disabled="${this._mode !== 'module' && this._mode !== 'subject'}" required pattern="^([^/]*)$"></mwc-textfield>
-        <mwc-textfield label="Kapitel" type="text" .value="${this._chapter}" @change="${e => this._chapter = e.target.value}" ?disabled="${this._mode !== 'module' && this._mode !== 'chapter'}" required pattern="^([^/]*)$"></mwc-textfield>
-        <mwc-textfield label="Thema" type="text" .value="${this._topic}" @change="${e => this._topic = e.target.value}" pattern="^([^/]*)$"></mwc-textfield>
+        <mwc-textfield label="Fach" type="text" .value="${this._subject}" @change="${e => {this._subject = e.target.value; this._chapter = this._subject}}" ?disabled="${this._mode !== 'subject'}" required pattern="^([^/.]*)$"></mwc-textfield>
+        <mwc-textfield label="Modul" type="text" .value="${this._module}" @change="${e => this._module = e.target.value}" ?disabled="${this._mode !== 'module' && this._mode !== 'subject'}" required pattern="^([^/.]*)$"></mwc-textfield>
+        <mwc-textfield label="Kapitel" type="text" .value="${this._chapter}" @change="${e => this._chapter = e.target.value}" ?disabled="${this._mode !== 'module' && this._mode !== 'chapter'}" required pattern="^([^/.]*)$"></mwc-textfield>
+        <mwc-textfield label="Thema" type="text" .value="${this._topic}" @change="${e => this._topic = e.target.value}" pattern="^([^/.]*)$"></mwc-textfield>
         </validating-form>
         <mwc-button slot="secondaryAction" dialogAction="cancel">Abbrechen</mwc-button>
         <mwc-button slot="primaryAction" @click="${this._ok}">Erstellen</mwc-button>

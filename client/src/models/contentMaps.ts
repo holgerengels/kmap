@@ -1,4 +1,4 @@
-import {createModel, RoutingState} from '@captaincodeman/rdx';
+import {createModel} from '@captaincodeman/rdx';
 import { Store } from '../store';
 import {endpoint, fetchblob, fetchjson} from "../endpoint";
 import {urls} from "../urls";
@@ -9,9 +9,8 @@ export interface Module {
   count?: number,
 }
 export interface ContentMapsState {
-  modules: Module[],
+  modules?: Module[],
   selected?: Module,
-  timestamp: number,
   loading: boolean,
   importing: boolean,
   exporting: boolean,
@@ -21,9 +20,6 @@ export interface ContentMapsState {
 
 export default createModel({
   state: <ContentMapsState>{
-    modules: [],
-    selected: undefined,
-    timestamp: -1,
     loading: false,
     importing: false,
     exporting: false,
@@ -33,7 +29,6 @@ export default createModel({
   reducers: {
     requestLoad(state) {
       return { ...state, loading: true,
-        timestamp: Date.now(),
         error: "",
       };
     },
@@ -44,7 +39,7 @@ export default createModel({
       };
     },
     forget(state) {
-      return { ...state, modules: [], selected: undefined}
+      return { ...state, modules: undefined, selected: undefined}
     },
 
     requestImport(state) {
@@ -86,8 +81,7 @@ export default createModel({
     return {
       async load() {
         const state = store.getState();
-        // @ts-ignore
-        if (Date.now() - state.contentMaps.timestamp > 3000) {
+
           dispatch.contentMaps.requestLoad();
           fetchjson(`${urls.server}edit?modules=all`, endpoint.get(state),
             (json) => {
@@ -95,7 +89,6 @@ export default createModel({
             },
             dispatch.app.handleError,
             dispatch.contentMaps.error);
-        }
       },
       async import(files: FileList) {
         const state = store.getState();
@@ -153,18 +146,24 @@ export default createModel({
           dispatch.contentMaps.error);
       },
 
-      'routing/change': async function (routing: RoutingState<string>) {
-        const state = store.getState();
-        if (state.app.roles.includes("teacher") && (routing.page === 'content-manager' || routing.page === 'browser'))
-          dispatch.contentMaps.load();
-      },
       'app/receivedLogin': async function () {
         const state = store.getState();
-        const routing: RoutingState<string> = state.routing;
-        if (state.app.roles.includes("teacher") && (routing.page === 'content-manager' || routing.page === 'browser'))
+        if (state.app.roles.includes("teacher") && state.shell.layers.includes('editor'))
           dispatch.contentMaps.load();
       },
-
+      'shell/addLayer': async function () {
+        const state = store.getState();
+        if (state.app.roles.includes("teacher") && state.shell.layers.includes('editor'))
+          dispatch.contentMaps.load();
+      },
+      'contentMaps/receivedDelete': async function() {
+        dispatch.contentMaps.forget();
+        dispatch.contentMaps.load();
+      },
+      'contentMaps/receivedImport': async function() {
+        dispatch.contentMaps.forget();
+        dispatch.contentMaps.load();
+      },
       'app/receivedLogout': async function () {
         dispatch.contentMaps.forget();
       },

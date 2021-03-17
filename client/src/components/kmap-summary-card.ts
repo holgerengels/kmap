@@ -10,9 +10,9 @@ import './kmap-summary-card-editor';
 import './kmap-summary-card-rating';
 import './kmap-summary-card-ratecolors';
 import {colorStyles, elevationStyles, fontStyles} from "./kmap-styles";
-import {encode} from "../urls";
+import {encodePath} from "../urls";
 import {Card} from "../models/types";
-import {iconTest} from "./icons";
+import {includes, Topics} from "../models/tests";
 
 @customElement('kmap-summary-card')
 export class KMapSummaryCard extends Connected {
@@ -38,7 +38,7 @@ export class KMapSummaryCard extends Connected {
   @property()
   private _hasTests: boolean = false;
   @property()
-  private _topics: string[] = [];
+  private _topics?: Topics;
   @property()
   private _selectedDependencies: string[] = [];
 
@@ -51,7 +51,7 @@ export class KMapSummaryCard extends Connected {
     return {
       _instance: state.app.instance,
       _userid: state.app.userid,
-      _topics: state.tests.topics ? state.tests.topics.topics : [],
+      _topics: state.tests.topics,
       _layers: state.shell.layers,
       _selectedDependencies: state.maps.selectedDependencies,
       selected: this.card !== undefined && state.maps.selected === this.card.topic,
@@ -67,7 +67,7 @@ export class KMapSummaryCard extends Connected {
       this._key = this.card.links ? this.card.links : this.card.chapter + "." + this.card.topic;
       /*
       this._thumbStyles = this.card.thumb !== undefined ? {
-        "background-image": `url('${urls.server}${encode("data", this.subject, this.chapter, this.card.topic, this.card.thumb)}?instance=${this._instance}')`,
+        "background-image": `url('${urls.server}${encodePath("data", this.subject, this.chapter, this.card.topic, this.card.thumb)}?instance=${this._instance}')`,
         "background-position": "center",
         "background-size": "contain",
         "background-repeat": "no-repeat",
@@ -76,7 +76,7 @@ export class KMapSummaryCard extends Connected {
     }
 
     if (changedProperties.has("card") || changedProperties.has("_topics"))
-      this._hasTests = this.card !== undefined && this._topics.includes(this.card.chapter + "." + this.card.topic);
+      this._hasTests = this.card !== undefined && this._topics !== undefined && includes(this._topics, this.card.chapter, this.card.topic);
 
     if (changedProperties.has("_userid") || changedProperties.has("_layers") || changedProperties.has("_key"))
       this._colorizeEvent( );
@@ -112,13 +112,18 @@ export class KMapSummaryCard extends Connected {
     this._colorize(source ? source.getState() : 0);
   }
 
-  _hovered() {
+  _hovered(e) {
     if (this.card == undefined) return;
 
-    if (store.state.maps.selected === this.card.topic)
-      store.dispatch.maps.unselectCard();
-    else
+    if (e.detail.hover === true && store.state.maps.selected !== this.card.topic)
       store.dispatch.maps.selectCard(this.card);
+    else if (e.detail.hover === false && store.state.maps.selected === this.card.topic)
+      store.dispatch.maps.unselectCard();
+  }
+
+  _test() {
+    if (this.card === undefined) return;
+    store.dispatch.routing.push('/app/test/' + encodePath(this.card.subject, this.card.chapter, this.card.topic));
   }
 
   static get styles() {
@@ -184,7 +189,7 @@ export class KMapSummaryCard extends Connected {
             <kmap-summary-card-rating slot="button" .key="${this._key}" style="padding-left: 8px"></kmap-summary-card-rating>
           ` : '' }
           ${this._hasTests ? html`
-            <a slot="icon" href="${'/app/test/' + encode(this.card.subject, this.card.chapter, this.card.topic)}" title="Aufgaben zum Thema ${this.card.topic}" style="display: flex; padding-right: 8px; --foreground: var(--color-darkgray)"><span class="print-show">Aufgaben →&nbsp;</span>${iconTest}</a>
+            <mwc-icon-button slot="icon" icon="quiz" title="Aufgaben zum Thema ${this.card.topic}" @click="${this._test}"></mwc-icon-button>
           ` : '' }
         </kmap-card>
     `;
@@ -192,7 +197,7 @@ export class KMapSummaryCard extends Connected {
 
   _link() {
     if (this.card === undefined) return "";
-    return this.card.links ? '/app/browser/' + encode(this.card.subject, this.card.links) : '/app/browser/' + encode(this.card.subject, this.card.chapter, this.card.topic)
+    return this.card.links ? '/app/browser/' + encodePath(this.card.subject, this.card.links) : '/app/browser/' + encodePath(this.card.subject, this.card.chapter, this.card.topic)
   }
 
   _linkTitle() {

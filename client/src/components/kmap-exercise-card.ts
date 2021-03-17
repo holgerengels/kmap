@@ -1,5 +1,5 @@
 import {html, css, customElement, property, query} from 'lit-element';
-import {Connected} from "./connected";
+import {Connected, store} from "./connected";
 import {State} from "../store";
 
 import {encodePath} from '../urls';
@@ -12,11 +12,14 @@ import "./kmap-test-card-hint";
 import "./kmap-test-card-solution";
 import "./kmap-feedback";
 import {KMapTestCardContent} from "./kmap-test-card-content";
+import {KMapFeedback} from "./kmap-feedback";
 
-@customElement('kmap-randomtest-card')
+@customElement('kmap-exercise-card')
 export class KMapRandomTestCard extends Connected {
   @property({type: String})
   private _instance: string = '';
+  @property({type: String})
+  private _userid: string = '';
 
   @property({type: String})
   private key: string = '';
@@ -36,8 +39,6 @@ export class KMapRandomTestCard extends Connected {
   private answer: string = '';
   @property({type: Number})
   private balance: number = 4;
-  @property()
-  private last: boolean = false;
 
   @property({type: String})
   private values: string[] = [];
@@ -45,8 +46,13 @@ export class KMapRandomTestCard extends Connected {
   @query('kmap-test-card-content')
   private _content: KMapTestCardContent;
 
-  @query('#tests')
-  private _tests: HTMLAnchorElement;
+  @query('#blinky')
+  // @ts-ignore
+  private _blinky: HTMLElement;
+
+  @query('#feedbackDialog')
+  // @ts-ignore
+  private _feedbackDialog: KMapFeedback;
 
   mapState(state: State) {
     return {
@@ -68,19 +74,28 @@ export class KMapRandomTestCard extends Connected {
   }
 
   _sendAnswer() {
-    this._content.checkValues();
+    var everythingCorrect = this._content.checkValues();
+    if (!everythingCorrect) {
+      this._blinky.addEventListener("animationend", () => {
+        this._blinky.className = '';
+      });
+      this._blinky.className = "blink";
+    }
   }
 
   _showAnswer() {
     this._content.showAnswer();
   }
 
-  _next() {
-    this.dispatchEvent(new CustomEvent('next', {bubbles: true, composed: true}));
+  _card() {
+    store.dispatch.routing.push("/app/" + encodePath("browser", this.subject, this.chapter, this.topic));
   }
 
-  _more() {
-    this._tests.click();
+  _feedback() {
+    if (this._userid)
+      this._feedbackDialog.show();
+    else
+      store.dispatch.shell.showMessage("Bitte melde Dich an, um die Feedbackfunktion zu nutzen!")
   }
 
   static get styles() {
@@ -106,6 +121,7 @@ export class KMapRandomTestCard extends Connected {
           70% {
             text-shadow: 1px 1px 4px var(--color-darkgray);
             transform: scale(1.1);
+            color: var(--color-secondary-dark)
           }
         }
       `];
@@ -129,11 +145,11 @@ export class KMapRandomTestCard extends Connected {
         <mwc-button slot="button" @click="${this._showAnswer}">Antwort zeigen</mwc-button>
         <mwc-button slot="button" @click="${this._sendAnswer}">Antwort Abschicken</mwc-button>
 
-        <mwc-button slot="button" @click="${this._next}" ?hidden="${this.last}">Nächste Aufgabe</mwc-button>
-        <mwc-button slot="button" @click="${this._more}" ?hidden="${!this.last}">Mehr Aufgaben</mwc-button>
-  </kmap-card>
+        <mwc-icon-button slot="icon" icon="info" title="Wissenskarte" @click="${this._card}" id="blinky"></mwc-icon-button>
+        <mwc-icon-button slot="icon" icon="feedback" title="Feedback" @click="${this._feedback}"></mwc-icon-button>
+      </kmap-card>
 
-  <a hidden id="tests" href="/app/test/${encodePath(this.subject, this.chapter, this.topic)}"></a>
+      <kmap-feedback id="feedbackDialog" .subject="${this.subject}" .chapter="${this.chapter}" .topic="${this.topic}" .test="${this.key}"></kmap-feedback>
     `;
   }
 }

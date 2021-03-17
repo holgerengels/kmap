@@ -17,6 +17,7 @@ import 'pwa-helper-components/pwa-update-available';
 import './components/kmap-subjects';
 import './components/kmap-browser';
 import './components/kmap-test';
+import './components/kmap-exercise';
 import './components/kmap-timeline-selector';
 import './components/share-facebook';
 
@@ -391,7 +392,7 @@ export class KmapMain extends connect(store, LitElement) {
 
     <main id="main" slot="appContent" role="main">
       <mwc-top-app-bar id="bar" dense>
-        <mwc-icon-button icon="menu" slot="navigationIcon" @click="${() => this._drawerOpen = !this._drawerOpen}"></mwc-icon-button>
+        <mwc-icon-button style="color: white" icon="menu" slot="navigationIcon" @click="${() => this._drawerOpen = !this._drawerOpen}"></mwc-icon-button>
         <h1 slot="title">${this._barTitle}</h1>
         <mwc-icon-button-toggle slot="actionItems" @click="${this._toggleTimeline}" ?hidden="${this._timelines.length !== 1 || this._page !== 'browser'}" title="Wochenplan">${timelineOpen}${timelineClosed}</mwc-icon-button-toggle>
         <kmap-login-button slot="actionItems" @click="${this._showLogin}" title="Anmeldung"></kmap-login-button>
@@ -409,6 +410,7 @@ export class KmapMain extends connect(store, LitElement) {
   ` : ''}
   ${this._page === 'test' ? html`
     ${this._layers.includes('editor') ? html`<kmap-test-editor-edit-dialog></kmap-test-editor-edit-dialog>` : ''}
+    ${this._layers.includes('editor') ? html`<kmap-test-editor-rename-dialog></kmap-test-editor-rename-dialog>` : ''}
     ${this._layers.includes('editor') ? html`<kmap-test-editor-delete-dialog></kmap-test-editor-delete-dialog>` : ''}
     ${this._layers.includes('editor') ? html`<kmap-test-editor-add-fabs></kmap-test-editor-add-fabs>` : ''}
   ` : ''}

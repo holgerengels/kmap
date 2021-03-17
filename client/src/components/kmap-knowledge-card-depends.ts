@@ -1,6 +1,6 @@
 import {LitElement, html, css, customElement, property} from 'lit-element';
 import {colorStyles, fontStyles} from "./kmap-styles";
-import {encode} from "../urls";
+import {encodePath} from "../urls";
 
 @customElement('kmap-knowledge-card-depends')
 export class KMapKnowledgeCardDepends extends LitElement {
@@ -29,7 +29,7 @@ export class KMapKnowledgeCardDepends extends LitElement {
     return this.dependencies && this.dependencies.length > 0
       ? html`
         <b>Voraussetzungen:</b> ${this.dependencies.map((depend) => html`
-          <a href="/app/browser/${encode(this.subject, ...depend.split('/'))}" title="${(depend.includes('/') ? 'Wissenskarte ': 'Wissenslandkarte ') + depend}">${depend.replace(/\//, " → ")}</a>
+          <a href="/app/browser/${encodePath(this.subject, ...depend.split('/'))}" title="${(depend.includes('/') ? 'Wissenskarte ': 'Wissenslandkarte ') + depend}">${depend.replace(/\//, " → ")}</a>
         `)}
       ` : ''
     ;

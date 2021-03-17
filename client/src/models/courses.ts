@@ -235,6 +235,14 @@ export default createModel({
         if (state.app.roles.includes("teacher") || state.app.roles.includes("student"))
           dispatch.courses.loadTimelines();
       },
+      'courses/receivedDeleteCourse': async function() {
+        dispatch.courses.forget();
+        dispatch.courses.loadCourses();
+      },
+      'courses/receivedSaveCourse': async function() {
+        dispatch.courses.forget();
+        dispatch.courses.loadCourses();
+      },
       'app/receivedLogout': async function () {
         dispatch.courses.forget();
       },

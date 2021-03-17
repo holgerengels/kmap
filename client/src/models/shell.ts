@@ -91,6 +91,7 @@ export default createModel({
           await import('../components/kmap-set-selector');
           await import('../components/kmap-test-editor-add-fabs');
           await import('../components/kmap-test-editor-delete-dialog');
+          await import('../components/kmap-test-editor-rename-dialog');
           await import('../components/kmap-test-editor-edit-dialog');
 
           await import('../components/kmap-course-selector');

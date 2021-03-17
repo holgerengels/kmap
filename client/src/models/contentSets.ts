@@ -1,4 +1,4 @@
-import {createModel, RoutingState} from '@captaincodeman/rdx';
+import {createModel} from '@captaincodeman/rdx';
 import { Store } from '../store';
 import {endpoint, fetchblob, fetchjson} from "../endpoint";
 import {urls} from "../urls";
@@ -15,9 +15,8 @@ interface TestSet {
   tests: Test[],
 }
 export interface ContentSetsState {
-  sets: Set[],
+  sets?: Set[],
   selected?: Set,
-  timestamp: number,
   loading: boolean,
   importing: boolean,
   exporting: boolean,
@@ -30,22 +29,17 @@ export interface ContentSetsState {
 
 export default createModel({
   state: <ContentSetsState>{
-    sets: [],
-    selected: undefined,
     timestamp: -1,
     loading: false,
     importing: false,
     exporting: false,
     deleting: false,
-    set: undefined,
-    tests: undefined,
     loadingSet: false,
     error: "",
   },
   reducers: {
     requestLoad(state) {
       return { ...state, loading: true,
-        timestamp: Date.now(),
         error: "",
       };
     },
@@ -57,7 +51,7 @@ export default createModel({
     },
     forget(state) {
       return { ...state,
-        sets: [],
+        sets: undefined,
         selected: undefined,
         set: undefined,
         tests: undefined,
@@ -114,24 +108,19 @@ export default createModel({
     return {
       async load() {
         const state = store.getState();
-        if (Date.now() - state.contentSets.timestamp > 3000) {
-          dispatch.contentSets.requestLoad();
-          const resp = await fetch(`${urls.server}tests?sets=all`, endpoint.get(state));
-          if (resp.ok) {
-            const json = await resp.json();
-            // @ts-ignore
+
+        dispatch.contentSets.requestLoad();
+        fetchjson(`${urls.server}tests?sets=all`, endpoint.get(state),
+          (json) => {
             dispatch.contentSets.receivedLoad(json);
-          } else {
-            const message = await resp.text();
-            // @ts-ignore
-            dispatch.app.handleError({code: resp.status, message: message});
-            // @ts-ignore
-            dispatch.contentSets.error(message);
-          }
-        }
+          },
+          dispatch.app.handleError,
+          dispatch.contentSets.error);
       },
       async loadSet(set: Set) {
         const state = store.getState();
+        if (state.contentSets.sets === undefined) return;
+
         if (!set.subject || !set.set)
           return;
 
@@ -163,6 +152,8 @@ export default createModel({
       },
       maybeNewSet(set: Set) {
         const state = store.getState();
+        if (state.contentSets.sets === undefined) return;
+
         if (state.contentSets.sets.filter(s => s.subject === set.subject && s.set === set.set).length === 0) {
           // @ts-ignore
           dispatch.contentSets.receivedLoad([...new Set(state.contentSets.sets).add(set)].sort((a, b) => a.set.localeCompare(b.set)));
@@ -174,6 +165,7 @@ export default createModel({
       },
       maybeObsoleteSet(set: Set) {
         const state = store.getState();
+        if (state.contentSets.sets === undefined) return;
 
         // @ts-ignore
         if (state.contentSets.set.count === 1) {
@@ -242,18 +234,24 @@ export default createModel({
           dispatch.contentSets.error);
       },
 
-      'routing/change': async function (routing: RoutingState<string>) {
-        const state = store.getState();
-        if (state.app.roles.includes("teacher") && (routing.page === 'content-manager' || routing.page === 'test'))
-          dispatch.contentSets.load();
-      },
       'app/receivedLogin': async function () {
         const state = store.getState();
-        const routing: RoutingState<string> = state.routing;
-        if (state.app.roles.includes("teacher") && (routing.page === 'content-manager' || routing.page === 'test'))
+        if (state.app.roles.includes("teacher") && state.shell.layers.includes('editor'))
           dispatch.contentSets.load();
       },
-
+      'shell/addLayer': async function () {
+        const state = store.getState();
+        if (state.app.roles.includes("teacher") && state.shell.layers.includes('editor'))
+          dispatch.contentSets.load();
+      },
+      'contentSets/receivedDelete': async function() {
+        dispatch.contentSets.forget();
+        dispatch.contentSets.load();
+      },
+      'contentSets/receivedImport': async function() {
+        dispatch.contentSets.forget();
+        dispatch.contentSets.load();
+      },
       'app/receivedLogout': async function () {
         dispatch.contentSets.forget();
       },

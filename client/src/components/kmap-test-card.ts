@@ -2,7 +2,7 @@ import {html, css, customElement, property, query} from 'lit-element';
 import {Connected} from "./connected";
 import {State, store} from "../store";
 
-import {encode} from '../urls';
+import {encodePath} from '../urls';
 import {fontStyles, colorStyles} from "./kmap-styles";
 import '@material/mwc-icon';
 import '@material/mwc-button';
@@ -139,11 +139,32 @@ export class KMapTestCard extends Connected {
     }));
   }
 
+  _card() {
+    store.dispatch.routing.push("/app/" + encodePath("browser", this.subject, this.chapter, this.topic));
+  }
+
   _feedback() {
     if (this._userid)
       this._feedbackDialog.show();
     else
       store.dispatch.shell.showMessage("Bitte melde Dich an, um die Feedbackfunktion zu nutzen!")
+  }
+
+  _permalink() {
+    navigator.clipboard.writeText(window.location.origin + "/app/" + encodePath("exercise", this.subject, this.chapter, this.topic, this.key))
+      .then(
+        () => store.dispatch.shell.showMessage("Link wurde kopiert"),
+        () => store.dispatch.shell.showMessage("Link konnte nicht kopiert werden")
+      );
+  }
+
+  _share() {
+    // @ts-ignore
+    navigator.share({
+      title: "KMap Aufgabe",
+      text: this.chapter + " - " + this.topic,
+      url: window.location.origin + "/app/" + encodePath("exercise", this.subject, this.chapter, this.topic, this.key),
+    })
   }
 
   _showHint() {
@@ -178,6 +199,7 @@ export class KMapTestCard extends Connected {
           70% {
             text-shadow: 1px 1px 4px var(--color-darkgray);
             transform: scale(1.1);
+            color: var(--color-secondary-dark)
           }
         }
       `];
@@ -222,8 +244,10 @@ export class KMapTestCard extends Connected {
         <mwc-button slot="button" @click="${this._showHint}" ?hidden="${!this.hint}">Tipp</mwc-button>
         <mwc-button slot="button" @click="${this._sendAnswer}" ?hidden="${this.sent}">Antwort abschicken</mwc-button>
         <mwc-button slot="button" @click="${this._next}" ?hidden="${!this.correct}">Weiter</mwc-button>
-        <a slot="icon" href="/app/browser/${encode(this.subject, this.chapter, this.topic)}" id="blinky"><mwc-icon title="Wissenskarte">help_outline</mwc-icon></a>&nbsp;
+        <mwc-icon-button slot="icon" icon="info" title="Wissenskarte" @click="${this._card}" id="blinky"></mwc-icon-button>
         <mwc-icon-button slot="icon" icon="feedback" title="Feedback" @click="${this._feedback}"></mwc-icon-button>
+        <mwc-icon-button slot="icon" icon="share" title="Teilen..." ?hidden="${typeof navigator['share'] !== 'function'}" @click="${this._share}"></mwc-icon-button>
+        <mwc-icon-button slot="icon" icon="link" title="Permalink" @click="${this._permalink}"></mwc-icon-button>
       </kmap-card>
 
       <kmap-feedback id="feedbackDialog" .subject="${this.subject}" .chapter="${this.chapter}" .topic="${this.topic}" .test="${this.key}"></kmap-feedback>
