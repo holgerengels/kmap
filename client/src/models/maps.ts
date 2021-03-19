@@ -351,10 +351,10 @@ export default createModel({
             modified: state.maps.topicCard.modified,
             author: state.maps.topicCard.author,
             keywords: [subject, chapter, topic, ...(state.maps.topicCard.keywords ? state.maps.topicCard.keywords.split(",").map(k => k.trim()) : [])],
-            breadcrumbs: [subject, chapter, topic],
+            breadcrumbs: ["browser", subject, chapter, topic],
             about: [subject],
             type: ["Text"],
-            thumb: `${urls.snappy}${encode(subject, chapter, topic)}`
+            thumb: `${urls.snappy}${encodePath(subject, chapter, topic)}`
           });
         }
         else {
@@ -371,7 +371,7 @@ export default createModel({
             title: chapter,
             description: state.maps.chapterCard !== undefined && state.maps.chapterCard.summary ? state.maps.chapterCard.summary : "Wissenslandkarte zum Kapitel " + chapter,
             keywords: [subject, chapter, ...topics],
-            breadcrumbs: [subject, chapter],
+            breadcrumbs: ["browser", subject, chapter],
             about: [subject],
             type: ["Karte"]
           });

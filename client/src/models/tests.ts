@@ -387,8 +387,8 @@ export default createModel({
             let breadcrumbs: string[] | undefined = undefined;
             if (state.tests.subject && state.tests.chapter) {
               if (state.tests.topic) {
-                title = "Aufgaben zum Thema " + state.tests.chapter + " - " + state.tests.topic;
-                breadcrumbs = [state.tests.subject, state.tests.chapter, state.tests.topic, "tests"];
+                title = "Aufgaben zum Thema " + state.tests.subject + " → " + state.tests.chapter + " → " + state.tests.topic;
+                breadcrumbs = ["tests", state.tests.subject, state.tests.chapter, state.tests.topic];
               }
               else {
                 title = "Aufgaben zum Thema " + state.tests.chapter;

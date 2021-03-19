@@ -78,6 +78,20 @@ export default createModel({
           dispatch.app.handleError,
           dispatch.maps.error);
       },
+      'exercises/received': async function () {
+        const state = store.getState();
+        const subject = state.exercises.subject || '';
+        const chapter = state.exercises.chapter || '';
+        const topic = state.exercises.topic || '';
+        const key = state.exercises.key || '';
+        dispatch.shell.updateMeta({
+          title: key, description: "Aufgabe zum Thema " + subject + " → " + chapter + " → " + topic,
+          keywords: [subject, chapter, topic, key],
+          breadcrumbs: ["exercises", subject, chapter, topic, key],
+          about: [subject],
+          type: ["Übung"]
+        });
+      },
       'routing/change': async function (routing: RoutingState<string>) {
         switch (routing.page) {
           case 'exercise':

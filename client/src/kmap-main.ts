@@ -197,13 +197,8 @@ export class KmapMain extends connect(store, LitElement) {
   }
 
   private breadCrumbsLd(path: string[]) {
-    let tests: boolean;
-    if (path[path.length-1] === 'tests') {
-      path.pop();
-      tests = true;
-    }
-    else
-      tests = false;
+    const page = path.shift();
+    const key = page === "exercises" ? path.pop() : undefined;
 
     const items = path.map((v, i, a) => {
       return {
@@ -213,13 +208,24 @@ export class KmapMain extends connect(store, LitElement) {
         "item": "https://kmap.eu" + urls.client + "browser/" + a.slice(0, i+1).map(p => encodeURIComponent(p)).join("/")
       }
     });
-    if (tests) {
-      items.push({
-        "@type": "ListItem",
-        "position": items.length + 1,
-        "name": "Test",
-        "item": "https://kmap.eu" + urls.client + "test/" + path.map(p => encodeURIComponent(p)).join("/")
-      });
+
+    switch (page) {
+      case "tests":
+        items.push({
+          "@type": "ListItem",
+          "position": items.length + 1,
+          "name": "Test",
+          "item": "https://kmap.eu" + urls.client + "test/" + path.map(p => encodeURIComponent(p)).join("/")
+        });
+        break;
+      case "exercises":
+        items.push({
+          "@type": "ListItem",
+          "position": items.length + 1,
+          "name": "Test",
+          "item": "https://kmap.eu" + urls.client + "exercises/" + path.map(p => encodeURIComponent(p)).join("/") + "/" + key,
+        });
+        break;
     }
 
     return {
