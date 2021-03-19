@@ -8,12 +8,12 @@ import '@material/mwc-textfield';
 import './validating-form';
 import {colorStyles, fontStyles} from "./kmap-styles";
 import {Dialog} from "@material/mwc-dialog/mwc-dialog";
-import {Card} from "../models/types";
+import {Test} from "../models/tests";
 
-@customElement('kmap-editor-rename-dialog')
-export class KMapEditorRenameDialog extends Connected {
+@customElement('kmap-test-editor-rename-dialog')
+export class KMapTestEditorRenameDialog extends Connected {
   @property()
-  private _card?: Card = undefined;
+  private _test?: Test = undefined;
   @property()
   private _newName: string = '';
 
@@ -26,16 +26,16 @@ export class KMapEditorRenameDialog extends Connected {
 
   mapState(state: State) {
     return {
-      _card: state.maps.cardForRename,
+      _test: state.tests.testForRename,
     };
   }
 
   updated(changedProperties) {
-    if (changedProperties.has('_card') && this._card !== undefined) {
-      if (!this._card.subject)
-        this._card.subject = store.state.maps.subject || '';
-      if (!this._card.chapter)
-        this._card.chapter = store.state.maps.chapter || '';
+    if (changedProperties.has('_test') && this._test !== undefined) {
+      if (!this._test.subject)
+        this._test.subject = store.state.tests.subject || '';
+      if (!this._test.chapter)
+        this._test.chapter = store.state.tests.chapter || '';
 
       this._newName = '';
       this._renameDialog.show();
@@ -45,21 +45,21 @@ export class KMapEditorRenameDialog extends Connected {
 
   _rename() {
     this._renameDialog.close();
-    if (!this._card)
+    if (!this._test)
       return;
 
-    const card: Card | any = this._card;
-    card.newName = this._newName;
+    const test: Test | any = this._test;
+    test.newName = this._newName;
 
-    store.dispatch.maps.renameTopic(card);
+    store.dispatch.tests.renameTest(test);
     window.setTimeout(function() {
-      store.dispatch.maps.load();
+      store.dispatch.tests.load();
     }, 1000);
   }
 
   _cancel() {
     this._renameDialog.close();
-    store.dispatch.maps.unsetCardForRename();
+    store.dispatch.tests.unsetTestForRename();
   }
 
   _maybeEnter(event) {
@@ -85,11 +85,11 @@ export class KMapEditorRenameDialog extends Connected {
     // language=HTML
     return html`
         <mwc-dialog id="renameDialog" title="Umbenennen">
-        ${this._card ? html`
+        ${this._test ? html`
         <validating-form @keyup="${this._maybeEnter}" @validity="${e => this._valid = e.target.valid}">
             <div class="field">
               <label for="topic">Thema</label>
-              <span id="topic">${this._card.topic}</span>
+              <span id="topic">${this._test.key}</span>
             </div>
             <mwc-textfield label="Umbenennen in ..." type="text" .value="${this._newName}" @change="${e => this._newName = e.target.value}" pattern="^([^/.]*)$" required></mwc-textfield>
           </validating-form>

@@ -4,6 +4,6 @@ export const urls = {
   snappy: "/snappy/",
 };
 
-export const encode = (...path: string[]): string => {
-  return path.map(p => encodeURIComponent(p)).join("/")
-};
+export const encodePath = (...path: string[]): string => path.map(p => encodeURIComponent(p)).join("/");
+
+export const encodeParams = (m: { [name: string]: string }): string => Object.entries(m).map(e => e[0] + "=" + encodeURIComponent(e[1])).join("&");

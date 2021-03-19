@@ -112,6 +112,7 @@ public class TestsServlet
             String set = req.getParameter("set");
             String chapter = req.getParameter("chapter");
             String topic = req.getParameter("topic");
+            String key = req.getParameter("key");
             String chapters = req.getParameter("chapters");
             String topics = req.getParameter("topics");
             String random = req.getParameter("random");
@@ -127,6 +128,12 @@ public class TestsServlet
                 JsonArray array = tests.loadTestsBySet(subject, set);
                 if (array != null)
                     writeResponse(req, resp, array);
+            }
+            else if (key != null) { // uses chapter, topic and key !!!
+                log("load key = " + chapter + " " + topic + " " + key);
+                JsonObject object = tests.loadTestByKey(subject, chapter, topic, key);
+                if (object != null)
+                    writeResponse(req, resp, object);
             }
             else if (topic != null) { // uses chapter and topic !!!
                 log("load topic = " + chapter + " " + topic);

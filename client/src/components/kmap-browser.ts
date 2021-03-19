@@ -14,13 +14,13 @@ import './svg-connector';
 import {Line} from "../models/maps";
 import {Card} from "../models/types";
 import {Connector} from "./svg-connector";
-import {iconTest} from "./icons";
-import {encode} from "../urls";
+import {encodePath} from "../urls";
 import {KMapTimelineAside} from "./kmap-timeline-aside";
 import {throttle} from "../debounce";
 import {Timeline} from "../models/courses";
 import {StyleInfo, styleMap} from "lit-html/directives/style-map";
 import {Connected} from "./connected";
+import {Topics, includes} from "../models/tests";
 
 type SideBarState = "hidden" | "collapsed" | "open";
 
@@ -49,7 +49,7 @@ export class KMapBrowser extends Connected {
   @property()
   private _hasTests: boolean = false;
   @property()
-  private _testTopics: string[] = [];
+  private _testTopics?: Topics;
 
   @property()
   private _page: string = '';
@@ -100,7 +100,7 @@ export class KMapBrowser extends Connected {
       _chapterCard: state.maps.chapterCard,
       _topicCard: state.maps.topicCard,
       _loading: state.maps.loading,
-      _testTopics: state.tests.topics ? state.tests.topics.topics : [],
+      _testTopics: state.tests.topics,
       _selected: state.maps.selected,
       _highlighted: state.maps.selectedDependencies,
       _timeline: state.courses.selectedTimeline,
@@ -203,7 +203,7 @@ export class KMapBrowser extends Connected {
     }
 
     if (changedProperties.has("_chapter")) {
-      this._hasTests = this._testTopics.filter(t => t.startsWith(this._chapter)).length > 1;
+      this._hasTests = this._testTopics !== undefined && includes(this._testTopics, this._chapter);
       // @ts-ignore
       const connector: Connector = this.shadowRoot.getElementById("connector") as Connector;
       connector.clear();
@@ -260,6 +260,10 @@ export class KMapBrowser extends Connected {
 
   _hover(e) {
     this._animFrom = e.target.getBoundingClientRect();
+  }
+
+  _test() {
+    store.dispatch.routing.push('/app/test/' + encodePath(this._subject, this._chapter));
   }
 
   static get styles() {
@@ -377,7 +381,7 @@ export class KMapBrowser extends Connected {
         ${this._chapterCard.links ? html`
           <kmap-card-text class="print-hide">
             <b>Zurück zu</b> ${this._chapterCard.links.split("/").map((backlink) => html`
-              <a href="/app/browser/${encode(this._subject, backlink)}" title="Wissenslandkarte ${backlink}">${backlink}</a>&nbsp;
+              <a href="/app/browser/${encodePath(this._subject, backlink)}" title="Wissenslandkarte ${backlink}">${backlink}</a>&nbsp;
             `)}
           </kmap-card-text>
         ` : html`
@@ -388,7 +392,7 @@ export class KMapBrowser extends Connected {
         ${this._chapterCard.dependencies ? html`
           <kmap-card-text class="depends">
             <b>Voraussetzung für das Kapitel ${this._chapter}:</b> ${this._chapterCard.dependencies.map((depend) => html`
-              <a href="/app/browser/${encode(this._subject, ...depend.split('/'))}" title="${(depend.includes('/') ? 'Wissenskarte ': 'Wissenslandkarte ') + depend}">${depend.replace(/\//, " → ")}</a>
+              <a href="/app/browser/${encodePath(this._subject, ...depend.split('/'))}" title="${(depend.includes('/') ? 'Wissenskarte ': 'Wissenslandkarte ') + depend}">${depend.replace(/\//, " → ")}</a>
             `)}
           </kmap-card-text>
         ` : '' }
@@ -406,10 +410,10 @@ export class KMapBrowser extends Connected {
         ` : '' }
 
         ${this._chapterCard.description ? html`
-          <a class="button" slot="button" href="/app/browser/${encode(this._subject, this._chapter, '_')}" title="Wissenskarte ${this._chapter}">Mehr</a>
+          <a class="button" slot="button" href="/app/browser/${encodePath(this._subject, this._chapter, '_')}" title="Wissenskarte ${this._chapter}">Mehr</a>
         ` : ''}
         ${this._hasTests ? html`
-          <a slot="icon" href="${'/app/test/' + encode(this._subject, this._chapter)}" title="Aufgaben zum Kapitel ${this._chapter}" style="display: flex; padding-right: 8px; --foreground: var(--color-darkgray)"><span class="print-show">Gemischte Aufgaben →&nbsp;</span>${iconTest}</a>
+          <span slot="icon" class="print-show">Gemischte Aufgaben →&nbsp;</span><mwc-icon-button slot="icon" icon="quiz" title="Aufgaben zum Kapitel ${this._chapter}" @click="${this._test}"></mwc-icon-button>
         ` : '' }
       </kmap-card>
     ` : '';

@@ -37,6 +37,11 @@ export class KMapTestEditorScroller extends Connected {
     store.dispatch.tests.setTestForDelete(test);
   }
 
+  _renameTest(test) {
+    console.log("rename " + test.key);
+    store.dispatch.tests.setTestForRename(test);
+  }
+
   _editTest(test) {
     console.log("edit " + test.key);
     store.dispatch.tests.setTestForEdit(test);
@@ -83,6 +88,7 @@ export class KMapTestEditorScroller extends Connected {
             <div class="item font-body" ?activated="${this._selectedIndex === i}" @click="${() => this._select(i)}">${test.key}
                 <span class="secondary">${test.chapter} - ${test.topic}</span>
                 <mwc-icon @click="${e => { e.stopPropagation(); this._deleteTest(test)}}">delete</mwc-icon>
+                <mwc-icon @click="${e => { e.stopPropagation(); this._renameTest(test)}}">label</mwc-icon>
                 <mwc-icon @click="${e => { e.stopPropagation(); this._editTest(test)}}">edit</mwc-icon>
             </div>
           `)}

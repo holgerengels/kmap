@@ -15,8 +15,8 @@ import './kmap-feedback';
 import {fontStyles, colorStyles} from "./kmap-styles";
 import {KMapFeedback} from "./kmap-feedback";
 import {Attachment, Card} from "../models/types";
-import {iconTest} from "./icons";
-import {encode} from "../urls";
+import {encodePath} from "../urls";
+import {includes, Topics} from "../models/tests";
 
 @customElement('kmap-knowledge-card')
 export class KMapKnowledgeCard extends Connected {
@@ -48,7 +48,7 @@ export class KMapKnowledgeCard extends Connected {
   @property()
   private _hasTests: boolean = false;
   @property()
-  private _topics: string[] = [];
+  private _topics?: Topics;
   @property()
   private _rates: object = {};
 
@@ -66,7 +66,7 @@ export class KMapKnowledgeCard extends Connected {
     return {
       _instance: state.app.instance,
       _userid: state.app.userid,
-      _topics: state.tests.topics ? state.tests.topics.topics : [],
+      _topics: state.tests.topics,
       _rates: state.rates.rates,
     };
   }
@@ -79,7 +79,7 @@ export class KMapKnowledgeCard extends Connected {
       this.divideAttachments(this.card ? this.card.attachments : []);
 
     if (changedProperties.has("card") || changedProperties.has("_topics"))
-      this._hasTests = this.card !== undefined && this._topics.includes(this.card.chapter + "." + this.card.topic);
+      this._hasTests = this.card !== undefined && this._topics !== undefined && includes(this._topics, this.card.chapter, this.card.topic);
   }
 
   _colorize(rate) {
@@ -140,6 +140,11 @@ export class KMapKnowledgeCard extends Connected {
     this._exercises = exercises;
   }
 
+  _test() {
+    if (this.card === undefined) return;
+    store.dispatch.routing.push('/app/test/' + encodePath(this.card.subject, this.card.chapter, this.card.topic));
+  }
+
   _feedback() {
     if (this._userid)
       this._feedbackDialog.show();
@@ -147,15 +152,26 @@ export class KMapKnowledgeCard extends Connected {
       store.dispatch.shell.showMessage("Bitte melde Dich an, um die Feedbackfunktion zu nutzen!")
   }
 
+  _permalink() {
+    if (this.card === undefined) return;
+
+    navigator.clipboard.writeText(window.location.origin + "/app/" + encodePath("browser", this.card.subject, this.card.chapter, this.card.topic))
+      .then(
+        () => store.dispatch.shell.showMessage("Link wurde kopiert"),
+        () => store.dispatch.shell.showMessage("Link konnte nicht kopiert werden")
+      );
+  }
+
   _share() {
     if (this.card === undefined)
       return;
     // @ts-ignore
     navigator.share({
-      title: "KMap",
+      title: "KMap Wissenskarte",
       text: this.card.chapter + " - " + this.card.topic,
       url: document.location.href,
-    })  }
+    })
+  }
 
   static get styles() {
     // language=CSS
@@ -304,16 +320,17 @@ export class KMapKnowledgeCard extends Connected {
         </div>
         ` : '' }
 
-          <a class="button" slot="button" href="/app/browser/${encode(this.card.subject, this.card.chapter)}" title="Wissenslandkarte ${this.card.chapter}"><mwc-icon>expand_less</mwc-icon></a>
+          <a class="button" slot="button" href="/app/browser/${encodePath(this.card.subject, this.card.chapter)}" title="Wissenslandkarte ${this.card.chapter}"><mwc-icon>expand_less</mwc-icon></a>
 
           ${!this.card.links && false ? html`
             <star-rating slot="button" .rate="${this.state}" @clicked="${this._rated}"></star-rating>
           ` : '' }
           ${this._hasTests ? html`
-            <a slot="icon" href="${'/app/test/' + encode(this.card.subject, this.card.chapter, this.card.topic)}" title="Aufgaben zum Thema ${this.card.topic}" style="display: flex; padding-right: 8px; --foreground: var(--color-darkgray)">${iconTest}</a>
-          ` : '' }
-           <mwc-icon-button slot="icon" icon="share" title="Teilen..." ?hidden="${typeof navigator['share'] !== 'function'}" @click="${this._share}"></mwc-icon-button>
-           <mwc-icon-button slot="icon" icon="feedback" title="Feedback" @click="${this._feedback}"></mwc-icon-button>
+            <mwc-icon-button slot="icon" icon="quiz" title="Aufgaben zum Thema ${this.card.topic}" @click="${this._test}"></mwc-icon-button>
+          `:'' }
+            <mwc-icon-button slot="icon" icon="feedback" title="Feedback" @click="${this._feedback}"></mwc-icon-button>
+            <mwc-icon-button slot="icon" icon="share" title="Teilen..." ?hidden="${typeof navigator['share'] !== 'function'}" @click="${this._share}"></mwc-icon-button>
+            <mwc-icon-button slot="icon" icon="link" title="Permalink" ?hidden="${typeof navigator['share'] === 'function'}"  @click="${this._permalink}"></mwc-icon-button>
          </kmap-card>
 
   <kmap-feedback id="feedbackDialog" .subject="${this.card.subject}" .chapter="${this.card.chapter}" .topic="${this.card.topic}"></kmap-feedback>

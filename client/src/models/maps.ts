@@ -1,7 +1,7 @@
 import {createModel, RoutingState} from '@captaincodeman/rdx';
 import {Store} from '../store';
 import {endpoint, fetchjson} from "../endpoint";
-import {encode, urls} from "../urls";
+import {encodePath, urls} from "../urls";
 import {Card} from "./types";
 
 const defaults: object = {
@@ -35,13 +35,13 @@ export interface MapState {
   topicCard?: Card,
   timestamp: number,
   loading: boolean,
+  deleting: boolean,
+  renaming: boolean,
+  saving: boolean,
   error: string,
   selected: string,
   selectedDependencies: string[],
   targeted: string[],
-  deleting: boolean,
-  renaming: boolean,
-  saving: boolean,
   allTopics?: AllTopics,
   loadingAllTopics: boolean,
   cardForEdit?: Card,
@@ -54,22 +54,16 @@ export interface MapState {
 export default createModel({
   state: <MapState>{
     lines: [],
-    chapterCard: undefined,
-    topicCard: undefined,
     timestamp: -1,
     loading: false,
+    deleting: false,
+    renaming: false,
+    saving: false,
     error: "",
     selected: "",
     selectedDependencies: [],
     targeted: [],
-    deleting: false,
-    renaming: false,
-    saving: false,
     loadingAllTopics: false,
-    cardForEdit: undefined,
-    cardForRename: undefined,
-    cardForDelete: undefined,
-    latest: undefined,
     loadingLatest: false,
     latestTimestamp: -1,
   },
@@ -115,13 +109,11 @@ export default createModel({
         topicCard: topicCard
       };
     },
-    subjectChanged(state) {
-      return { ...state};
-    },
     forget(state) {
       return { ...state,
-        subject: '',
-        chapter: '',
+        subject: undefined,
+        chapter: undefined,
+        topic: undefined,
         lines: [],
         loaded: undefined,
         chapterCard: undefined,
@@ -138,16 +130,16 @@ export default createModel({
       return { ...state, deleting: false, cardForDelete: undefined, loaded: undefined };
     },
     requestRenameTopic(state) {
-      return { ...state, deleting: true };
+      return { ...state, renaiming: true };
     },
     receivedRenameTopic(state) {
-      return { ...state, deleting: false, cardForRename: undefined, loaded: undefined };
+      return { ...state, renaiming: false, cardForRename: undefined, loaded: undefined };
     },
     requestSaveTopic(state) {
-      return { ...state, deleting: true };
+      return { ...state, saving: true };
     },
     receivedSaveTopic(state) {
-      return { ...state, deleting: false, cardForEdit: undefined, loaded: undefined };
+      return { ...state, saving: false, cardForEdit: undefined, loaded: undefined };
     },
 
     requestAllTopics(state) {
@@ -203,6 +195,9 @@ export default createModel({
     error(state, message) {
       return { ...state,
         loading: false,
+        deleting: false,
+        renaming: false,
+        saving: false,
         error: message,
       }
     },
@@ -350,7 +345,7 @@ export default createModel({
           dispatch.shell.updateMeta({
             title: chapter, detail: state.maps.topicCard.topic, description: state.maps.topicCard.summary,
             image: state.maps.topicCard.thumb ?
-              `${urls.server}${encode("data", subject, chapter, topic, state.maps.topicCard.thumb)}?instance=${state.app.instance}`
+              `${urls.server}${encodePath("data", subject, chapter, topic, state.maps.topicCard.thumb)}?instance=${state.app.instance}`
               : undefined,
             created: state.maps.topicCard.created,
             modified: state.maps.topicCard.modified,

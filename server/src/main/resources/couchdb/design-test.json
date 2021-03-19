@@ -1,6 +1,9 @@
 {
   "_id": "_design/test",
   "views": {
+    "byChapterTopicKey": {
+      "map": "function(doc) {\n    if (doc.subject && doc.chapter && doc.topic && doc.key)\n      emit([doc.subject, doc.chapter, doc.topic, doc.key]);\n}"
+    },
     "byChapterTopic": {
       "map": "function(doc) {\n    if (doc.subject && doc.chapter && doc.topic)\n      emit([doc.subject, doc.chapter, doc.topic]);\n}"
     },
@@ -18,10 +21,10 @@
       "reduce": "_sum"
     },
     "chapters": {
-      "map": "function(doc) {\n    if (!doc.links)\n        emit(doc.subject, doc.chapter);\n}"
+      "map": "function(doc) {\n    emit(doc.subject, doc.chapter);\n}"
     },
     "topics": {
-      "map": "function(doc) {\n    if (!doc.links)\n        emit(doc.subject, doc.chapter + \".\" + doc.topic);\n}"
+      "map": "function(doc) {\n    emit([doc.subject, doc.chapter, doc.topic]);\n}"
     }
   }
 }

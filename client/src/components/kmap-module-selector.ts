@@ -48,7 +48,7 @@ export class KMapModuleSelector extends Connected {
     return html`
         <mwc-list>
           ${this._modules.map((module, i) => html`
-            <mwc-list-item ?activated="${this._selectedIndex === i}" @click="${() => this._select(i)}">
+            <mwc-list-item ?activated="${this._selectedIndex === i}" @click="${() => this._select(i)}" title="${module.subject} - ${module.module}">
               <span>${module.subject} - ${module.module}</span>
             </mwc-list-item>
           `)}

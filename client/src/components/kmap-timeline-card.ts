@@ -3,7 +3,6 @@ import {css, customElement, html, LitElement, property} from 'lit-element';
 import {colorStyles, fontStyles} from "./kmap-styles";
 import '@material/mwc-icon';
 import {cardStyles} from "../mdc.card.css";
-import {iconTest} from "./icons";
 
 @customElement('kmap-timeline-card')
 export class KMapTimelineCard extends LitElement {
@@ -76,7 +75,7 @@ export class KMapTimelineCard extends LitElement {
             case 'test':
               return html`
                 <a href="${(this._test(top[1]))}" class="link mdc-card__primary-action">
-                    <span title="Tests">${iconTest}</span>
+                    <mwc-icon title="Tests">quiz</mwc-icon>
                     <span>${top[1].replace("/", " → ")}</span>
                     </a>
               `;

@@ -64,6 +64,7 @@ export default createModel({
         switch (routing.page) {
           case 'home':
             document.title = "KMap - Knowledge Map";
+            dispatch.subjects.load();
           case 'test':
             if (Object.keys(routing.params).length === 0)
               dispatch.subjects.load();
@@ -71,6 +72,7 @@ export default createModel({
         }
       },
       'app/chooseInstance': async function () {
+        //dispatch.subjects.forget();
         dispatch.subjects.load();
       },
     }

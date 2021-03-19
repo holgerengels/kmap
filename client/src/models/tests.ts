@@ -2,7 +2,7 @@ import {createModel, RoutingState} from '@captaincodeman/rdx';
 import {Store} from '../store';
 import {endpoint, fetchjson} from "../endpoint";
 import {urls} from "../urls";
-import {Attachment, Path} from "./types";
+import {Attachment} from "./types";
 
 export interface TestResult {
   subject: string;
@@ -30,19 +30,18 @@ export interface Test {
   attachments: Attachment[];
 }
 
+export interface TopicCount {
+  chapter: string,
+  topic: string,
+  count: number,
+}
 export interface Topics {
   subject: string,
-  topics: string[],
+  topics: TopicCount[],
 }
 interface Chapters {
   subject: string,
   chapters: string[],
-}
-interface Tests {
-  subject: string,
-  chapter: string,
-  topic?: string,
-  tests: object[],
 }
 export interface Random {
   subject?: string,
@@ -52,46 +51,54 @@ export interface Random {
 export interface TestsState {
   topics?: Topics,
   chapters?: Chapters,
-  subject: string,
+  subject?: string,
   chapter?: string,
   topic?: string,
+  loaded?: string,
   tree?: string[],
   tests?: object[],
   results: object[],
-  timestamp: number,
   loadingTopics: boolean,
   loadingChapters: boolean,
   loadingTree: boolean,
-  deleting: boolean;
+  timestamp: number,
+  loading: boolean,
+  deleting: boolean,
+  renaming: boolean,
   saving: boolean,
   error: string,
   testForEdit?: Test,
-  testForDelete?: Test,
+  testForRename?: Partial<Test>,
+  testForDelete?: Partial<Test>,
   random?: Random,
   randomTimestamp: number,
 }
 
 export default createModel({
   state: <TestsState>{
-    subject: "",
-    chapters: undefined,
-    tree: undefined,
-    tests: undefined,
     results: [],
     timestamp: -1,
     loadingTopics: false,
     loadingChapters: false,
     loadingTree: false,
+    loading: false,
     deleting: false,
+    renaming: false,
     saving: false,
     error: "",
-    testForEdit: undefined,
-    testForDelete: undefined,
-    random: undefined,
     loadingRandomTests: false,
     randomTimestamp: -1,
   },
   reducers: {
+    'routing/change'(state, routing: RoutingState<string>) {
+      return routing.page === 'test' ? {
+        ...state,
+        subject: routing.params["subject"] ? decodeURIComponent(routing.params["subject"]) : undefined,
+        chapter: routing.params["chapter"] ? decodeURIComponent(routing.params["chapter"]) : undefined,
+        topic: routing.params["topic"] ? decodeURIComponent(routing.params["topic"]) : undefined,
+      }
+      : state;
+    },
     requestTopics(state) {
       return { ...state, loadingTopics: true,
         timestamp: Date.now(),
@@ -130,30 +137,31 @@ export default createModel({
       };
     },
 
-    requestTests(state) {
-      return { ...state, loadingTests: true,
+    request(state) {
+      return { ...state, loading: true,
         timestamp: Date.now(),
         error: "",
       };
     },
-    receivedTests(state, payload: Tests) {
+    received(state, tests: object[]) {
       return { ...state,
-        subject: payload.subject,
-        chapter: payload.chapter,
-        topic: payload.topic,
-        tests: payload.tests,
-        loadingTests: false,
+        tests: tests,
+        loaded: "" + state.subject + state.chapter + state.topic,
+        loading: false,
       };
     },
     forget(state) {
       return { ...state,
-        deleting: true,
-        subject: "",
+        subject: undefined,
+        chapter: undefined,
+        topic: undefined,
         chapters: undefined,
         tree: undefined,
         tests: undefined,
+        loaded: undefined,
         results: [],
         testForDelete: undefined,
+        testForRename: undefined,
         testForEdit: undefined,
         topics: undefined,
       };
@@ -165,11 +173,31 @@ export default createModel({
     receivedDeleteTest(state) {
       return { ...state, deleting: false };
     },
+    requestRenameTest(state) {
+      return { ...state, renaiming: true };
+    },
+    receivedRenameTest(state) {
+      return { ...state, renaiming: false, testForRename: undefined };
+    },
     requestSaveTest(state) {
-      return { ...state, deleting: true };
+      return { ...state, saving: true };
     },
     receivedSaveTest(state) {
-      return { ...state, deleting: false };
+      return { ...state, saving: false };
+    },
+
+    requestRandomTests(state) {
+      return { ...state, loadingRandomTests: true,
+        randomTimestamp: Date.now(),
+        random: undefined,
+        error: "",
+      };
+    },
+    receivedRandomTests(state, payload: Random) {
+      return { ...state,
+        random: payload,
+        loadingRandomTests: false,
+      };
     },
 
     clearResults(state) {
@@ -187,31 +215,25 @@ export default createModel({
     unsetTestForEdit(state) {
       return { ...state, testForEdit: undefined }
     },
-    setTestForDelete(state, testForDelete: Test) {
+    setTestForRename(state, testForRename: Partial<Test>) {
+      return { ...state, testForRename: testForRename }
+    },
+    unsetTestForRename(state) {
+      return { ...state, testForRename: undefined }
+    },
+    setTestForDelete(state, testForDelete: Partial<Test>) {
       return { ...state, testForDelete: testForDelete }
     },
     unsetTestForDelete(state) {
       return { ...state, testForDelete: undefined }
     },
 
-    requestRandomTests(state) {
-      return { ...state, loadingRandomTests: true,
-        randomTimestamp: Date.now(),
-        random: undefined,
-        error: "",
-      };
-    },
-    receivedRandomTests(state, payload: Random) {
-      return { ...state,
-        random: payload,
-        loadingRandomTests: false,
-      };
-    },
-
     error(state, message) {
       return { ...state,
         loading: false,
         deleting: false,
+        renaming: false,
+        saving: false,
         error: message,
       }
     },
@@ -265,26 +287,20 @@ export default createModel({
             dispatch.tests.error);
         }
       },
-      async loadTests(payload: Path) {
+      async load() {
         const state = store.getState();
-        if (!payload.subject || !payload.chapter)
-          return;
+        const load = "" + state.tests.subject + state.tests.chapter + state.tests.topic;
+        if (!state.tests.subject || !state.tests.chapter) return;
 
-        // @ts-ignore
-        if (!state.tests || state.tests.subject !== payload.subject || state.tests.chapter !== payload.chapter || state.tests.topic !== payload.topic || !state.tests.tests) {
-          dispatch.tests.requestTests();
-          const url = payload.topic
-            ? `${urls.server}tests?subject=${payload.subject}&chapter=${payload.chapter}&topic=${payload.topic}`
-            : `${urls.server}tests?subject=${payload.subject}&chapter=${payload.chapter}`;
+        if (state.tests.loaded !== load) {
+          dispatch.tests.request();
+          const url = state.tests.topic
+            ? `${urls.server}tests?subject=${state.tests.subject}&chapter=${state.tests.chapter}&topic=${state.tests.topic}`
+            : `${urls.server}tests?subject=${state.tests.subject}&chapter=${state.tests.chapter}`;
 
           fetchjson(url, endpoint.get(state),
             (json) => {
-              dispatch.tests.receivedTests({
-                subject: payload.subject,
-                chapter: payload.chapter,
-                topic: payload.topic,
-                tests: json
-              });
+              dispatch.tests.received(json);
             },
             dispatch.app.handleError,
             dispatch.tests.error);
@@ -311,14 +327,27 @@ export default createModel({
         const userid = state.app.userid;
 
         dispatch.tests.requestDeleteTest();
-        fetchjson(`${urls.server}tests?userid=${userid}&subject=${test.subject}&save=${test.set}`, {
-            ...endpoint.post(state),
-            body: JSON.stringify({delete: test})
-          },
+        fetchjson(`${urls.server}tests?userid=${userid}&subject=${test.subject}&save=${test.set}`,
+          {...endpoint.post(state), body: JSON.stringify({delete: test})},
           () => {
             dispatch.tests.receivedDeleteTest();
             dispatch.tests.unsetTestForDelete();
             dispatch.contentSets.maybeObsoleteSet({subject: test.subject, set: test.set});
+          },
+          dispatch.app.handleError,
+          dispatch.tests.error);
+      },
+      async renameTest(test: Test) {
+        const state = store.getState();
+        const userid = state.app.userid;
+
+        dispatch.tests.requestRenameTest();
+        fetchjson(`${urls.server}tests?userid=${userid}&subject=${test.subject}&save=${test.set}`,
+          // @ts-ignore
+          {...endpoint.post(state), body: JSON.stringify({rename: test, name: test.newName})},
+          () => {
+            dispatch.tests.receivedRenameTest();
+            dispatch.tests.unsetTestForRename();
           },
           dispatch.app.handleError,
           dispatch.tests.error);
@@ -343,42 +372,34 @@ export default createModel({
       'routing/change': async function (routing: RoutingState<string>) {
         switch (routing.page) {
           case 'test':
-            let subject = routing.params["subject"];
-            let chapter = routing.params["chapter"];
-            let topic = routing.params["topic"];
+            const state = store.getState();
+            dispatch.tests.load();
 
-            dispatch.tests.loadTests({
-              subject: routing.params["subject"],
-              chapter: routing.params["chapter"],
-              topic: routing.params["topic"]
-            });
-
-            if (chapter)
+            if (state.tests.chapter)
               document.title = "KMap - Aufgaben bearbeiten";
             else if (routing.params["results"])
               document.title = "KMap - Aufgaben auswerten";
             else
               document.title = "KMap - Aufgaben wählen";
 
-            subject = subject ? decodeURIComponent(subject) : undefined;
-            chapter = chapter ? decodeURIComponent(chapter) : undefined;
-            topic = topic ? decodeURIComponent(topic) : undefined;
-
             let title = document.title;
             let description: string | undefined = undefined;
             let breadcrumbs: string[] | undefined = undefined;
-            if (subject && chapter) {
-              if (topic) {
-                title = "Aufgaben zum Thema " + chapter + " - " + topic;
-                breadcrumbs = [subject, chapter, topic, "tests"];
+            if (state.tests.subject && state.tests.chapter) {
+              if (state.tests.topic) {
+                title = "Aufgaben zum Thema " + state.tests.chapter + " - " + state.tests.topic;
+                breadcrumbs = [state.tests.subject, state.tests.chapter, state.tests.topic, "tests"];
               }
               else {
-                title = "Aufgaben zum Thema " + chapter;
-                breadcrumbs = [subject, chapter, "tests"];
+                title = "Aufgaben zum Thema " + state.tests.chapter;
+                breadcrumbs = [state.tests.subject, state.tests.chapter, "tests"];
               }
               description = "Ermittle Deinen Wissensstand mit Hilfe von interaktiven Aufgaben!";
             }
-            dispatch.shell.updateMeta({title: title, description: description, breadcrumbs: breadcrumbs, about: [subject], type: ["Lernkontrolle"] });
+            dispatch.shell.updateMeta({title: title, description: description, breadcrumbs: breadcrumbs, about: state.tests.subject ? [state.tests.subject] : undefined, type: ["Lernkontrolle"] });
+
+            if (Object.keys(routing.params).length === 0)
+              dispatch.tests.loadTopics();
             break;
           case 'browser':
             dispatch.tests.loadTopics();
@@ -391,12 +412,10 @@ export default createModel({
       'app/chooseInstance': async function () {
         const state = store.getState();
         const routing: RoutingState<string> = state.routing;
-        if (routing.page === 'test')
-          dispatch.tests.loadTests({
-            subject: routing.params["subject"],
-            chapter: routing.params["chapter"],
-            topic: routing.params["topic"]
-          });
+        if (routing.page === 'test') {
+          dispatch.tests.loadTopics();
+          dispatch.tests.load();
+        }
         else if (routing.page === 'browser')
           dispatch.tests.loadTopics();
         else
@@ -419,3 +438,15 @@ export default createModel({
     }
   }
 })
+
+export const includes = (topics: Topics, chapter: string, topic?: string): boolean => {
+  for (const count of topics.topics) {
+    if (count.chapter === chapter && (topic === undefined || count.topic === topic))
+      return true;
+  }
+  return false;
+};
+
+export const count = (topics: Topics, chapter: string, topic?: string): number | undefined => {
+  return topics.topics.filter(t => t.chapter === chapter && (topic === undefined || t.topic === topic)).map(t => t.count).reduce((sum, c) => sum + c, 0)
+};

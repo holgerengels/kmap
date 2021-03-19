@@ -8,7 +8,7 @@ import '@material/mwc-icon';
 import './star-rating';
 import {colorStyles, fontStyles} from "./kmap-styles";
 import {TestResult} from "../models/tests";
-import {encode} from "../urls";
+import {encodePath} from "../urls";
 
 @customElement('kmap-test-result-card')
 export class KMapTestResultCard extends Connected {
@@ -116,7 +116,7 @@ export class KMapTestResultCard extends Connected {
   render() {
     return this.card !== undefined ? html`
       <kmap-card header="${this.card.chapter} → ${this.card.topic}"
-            primaryLink="/app/browser/${encode(this.card.subject, this.card.chapter, this.card.topic)}"
+            primaryLink="/app/browser/${encodePath(this.card.subject, this.card.chapter, this.card.topic)}"
             primaryLinkTitle="${'Wissenskarte ' + this.card.topic}"
             style=${styleMap(this._colorStyles)}>
         <div class="content">

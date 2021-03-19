@@ -73,10 +73,10 @@ a[disabled] {
 
 // language=CSS
 export const colorStyles: CSSResult = css`
-h1, h2, h3, h4, p, th, td, .color-content-text, :host {
+h1, h2, h3, h4, p, th, td, :host {
   color: var(--color-darkgray);
 }
-span.secondary, label {
+span.secondary, label, mwc-icon-button {
   color: var(--color-mediumgray);
 }
 hr {

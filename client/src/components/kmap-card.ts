@@ -44,7 +44,7 @@ export class KMapCard extends LitElement {
   }
 
   protected updated(_changedProperties: PropertyValues) {
-    if (_changedProperties.has("hover")) {
+    if (_changedProperties.has("hover") && _changedProperties.get("hover") !== undefined) {
       this.dispatchEvent(new CustomEvent('hover', {bubbles: true, composed: true, detail: {hover: this.hover}}));
     }
   }

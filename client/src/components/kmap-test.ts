@@ -4,11 +4,6 @@ import {RoutingState} from '@captaincodeman/rdx';
 import {State, store} from "../store";
 
 import '@material/mwc-button';
-import '@material/mwc-icon';
-import '@material/mwc-icon-button';
-import '@material/mwc-formfield';
-import '@material/mwc-slider';
-import '@material/mwc-top-app-bar';
 import './kmap-test-chooser';
 import './kmap-test-exercise';
 import './kmap-test-results';
@@ -24,10 +19,6 @@ export class KmapTest extends Connected {
   @property()
   private _noRoute?: string = 'chooser';
   @property()
-  private _subject: string = '';
-  @property()
-  private _chapter: string = '';
-  @property()
   private _results: string[] = [];
 
   set route(val: RoutingState<string>) {
@@ -38,8 +29,6 @@ export class KmapTest extends Connected {
         this._noRoute = 'chooser';
       else {
         this._noRoute = undefined;
-        this._subject = val.params.subject;
-        this._chapter = val.params.chapter ? decodeURIComponent(val.params.chapter) : '';
       }
     }
   }
@@ -66,13 +55,7 @@ export class KmapTest extends Connected {
   }
 
   _goBack() {
-    let path = "/app/";
-    if (this._subject)
-      path += "browser/" + encodeURIComponent(this._subject);
-    if (this._chapter)
-      path += "/" + encodeURIComponent(this._chapter);
-
-    store.dispatch.routing.replace(path);
+    store.dispatch.routing.back();
   }
 
   _goResults() {
