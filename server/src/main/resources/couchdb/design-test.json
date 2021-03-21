@@ -27,7 +27,8 @@
       "map": "function(doc) {\n    emit(doc.subject, doc.chapter);\n}"
     },
     "topics": {
-      "map": "function(doc) {\n    emit([doc.subject, doc.chapter, doc.topic]);\n}"
+      "map": "function(doc) {\n    emit([doc.subject, doc.chapter, doc.topic]);\n}",
+      "reduce": "_sum"
     }
   }
 }
