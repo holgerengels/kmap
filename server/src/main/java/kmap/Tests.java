@@ -170,6 +170,18 @@ public class Tests {
         return three;
     }
 
+    public JsonArray latestThin(String subject, int n) {
+        View view = getClient().view("test/byModified")
+                .startKey(subject, Long.MAX_VALUE)
+                .endKey(subject, Long.MIN_VALUE)
+                .reduce(false)
+                .descending(true)
+                .includeDocs(true)
+                .limit(n);
+        List<JsonObject> objects = view.query(JsonObject.class);
+        return array(objects);
+    }
+
     private JsonArray amendAttachments(JsonObject _attachments) {
         JsonArray attachments = new JsonArray();
 
@@ -290,6 +302,8 @@ public class Tests {
 
                 if (existing != null) {
                     existing.addProperty("subject", subject);
+                    existing.addProperty("modified", System.currentTimeMillis());
+                    existing.add("author", changed.get("author"));
                     existing.add("chapter", changed.get("chapter"));
                     existing.add("topic", changed.get("topic"));
                     existing.add("key", changed.get("key"));
@@ -315,6 +329,9 @@ public class Tests {
             else {
                 System.out.println("adding " + changed);
                 changed.addProperty("subject", subject);
+                long millis = System.currentTimeMillis();
+                changed.addProperty("created", millis);
+                changed.addProperty("modified", millis);
                 changed.remove("added");
                 if (checks(changed)) {
                     Response response = client.save(changed);

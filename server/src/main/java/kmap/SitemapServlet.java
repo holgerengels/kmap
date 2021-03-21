@@ -25,12 +25,14 @@ import static kmap.JSON.string;
 
 public class SitemapServlet extends JsonServlet {
     private Couch couch;
+    private Tests tests;
     private String file;
 
     @Override
     public void init() throws ServletException {
         super.init();
         couch = new Couch(properties);
+        tests = new Tests(couch);
     }
 
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -91,6 +93,26 @@ public class SitemapServlet extends JsonServlet {
                     eventWriter.add(end);
 
                     createNode(eventWriter, "loc", "https://kmap.eu/app/browser/" + encode(subject) + "/" + encode(chapter));
+                    createNode(eventWriter, "lastmod", date_format.format(new Date(modified)));
+
+                    eventWriter.add(end);
+                    eventWriter.add(eventFactory.createEndElement("", "", "url"));
+                    eventWriter.add(end);
+                }
+
+                array = tests.latestThin(subject, 100000);
+                for (JsonElement element : array) {
+                    JsonObject test = (JsonObject)element;
+                    eventWriter.add(eventFactory.createStartElement("", "", "url"));
+                    eventWriter.add(end);
+
+                    String chapter = string(test, "chapter");
+                    String topic = string(test, "topic");
+                    String key = string(test, "key");
+                    Long modified = loong(test, "modified");
+                    if (modified == null)
+                        modified = start;
+                    createNode(eventWriter, "loc", "https://kmap.eu/app/exercise/" + encode(subject) + "/" + encode(chapter) + "/" + encode(topic) + "/" + encode(key));
                     createNode(eventWriter, "lastmod", date_format.format(new Date(modified)));
 
                     eventWriter.add(end);

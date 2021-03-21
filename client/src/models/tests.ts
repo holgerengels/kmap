@@ -28,6 +28,9 @@ export interface Test {
   hint: string,
   solution: string,
   attachments: Attachment[];
+  created?: number,
+  modified?: number,
+  author?: string,
 }
 
 export interface TopicCount {

@@ -16,6 +16,9 @@
     "byKey": {
       "map": "function(doc) {\n    if (doc.subject && doc.set && doc.key)\n      emit([doc.subject, doc.set, doc.key]);\n}"
     },
+    "byModified": {
+      "map": "function(doc) {\n    if (doc.subject)\n      emit([doc.subject, doc.modified || 1577833200000]);\n}"
+    },
     "availableSets": {
       "map": "function(doc) {\n    if (doc.subject && doc.set)\n      emit([doc.subject, doc.set], 1);\n}",
       "reduce": "_sum"

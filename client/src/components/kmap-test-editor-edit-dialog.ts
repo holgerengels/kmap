@@ -180,6 +180,8 @@ export class KMapTestEditorEditDialog extends Connected {
     this._test.solution = this._solution;
     this._test.values = this._values;
     this._test.attachments = this._attachments;
+    if (!this._test.author)
+      this._test.author = store.state.app.username;
 
     let test = this._test;
     console.log(test);
