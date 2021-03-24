@@ -247,7 +247,7 @@ export class KMapTestCard extends Connected {
         <mwc-icon-button slot="icon" icon="info" title="Wissenskarte" @click="${this._card}" id="blinky"></mwc-icon-button>
         <mwc-icon-button slot="icon" icon="feedback" title="Feedback" @click="${this._feedback}"></mwc-icon-button>
         <mwc-icon-button slot="icon" icon="share" title="Teilen..." ?hidden="${typeof navigator['share'] !== 'function'}" @click="${this._share}"></mwc-icon-button>
-        <mwc-icon-button slot="icon" icon="link" title="Permalink" @click="${this._permalink}"></mwc-icon-button>
+        <mwc-icon-button slot="icon" icon="link" title="Permalink" ?hidden="${typeof navigator['share'] === 'function'}" @click="${this._permalink}"></mwc-icon-button>
       </kmap-card>
 
       <kmap-feedback id="feedbackDialog" .subject="${this.subject}" .chapter="${this.chapter}" .topic="${this.topic}" .test="${this.key}"></kmap-feedback>

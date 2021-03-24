@@ -171,8 +171,6 @@ export default createModel({
         ...state, cardForEdit: {
           ...defaults,
           ...cardForEdit,
-          subject: state.subject || '',
-          chapter: state.chapter || '',
         }
       }
     },
@@ -343,13 +341,15 @@ export default createModel({
           const chapter = state.maps.chapter || '';
           const topic = state.maps.topic || '';
           dispatch.shell.updateMeta({
-            title: chapter, detail: state.maps.topicCard.topic, description: state.maps.topicCard.summary,
-            image: state.maps.topicCard.thumb ?
-              `${urls.server}${encodePath("data", subject, chapter, topic, state.maps.topicCard.thumb)}?instance=${state.app.instance}`
-              : undefined,
+            title: chapter,
+            detail: state.maps.topicCard.topic,
+            description: state.maps.topicCard.summary,
             created: state.maps.topicCard.created,
             modified: state.maps.topicCard.modified,
             author: state.maps.topicCard.author,
+            image: state.maps.topicCard.thumb ?
+              `${urls.server}${encodePath("data", subject, chapter, topic, state.maps.topicCard.thumb)}?instance=${state.app.instance}`
+              : undefined,
             keywords: [subject, chapter, topic, ...(state.maps.topicCard.keywords ? state.maps.topicCard.keywords.split(",").map(k => k.trim()) : [])],
             breadcrumbs: ["browser", subject, chapter, topic],
             about: [subject],

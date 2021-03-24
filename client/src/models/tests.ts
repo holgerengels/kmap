@@ -385,21 +385,31 @@ export default createModel({
             else
               document.title = "KMap - Aufgaben wählen";
 
+            const subject = state.tests.subject || '';
+            const chapter = state.tests.chapter || '';
+            const topic = state.tests.topic || '';
             let title = document.title;
             let description: string | undefined = undefined;
             let breadcrumbs: string[] | undefined = undefined;
-            if (state.tests.subject && state.tests.chapter) {
-              if (state.tests.topic) {
-                title = "Aufgaben zum Thema " + state.tests.subject + " → " + state.tests.chapter + " → " + state.tests.topic;
-                breadcrumbs = ["tests", state.tests.subject, state.tests.chapter, state.tests.topic];
+            if (subject && chapter) {
+              if (topic) {
+                title = "Aufgaben zum Thema " + subject + " → " + chapter + " → " + topic;
+                breadcrumbs = ["tests", subject, chapter, topic];
               }
               else {
-                title = "Aufgaben zum Thema " + state.tests.chapter;
-                breadcrumbs = [state.tests.subject, state.tests.chapter, "tests"];
+                title = "Aufgaben zum Thema " + subject + " → " + chapter;
+                breadcrumbs = ["tests", subject, chapter];
               }
               description = "Ermittle Deinen Wissensstand mit Hilfe von interaktiven Aufgaben!";
             }
-            dispatch.shell.updateMeta({title: title, description: description, breadcrumbs: breadcrumbs, about: state.tests.subject ? [state.tests.subject] : undefined, type: ["Lernkontrolle"] });
+            dispatch.shell.updateMeta({
+              title: title,
+              description: description,
+              keywords: subject != undefined ? [subject, chapter, topic] : undefined,
+              breadcrumbs: breadcrumbs,
+              about: subject !== undefined ? [subject] : undefined,
+              type: ["Lernkontrolle"]
+            });
 
             if (Object.keys(routing.params).length === 0)
               dispatch.tests.loadTopics();
