@@ -93,6 +93,7 @@ export class KMapRandomTestCard extends Connected {
           display: flex;
         }
         kmap-card {
+          max-width: 800px;
           background-color: white;
         }
         [hidden] {
