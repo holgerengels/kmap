@@ -16,7 +16,7 @@ import {fontStyles, colorStyles} from "./kmap-styles";
 import {KMapFeedback} from "./kmap-feedback";
 import {Attachment, Card} from "../models/types";
 import {encodePath} from "../urls";
-import {includes, Topics} from "../models/tests";
+import {includes, TopicCount} from "../models/tests";
 
 @customElement('kmap-knowledge-card')
 export class KMapKnowledgeCard extends Connected {
@@ -48,7 +48,7 @@ export class KMapKnowledgeCard extends Connected {
   @property()
   private _hasTests: boolean = false;
   @property()
-  private _topics?: Topics;
+  private _topics?: TopicCount[];
   @property()
   private _rates: object = {};
 

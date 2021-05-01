@@ -129,6 +129,17 @@ export class KmapMain extends connect(store, LitElement) {
     installOfflineWatcher((offline) => store.dispatch.app.updateOffline(offline));
     installMediaQueryWatcher(`(max-width: 500px)`, (matches) => store.dispatch.shell.updateNarrow(matches));
     this.installOnErrorHandler();
+
+    var supportsPassive = false;
+    try {
+      var opts = Object.defineProperty({}, 'passive', { get: function() { supportsPassive = true; } });
+      // @ts-ignore
+      window.addEventListener("testPassive", null, opts);
+      // @ts-ignore
+      window.removeEventListener("testPassive", null, opts);
+    } catch (e) {}
+    console.log("passive eventlisteners supported: " + supportsPassive);
+    store.dispatch.shell.updatePassiveEventListeners(supportsPassive);
   }
 
   updated(changedProps) {
@@ -304,6 +315,11 @@ export class KmapMain extends connect(store, LitElement) {
     return a ? a[1] : null;
   }
 
+  _updateAvailable() {
+    this._drawerOpen = true;
+    store.dispatch.shell.showMessage('Bitte aktualisiere die KMap App, indem Du im Menü auf "APP AKTUALISIEREN" klickst!');
+  }
+
   static get styles() {
     // language=CSS
     return [
@@ -443,7 +459,7 @@ export class KmapMain extends connect(store, LitElement) {
         <a href="/app/browser/Hilfe/Hilfe">Hilfe</a>
         <a href="/app/browser/Hilfe/Hilfe/Impressum">Impressum</a>
         <pwa-install-button><mwc-button outlined style="--mdc-theme-primary: var(--color-secondary-dark);">App installieren</mwc-button></pwa-install-button>
-        <pwa-update-available><mwc-button outlined style="--mdc-theme-primary: var(--color-secondary-dark);">App aktualisieren</mwc-button></pwa-update-available>
+        <pwa-update-available @pwa-update-available="${this._updateAvailable}"><mwc-button outlined style="--mdc-theme-primary: var(--color-secondary-dark);">App aktualisieren</mwc-button></pwa-update-available>
       </nav>
       <!--googleoff: all-->
       <hr/>

@@ -12,7 +12,7 @@ import './kmap-summary-card-ratecolors';
 import {colorStyles, elevationStyles, fontStyles} from "./kmap-styles";
 import {encodePath} from "../urls";
 import {Card} from "../models/types";
-import {includes, Topics} from "../models/tests";
+import {includes, TopicCount} from "../models/tests";
 
 @customElement('kmap-summary-card')
 export class KMapSummaryCard extends Connected {
@@ -38,7 +38,7 @@ export class KMapSummaryCard extends Connected {
   @property()
   private _hasTests: boolean = false;
   @property()
-  private _topics?: Topics;
+  private _topics?: TopicCount[];
   @property()
   private _selectedDependencies: string[] = [];
 

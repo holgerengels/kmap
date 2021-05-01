@@ -38,22 +38,10 @@ export interface TopicCount {
   topic: string,
   count: number,
 }
-export interface Topics {
-  subject: string,
-  topics: TopicCount[],
-}
-interface Chapters {
-  subject: string,
-  chapters: string[],
-}
-export interface Random {
-  subject?: string,
-  tests: Test[],
-}
 
 export interface TestsState {
-  topics?: Topics,
-  chapters?: Chapters,
+  topics?: TopicCount[],
+  chapters?: string[],
   subject?: string,
   chapter?: string,
   topic?: string,
@@ -64,7 +52,6 @@ export interface TestsState {
   loadingTopics: boolean,
   loadingChapters: boolean,
   loadingTree: boolean,
-  timestamp: number,
   loading: boolean,
   deleting: boolean,
   renaming: boolean,
@@ -73,14 +60,13 @@ export interface TestsState {
   testForEdit?: Test,
   testForRename?: Partial<Test>,
   testForDelete?: Partial<Test>,
-  random?: Random,
+  random?: Test[],
   randomTimestamp: number,
 }
 
 export default createModel({
   state: <TestsState>{
     results: [],
-    timestamp: -1,
     loadingTopics: false,
     loadingChapters: false,
     loadingTree: false,
@@ -104,11 +90,10 @@ export default createModel({
     },
     requestTopics(state) {
       return { ...state, loadingTopics: true,
-        timestamp: Date.now(),
         error: "",
       };
     },
-    receivedTopics(state, payload: Topics) {
+    receivedTopics(state, payload: TopicCount[]) {
       return { ...state,
         topics: payload,
         loadingTopics: false,
@@ -116,11 +101,10 @@ export default createModel({
     },
     requestChapters(state) {
       return { ...state, loadingChapters: true,
-        timestamp: Date.now(),
         error: "",
       };
     },
-    receivedChapters(state, payload: Chapters) {
+    receivedChapters(state, payload: string[]) {
       return { ...state,
         chapters: payload,
         loadingChapters: false,
@@ -128,21 +112,18 @@ export default createModel({
     },
     requestTree(state) {
       return { ...state, loadingTree: true,
-        timestamp: Date.now(),
         error: "",
       };
     },
-    receivedTree(state, payload: Chapters) {
+    receivedTree(state, payload: string[]) {
       return { ...state,
-        subject: payload.subject,
-        tree: payload.chapters,
+        tree: payload,
         loadingTree: false,
       };
     },
 
     request(state) {
       return { ...state, loading: true,
-        timestamp: Date.now(),
         error: "",
       };
     },
@@ -196,7 +177,7 @@ export default createModel({
         error: "",
       };
     },
-    receivedRandomTests(state, payload: Random) {
+    receivedRandomTests(state, payload: Test[]) {
       return { ...state,
         random: payload,
         loadingRandomTests: false,
@@ -245,6 +226,46 @@ export default createModel({
   effects(store: Store) {
     const dispatch = store.getDispatch();
     return {
+      async init() {
+        navigator.serviceWorker.addEventListener('message', async (event: MessageEvent) => {
+          console.log(event);
+          if (event.data.meta === 'workbox-broadcast-update') {
+            const {cacheName, updatedURL}: { cacheName: string; updatedURL: string } = event.data.payload;
+            const cache = await caches.open(cacheName);
+            console.log(updatedURL);
+            if (updatedURL.includes("tests?topics=all")) {
+              const updatedResponse = await cache.match(updatedURL);
+              const json = await updatedResponse?.json();
+              console.log("CACHE UPDATE TESTS TOPICS");
+              dispatch.tests.receivedTopics(json);
+            }
+            else if (updatedURL.includes("tests?chapters=all")) {
+              const updatedResponse = await cache.match(updatedURL);
+              const json = await updatedResponse?.json();
+              console.log("CACHE UPDATE TESTS CHAPTERS");
+              dispatch.tests.receivedChapters(json);
+            }
+            else if (updatedURL.includes("data?tree=all")) {
+              const updatedResponse = await cache.match(updatedURL);
+              const json = await updatedResponse?.json();
+              console.log("CACHE UPDATE TESTS TREE");
+              dispatch.tests.receivedTree(json);
+            }
+            else if (updatedURL.includes("tests?random")) {
+              const updatedResponse = await cache.match(updatedURL);
+              const json = await updatedResponse?.json();
+              console.log("CACHE UPDATE TESTS RANDOM");
+              dispatch.tests.receivedRandomTests(json);
+            }
+            else if (updatedURL.includes("tests?subject")) {
+              const updatedResponse = await cache.match(updatedURL);
+              const json = await updatedResponse?.json();
+              console.log("CACHE UPDATE TESTS LOAD TESTS");
+              dispatch.tests.received(json);
+            }
+          }
+        });
+      },
       async loadTopics() {
         const state = store.getState();
         const subject = state.maps.subject;
@@ -255,9 +276,7 @@ export default createModel({
         if (!state.tests.topics || state.tests.topics.subject !== subject) {
           dispatch.tests.requestTopics();
           fetchjson(`${urls.server}tests?topics=all&subject=${subject}`, endpoint.get(state),
-            (json) => {
-              dispatch.tests.receivedTopics({subject: subject, topics: json});
-            },
+            dispatch.tests.receivedTopics,
             dispatch.app.handleError,
             dispatch.tests.error);
         }
@@ -269,9 +288,7 @@ export default createModel({
         if (state.tests.subject !== subject || !state.tests.chapters) {
           dispatch.tests.requestChapters();
           fetchjson(`${urls.server}tests?chapters=all&subject=${subject}`, endpoint.get(state),
-            (json) => {
-              dispatch.tests.receivedChapters({subject: subject, chapters: json});
-            },
+            dispatch.tests.receivedChapters,
             dispatch.app.handleError,
             dispatch.tests.error);
         }
@@ -283,9 +300,7 @@ export default createModel({
         if (state.tests.subject !== subject || !state.tests.tree) {
           dispatch.tests.requestTree();
           fetchjson(`${urls.server}data?tree=all&subject=${subject}`, endpoint.get(state),
-            (json) => {
-              dispatch.tests.receivedTree({subject: subject, chapters: json});
-            },
+            dispatch.tests.receivedTree,
             dispatch.app.handleError,
             dispatch.tests.error);
         }
@@ -302,9 +317,7 @@ export default createModel({
             : `${urls.server}tests?subject=${state.tests.subject}&chapter=${state.tests.chapter}`;
 
           fetchjson(url, endpoint.get(state),
-            (json) => {
-              dispatch.tests.received(json);
-            },
+            dispatch.tests.received,
             dispatch.app.handleError,
             dispatch.tests.error);
         }
@@ -317,9 +330,7 @@ export default createModel({
           dispatch.tests.requestRandomTests();
 
           fetchjson(`${urls.server}tests?random=${subject}`, endpoint.get(state),
-            (json) => {
-              dispatch.tests.receivedRandomTests({subject: subject, tests: json});
-            },
+            dispatch.tests.receivedRandomTests,
             dispatch.app.handleError,
             dispatch.tests.error);
         }
@@ -452,14 +463,14 @@ export default createModel({
   }
 })
 
-export const includes = (topics: Topics, chapter: string, topic?: string): boolean => {
-  for (const count of topics.topics) {
+export const includes = (topics: TopicCount[], chapter: string, topic?: string): boolean => {
+  for (const count of topics) {
     if (count.chapter === chapter && (topic === undefined || count.topic === topic))
       return true;
   }
   return false;
 };
 
-export const count = (topics: Topics, chapter: string, topic?: string): number | undefined => {
-  return topics.topics.filter(t => t.chapter === chapter && (topic === undefined || t.topic === topic)).map(t => t.count).reduce((sum, c) => sum + c, 0)
+export const count = (topics: TopicCount[], chapter: string, topic?: string): number | undefined => {
+  return topics.filter(t => t.chapter === chapter && (topic === undefined || t.topic === topic)).map(t => t.count).reduce((sum, c) => sum + c, 0)
 };

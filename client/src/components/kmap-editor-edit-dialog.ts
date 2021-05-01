@@ -357,6 +357,8 @@ ${this._card ? html`
       <kmap-summary-card-summary .summary="${this._summary}"></kmap-summary-card-summary>
       <hr/>
       <kmap-knowledge-card-description
+        .subject="${this._card.subject}"
+        .chapter="${this._card.chapter}"
         .topic="${this._card.topic}"
         .description="${this._description}"
         .instance="${this._instance}">

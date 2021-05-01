@@ -9,18 +9,18 @@ import '@material/mwc-top-app-bar';
 import './kmap-login-button';
 import './kmap-subject-card';
 import './kmap-randomtest-card';
-import {Random, Test} from "../models/tests";
-import {Latest} from "../models/maps";
+import {Test} from "../models/tests";
 import {Subject} from "../models/subjects";
+import {Card} from "../models/types";
 
 @customElement('kmap-subjects')
 export class KMapSubjects extends Connected {
   @property()
   private _subjects: Subject[] = [];
   @property()
-  private _randomTests?: Random = undefined;
+  private _randomTests?: Test[] = undefined;
   @property()
-  private _latestCards?: Latest = undefined;
+  private _latestCards?: Card[] = undefined;
   @property()
   private _currentTest?: Test;
   @property()
@@ -37,10 +37,10 @@ export class KMapSubjects extends Connected {
   updated(changedProperties) {
     if (changedProperties.has("_randomTests")) {
       this._index = 0;
-      this._currentTest = this._randomTests !== undefined ? this._randomTests.tests[0] : undefined;
+      this._currentTest = this._randomTests ? this._randomTests[0] : undefined;
     }
     if (changedProperties.has("_index")) {
-      this._currentTest = this._randomTests !== undefined ? this._randomTests.tests[this._index] : undefined;
+      this._currentTest = this._randomTests ? this._randomTests[this._index] : undefined;
     }
   }
 
@@ -97,13 +97,13 @@ export class KMapSubjects extends Connected {
           `)}
         </div>
 
-        ${this._latestCards && this._latestCards.cards ? html`
+        ${this._latestCards ? html`
           <div class="title">
             <label style="line-height: 200%">Neueste Änderungen</label><br/>
             <label secondary>.. von Wissenskarten aus allen Bereichen ..</label>
           </div>
           <div class="cards">
-            ${this._latestCards.cards.map((card) => html`
+            ${this._latestCards.map((card) => html`
               <kmap-summary-card .subject="${card.subject}" .chapter="${card.chapter}" .card="${card}" key="${card.topic}"></kmap-summary-card>
             `)}
           </div>

@@ -14,7 +14,7 @@ import '@material/mwc-top-app-bar';
 import '@material/menu-surface';
 import {colorStyles, elevationStyles, fontStyles} from "./kmap-styles";
 import {Subject} from "../models/subjects";
-import {count, Topics} from "../models/tests";
+import {count, TopicCount} from "../models/tests";
 
 @customElement('kmap-test-chooser')
 export class KmapTestChooser extends Connected {
@@ -29,7 +29,7 @@ export class KmapTestChooser extends Connected {
   @property()
   private _chaptersLoading: boolean = false;
   @property()
-  private _testTopics?: Topics;
+  private _testTopics?: TopicCount[];
 
   @property()
   private _arrangedChapters: string[] = [];
@@ -43,7 +43,7 @@ export class KmapTestChooser extends Connected {
   mapState(state: State) {
     return {
       _subjects: state.subjects.subjects,
-      _chapters: state.tests.chapters ? state.tests.chapters.chapters : [],
+      _chapters: state.tests.chapters,
       _tree: state.tests.tree,
       _chaptersLoading: state.tests.loadingChapters || state.tests.loadingTree,
       _testTopics: state.tests.topics,

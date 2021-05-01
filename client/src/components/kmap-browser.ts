@@ -20,7 +20,7 @@ import {throttle} from "../debounce";
 import {Timeline} from "../models/courses";
 import {StyleInfo, styleMap} from "lit-html/directives/style-map";
 import {Connected} from "./connected";
-import {Topics, includes} from "../models/tests";
+import {includes, TopicCount} from "../models/tests";
 
 type SideBarState = "hidden" | "collapsed" | "open";
 
@@ -49,7 +49,7 @@ export class KMapBrowser extends Connected {
   @property()
   private _hasTests: boolean = false;
   @property()
-  private _testTopics?: Topics;
+  private _testTopics?: TopicCount[];
 
   @property()
   private _page: string = '';
@@ -73,7 +73,7 @@ export class KMapBrowser extends Connected {
   private timelineState: SideBarState = "hidden";
 
   @property()
-  private _timeline: Timeline;
+  private _timeline?: Timeline;
 
   @property({reflect: true, type: Boolean})
   // @ts-ignore
@@ -82,6 +82,9 @@ export class KMapBrowser extends Connected {
   @property({reflect: true, type: Boolean})
   // @ts-ignore
   private wide: boolean = false;
+
+  @property()
+  private _passiveEventListeners: boolean = false;
 
   @query('#timeline')
   private _timelineElement: KMapTimelineAside;
@@ -92,6 +95,7 @@ export class KMapBrowser extends Connected {
       _layers: state.shell.layers,
       wide: !state.shell.narrow,
       drawerOpen: state.shell.drawerOpen && !state.shell.narrow,
+      _passiveEventListeners: state.shell.passiveEventListeners,
       _subject: state.maps.subject,
       _chapter: state.maps.chapter,
       _topic: state.maps.topic,
@@ -109,19 +113,8 @@ export class KMapBrowser extends Connected {
 
   protected firstUpdated() {
     this._sideBar(this.timelineState);
-
-    console.log("register timeline touch listeners ..");
-    var supportsPassive = false;
-    try {
-      var opts = Object.defineProperty({}, 'passive', { get: function() { supportsPassive = true; } });
-      // @ts-ignore
-      window.addEventListener("testPassive", null, opts);
-      // @ts-ignore
-      window.removeEventListener("testPassive", null, opts);
-    } catch (e) {}
-    console.log("passive supported: " + supportsPassive);
-    this._timelineElement.addEventListener('touchstart', this._swipeStart, supportsPassive ? { passive: true } : false);
-    this._timelineElement.addEventListener('touchmove', this._swipeMove, supportsPassive ? { passive: true } : false);
+    this._timelineElement.addEventListener('touchstart', this._swipeStart, this._passiveEventListeners ? { passive: true } : false);
+    this._timelineElement.addEventListener('touchmove', this._swipeMove, this._passiveEventListeners ? { passive: true } : false);
     this._timelineElement.addEventListener('touchend', this._swipeEnd);
   }
 

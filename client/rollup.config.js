@@ -1,5 +1,5 @@
 import { createSpaConfig } from '@open-wc/building-rollup';
-import replace from '@rollup/plugin-replace'
+//import replace from '@rollup/plugin-replace'
 import copy from 'rollup-plugin-copy';
 const { generateSW } = require('rollup-plugin-workbox');
 import merge from 'deepmerge';
@@ -47,10 +47,12 @@ const baseConfig = createSpaConfig({
 export default merge(baseConfig, {
   input: './index.html',
   plugins: [
+    /*
     replace({
       'process.env.DEPLOY_SERVER': JSON.stringify(process.env.DEPLOY_SERVER || 'http://127.0.0.1:8081/server/'),
       'process.env.DEPLOY_CLIENT': JSON.stringify(process.env.DEPLOY_CLIENT || 'http://127.0.0.1:8080/app/'),
     }),
+    */
     copy({
       targets: [
         {src: 'src/icons/*', dest: 'dist'},
@@ -68,8 +70,33 @@ export default merge(baseConfig, {
       swDest: 'dist/sw.js',
       globDirectory: 'dist/',
       globPatterns: ['**/*.{html,js,css,png,svg,woff2}'],
-      navigateFallback: '/index.html',
+      navigateFallback: 'index.html',
       navigateFallbackDenylist: [/geogebra.html/],
+      runtimeCaching: [{
+        urlPattern: /data/,
+        handler: 'StaleWhileRevalidate',
+        options: {
+          cacheName: 'maps',
+          broadcastUpdate: {
+            channelName: 'maps',
+          }
+        },
+      }, {
+        urlPattern: /tests/,
+        handler: 'StaleWhileRevalidate',
+        options: {
+          cacheName: 'tests',
+          broadcastUpdate: {
+            channelName: 'tests',
+          }
+        },
+      }, {
+        urlPattern: /subjects/,
+        handler: 'StaleWhileRevalidate',
+        options: {
+          cacheName: 'subjects',
+        },
+      }],
     }),
   ],
 });

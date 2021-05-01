@@ -96,7 +96,7 @@ export class KMapTestEditorEditDialog extends Connected {
   mapState(state: State) {
     return {
       _test: state.tests.testForEdit,
-      _allTopics: state.maps.allTopics ? state.maps.allTopics.topics : undefined,
+      _allTopics: state.maps.allTopics,
     };
   }
 

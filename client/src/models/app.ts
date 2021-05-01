@@ -1,5 +1,5 @@
 import { createModel } from '@captaincodeman/rdx';
-import { Store } from '../store';
+import {Store} from '../store';
 import {endpoint, fetchjson} from "../endpoint";
 import {urls} from "../urls";
 
@@ -20,6 +20,7 @@ export interface Credentials {
 }
 
 export interface AppState {
+  version: string,
   instance: string,
   userid: string,
   username?: string,
@@ -32,6 +33,7 @@ export interface AppState {
 
 export default createModel({
   state: <AppState>{
+    version: (window as any).kmapVersion,
     instance: "",
     userid: "",
     roles: [],
@@ -88,6 +90,15 @@ export default createModel({
   effects(store: Store) {
     const dispatch = store.getDispatch();
     return {
+      async init() {
+        const state = store.getState();
+        if (state.app.instance === "") {
+          if ((window as any).kmapInstance)
+            dispatch.app.chooseInstance((window as any).kmapInstance);
+          else
+            dispatch.app.chooseInstance("root");
+        }
+      },
       async login(payload: Credentials) {
         const state = store.getState();
 

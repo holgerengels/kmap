@@ -19,6 +19,7 @@ export interface ShellState {
   meta: Meta,
   narrow: boolean,
   drawerOpen: boolean,
+  passiveEventListeners: boolean,
   messages: string[],
   layers: string[],
 }
@@ -28,6 +29,7 @@ export default createModel({
     meta: {},
     narrow: false,
     drawerOpen: false,
+    passiveEventListeners: false,
     messages: [],
     layers: ["summaries", "ratings"],
   },
@@ -49,6 +51,9 @@ export default createModel({
     },
     clearMessages(state) {
       return { ...state, messages: [] }
+    },
+    updatePassiveEventListeners(state, passiveEventListeners: boolean) {
+      return { ...state, passiveEventListeners: passiveEventListeners }
     },
     addLayer(state, layer: string) {
       return { ...state, layers: state.layers.includes(layer) ? state.layers : [...state.layers, layer] }

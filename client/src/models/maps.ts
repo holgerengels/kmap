@@ -16,14 +16,6 @@ const defaults: object = {
 export interface Line {
   cards: Card[],
 }
-interface AllTopics {
-  subject: string,
-  topics: string[],
-}
-export interface Latest {
-  subject?: string,
-  cards: Card[],
-}
 
 export interface MapState {
   subject?: string,
@@ -33,7 +25,6 @@ export interface MapState {
   lines: Line[],
   chapterCard?: Card,
   topicCard?: Card,
-  timestamp: number,
   loading: boolean,
   deleting: boolean,
   renaming: boolean,
@@ -42,19 +33,18 @@ export interface MapState {
   selected: string,
   selectedDependencies: string[],
   targeted: string[],
-  allTopics?: AllTopics,
+  allTopics?: string[],
   loadingAllTopics: boolean,
   cardForEdit?: Card,
   cardForRename?: Partial<Card>,
   cardForDelete?: Partial<Card>,
-  latest?: Latest,
+  latest?: Card[],
   latestTimestamp: number,
 }
 
 export default createModel({
   state: <MapState>{
     lines: [],
-    timestamp: -1,
     loading: false,
     deleting: false,
     renaming: false,
@@ -91,7 +81,6 @@ export default createModel({
         lines: [],
         chapterCard: undefined,
         topicCard: undefined,
-        timestamp: Date.now(),
         error: "",
       };
     },
@@ -145,7 +134,7 @@ export default createModel({
     requestAllTopics(state) {
       return { ...state, loadingAllTopics: true, error: "" };
     },
-    receivedAllTopics(state, payload: AllTopics) {
+    receivedAllTopics(state, payload: string[]) {
       return { ...state,
         allTopics: payload,
         loadingAllTopics: false,
@@ -159,7 +148,7 @@ export default createModel({
         error: "",
       };
     },
-    receivedLatest(state, payload: Latest) {
+    receivedLatest(state, payload: Card[]) {
       return { ...state,
         latest: payload,
         loadingLatest: false,
@@ -204,6 +193,34 @@ export default createModel({
   effects(store: Store) {
     const dispatch = store.getDispatch();
     return {
+      async init() {
+        navigator.serviceWorker.addEventListener('message', async (event: MessageEvent) => {
+          console.log(event);
+          if (event.data.meta === 'workbox-broadcast-update') {
+            const {cacheName, updatedURL}: { cacheName: string; updatedURL: string } = event.data.payload;
+            const cache = await caches.open(cacheName);
+            console.log(updatedURL);
+            if (updatedURL.includes("data?load")) {
+              const updatedResponse = await cache.match(updatedURL);
+              const json = await updatedResponse?.json();
+              console.log("CACHE UPDATE MAPS LOAD MAP");
+              dispatch.maps.loadedMap(json);
+            }
+            else if (updatedURL.includes("data?latest")) {
+              const updatedResponse = await cache.match(updatedURL);
+              const json = await updatedResponse?.json();
+              console.log("CACHE UPDATE MAPS LATEST");
+              dispatch.maps.receivedLatest(json);
+            }
+            else if (updatedURL.includes("data?topics=all")) {
+              const updatedResponse = await cache.match(updatedURL);
+              const json = await updatedResponse?.json();
+              console.log("CACHE UPDATE MAPS ALL TOPICS");
+              dispatch.maps.receivedAllTopics(json);
+            }
+          }
+        });
+      },
       async load() {
         const state = store.getState();
         const load = "" + state.maps.subject + state.maps.chapter;
@@ -213,26 +230,8 @@ export default createModel({
           console.log("reloading map " + state.maps.subject + " " + state.maps.chapter);
           dispatch.maps.unselectCard();
           dispatch.maps.request();
-          fetchjson(`${urls.server}data?subject=${encodeURIComponent(state.maps.subject)}&load=${encodeURIComponent(state.maps.chapter)}`, endpoint.get(state),
-            (json) => {
-              const mapState = json;
-              mapState.topic = state.maps.topic;
-              complete(mapState);
-              dispatch.maps.received(mapState);
-              if (mapState.lines.length === 0) {
-                dispatch.shell.showMessage("Die Wissenslandkarte " + mapState.subject + " → " + mapState.chapter + " existiert nicht!");
-                dispatch.maps.setTopicCard(undefined);
-              }
-              else {
-                try {
-                  dispatch.maps.setTopicCard(topicCard(mapState));
-                }
-                catch (e) {
-                  dispatch.maps.setTopicCard(undefined);
-                  dispatch.shell.showMessage("Die Wissenskarte " + mapState.subject + " → " + mapState.chapter + " → " + mapState.topic + " existiert nicht!");
-                }
-              }
-            },
+          fetchjson(`${urls.server}data?load=${encodeURIComponent(state.maps.chapter)}&subject=${encodeURIComponent(state.maps.subject)}`, endpoint.get(state),
+            dispatch.maps.loadedMap,
             dispatch.app.handleError,
             dispatch.maps.error);
         }
@@ -246,7 +245,26 @@ export default createModel({
           }
         }
       },
-
+      loadedMap(json) {
+        const state = store.getState();
+        const mapState = json;
+        mapState.topic = state.maps.topic;
+        complete(mapState);
+        dispatch.maps.received(mapState);
+        if (mapState.lines.length === 0) {
+          dispatch.shell.showMessage("Die Wissenslandkarte " + mapState.subject + " → " + mapState.chapter + " existiert nicht!");
+          dispatch.maps.setTopicCard(undefined);
+        }
+        else {
+          try {
+            dispatch.maps.setTopicCard(topicCard(mapState));
+          }
+          catch (e) {
+            dispatch.maps.setTopicCard(undefined);
+            dispatch.shell.showMessage("Die Wissenskarte " + mapState.subject + " → " + mapState.chapter + " → " + mapState.topic + " existiert nicht!");
+          }
+        }
+      },
       async loadLatest(subject: string) {
         const state = store.getState();
 
@@ -254,9 +272,7 @@ export default createModel({
           dispatch.maps.requestLatest();
 
           fetchjson(`${urls.server}data?latest=${subject}`, endpoint.get(state),
-            (json) => {
-              dispatch.maps.receivedLatest({subject: subject, cards: json});
-            },
+            dispatch.maps.receivedLatest,
             dispatch.app.handleError,
             dispatch.maps.error);
         }
@@ -310,15 +326,9 @@ export default createModel({
       async loadAllTopics(subject: string) {
         const state = store.getState();
 
-        if (state.maps.allTopics && state.maps.allTopics.subject === subject) {
-          console.warn("reloading all topics " + subject);
-        }
-
         dispatch.maps.requestAllTopics();
-        fetchjson(`${urls.server}data?subject=${subject}&topics=all`, endpoint.get(state),
-          (json) => {
-            dispatch.maps.receivedAllTopics({subject: subject, topics: json});
-          },
+        fetchjson(`${urls.server}data?topics=all&subject=${subject}`, endpoint.get(state),
+          dispatch.maps.receivedAllTopics,
           dispatch.app.handleError,
           dispatch.maps.error);
       },

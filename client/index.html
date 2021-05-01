@@ -57,11 +57,21 @@
   <link rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/" />
 
   <script>
-      if (!window.location.host.includes("localhost") && 'serviceWorker' in navigator) {
-          window.addEventListener('load', () => {
-              navigator.serviceWorker.register('./sw.js');
-          });
+    window.kmapVersion = "3.0";
+    const json = localStorage.getItem(location.hostname);
+    if (json) {
+      const data = JSON.parse(json);
+      console.log(data);
+      if (data.app.version !== window.kmapVersion) {
+        console.log("DROP STATE");
+        window.kmapInstance = data.app.instance;
+        localStorage.removeItem(location.hostname);
       }
+    }
+
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js');
+    });
   </script>
   <script id="ld" type="application/ld+json">{}</script>
 
