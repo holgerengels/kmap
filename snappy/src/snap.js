@@ -13,9 +13,9 @@ const couchDB = config.couch_db;
 
 let server;
 let browser;
-const couch = new NodeCouchDb({ auth: { user: config.couch_user, pass: config.couch_password }});
+const couch = new NodeCouchDb({ host: config.couch_host, auth: { user: config.couch_user, pass: config.couch_password }});
 
-const job = schedule.scheduleJob('22 11,23 * * *', async function() {
+const job = schedule.scheduleJob('22 * * * *', async function() {
     console.log("Snappy background job");
 
     const arr = await latest();
