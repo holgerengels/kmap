@@ -63,6 +63,11 @@
     </servlet>
 
     <servlet>
+        <servlet-name>mundo</servlet-name>
+        <servlet-class>kmap.MundoServlet</servlet-class>
+    </servlet>
+
+    <servlet>
         <servlet-name>sitemap</servlet-name>
         <servlet-class>kmap.SitemapServlet</servlet-class>
     </servlet>
@@ -115,6 +120,11 @@
     <servlet-mapping>
         <servlet-name>feed</servlet-name>
         <url-pattern>/feed/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>mundo</servlet-name>
+        <url-pattern>/mundo/*</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>

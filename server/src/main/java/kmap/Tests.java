@@ -164,6 +164,8 @@ public class Tests {
             return topics;
         JsonObject object = (JsonObject) topics.get(new Random().nextInt(topics.size()));
         JsonArray array = loadTestsByTopic(subject, JSON.string(object, "chapter"), JSON.string(object, "topic"));
+        if (array.size() < 3)
+            return array;
         JsonArray three = new JsonArray();
         Random random = new Random();
         IntStream.range(0, 3).mapToObj(i -> array.remove(random.nextInt(array.size()))).forEach(three::add);
