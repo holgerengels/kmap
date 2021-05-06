@@ -11,6 +11,9 @@
       "map": "function(doc) {\n  if (!doc.links && doc.topic != \"_\")\n    emit(doc.subject + \".\" + doc.chapter, doc.subject + \".\" + doc.chapter);\n}",
       "reduce": "_count"
     },
+    "bySubject": {
+      "map": "function(doc) {\n    if (doc.subject)\n      emit(doc.subject);\n}"
+    },
     "byModule": {
       "map": "function(doc) {\n    if (doc.subject && doc.module)\n      emit([doc.subject, doc.module]);\n    else if (doc.module)\n      emit([\"Mathematik\", doc.module]);\n}"
     },
