@@ -181,7 +181,7 @@ public class Tests {
                 .includeDocs(true)
                 .limit(n);
         List<JsonObject> objects = view.query(JsonObject.class);
-        return array(objects);
+        return toArray(objects);
     }
 
     private JsonArray amendAttachments(JsonObject _attachments) {

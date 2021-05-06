@@ -35,7 +35,7 @@ public class JSON {
         return newArray;
     }
 
-    static JsonArray array(List<JsonObject> objects) {
+    static JsonArray toArray(List<JsonObject> objects) {
         JsonArray array = new JsonArray();
         objects.forEach(array::add);
         return array;

@@ -14,6 +14,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import static java.util.Objects.requireNonNullElse;
 import static kmap.JSON.*;
 
 /**
@@ -38,7 +39,7 @@ public class Couch extends Server {
 
     public synchronized JsonArray loadModule(String subject, String module) {
         List<JsonObject> objects = loadModuleAsList(subject, module);
-        return array(objects);
+        return toArray(objects);
     }
 
     private List<JsonObject> loadModuleAsList(String subject, String module) {
@@ -82,7 +83,7 @@ public class Couch extends Server {
             fixAttachments(attachments, subject, string(o, "chapter"), string(o, "topic"));
             o.remove("_attachments");
         });
-        return array(objects);
+        return toArray(objects);
     }
 
     public synchronized JsonArray loadModules() {
@@ -102,7 +103,7 @@ public class Couch extends Server {
             .comparing((JsonObject o) -> o.getAsJsonPrimitive("subject").getAsString())
             .thenComparing(o -> o.getAsJsonPrimitive("module").getAsString())
         );
-        return array(modules);
+        return toArray(modules);
     }
 
     public JsonArray loadSubjects() {
@@ -876,18 +877,44 @@ public class Couch extends Server {
         return object;
     }
 
+    public synchronized JsonArray checkAttachments(String subject) {
+        View view = createClient("map").view("net/bySubject")
+                .key(subject)
+                .reduce(false)
+                .includeDocs(true);
+
+        JsonArray messages = new JsonArray();
+        List<JsonObject> objects = view.query(JsonObject.class);
+        for (JsonObject object : objects) {
+            JsonObject _attachments = object.getAsJsonObject("_attachments");
+            Set<String> names = _attachments != null ? _attachments.keySet() : Collections.emptySet();
+            JsonArray attachments = requireNonNullElse(object.getAsJsonArray("attachments"), new JsonArray());
+            for (JsonElement element : attachments) {
+                JsonObject attachment = (JsonObject)element;
+                if ("file".equals(JSON.string(attachment, "type"))) {
+                    if (!names.contains(JSON.string(attachment, "file"))) {
+                        System.out.println(formatIdentity(object) + ": lost the file for " + JSON.string(attachment, "name"));
+                        JsonObject message = new JsonObject();
+                        message.addProperty("id", JSON.string(object, "_id"));
+                        message.addProperty("chapter", JSON.string(object, "chapter"));
+                        message.addProperty("topic", JSON.string(object, "topic"));
+                        message.addProperty("message", "lost the file for " + JSON.string(attachment, "name"));
+                        messages.add(message);
+                    }
+                }
+            }
+        }
+        return messages;
+    }
+
+    private String formatIdentity(JsonObject object) {
+        return JSON.string(object, "_id") + ": " + JSON.string(object, "chapter") + "/" + JSON.string(object, "topic");
+    }
+
     public static void main(String[] args) throws IOException {
         Couch couch = new Couch(readProperties(args[0]));
-        Server.CLIENT.set("root");
-
-        JsonArray jsonElements = couch.loadSubjects();
-        System.out.println("jsonElements = " + jsonElements);
-        JsonObject dependencies = couch.dependencies("Mathematik");
-        System.out.println("dependencies = " + dependencies);
-        MultiMap<String, String> deps = couch.deps("Mathematik");
-        System.out.println("deps = " + deps);
-        Map<String, String> links = couch.links("Mathematik");
-        System.out.println("links = " + links);
+        Server.CLIENT.set("vu");
+        couch.checkAttachments("Mathematik");
 
         /*
         JsonObject object = couch.chapter("mathe", "Mathematik");

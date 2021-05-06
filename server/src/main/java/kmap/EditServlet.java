@@ -93,6 +93,7 @@ public class EditServlet
             String modules = req.getParameter("modules");
             String subject = req.getParameter("subject");
             String load = req.getParameter("load");
+            String checks = req.getParameter("checks");
             if (modules != null) {
                 log("modules = " + modules);
                 JsonArray array = couch.loadModules();
@@ -102,6 +103,12 @@ public class EditServlet
             else if (load != null) {
                 log("load chapter = " + load);
                 JsonArray array = couch.loadModule(subject, load);
+                if (array != null)
+                    writeResponse(req, resp, array);
+            }
+            else if (checks != null) {
+                log("checks for subject = " + checks);
+                JsonArray array = couch.checkAttachments(checks);
                 if (array != null)
                     writeResponse(req, resp, array);
             }
