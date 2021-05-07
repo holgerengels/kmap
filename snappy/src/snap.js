@@ -127,7 +127,7 @@ async function generate(directory, path, file) {
 async function sendFile(res, location, fileName) {
     const content = await fs.readFile(location);
     res.setHeader("Content-Type", "image/png");
-    res.setHeader("Content-Disposition", "attachment; filename=" + fileName);
+    res.setHeader("Content-Disposition", "attachment; filename=" + encodeURIComponent(fileName));
     res.writeHead(200);
     res.end(content);
 }
