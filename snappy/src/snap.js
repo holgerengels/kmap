@@ -118,10 +118,10 @@ async function generate(directory, path, file) {
     await fs.mkdir(directory, {recursive: true});
     const url = "https://kmap.eu/app/browser/" + path;
     const page = await browser.newPage();
-    await page.setViewport({width: 400, height: 688,})
+    await page.setViewport({width: 800, height: 498,})
     await page.goto(url, {waitUntil: 'networkidle0'});
     await page.waitForTimeout(1000);
-    await page.screenshot({path: file, clip: {x: 0, y: 48, width: 400, height: 640}});
+    await page.screenshot({path: file, clip: {x: 0, y: 48, width: 800, height: 450}});
 }
 
 async function sendFile(res, location, fileName) {
