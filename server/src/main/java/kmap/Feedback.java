@@ -74,6 +74,8 @@ public class Feedback {
     List<JsonObject> load(String state) {
         View view = getClient().view("_all_docs").includeDocs(true);
         List<JsonObject> objects = view.query(JsonObject.class).stream().filter(o -> "open".equals(string(o, "state"))).collect(Collectors.toList());
+        if (objects.size() > 100)
+            objects = objects.subList(0, 100);
         return objects;
     }
 
