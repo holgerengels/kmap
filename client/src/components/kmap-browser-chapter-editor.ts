@@ -56,11 +56,12 @@ export class KMapBrowserChapterEditor extends Connected {
       topic: '_',
       summary: '',
       description: '',
+      thumb: '',
       links: '',
       depends: [],
       attachments: [],
     };
-    store.dispatch.maps.setCardForEdit(card);
+    store.dispatch.maps.setEditAction({ card: card, action: "edit" });
   }
 
   _showDelete() {
@@ -70,7 +71,7 @@ export class KMapBrowserChapterEditor extends Connected {
       chapter: this.chapter,
       topic: '_',
     };
-    store.dispatch.maps.setCardForDelete(card);
+    store.dispatch.maps.setEditAction({ card: card, action: "delete" });
   }
 
   static get styles() {

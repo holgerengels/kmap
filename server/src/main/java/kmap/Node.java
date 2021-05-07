@@ -20,6 +20,7 @@ public class Node {
     Integer priority;
     private String links;
     private String keywords;
+    private String sgs;
     private String description;
     private String summary;
     private String thumb;
@@ -125,6 +126,10 @@ public class Node {
     public String getKeywords() { return keywords; }
 
     public void setKeywords(String keywords) { this.keywords = keywords; }
+
+    public String getSGS() { return sgs; }
+
+    public void setSGS(String sgs) { this.sgs = sgs; }
 
     public String getDescription() {
         return description;

@@ -19,7 +19,7 @@ export class KMapEditorDeleteDialog extends Connected {
 
   mapState(state: State) {
     return {
-      _card: state.maps.cardForDelete,
+      _card: state.maps.editAction?.action === "delete" ? state.maps.editAction.card : undefined,
     };
   }
 
@@ -34,22 +34,22 @@ export class KMapEditorDeleteDialog extends Connected {
     }
   }
 
-  _delete() {
+  async _delete() {
     this._deleteDialog.close();
     if (!this._card)
       return;
 
     const card: Card = this._card;
 
-    store.dispatch.maps.deleteTopic(card);
-    window.setTimeout(function() {
+    await store.dispatch.maps.deleteTopic(card);
+    window.setTimeout(function () {
       store.dispatch.maps.load();
     }, 1000);
   }
 
   _cancel() {
     this._deleteDialog.close();
-    store.dispatch.maps.unsetCardForDelete();
+    store.dispatch.maps.unsetEditAction();
   }
 
   static get styles() {

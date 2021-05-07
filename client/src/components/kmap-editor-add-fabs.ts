@@ -147,12 +147,13 @@ export class KMapEditorAddFabs extends Connected {
       name: this._topic,
       summary: '',
       description: '',
+      thumb: '',
       links: '',
       depends: [],
       attachments: [],
     };
     console.log(card);
-    store.dispatch.maps.setCardForEdit(card);
+    store.dispatch.maps.setEditAction({ card: card, action: "edit" });
     this._addDialog.close();
   }
 

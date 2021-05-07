@@ -38,19 +38,25 @@ export class KMapSummaryCardEditor extends Connected {
   _showEdit(e) {
     e.cancelBubble = true;
     if (this.card !== undefined)
-      store.dispatch.maps.setCardForEdit(this.card);
+      store.dispatch.maps.setEditAction({ card: this.card, action: "edit" });
   }
 
   _showRename(e) {
     e.cancelBubble = true;
     if (this.card !== undefined)
-      store.dispatch.maps.setCardForRename(this.card);
+      store.dispatch.maps.setEditAction({ card: this.card, action: "rename" });
+  }
+
+  _showMove(e) {
+    e.cancelBubble = true;
+    if (this.card !== undefined)
+      store.dispatch.maps.setEditAction({ card: this.card, action: "move" });
   }
 
   _showDelete(e) {
     e.cancelBubble = true;
     if (this.card !== undefined)
-      store.dispatch.maps.setCardForDelete(this.card);
+      store.dispatch.maps.setEditAction({ card: this.card, action: "delete" });
   }
 
   getState() { return 0; }
@@ -81,6 +87,7 @@ export class KMapSummaryCardEditor extends Connected {
     return html`
       <mwc-button icon="edit" ?disabled="${!this._enabled}" @click="${this._showEdit}" title="editieren"></mwc-button>
       <mwc-button icon="label" ?disabled="${!this._enabled}" @click="${this._showRename}" title="umbenennen"></mwc-button>
+      <mwc-button icon="read_more" ?disabled="${!this._enabled}" @click="${this._showMove}" title="verschieben"></mwc-button>
       <mwc-button icon="delete" ?disabled="${!this._enabled}" @click="${this._showDelete}" title="löschen"></mwc-button>
       ${this.card !== undefined && this.card.annotations ? html`<div class="warn">${this.card.annotations}</div>` : ''}
     `;

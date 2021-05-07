@@ -90,9 +90,10 @@ export default createModel({
           console.log("loading components")
           await import('../components/kmap-module-selector');
           await import('../components/kmap-editor-add-fabs');
-          await import('../components/kmap-editor-delete-dialog');
           await import('../components/kmap-editor-edit-dialog');
           await import('../components/kmap-editor-rename-dialog');
+          await import('../components/kmap-editor-move-dialog');
+          await import('../components/kmap-editor-delete-dialog');
 
           await import('../components/kmap-set-selector');
           await import('../components/kmap-test-editor-add-fabs');

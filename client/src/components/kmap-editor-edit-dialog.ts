@@ -44,6 +44,8 @@ export class KMapEditorEditDialog extends Connected {
   @property()
   private _keywords: string = '';
   @property()
+  private _sgs: string = '';
+  @property()
   private _tab: string = 'editor';
 
   @property()
@@ -100,7 +102,7 @@ export class KMapEditorEditDialog extends Connected {
   mapState(state: State) {
     return {
       _instance: state.app.instance,
-      _card: state.maps.cardForEdit,
+      _card: state.maps.editAction?.action === "edit" ? state.maps.editAction.card : undefined,
       _uploads: state.uploads.uploads,
     };
   }
@@ -126,6 +128,7 @@ export class KMapEditorEditDialog extends Connected {
       this._description = this._card.description;
       this._thumb = this._card.thumb || '';
       this._keywords = this._card.keywords || '';
+      this._sgs = this._card.sgs || '';
       this._depends = this._card.depends ? this._card.depends.join(" / ") : '';
       this._links = this._card.links || '';
       this._priority = this._card.priority !== undefined ? this._card.priority + '' : '';
@@ -140,7 +143,7 @@ export class KMapEditorEditDialog extends Connected {
     }
   }
 
-  _save() {
+  async _save() {
     this._editDialog.close();
     if (!this._card)
       return;
@@ -150,6 +153,7 @@ export class KMapEditorEditDialog extends Connected {
     card.description = this._description;
     card.thumb = this._thumb;
     card.keywords = this._keywords;
+    card.sgs = this._sgs;
     card.depends = this._depends.split("/").map(d => d.trim()).filter(d => d.length > 0);
     card.links = this._links;
     card.priority = this._priority !== '' ? parseInt(this._priority) : undefined;
@@ -159,12 +163,11 @@ export class KMapEditorEditDialog extends Connected {
 
     console.log(card);
 
-    store.dispatch.maps.saveTopic(card);
+    await store.dispatch.maps.saveTopic(card);
     window.setTimeout(function (navigateAfterSafe) {
       if (navigateAfterSafe) {
         store.dispatch.routing.replace(navigateAfterSafe);
-      }
-      else {
+      } else {
         store.dispatch.maps.load();
       }
     }.bind(undefined, this._navigateAfterSave), 1000);
@@ -174,7 +177,7 @@ export class KMapEditorEditDialog extends Connected {
 
   _cancel() {
     this._editDialog.close();
-    store.dispatch.maps.unsetCardForEdit();
+    store.dispatch.maps.unsetEditAction();
     store.dispatch.uploads.clearUploads();
   }
 
@@ -314,7 +317,8 @@ ${this._card ? html`
         <mwc-textfield s1 ?hidden="${this._card.topic === '_'}" id="priority" name="priority" label="Priorität" dense type="number" inputmode="numeric" min="0" step="1" .value="${this._priority}" @change="${e => this._priority = e.target.value}"></mwc-textfield>
         <mwc-textfield s5 ?hidden="${this._card.topic === '_'}" ?dialogInitialFocus="${this._card.topic !== '_'}" id="depends" label="Basiert auf ..." dense .value=${this._depends} @change="${e => this._depends = e.target.value}"></mwc-textfield>
         <mwc-textfield s1 ?hidden="${this._card.topic === '_'}" id="thumb" label="Thumbnail" dense .value=${this._thumb} @change="${e => this._thumb = e.target.value}"></mwc-textfield>
-        <mwc-textfield s6 ?hidden="${this._card.topic === '_'}" id="keywords" label="Keywords" dense .value=${this._keywords} @change="${e => this._keywords = e.target.value}"></mwc-textfield>
+        <mwc-textfield s5 ?hidden="${this._card.topic === '_'}" id="keywords" label="Keywords" dense .value=${this._keywords} @change="${e => this._keywords = e.target.value}"></mwc-textfield>
+        <mwc-textfield s1 ?hidden="${this._card.topic === '_'}" id="sgs" label="SGS" dense .value=${this._sgs} @change="${e => this._sgs = e.target.value}"></mwc-textfield>
         <mwc-textarea s6 id="summary" label="Kurztext" ?dialogInitialFocus="${this._card.topic === '_'}" dense fullwidth rows="2" .value=${this._card.summary} @keyup="${this._setSummary}"></mwc-textarea>
         <mwc-textarea s6 id="description" label="Langtext" dense fullwidth rows="9" .value=${this._card.description} @keyup="${this._setDescription}"></mwc-textarea>
       </div>

@@ -428,6 +428,7 @@ export class KmapMain extends connect(store, LitElement) {
   ${this._page === 'home' || this._page === 'browser' ? html`
       ${this._layers.includes('editor') ? html`<kmap-editor-edit-dialog></kmap-editor-edit-dialog>` : ''}
       ${this._layers.includes('editor') ? html`<kmap-editor-rename-dialog></kmap-editor-rename-dialog>` : ''}
+      ${this._layers.includes('editor') ? html`<kmap-editor-move-dialog></kmap-editor-move-dialog>` : ''}
       ${this._layers.includes('editor') ? html`<kmap-editor-delete-dialog></kmap-editor-delete-dialog>` : ''}
       ${this._layers.includes('editor') ? html`<kmap-editor-add-fabs></kmap-editor-add-fabs>` : ''}
   ` : ''}

@@ -82,7 +82,6 @@ export class KMapCurriculumEditDialog extends Connected {
   mapState(state: State) {
     return {
       _instance: state.app.instance,
-      _card: state.maps.cardForEdit,
       _uploads: state.uploads.uploads,
     };
   }

@@ -10,23 +10,23 @@ import {colorStyles, fontStyles} from "./kmap-styles";
 import {Dialog} from "@material/mwc-dialog/mwc-dialog";
 import {Card} from "../models/types";
 
-@customElement('kmap-editor-rename-dialog')
-export class KMapEditorRenameDialog extends Connected {
+@customElement('kmap-editor-move-dialog')
+export class KMapEditorMoveDialog extends Connected {
   @property()
   private _card?: Card = undefined;
   @property()
-  private _newName: string = '';
+  private _newModule: string = '';
 
-  @query('#renameDialog')
+  @query('#moveDialog')
   // @ts-ignore
-  private _renameDialog: Dialog;
+  private _moveDialog: Dialog;
 
   @property()
   private _valid: boolean = false;
 
   mapState(state: State) {
     return {
-      _card: state.maps.editAction?.action === "rename" ? state.maps.editAction.card : undefined,
+      _card: state.maps.editAction?.action === "move" ? state.maps.editAction.card : undefined,
     };
   }
 
@@ -37,35 +37,35 @@ export class KMapEditorRenameDialog extends Connected {
       if (!this._card.chapter)
         this._card.chapter = store.state.maps.chapter || '';
 
-      this._newName = '';
-      this._renameDialog.show();
+      this._newModule = '';
+      this._moveDialog.show();
 
     }
   }
 
-  async _rename() {
-    this._renameDialog.close();
+  async _move() {
+    this._moveDialog.close();
     if (!this._card)
       return;
 
     const card: Card | any = this._card;
-    card.newName = this._newName;
+    card.newModule = this._newModule;
 
-    await store.dispatch.maps.renameTopic(card);
+    await store.dispatch.maps.moveTopic(card);
     window.setTimeout(function () {
       store.dispatch.maps.load();
     }, 1000);
   }
 
   _cancel() {
-    this._renameDialog.close();
+    this._moveDialog.close();
     store.dispatch.maps.unsetEditAction();
   }
 
   _maybeEnter(event) {
     if (event.key === "Enter" && this._valid) {
       event.preventDefault();
-      this._rename();
+      this._move();
     }
   }
 
@@ -84,18 +84,18 @@ export class KMapEditorRenameDialog extends Connected {
   render() {
     // language=HTML
     return html`
-        <mwc-dialog id="renameDialog" title="Umbenennen">
+        <mwc-dialog id="moveDialog" title="Verschieben">
         ${this._card ? html`
         <validating-form @keyup="${this._maybeEnter}" @validity="${e => this._valid = e.target.valid}">
             <div class="field">
               <label for="topic">Thema</label>
               <span id="topic">${this._card.topic}</span>
             </div>
-            <mwc-textfield label="Umbenennen in ..." type="text" .value="${this._newName}" @change="${e => this._newName = e.target.value}" pattern="^([^/.]*)$" required></mwc-textfield>
+            <mwc-textfield label="Verschieben nach ..." type="text" .value="${this._newModule}" @change="${e => this._newModule = e.target.value}" pattern="^([^/.]*)$" required></mwc-textfield>
           </validating-form>
           ` : '' }
           <mwc-button slot="secondaryAction" @click=${this._cancel}>Abbrechen</mwc-button>
-          <mwc-button slot="primaryAction" @click=${this._rename} ?disabled="${!this._valid}">Umbenennen</mwc-button>
+          <mwc-button slot="primaryAction" @click=${this._move} ?disabled="${!this._valid}">Verschieben</mwc-button>
         </mwc-dialog>
     `;
   }

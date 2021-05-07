@@ -178,6 +178,23 @@ public class Couch extends Server {
             }
             return "reload:";
         }
+        else if (object.has("move")) {
+            JsonObject move = (JsonObject)object.get("move");
+            String chapter = string(move, "chapter");
+            String topic = string(move, "topic");
+            String nmodule = string(object, "module");
+            assert chapter != null;
+            assert topic != null;
+            assert nmodule != null;
+            JsonArray array = loadModule(subject, module);
+            for (JsonElement element : array) {
+                if (equals((JsonObject)element, subject, chapter, topic)) {
+                    ((JsonObject)element).addProperty("module", nmodule);
+                    client.update(element);
+                }
+            }
+            return "reload:";
+        }
         else {
             JsonObject changed = (JsonObject)object.get("changed");
             if (changed.get("priority") != null && (changed.get("priority").isJsonNull() || string(changed, "priority") == null))
@@ -203,6 +220,7 @@ public class Couch extends Server {
                     existing.add("depends", changed.get("depends"));
                     existing.add("priority", changed.get("priority"));
                     existing.add("keywords", changed.get("keywords"));
+                    existing.add("sgs", changed.get("sgs"));
                     existing.add("description", changed.get("description"));
                     existing.add("thumb", changed.get("thumb"));
                     existing.add("summary", changed.get("summary"));
@@ -333,6 +351,7 @@ public class Couch extends Server {
                 chapterNode.setModified(loong(topic, "modified"));
                 chapterNode.setAuthor(string(topic, "author"));
                 chapterNode.setKeywords(string(topic, "keywords"));
+                chapterNode.setSGS(string(topic, "sgs"));
                 chapterNode.setDescription(string(topic, "description"));
                 chapterNode.setSummary(string(topic, "summary"));
                 chapterNode.setAttachments(amendAttachments(topic.getAsJsonArray("attachments"), topic.getAsJsonObject("_attachments")));
@@ -345,6 +364,7 @@ public class Couch extends Server {
                 node.setModified(loong(topic, "modified"));
                 node.setAuthor(string(topic, "author"));
                 node.setKeywords(string(topic, "keywords"));
+                node.setSGS(string(topic, "sgs"));
                 node.setDescription(string(topic, "description"));
                 node.setSummary(string(topic, "summary"));
                 node.setThumb(string(topic, "thumb"));
@@ -425,6 +445,7 @@ public class Couch extends Server {
             card.addProperty("row", node.getRow());
             card.addProperty("col", node.getColumn());
             addProperty(card, "keywords", node.getKeywords());
+            addProperty(card, "sgs", node.getSGS());
             addProperty(card, "description", node.getDescription());
             addProperty(card, "summary", node.getSummary());
             addProperty(card, "thumb", node.getThumb());
@@ -456,6 +477,7 @@ public class Couch extends Server {
                 add(card, "dependencies", array);
             }
             addProperty(card, "keywords", chapterNode.getKeywords());
+            addProperty(card, "sgs", chapterNode.getSGS());
             addProperty(card, "description", chapterNode.getDescription());
             addProperty(card, "summary", chapterNode.getSummary());
             addProperty(card, "links", chapterNode.getLinks());

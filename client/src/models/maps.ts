@@ -4,17 +4,14 @@ import {endpoint, fetchjson} from "../endpoint";
 import {encodePath, urls} from "../urls";
 import {Card} from "./types";
 
-const defaults: object = {
-  summary: '',
-  description: '',
-  thumb: '',
-  links: '',
-  depends: [],
-  attachments: []
-};
-
 export interface Line {
   cards: Card[],
+}
+
+export type EditActionType = "edit" | "rename" | "move" | "delete";
+export interface EditAction {
+  action: EditActionType,
+  card: Partial<Card>,
 }
 
 export interface MapState {
@@ -35,9 +32,7 @@ export interface MapState {
   targeted: string[],
   allTopics?: string[],
   loadingAllTopics: boolean,
-  cardForEdit?: Card,
-  cardForRename?: Partial<Card>,
-  cardForDelete?: Partial<Card>,
+  editAction?: EditAction,
   latest?: Card[],
   latestTimestamp: number,
 }
@@ -106,9 +101,7 @@ export default createModel({
         lines: [],
         loaded: undefined,
         chapterCard: undefined,
-        cardForEdit: undefined,
-        cardForRename: undefined,
-        cardForDelete: undefined,
+        editAction: undefined,
       };
     },
 
@@ -116,19 +109,25 @@ export default createModel({
       return { ...state, deleting: true };
     },
     receivedDeleteTopic(state) {
-      return { ...state, deleting: false, cardForDelete: undefined, loaded: undefined };
+      return { ...state, deleting: false, editAction: undefined, loaded: undefined };
     },
     requestRenameTopic(state) {
       return { ...state, renaiming: true };
     },
     receivedRenameTopic(state) {
-      return { ...state, renaiming: false, cardForRename: undefined, loaded: undefined };
+      return { ...state, renaiming: false, editAction: undefined, loaded: undefined };
+    },
+    requestMoveTopic(state) {
+      return { ...state, moving: true };
+    },
+    receivedMoveTopic(state) {
+      return { ...state, moving: false, editAction: undefined, loaded: undefined };
     },
     requestSaveTopic(state) {
       return { ...state, saving: true };
     },
     receivedSaveTopic(state) {
-      return { ...state, saving: false, cardForEdit: undefined, loaded: undefined };
+      return { ...state, saving: false, editAction: undefined, loaded: undefined };
     },
 
     requestAllTopics(state) {
@@ -155,28 +154,13 @@ export default createModel({
       };
     },
 
-    setCardForEdit(state, cardForEdit: Card) {
+    setEditAction(state, action: EditAction) {
       return {
-        ...state, cardForEdit: {
-          ...defaults,
-          ...cardForEdit,
-        }
+        ...state, editAction: action,
       }
     },
-    unsetCardForEdit(state) {
-      return { ...state, cardForEdit: undefined }
-    },
-    setCardForRename(state, cardForRename: Partial<Card>) {
-      return { ...state, cardForRename: cardForRename }
-    },
-    unsetCardForRename(state) {
-      return { ...state, cardForRename: undefined }
-    },
-    setCardForDelete(state, cardForDelete: Partial<Card>) {
-      return { ...state, cardForDelete: cardForDelete }
-    },
-    unsetCardForDelete(state) {
-      return { ...state, cardForDelete: undefined }
+    unsetEditAction(state) {
+      return { ...state, editAction: undefined }
     },
 
     error(state, message) {
@@ -287,7 +271,7 @@ export default createModel({
           {...endpoint.post(state), body: JSON.stringify({delete: card})},
           () => {
             dispatch.maps.receivedDeleteTopic();
-            dispatch.maps.unsetCardForDelete();
+            dispatch.maps.unsetEditAction();
           },
           dispatch.app.handleError,
           dispatch.maps.error);
@@ -302,7 +286,22 @@ export default createModel({
           {...endpoint.post(state), body: JSON.stringify({rename: card, name: card.newName})},
           () => {
             dispatch.maps.receivedRenameTopic();
-            dispatch.maps.unsetCardForRename();
+            dispatch.maps.unsetEditAction();
+          },
+          dispatch.app.handleError,
+          dispatch.maps.error);
+      },
+      async moveTopic(card: Card) {
+        const state = store.getState();
+        const userid = state.app.userid;
+
+        dispatch.maps.requestMoveTopic();
+        fetchjson(`${urls.server}edit?userid=${userid}&subject=${card.subject}&save=${card.module}`,
+          // @ts-ignore
+          {...endpoint.post(state), body: JSON.stringify({move: card, module: card.newModule})},
+          () => {
+            dispatch.maps.receivedMoveTopic();
+            dispatch.maps.unsetEditAction();
           },
           dispatch.app.handleError,
           dispatch.maps.error);
@@ -317,7 +316,7 @@ export default createModel({
           {...endpoint.post(state), body: JSON.stringify(card.added ? {changed: card} : {old: card, changed: card})},
           () => {
             dispatch.maps.receivedSaveTopic();
-            dispatch.maps.unsetCardForEdit();
+            dispatch.maps.unsetEditAction();
           },
           dispatch.app.handleError,
           dispatch.maps.error);
@@ -399,9 +398,7 @@ export default createModel({
       'shell/removeLayer': async function () {
         const state = store.getState();
         if (!state.shell.layers.includes("editor")) {
-          dispatch.maps.unsetCardForDelete();
-          dispatch.maps.unsetCardForEdit();
-          dispatch.maps.unsetCardForRename();
+          dispatch.maps.unsetEditAction();
         }
         if (!state.shell.layers.includes("timeline")) {
           dispatch.maps.setTargeted(undefined);
