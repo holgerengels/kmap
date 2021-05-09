@@ -72,7 +72,8 @@ public class Couch extends Server {
         objects.removeIf(o -> string(o, "chapter") == null
                 || string(o,"topic") == null
                 || "_".equals(string(o, "topic"))
-                || string(o,"description") == null);
+                || string(o,"description") == null
+                || string(o,"description").trim().length() == 0);
         if (n < objects.size())
             objects = objects.subList(0, n);
         objects.forEach(JSON::removeEmptyStrings);
@@ -924,6 +925,17 @@ public class Couch extends Server {
                         messages.add(message);
                     }
                 }
+            }
+            String description = string(object, "description");
+            String links = string(object, "links");
+            if (links == null && (description == null || description.trim().length() == 0)) {
+                System.out.println(formatIdentity(object) + ": has no description");
+                JsonObject message = new JsonObject();
+                message.addProperty("id", JSON.string(object, "_id"));
+                message.addProperty("chapter", JSON.string(object, "chapter"));
+                message.addProperty("topic", JSON.string(object, "topic"));
+                message.addProperty("message", ": has no description");
+                messages.add(message);
             }
         }
         return messages;
