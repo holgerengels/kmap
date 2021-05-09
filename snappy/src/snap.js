@@ -2,6 +2,7 @@ var config = require('./config.json');
 
 const puppeteer = require('puppeteer');
 const http = require("http");
+const url = require("url");
 const fs = require("fs").promises;
 const schedule = require('node-schedule');
 const NodeCouchDb = require('node-couchdb');
@@ -38,25 +39,39 @@ const job = schedule.scheduleJob('22 12,21 * * *', async function() {
     }
 });
 
+function determineWidth(url) {
+    const width = url.searchParams.get("width");
+    return width ? parseInt(width) : 800;
+}
+
+function determineHeight(url) {
+    const height = url.searchParams.get("height");
+    return height ? parseInt(height) : 450;
+}
+
 (async () => {
     browser = await puppeteer.launch({args: ['--disable-dev-shm-usage', '--no-sandbox'] });
 
     const requestListener = async function (req, res) {
         try {
-            let path = req.url;
+            let url = new URL(req.url, "https://kmap.eu");
+            let path = url.pathname;
+            let width = determineWidth(url);
+            let height = determineHeight(url);
+
             path = path.substr("snappy/".length + 1);
             console.log("Snappy snap " + path);
 
             const parts = path.split("/").map(p => decodeURIComponent(p));
-            const directory = config.path + path;
+            const directory = config.path + width + "x" + height + "/" + path;
 
-            const lastModified = modified(parts);
+            const lastModified = await modified(parts);
             const file = directory + "/" + lastModified + ".png"
 
             const cached = await exists(file);
             if (!cached) {
                 console.log("Snappy regenerate " + path);
-                await generate(directory, path, file);
+                await generate(directory, path, file, width, height);
             }
             else {
                 console.log("Snappy load from cache " + path);
@@ -114,14 +129,14 @@ async function exists(path) {
     }
 }
 
-async function generate(directory, path, file) {
+async function generate(directory, path, file, width, height) {
     await fs.mkdir(directory, {recursive: true});
     const url = "https://kmap.eu/app/browser/" + path;
     const page = await browser.newPage();
-    await page.setViewport({width: 800, height: 498,})
+    await page.setViewport({width: width, height: height + 48,})
     await page.goto(url, {waitUntil: 'networkidle0'});
     await page.waitForTimeout(1000);
-    await page.screenshot({path: file, clip: {x: 0, y: 48, width: 800, height: 450}});
+    await page.screenshot({path: file, clip: {x: 0, y: 48, width: width, height: height}});
 }
 
 async function sendFile(res, location, fileName) {
