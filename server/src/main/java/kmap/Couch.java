@@ -926,9 +926,10 @@ public class Couch extends Server {
                     }
                 }
             }
+            String summary = string(object, "summary");
             String description = string(object, "description");
             String links = string(object, "links");
-            if (links == null && (description == null || description.trim().length() == 0)) {
+            if (links == null && nully(description)) {
                 System.out.println(formatIdentity(object) + ": has no description");
                 JsonObject message = new JsonObject();
                 message.addProperty("id", JSON.string(object, "_id"));
@@ -937,8 +938,21 @@ public class Couch extends Server {
                 message.addProperty("message", ": has no description");
                 messages.add(message);
             }
+            else if (links == null && !nully(description) && nully(summary)) {
+                System.out.println(formatIdentity(object) + ": has no summary");
+                JsonObject message = new JsonObject();
+                message.addProperty("id", JSON.string(object, "_id"));
+                message.addProperty("chapter", JSON.string(object, "chapter"));
+                message.addProperty("topic", JSON.string(object, "topic"));
+                message.addProperty("message", ": has no summary");
+                messages.add(message);
+            }
         }
         return messages;
+    }
+
+    private boolean nully(String value) {
+        return value == null || value.trim().length() == 0;
     }
 
     private String formatIdentity(JsonObject object) {
