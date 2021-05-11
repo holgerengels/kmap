@@ -129,14 +129,17 @@ async function exists(path) {
     }
 }
 
+const windowSet = (page, name, value) => page.evaluateOnNewDocument(`Object.defineProperty(window, '${name}', { get: function() { return '${value}' } })`);
+
 async function generate(directory, path, file, width, height) {
     await fs.mkdir(directory, {recursive: true});
     const url = "https://kmap.eu/app/browser/" + path;
     const page = await browser.newPage();
-    await page.setViewport({width: width, height: height + 48,})
+    await page.setViewport({width: width + 16, height: height + 48 + 16})
+    await windowSet(page, 'compactCards', true);
     await page.goto(url, {waitUntil: 'networkidle0'});
     await page.waitForTimeout(1000);
-    await page.screenshot({path: file, clip: {x: 0, y: 48, width: width, height: height}});
+    await page.screenshot({path: file, clip: {x: 8, y: 48 + 8, width: width, height: height}});
 }
 
 async function sendFile(res, location, fileName) {

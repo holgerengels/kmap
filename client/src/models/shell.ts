@@ -22,6 +22,7 @@ export interface ShellState {
   passiveEventListeners: boolean,
   messages: string[],
   layers: string[],
+  compactCards: boolean,
 }
 
 export default createModel({
@@ -32,6 +33,7 @@ export default createModel({
     passiveEventListeners: false,
     messages: [],
     layers: ["summaries", "ratings"],
+    compactCards: false,
   },
   reducers: {
     updateMeta(state, meta: Meta) {
@@ -60,6 +62,9 @@ export default createModel({
     },
     removeLayer(state, layer: string) {
       return { ...state, layers: state.layers.filter(m => m !== layer) }
+    },
+    updateCompactCards(state, compactCards: boolean) {
+      return { ...state, compactCards: compactCards }
     },
   },
 

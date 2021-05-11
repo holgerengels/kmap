@@ -79,7 +79,7 @@ public class MundoServlet extends JsonServlet {
                     String topic = string(card, "topic");
                     String author = string(card, "author");
                     if (author == null)
-                        author = "KMap Team <hengels@gmail.com>";
+                        author = "KMap Team";
                     Long modified = loong(card, "modified");
                     String keywords = string(card, "keywords");
                     createNode(eventWriter, "title", chapter + " - " + topic);

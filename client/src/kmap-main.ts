@@ -34,7 +34,6 @@ import {urls} from "./urls";
 
 @customElement('kmap-main')
 export class KmapMain extends connect(store, LitElement) {
-
   @property()
   private _page: string = '';
   @property()
@@ -99,6 +98,10 @@ export class KmapMain extends connect(store, LitElement) {
 
   // @ts-ignore
   firstUpdated(changedProperties) {
+    if ((window as any).compactCards) {
+      store.dispatch.shell.updateCompactCards(true);
+    }
+
     updateMetadata({ title: "KMap", description: "KMap kartographiert Wissen mit Zusammenhang", image: window.location.origin + "/app/icons/KMap-Logo-cropped.png", keywords: undefined });
 
     this._bar.scrollTarget = this._main;

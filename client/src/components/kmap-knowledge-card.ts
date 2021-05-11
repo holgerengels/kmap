@@ -51,6 +51,8 @@ export class KMapKnowledgeCard extends Connected {
   private _topics?: TopicCount[];
   @property()
   private _rates: object = {};
+  @property()
+  private _compactCards: boolean = false;
 
   @query('#feedbackDialog')
   // @ts-ignore
@@ -68,6 +70,7 @@ export class KMapKnowledgeCard extends Connected {
       _userid: state.app.userid,
       _topics: state.tests.topics,
       _rates: state.rates.rates,
+      _compactCards: state.shell.compactCards,
     };
   }
 
@@ -223,11 +226,13 @@ export class KMapKnowledgeCard extends Connected {
       // language=HTML
       return html`
       <kmap-card style=${styleMap(this._colorStyles)}>
-        <kmap-card-text type="header">
-          <h2>${this.card.topic !== "_" ? this.card.topic : this.card.chapter}</h2>
-        </kmap-card-text>
+        ${this._compactCards ? '' : html`
+          <kmap-card-text type="header">
+            <h2>${this.card.topic !== "_" ? this.card.topic : this.card.chapter}</h2>
+          </kmap-card-text>
+        `}
 
-        ${this.card.dependencies && this.card.dependencies.length !== 0 ? html`
+        ${!this._compactCards && this.card.dependencies && this.card.dependencies.length !== 0 ? html`
           <kmap-card-text>
             <kmap-knowledge-card-depends
                 .subject="${this.card.subject}"
