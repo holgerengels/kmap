@@ -275,7 +275,6 @@ export default createModel({
       async loadTopics() {
         const state = store.getState();
         const subject = state.maps.subject;
-        console.log("subject " + subject)
         if (!subject)
           return;
 
@@ -283,7 +282,7 @@ export default createModel({
         if (!state.tests.topics || state.tests.loadedTopics != subject) {
           dispatch.tests.requestTopics();
           await fetchjson(`${urls.server}tests?topics=all&subject=${subject}`, endpoint.get(state),
-            dispatch.tests.loadTopics,
+            dispatch.tests.receivedTopics,
             dispatch.app.handleError,
             dispatch.tests.error);
           dispatch.tests.loadedTopics(subject);
