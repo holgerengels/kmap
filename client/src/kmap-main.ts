@@ -1,9 +1,9 @@
-import {LitElement, html, css, customElement, property, query} from 'lit-element';
+import {css, customElement, html, LitElement, property, query} from 'lit-element';
 import {installMediaQueryWatcher} from 'pwa-helpers/media-query.js';
 import {installOfflineWatcher} from 'pwa-helpers/network.js';
 import "web-animations-js/web-animations.min";
 import {connect, RoutingState} from '@captaincodeman/rdx'
-import { store, State } from './store'
+import {State, store} from './store'
 
 import '@material/mwc-button';
 import '@material/mwc-drawer';
@@ -21,13 +21,12 @@ import './components/kmap-exercise';
 import './components/kmap-timeline-selector';
 import './components/share-facebook';
 
-import {fontStyles, colorStyles} from "./components/kmap-styles";
+import {colorStyles, fontStyles} from "./components/kmap-styles";
 import {Snackbar} from "@material/mwc-snackbar/mwc-snackbar";
 import {TopAppBar} from "@material/mwc-top-app-bar/mwc-top-app-bar";
 import {Meta} from "./models/shell";
 import {Timeline} from "./models/courses";
 import {timelineClosed, timelineOpen} from "./components/icons";
-import {urls} from "./urls";
 
 // @ts-ignore
 //const _standalone = (window.matchMedia('(display-mode: standalone)').matches) || (window.navigator.standalone) || document.referrer.includes('android-app://');
@@ -102,8 +101,6 @@ export class KmapMain extends connect(store, LitElement) {
       store.dispatch.shell.updateCompactCards(true);
     }
 
-    updateMetadata({ title: "KMap", description: "KMap kartographiert Wissen mit Zusammenhang", image: window.location.origin + "/app/icons/KMap-Logo-cropped.png", keywords: undefined });
-
     this._bar.scrollTarget = this._main;
 
     store.dispatch.shell.clearMessages();
@@ -148,51 +145,8 @@ export class KmapMain extends connect(store, LitElement) {
   updated(changedProps) {
     if (changedProps.has('_meta')) {
       console.log(this._meta);
-      const barTitle = this._meta.title || _title.get(this._page);
-      const title = this._meta.detail ? this._meta.title  + " - " + this._meta.detail : this._meta.title;
-      const docTitle = title || _title.get(this._page);
-      const description = this._meta.description || "KMap kartographiert Wissen mit Zusammenhang";
-      this._barTitle = barTitle || "KMap";
-      document.title = docTitle ? docTitle + " - KMap" : "KMap";
-      updateMetadata({ title: title, description: description, image: this._meta.image, keywords: this._meta.keywords });
-      updateLd({
-        "@context": "https://schema.org",
-        "@type": "WebPage",
-        "breadcrumb": this._meta.breadcrumbs ? this.breadCrumbsLd(this._meta.breadcrumbs) : undefined,
-        "mainEntity": {
-          "@type": "Article",
-          "headline": title,
-          "name": title,
-          "description": description,
-          "keywords": this._meta.keywords?.join(", "),
-          "mainEntityOfPage": window.location.href,
-          "image": this._meta.image ? [this._meta.image] : "https://kmap.eu/app/icons/KMap-Logo-cropped.png",
-          "datePublished": this._meta.created ? new Date(this._meta.created) : new Date(),
-          "dateModified": this._meta.modified ? new Date(this._meta.modified) : undefined,
-          "author": this._meta.author ? {
-            "@type": "Person",
-            "name": this._meta.author
-          } : {
-            "@type": "Organization",
-            "name": "KMap Team"
-          },
-          "publisher": {
-            "@type": "Organization",
-            "name": "KMap Team",
-            "email": "hengels@gmail.com",
-            "logo": {
-              "@type": "ImageObject",
-              "url": "https://kmap.eu/app/icons/KMap-Logo-cropped.png"
-            }
-          },
-          "license": "https://creativecommons.org/licenses/by-sa/4.0/",
-          "inLanguage": ["de"],
-          "audience": ["Lerner/in"],
-          "about": this._meta.about,
-          "learningResourceType": this._meta.type,
-          "thumbnailUrl": this._meta.thumb,
-        }
-      });
+
+      this._barTitle = this._meta.title || _title.get(this._page) || "KMap";
     }
 
     if (changedProps.has('_page') && !this._layers.includes('editor'))
@@ -208,45 +162,6 @@ export class KmapMain extends connect(store, LitElement) {
     if (changedProps.has("_drawerOpen")) {
       store.dispatch.shell.updateDrawerOpen(this._drawerOpen);
     }
-  }
-
-  private breadCrumbsLd(path: string[]) {
-    const page = path.shift();
-    const key = page === "exercises" ? path.pop() : undefined;
-
-    const items = path.map((v, i, a) => {
-      return {
-        "@type": "ListItem",
-        "position": i+1,
-        "name": v,
-        "item": "https://kmap.eu" + urls.client + "browser/" + a.slice(0, i+1).map(p => encodeURIComponent(p)).join("/")
-      }
-    });
-
-    switch (page) {
-      case "tests":
-        items.push({
-          "@type": "ListItem",
-          "position": items.length + 1,
-          "name": "Test",
-          "item": "https://kmap.eu" + urls.client + "test/" + path.map(p => encodeURIComponent(p)).join("/")
-        });
-        break;
-      case "exercises":
-        items.push({
-          "@type": "ListItem",
-          "position": items.length + 1,
-          "name": "Test",
-          "item": "https://kmap.eu" + urls.client + "exercises/" + path.map(p => encodeURIComponent(p)).join("/") + "/" + key,
-        });
-        break;
-    }
-
-    return {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": items
-    };
   }
 
   private installOnErrorHandler() {
@@ -513,27 +428,3 @@ const _title = new Map([
   ['courses', "Kurse"],
   ['content-manager', "Content Manager"],
 ]);
-
-const updateMetadata = ({ title, description, image, keywords }) => {
-  setMetaTag('property', 'og:title', title);
-  setMetaTag('name', 'description', description);
-  setMetaTag('property', 'og:description', description);
-  setMetaTag('property', 'og:image', image);
-  setMetaTag('name', 'keywords', keywords ? keywords.join(", ") : "Schule, Wissen, Wissenslandkarte, Lernen, Lernfortschritt");
-  setMetaTag('property', 'og:url', window.location.href);
-};
-
-function setMetaTag(attrName, attrValue, content) {
-  let element = document.head.querySelector(`meta[${attrName}="${attrValue}"]`);
-  if (!element) {
-    element = document.createElement('meta');
-    element.setAttribute(attrName, attrValue);
-    document.head.appendChild(element);
-  }
-  element.setAttribute('content', content || '');
-}
-
-const updateLd = (ld) => {
-  const element: HTMLScriptElement = document.getElementById("ld") as HTMLScriptElement;
-  element.innerText = JSON.stringify(ld);
-};
