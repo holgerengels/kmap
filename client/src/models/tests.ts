@@ -46,6 +46,7 @@ export interface TestsState {
   chapter?: string,
   topic?: string,
   loaded?: string,
+  loadedTopics?: string,
   tree?: string[],
   tests?: object[],
   results: object[],
@@ -97,6 +98,11 @@ export default createModel({
       return { ...state,
         topics: payload,
         loadingTopics: false,
+      };
+    },
+    loadedTopics(state, payload: string) {
+      return { ...state,
+        loadedTopics: payload,
       };
     },
     requestChapters(state) {
@@ -269,16 +275,18 @@ export default createModel({
       async loadTopics() {
         const state = store.getState();
         const subject = state.maps.subject;
+        console.log("subject " + subject)
         if (!subject)
           return;
 
         // @ts-ignore
-        if (!state.tests.topics || state.tests.topics.subject !== subject) {
+        if (!state.tests.topics || state.tests.loadedTopics != subject) {
           dispatch.tests.requestTopics();
-          fetchjson(`${urls.server}tests?topics=all&subject=${subject}`, endpoint.get(state),
-            dispatch.tests.receivedTopics,
+          await fetchjson(`${urls.server}tests?topics=all&subject=${subject}`, endpoint.get(state),
+            dispatch.tests.loadTopics,
             dispatch.app.handleError,
             dispatch.tests.error);
+          dispatch.tests.loadedTopics(subject);
         }
       },
       async loadChapters(subject: string) {
