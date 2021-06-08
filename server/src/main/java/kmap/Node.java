@@ -21,6 +21,9 @@ public class Node {
     private String links;
     private String keywords;
     private String sgs;
+    private String educationalLevel;
+    private String educationalContext;
+    private String typicalAgeRange;
     private String description;
     private String summary;
     private String thumb;
@@ -130,6 +133,30 @@ public class Node {
     public String getSGS() { return sgs; }
 
     public void setSGS(String sgs) { this.sgs = sgs; }
+
+    public String getEducationalLevel() {
+        return educationalLevel;
+    }
+
+    public void setEducationalLevel(String educationalLevel) {
+        this.educationalLevel = educationalLevel;
+    }
+
+    public String getEducationalContext() {
+        return educationalContext;
+    }
+
+    public void setEducationalContext(String educationalContext) {
+        this.educationalContext = educationalContext;
+    }
+
+    public String getTypicalAgeRange() {
+        return typicalAgeRange;
+    }
+
+    public void setTypicalAgeRange(String typicalAgeRange) {
+        this.typicalAgeRange = typicalAgeRange;
+    }
 
     public String getDescription() {
         return description;

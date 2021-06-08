@@ -25,8 +25,11 @@ export interface Card {
   topic: string,
   row?: number,
   col?: number,
-  keywords: string,
-  sgs: string,
+  keywords?: string,
+  sgs?: string,
+  educationalLevel?: string,
+  educationalContext?: string,
+  typicalAgeRange?: string,
   summary: string,
   description: string,
   thumb?: string;

@@ -15,6 +15,9 @@ export interface Meta {
   about?: string[],
   type?: string[],
   thumb?: string,
+  educationalLevel?: string[],
+  educationalContext?: string[],
+  typicalAgeRange?: string,
 }
 export interface ShellState {
   meta: Meta,
@@ -122,6 +125,9 @@ export default createModel({
             "about": meta.about,
             "learningResourceType": meta.type,
             "thumbnailUrl": meta.thumb,
+            "educationalLevel": meta.educationalLevel,
+            "oeh:educationalContext": meta.educationalContext,
+            "typicalAgeRange": meta.typicalAgeRange,
           }
         });
       },

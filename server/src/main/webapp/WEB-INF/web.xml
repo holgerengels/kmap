@@ -68,6 +68,11 @@
     </servlet>
 
     <servlet>
+        <servlet-name>edutags</servlet-name>
+        <servlet-class>kmap.EduTagsServlet</servlet-class>
+    </servlet>
+
+    <servlet>
         <servlet-name>sitemap</servlet-name>
         <servlet-class>kmap.SitemapServlet</servlet-class>
     </servlet>
@@ -125,6 +130,11 @@
     <servlet-mapping>
         <servlet-name>mundo</servlet-name>
         <url-pattern>/mundo/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>edutags</servlet-name>
+        <url-pattern>/edutags/*</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>

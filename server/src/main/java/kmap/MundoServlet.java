@@ -18,8 +18,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static kmap.JSON.loong;
-import static kmap.JSON.string;
+import static kmap.JSON.*;
 
 public class MundoServlet extends JsonServlet {
     private Couch couch;
@@ -89,6 +88,10 @@ public class MundoServlet extends JsonServlet {
                     createNode(eventWriter, "guid", DigestUtils.md5Hex(subject + "/" + chapter + "/" + topic), Collections.singletonMap("isPermaLink", "false"));
                     if (modified != null)
                         createNode(eventWriter, "pubDate", date_format.format(new Date(modified)));
+
+                    Integer sgs = integer(card, "sgs");
+                    if (sgs != null)
+                        createNode(eventWriter, "category", "" + sgs, Map.of("domain", "eaf-classification-coded"), false);
 
                     keywords = keywords == null ? chapter + ", " + topic : chapter + ", " + topic + ", " + keywords;
                     createNode(eventWriter, "itunes:keywords", keywords, null, false);

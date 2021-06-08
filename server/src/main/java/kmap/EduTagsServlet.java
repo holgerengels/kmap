@@ -21,8 +21,9 @@ import java.util.stream.Collectors;
 import static kmap.JSON.loong;
 import static kmap.JSON.string;
 
-public class RSSServlet extends JsonServlet {
+public class EduTagsServlet extends JsonServlet {
     private Couch couch;
+    private String file;
 
     @Override
     public void init() throws ServletException {
@@ -90,10 +91,16 @@ public class RSSServlet extends JsonServlet {
                     if (modified != null)
                         createNode(eventWriter, "pubDate", date_format.format(new Date(modified)));
 
-                    keywords = keywords == null ? chapter + ", " + topic : chapter + ", " + topic + ", " + keywords;
-                    createNode(eventWriter, "itunes:keywords", keywords, null, false);
+                    createNode(eventWriter, "category", chapter, null, true);
+                    createNode(eventWriter, "category", topic, null, true);
+                    if (keywords != null) {
+                        for (String keyword : keywords.split(",")) {
+                            keyword = keyword.trim();
+                            createNode(eventWriter, "category", keyword, null, true);
+                        }
+                    }
 
-                    createNode(eventWriter, "itunes:image", null, Map.of("href", "https://kmap.eu/snappy/" + encode(subject) + "/" + encode(chapter) + "/" + encode(topic)), false);
+                    createNode(eventWriter, "enclosure", null, Map.of("url", "https://kmap.eu/snappy/" + encode(subject) + "/" + encode(chapter) + "/" + encode(topic) + "?height=640", "type", "image/*"), false);
 
                     eventWriter.add(end);
                     eventWriter.add(eventFactory.createEndElement("", "", "item"));

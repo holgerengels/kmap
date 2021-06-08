@@ -222,6 +222,9 @@ public class Couch extends Server {
                     existing.add("priority", changed.get("priority"));
                     existing.add("keywords", changed.get("keywords"));
                     existing.add("sgs", changed.get("sgs"));
+                    existing.add("educationalLevel", changed.get("educationalLevel"));
+                    existing.add("educationalContext", changed.get("educationalContext"));
+                    existing.add("typicalAgeRange", changed.get("typicalAgeRange"));
                     existing.add("description", changed.get("description"));
                     existing.add("thumb", changed.get("thumb"));
                     existing.add("summary", changed.get("summary"));
@@ -353,6 +356,9 @@ public class Couch extends Server {
                 chapterNode.setAuthor(string(topic, "author"));
                 chapterNode.setKeywords(string(topic, "keywords"));
                 chapterNode.setSGS(string(topic, "sgs"));
+                chapterNode.setEducationalLevel(string(topic, "educationalLevel"));
+                chapterNode.setEducationalContext(string(topic, "educationalContext"));
+                chapterNode.setTypicalAgeRange(string(topic, "typicalAgeRange"));
                 chapterNode.setDescription(string(topic, "description"));
                 chapterNode.setSummary(string(topic, "summary"));
                 chapterNode.setAttachments(amendAttachments(topic.getAsJsonArray("attachments"), topic.getAsJsonObject("_attachments")));
@@ -366,6 +372,9 @@ public class Couch extends Server {
                 node.setAuthor(string(topic, "author"));
                 node.setKeywords(string(topic, "keywords"));
                 node.setSGS(string(topic, "sgs"));
+                node.setEducationalLevel(string(topic, "educationalLevel"));
+                node.setEducationalContext(string(topic, "educationalContext"));
+                node.setTypicalAgeRange(string(topic, "typicalAgeRange"));
                 node.setDescription(string(topic, "description"));
                 node.setSummary(string(topic, "summary"));
                 node.setThumb(string(topic, "thumb"));
@@ -445,12 +454,15 @@ public class Couch extends Server {
             card.addProperty("topic", node.getTopic());
             card.addProperty("row", node.getRow());
             card.addProperty("col", node.getColumn());
-            addProperty(card, "keywords", node.getKeywords());
-            addProperty(card, "sgs", node.getSGS());
-            addProperty(card, "description", node.getDescription());
-            addProperty(card, "summary", node.getSummary());
-            addProperty(card, "thumb", node.getThumb());
-            addProperty(card, "links", node.getLinks());
+            JSON.addProperty(card, "keywords", node.getKeywords());
+            JSON.addProperty(card, "sgs", node.getSGS());
+            JSON.addProperty(card, "educationalLevel", node.getEducationalLevel());
+            JSON.addProperty(card, "educationalContext", node.getEducationalContext());
+            JSON.addProperty(card, "typicalAgeRange", node.getTypicalAgeRange());
+            JSON.addProperty(card, "description", node.getDescription());
+            JSON.addProperty(card, "summary", node.getSummary());
+            JSON.addProperty(card, "thumb", node.getThumb());
+            JSON.addProperty(card, "links", node.getLinks());
             add(card, "attachments", node.getAttachments());
             JsonArray depends = new JsonArray();
             JsonArray dependencies = new JsonArray();
@@ -462,7 +474,7 @@ public class Couch extends Server {
             card.add("depends", depends);
             card.add("dependencies", dependencies);
             card.addProperty("annotations", String.join(", ", node.getAnnotations()));
-            addProperty(card, "priority", node.getPriority());
+            JSON.addProperty(card, "priority", node.getPriority());
             cards.add(card);
         }
 
@@ -477,11 +489,14 @@ public class Couch extends Server {
                 chapterNode.getDepends().forEach(array::add);
                 add(card, "dependencies", array);
             }
-            addProperty(card, "keywords", chapterNode.getKeywords());
-            addProperty(card, "sgs", chapterNode.getSGS());
-            addProperty(card, "description", chapterNode.getDescription());
-            addProperty(card, "summary", chapterNode.getSummary());
-            addProperty(card, "links", chapterNode.getLinks());
+            JSON.addProperty(card, "keywords", chapterNode.getKeywords());
+            JSON.addProperty(card, "sgs", chapterNode.getSGS());
+            JSON.addProperty(card, "educationalLevel", chapterNode.getEducationalLevel());
+            JSON.addProperty(card, "educationalContext", chapterNode.getEducationalContext());
+            JSON.addProperty(card, "typicalAgeRange", chapterNode.getTypicalAgeRange());
+            JSON.addProperty(card, "description", chapterNode.getDescription());
+            JSON.addProperty(card, "summary", chapterNode.getSummary());
+            JSON.addProperty(card, "links", chapterNode.getLinks());
             add(card, "attachments", chapterNode.getAttachments());
             board.add("chapterCard", card);
         }
@@ -665,20 +680,6 @@ public class Couch extends Server {
         catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private void add(JsonObject card, String name, JsonArray array) {
-        if (array != null)
-            card.add(name, array);
-    }
-
-    private void addProperty(JsonObject card, String name, String value) {
-        if (value != null && value.length() != 0)
-            card.addProperty(name, value);
-    }
-    private void addProperty(JsonObject card, String name, Integer value) {
-        if (value != null)
-            card.addProperty(name, value);
     }
 
     public Map<String, String> links(String subject) {
@@ -900,7 +901,7 @@ public class Couch extends Server {
         return object;
     }
 
-    public synchronized JsonArray checkAttachments(String subject) {
+    public synchronized JsonArray checks(String subject) {
         View view = createClient("map").view("net/bySubject")
                 .key(subject)
                 .reduce(false)
@@ -959,18 +960,56 @@ public class Couch extends Server {
         return JSON.string(object, "_id") + ": " + JSON.string(object, "chapter") + "/" + JSON.string(object, "topic");
     }
 
+    public synchronized JsonArray list(String subject, String chapter) {
+        CouchDbClient client = createClient("map");
+        View view = chapter != null
+                ? client.view("net/byChapter").key(subject, chapter).reduce(false).includeDocs(true)
+                : client.view("net/bySubject").key(subject).reduce(false).includeDocs(true)
+                ;
+
+        JsonArray list = new JsonArray();
+        List<JsonObject> objects = view.query(JsonObject.class);
+        for (JsonObject object : objects) {
+            JsonObject line = new JsonObject();
+            chapter = JSON.string(object, "chapter");
+            String topic = JSON.string(object, "topic");
+            if ("_".equals(topic))
+                continue;
+            line.addProperty("subject", subject);
+            line.addProperty("chapter", chapter);
+            line.addProperty("topic", topic);
+            list.add(line);
+        }
+        return list;
+    }
+
+    private void addProperty(CouchDbClient client, String[] dirs, String name, JsonElement element) {
+        JsonObject object = loadTopic(dirs);
+        object.add(name, element);
+        client.update(object);
+    }
+
     public static void main(String[] args) throws IOException {
         Couch couch = new Couch(readProperties(args[0]));
+        if (args.length != 4) {
+            System.err.println("Usage: <kmap.properties> name value <topics>");
+            System.exit(1);
+        }
         Server.CLIENT.set("vu");
-        couch.checkAttachments("Mathematik");
-
-        /*
-        JsonObject object = couch.chapter("mathe", "Mathematik");
-        System.out.println("object = " + object);
-        States states = new States(couch);
-        JsonObject snp = states.statesAndProgress("h.engels", "Mathematik");
-        System.out.println("states = " + snp);
-         */
+        CouchDbClient client = couch.createClient("map");
+        String name = args[1];
+        JsonElement value = client.getGson().fromJson(args[2], JsonElement.class);
+        String json = Files.readString(Paths.get(args[3]));
+        JsonArray topics = client.getGson().fromJson(json, JsonArray.class);
+        for (JsonElement element : topics) {
+            String[] path = {
+                    JSON.string((JsonObject) element, "subject"),
+                    JSON.string((JsonObject) element, "chapter"),
+                    JSON.string((JsonObject) element, "topic")
+            };
+            couch.addProperty(client, path, name, value);
+        }
+        Server.CLIENT.remove();
     }
 
     static class WeightedSum {

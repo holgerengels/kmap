@@ -50,4 +50,19 @@ public class JSON {
     static boolean removeEmptyStrings(JsonObject o) {
         return o.entrySet().removeIf(entry -> entry.getValue().isJsonPrimitive() && "".equals(entry.getValue().getAsString()));
     }
+
+    static void add(JsonObject card, String name, JsonArray array) {
+        if (array != null)
+            card.add(name, array);
+    }
+
+    static void addProperty(JsonObject card, String name, String value) {
+        if (value != null && value.length() != 0)
+            card.addProperty(name, value);
+    }
+
+    static void addProperty(JsonObject card, String name, Integer value) {
+        if (value != null)
+            card.addProperty(name, value);
+    }
 }

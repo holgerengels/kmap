@@ -46,6 +46,12 @@ export class KMapEditorEditDialog extends Connected {
   @property()
   private _sgs: string = '';
   @property()
+  private _educationalLevel: string = '';
+  @property()
+  private _educationalContext: string = '';
+  @property()
+  private _typicalAgeRange: string = '';
+  @property()
   private _tab: string = 'editor';
 
   @property()
@@ -129,6 +135,9 @@ export class KMapEditorEditDialog extends Connected {
       this._thumb = this._card.thumb || '';
       this._keywords = this._card.keywords || '';
       this._sgs = this._card.sgs || '';
+      this._educationalLevel = this._card.educationalLevel || '';
+      this._educationalContext = this._card.educationalContext || '';
+      this._typicalAgeRange = this._card.typicalAgeRange || '';
       this._depends = this._card.depends ? this._card.depends.join(" / ") : '';
       this._links = this._card.links || '';
       this._priority = this._card.priority !== undefined ? this._card.priority + '' : '';
@@ -140,6 +149,17 @@ export class KMapEditorEditDialog extends Connected {
 
     if (changedProperties.has("_uploads")) {
       this._pendingUploads = this._uploads.some(u => u.uploading);
+    }
+
+    if (changedProperties.has("_educationalLevel")) {
+      const levels = this._educationalLevel?.split(",").map(l => l.trim()).map(l => Number.parseInt(l));
+      if (!levels)
+        this._typicalAgeRange = "";
+      else {
+        const min = Math.min(...levels) + 5;
+        const max = Math.max(...levels) + 5;
+        this._typicalAgeRange = min === max ? "" + min : min + "-" + max;
+      }
     }
   }
 
@@ -154,6 +174,9 @@ export class KMapEditorEditDialog extends Connected {
     card.thumb = this._thumb;
     card.keywords = this._keywords;
     card.sgs = this._sgs;
+    card.educationalLevel = this._educationalLevel;
+    card.educationalContext = this._educationalContext;
+    card.typicalAgeRange = this._typicalAgeRange;
     card.depends = this._depends.split("/").map(d => d.trim()).filter(d => d.length > 0);
     card.links = this._links;
     card.priority = this._priority !== '' ? parseInt(this._priority) : undefined;
@@ -241,10 +264,14 @@ export class KMapEditorEditDialog extends Connected {
   }
 
   _switchTab(e) {
+    const old = this._tab;
     if (e.type === "MDCTabBar:activated")
       this._tab = e.detail.index === 0 ? 'editor' : 'preview';
     else if (e.key === "p" && e.altKey === true)
       this._tabBar.activeIndex = this._tab === 'editor' ? 1 : 0;
+
+    if (old !== this._tab && this._tab === 'editor')
+      this._descriptionTextArea.focus();
   }
 
   _copy(attachment: Attachment) {
@@ -319,7 +346,10 @@ ${this._card ? html`
         <mwc-textfield s1 ?hidden="${this._card.topic === '_'}" id="thumb" label="Thumbnail" dense .value=${this._thumb} @change="${e => this._thumb = e.target.value}"></mwc-textfield>
         <mwc-textfield s5 ?hidden="${this._card.topic === '_'}" id="keywords" label="Keywords" dense .value=${this._keywords} @change="${e => this._keywords = e.target.value}"></mwc-textfield>
         <mwc-textfield s1 ?hidden="${this._card.topic === '_'}" id="sgs" label="SGS" dense .value=${this._sgs} @change="${e => this._sgs = e.target.value}"></mwc-textfield>
-        <mwc-textarea s6 id="summary" label="Kurztext" ?dialogInitialFocus="${this._card.topic === '_'}" dense fullwidth rows="2" .value=${this._card.summary} @keyup="${this._setSummary}"></mwc-textarea>
+        <mwc-textfield s2 ?hidden="${this._card.topic === '_'}" id="educationalLevel" label="Klassenstufe" helper="Z.B. 11, 12" dense .value=${this._educationalLevel} @change="${e => this._educationalLevel = e.target.value}" pattern="^ ?[0-9]{1,2} ?(, ?[0-9]{1,2} ?)*"></mwc-textfield>
+        <mwc-textfield s2 ?hidden="${this._card.topic === '_'}" id="educationalContext" label="Kontext" helper="Z.B. Primarstufe, Sekundarstufe I" dense .value=${this._educationalContext} @change="${e => this._educationalContext = e.target.value}"></mwc-textfield>
+        <mwc-textfield s2 ?hidden="${this._card.topic === '_'}" id="typicalAgeRange" label="Alter" disabled dense .value=${this._typicalAgeRange}></mwc-textfield>
+        <mwc-textarea s6 id="summary" label="Kurztext" ?dialogInitialFocus="${this._card.topic === '_'}" dense ?required=${this._description} fullwidth rows="2" .value=${this._card.summary} @keyup="${this._setSummary}"></mwc-textarea>
         <mwc-textarea s6 id="description" label="Langtext" dense fullwidth rows="9" .value=${this._card.description} @keyup="${this._setDescription}"></mwc-textarea>
       </div>
     </validating-form>

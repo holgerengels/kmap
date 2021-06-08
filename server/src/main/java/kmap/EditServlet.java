@@ -1,6 +1,7 @@
 package kmap;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import org.apache.commons.io.IOUtils;
 
@@ -9,6 +10,8 @@ import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
+
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -94,6 +97,8 @@ public class EditServlet
             String subject = req.getParameter("subject");
             String load = req.getParameter("load");
             String checks = req.getParameter("checks");
+            String list = req.getParameter("list");
+            String chapter = req.getParameter("chapter");
             if (modules != null) {
                 log("modules = " + modules);
                 JsonArray array = couch.loadModules();
@@ -108,7 +113,13 @@ public class EditServlet
             }
             else if (checks != null) {
                 log("checks for subject = " + checks);
-                JsonArray array = couch.checkAttachments(checks);
+                JsonArray array = couch.checks(checks);
+                if (array != null)
+                    writeResponse(req, resp, array);
+            }
+            else if (list != null) {
+                log("list topics of subject = " + list);
+                JsonArray array = couch.list(list, chapter);
                 if (array != null)
                     writeResponse(req, resp, array);
             }
@@ -129,4 +140,14 @@ public class EditServlet
         }
         return "noname";
     }
+
+    /*
+    static protected void writeText(HttpServletRequest request, HttpServletResponse resp, String text) throws IOException {
+        newSessionHeader(request, resp);
+        corsHeaders(request, resp);
+        resp.setContentType("text/plain");
+        resp.setCharacterEncoding("utf-8");
+        resp.getWriter().print(text);
+    }
+     */
 }

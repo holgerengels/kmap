@@ -345,25 +345,29 @@ export default createModel({
       'maps/setTopicCard': async function () {
         const state = store.getState();
 
-        if (state.maps.topicCard) {
+        const card = state.maps.topicCard;
+        if (card) {
           const subject = state.maps.subject || '';
           const chapter = state.maps.chapter || '';
           const topic = state.maps.topic || '';
           dispatch.shell.updateMeta({
             title: chapter,
-            detail: state.maps.topicCard.topic,
-            description: state.maps.topicCard.summary,
-            created: state.maps.topicCard.created,
-            modified: state.maps.topicCard.modified,
-            author: state.maps.topicCard.author,
-            image: state.maps.topicCard.thumb ?
-              `${urls.server}${encodePath("data", subject, chapter, topic, state.maps.topicCard.thumb)}?instance=${state.app.instance}`
+            detail: card.topic,
+            description: card.summary,
+            created: card.created,
+            modified: card.modified,
+            author: card.author,
+            image: card.thumb ?
+              `${urls.server}${encodePath("data", subject, chapter, topic, card.thumb)}?instance=${state.app.instance}`
               : undefined,
-            keywords: [subject, chapter, topic, ...(state.maps.topicCard.keywords ? state.maps.topicCard.keywords.split(",").map(k => k.trim()) : [])],
+            keywords: [subject, chapter, topic, ...(card.keywords ? card.keywords.split(",").map(k => k.trim()) : [])],
             breadcrumbs: ["browser", subject, chapter, topic],
             about: [subject],
             type: ["Text"],
-            thumb: `${urls.snappy}${encodePath(subject, chapter, topic)}`
+            thumb: `${urls.snappy}${encodePath(subject, chapter, topic)}`,
+            educationalLevel: card.educationalLevel?.split(",").map(l => l.trim()),
+            educationalContext: card.educationalContext?.split(",").map(l => l.trim()),
+            typicalAgeRange: card.typicalAgeRange,
           });
         }
         else {
@@ -382,7 +386,7 @@ export default createModel({
             keywords: [subject, chapter, ...topics],
             breadcrumbs: ["browser", subject, chapter],
             about: [subject],
-            type: ["Karte"]
+            type: ["Unterrichtsplanung"]
           });
         }
 
