@@ -995,7 +995,7 @@ public class Couch extends Server {
             System.err.println("Usage: <kmap.properties> name value <topics>");
             System.exit(1);
         }
-        Server.CLIENT.set("vu");
+        Server.CLIENT.set("root");
         CouchDbClient client = couch.createClient("map");
         String name = args[1];
         JsonElement value = client.getGson().fromJson(args[2], JsonElement.class);
