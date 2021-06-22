@@ -1012,6 +1012,32 @@ public class Couch extends Server {
         Server.CLIENT.remove();
     }
 
+    public int batchCards(String json) {
+        CouchDbClient client = createClient("map");
+        JsonObject batch = client.getGson().fromJson(json, JsonObject.class);
+        json = string(batch, "json");
+        batch = client.getGson().fromJson(json, JsonObject.class);
+        JsonArray properties = batch.getAsJsonArray("properties");
+        JsonArray cards = batch.getAsJsonArray("cards");
+        int count = 0;
+        for (JsonElement element : cards) {
+            JsonObject card = (JsonObject)element;
+            String[] path = {
+                    string(card, "subject"),
+                    string(card, "chapter"),
+                    string(card, "topic")
+            };
+            for (JsonElement elefant : properties) {
+                JsonObject property = (JsonObject)elefant;
+                String name = string(property, "name");
+                JsonElement value = property.get("value");
+                addProperty(client, path, name, value);
+            }
+            count++;
+        }
+        return count;
+    }
+
     static class WeightedSum {
         int sum = 0;
         int count = 0;

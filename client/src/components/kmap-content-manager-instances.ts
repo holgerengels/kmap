@@ -44,6 +44,9 @@ export class KMapContentManagerInstances extends Connected {
   @property()
   private _editAuthconf: string = '';
 
+  @property()
+  private _batchJson: string = '';
+
 
   mapState(state: State) {
     return {
@@ -93,6 +96,13 @@ export class KMapContentManagerInstances extends Connected {
 
     console.log("edit instance");
     store.dispatch.instances.edit({ name: this._selected.name, description: this._editDescription, authconf: this._editAuthconf});
+  }
+
+  _batch() {
+    if (this._selected === undefined) return;
+
+    console.log("batch instance");
+    store.dispatch.instances.batch({ instance: this._selected.name, json: this._batchJson});
   }
 
   _drop() {
@@ -160,7 +170,8 @@ export class KMapContentManagerInstances extends Connected {
           <label>Instanzen</label>
           <span style="float: right">
           <mwc-icon @click="${() => this._showPage('sync')}">merge_type</mwc-icon>
-          <mwc-icon @click="${() => this._showPage('edit')}">edit</mwc-icon>
+          <mwc-icon @click="${() => this._showPage('edit')}" ?disabled="${this._selectedIndex === -1}">edit</mwc-icon>
+          <mwc-icon @click="${() => this._showPage('batch')}" ?disabled="${this._selectedIndex === -1}">dynamic_feed</mwc-icon>
           <mwc-icon @click="${() => this._showPage('create')}">add</mwc-icon>
           <mwc-icon @click="${() => this._showPage('drop')}" ?disabled="${this._selectedIndex === -1}">delete</mwc-icon>
           </span>
@@ -208,6 +219,15 @@ export class KMapContentManagerInstances extends Connected {
             <div>
               <mwc-button @click="${() => this._showPage('')}">Abbrechen</mwc-button>
               <mwc-button outlined @click="${this._edit}">Speichern</mwc-button>
+            </div>
+          </div>
+          <div class="page" ?active="${this._page === 'batch'}">
+            <label>Batch Edit</label>
+            <mwc-textfield label="ID" type="text" .value="${this._selected ? this._selected.name : ''}" disabled></mwc-textfield>
+            <mwc-textarea label="JSON" .value="${this._batchJson}" @change="${e => this._batchJson = e.target.value}"></mwc-textarea>
+            <div>
+              <mwc-button @click="${() => this._showPage('')}">Abbrechen</mwc-button>
+              <mwc-button outlined @click="${this._batch}">Anwenden</mwc-button>
             </div>
           </div>
           <div class="page" ?active="${this._page === 'drop'}">

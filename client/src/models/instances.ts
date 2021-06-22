@@ -7,6 +7,10 @@ export interface Sync {
   from: string,
   to: string,
 }
+export interface Batch {
+  instance: string,
+  json: string,
+}
 export interface Instance {
   name: string,
   description?: string,
@@ -18,6 +22,7 @@ export interface InstancesState {
   loading: boolean,
   creating: boolean,
   editing: boolean,
+  batching: boolean,
   dropping: boolean,
   syncing: boolean,
   error: string,
@@ -30,6 +35,7 @@ export default createModel({
     loading: false,
     creating: false,
     editing: false,
+    batching: false,
     dropping: false,
     syncing: false,
     error: "",
@@ -75,6 +81,17 @@ export default createModel({
       return { ...state,
         editing: false,
         instances: [...state.instances.filter(i => i.name !== payload.name), payload].sort((a, b) => a.name.localeCompare(b.name))
+      };
+    },
+
+    requestBatch(state) {
+      return { ...state, batching: true,
+        error: "",
+      };
+    },
+    receivedBatch(state) {
+      return { ...state,
+        batching: false,
       };
     },
 
@@ -151,6 +168,21 @@ export default createModel({
           },
           () => {
             dispatch.instances.receivedEdit(instance);
+          },
+          dispatch.app.handleError,
+          dispatch.instances.error);
+      },
+      async batch(batch: Batch) {
+        const state = store.getState();
+        // @ts-ignore
+        dispatch.instances.requestBatch();
+        fetchjson(`${urls.server}content?batch-cards=${batch.instance}`,
+          {
+            ...endpoint.post(state),
+            body: JSON.stringify({instance: batch.instance, json: batch.json})
+          },
+          () => {
+            dispatch.instances.receivedBatch();
           },
           dispatch.app.handleError,
           dispatch.instances.error);

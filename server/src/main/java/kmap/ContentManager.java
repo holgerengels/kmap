@@ -359,6 +359,10 @@ public class ContentManager extends Server
         return couch.deleteModule(subject, module);
     }
 
+    public int batchCards(String json) {
+        return couch.batchCards(json);
+    }
+
     private static class KeepOpenInputStream extends InputStream {
         private InputStream in;
 

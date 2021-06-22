@@ -47,6 +47,7 @@ public class ContentManagerServlet
                 String subject = req.getParameter("subject");
                 String deleteModule = req.getParameter("delete-module");
                 String deleteSet = req.getParameter("delete-set");
+                String batchCards = req.getParameter("batch-cards");
 
                 if (importModule != null) {
                     authentication.checkRole(req, "teacher");
@@ -103,6 +104,12 @@ public class ContentManagerServlet
                     String json = IOUtils.toString(new InputStreamReader(req.getInputStream(), StandardCharsets.UTF_8));
                     contentManager.syncInstance(json);
                     writeResponse(req, resp, new JsonPrimitive(sync));
+                }
+                else if (batchCards != null) {
+                    authentication.checkRole(req, "admin");
+                    String json = IOUtils.toString(new InputStreamReader(req.getInputStream(), StandardCharsets.UTF_8));
+                    int num = contentManager.batchCards(json);
+                    writeResponse(req, resp, new JsonPrimitive(num));
                 }
             }
         }
