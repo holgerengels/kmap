@@ -16,7 +16,8 @@
     "allowSyntheticDefaultImports": true,
     "lib": ["esnext", "dom", "dom.iterable"],
     "baseUrl": "src",
-    "allowJs": true
+    "allowJs": true,
+    "useDefineForClassFields": false
   },
   "include": ["node_modules/@open-wc/**/*.js", "src/**/*.ts"],
   "exclude": ["node_modules/!(@open-wc)"]
