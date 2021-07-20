@@ -185,9 +185,11 @@ const updateLd = (ld) => {
     element = document.createElement('script') as HTMLScriptElement;
     element.setAttribute("id", "ld");
     element.setAttribute("type", "application/ld+json");
+    element.innerText = JSON.stringify(ld);
     document.head.appendChild(element);
   }
-  element.innerText = JSON.stringify(ld);
+  else
+    element.innerText = JSON.stringify(ld);
 };
 
 const breadCrumbsLd = function(path: string[]) {
