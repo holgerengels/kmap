@@ -178,8 +178,15 @@ export default createModel({
   }
 })
 
+// <script id="ld" type="application/ld+json">{}</script>
 const updateLd = (ld) => {
-  const element: HTMLScriptElement = document.getElementById("ld") as HTMLScriptElement;
+  let element: HTMLScriptElement = document.getElementById("ld") as HTMLScriptElement;
+  if (!element) {
+    element = document.createElement('script') as HTMLScriptElement;
+    element.setAttribute("id", "ld");
+    element.setAttribute("type", "application/ld+json");
+    document.head.appendChild(element);
+  }
   element.innerText = JSON.stringify(ld);
 };
 
