@@ -40,7 +40,7 @@ public class JsonLD {
 
         Writer writer = new StringWriter();
         Map<String, String> config = new HashMap<>();
-        config.put(JsonGenerator.PRETTY_PRINTING, "");
+        // config.put(JsonGenerator.PRETTY_PRINTING, "");
         Json.createWriterFactory(config).createWriter(writer).writeObject(Json.createObjectBuilder()
                 .add("@context", "https://schema.org")
                 .add("@type", "WebPage")

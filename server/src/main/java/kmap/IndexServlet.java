@@ -81,7 +81,12 @@ public class IndexServlet extends JsonServlet {
                             modified = JSON.date(card, "modified");
                             section = title;
                             keywords = string(card, "keywords");
-                            jsonld = new JsonLD().jsonld(card);
+                            try {
+                                jsonld = new JsonLD().jsonld(card);
+                            }
+                            catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
                         Server.CLIENT.remove();
                     }
@@ -130,6 +135,9 @@ public class IndexServlet extends JsonServlet {
         else
             string = string.replace("<meta type=\"\">", "<meta name=\"og:type\" content=\"website\">");
 
+        string = string.replace("<jsonld></jsonld>", jsonld != null
+                ? "<script id=\"ld\" type=\"application/ld+json\">" + jsonld + "</script>"
+                : "");
 
         // if (text == null) text = "";
         // string = string.replace("<ogtext></ogtext>", text);
