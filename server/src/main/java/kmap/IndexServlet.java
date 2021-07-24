@@ -135,7 +135,7 @@ public class IndexServlet extends JsonServlet {
         else
             string = string.replace("<meta type=\"\">", "<meta name=\"og:type\" content=\"website\">");
 
-        string = string.replace("<script jsonld></script>", jsonld != null
+        string = string.replace("<meta jsonld=\"\">", jsonld != null
                 ? "<script id=\"ld\" type=\"application/ld+json\">" + jsonld + "</script>"
                 : "");
 
