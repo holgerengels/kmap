@@ -49,6 +49,8 @@
   "description": "KMap - Wissen mit Zusammenhang",
   "license": "MIT",
   "dependencies": {
+    "@babel/plugin-proposal-decorators": "^7.14.5",
+    "@babel/plugin-transform-typescript": "^7.14.6",
     "@captaincodeman/rdx": "^1.0.0-rc.9",
     "@captaincodeman/router": "^1.0.3",
     "@material/mwc-button": "^0.21.0",
