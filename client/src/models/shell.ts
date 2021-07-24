@@ -202,7 +202,7 @@ const breadCrumbsLd = function(path: string[]) {
       "position": i+1,
       "name": v,
       "item": "https://kmap.eu" + urls.client + "browser/" + (i === 0
-        ? [a[0], a[0]]
+        ? a[0] + "/" + a[0]
         : a.slice(0, i+1).map(p => encodeURIComponent(p)).join("/"))
     }
   });
