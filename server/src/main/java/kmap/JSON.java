@@ -5,11 +5,17 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.StreamSupport;
 
 public class JSON {
+    private static DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+
     public static boolean isNull(JsonObject topic, String name) {
         return topic.get(name).isJsonNull();
     }
@@ -19,14 +25,29 @@ public class JSON {
         return primitive != null ? primitive.getAsString() : null;
     }
 
+    public static String string(JsonObject topic, String name, String defaultValue) {
+        JsonPrimitive primitive = topic.getAsJsonPrimitive(name);
+        return primitive != null ? primitive.getAsString() : defaultValue;
+    }
+
     public static Integer integer(JsonObject topic, String name) {
         JsonPrimitive primitive = topic.getAsJsonPrimitive(name);
         return primitive != null && primitive.getAsString().length() != 0 ? primitive.getAsInt() : null;
     }
 
+    public static Integer integer(JsonObject topic, String name, Integer defaultValue) {
+        JsonPrimitive primitive = topic.getAsJsonPrimitive(name);
+        return primitive != null && primitive.getAsString().length() != 0 ? primitive.getAsInt() : defaultValue;
+    }
+
     public static Long loong(JsonObject topic, String name) {
         JsonPrimitive primitive = topic.getAsJsonPrimitive(name);
         return primitive != null && primitive.getAsString().length() != 0 ? primitive.getAsLong() : null;
+    }
+
+    public static Long loong(JsonObject topic, String name, Long defaultValue) {
+        JsonPrimitive primitive = topic.getAsJsonPrimitive(name);
+        return primitive != null && primitive.getAsString().length() != 0 ? primitive.getAsLong() : defaultValue;
     }
 
     static JsonArray sort(JsonArray array) {
@@ -64,5 +85,15 @@ public class JSON {
     static void addProperty(JsonObject card, String name, Integer value) {
         if (value != null)
             card.addProperty(name, value);
+    }
+
+    public static String date(JsonObject object, String name) {
+        JsonPrimitive primitive = object.getAsJsonPrimitive(name);
+        return primitive != null ? format.format(new Date(primitive.getAsLong())) : null;
+    }
+
+    public static String date(JsonObject object, String name, long defaultValue) {
+        JsonPrimitive primitive = object.getAsJsonPrimitive(name);
+        return format.format(new Date(primitive != null ? primitive.getAsLong() : defaultValue));
     }
 }

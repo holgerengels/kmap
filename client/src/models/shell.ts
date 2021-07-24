@@ -100,7 +100,7 @@ export default createModel({
             "description": description,
             "keywords": meta.keywords?.join(", "),
             "mainEntityOfPage": window.location.href,
-            "image": meta.image ? [meta.image] : "https://kmap.eu/app/icons/KMap-Logo-cropped.png",
+            "image": meta.image ? meta.image : "https://kmap.eu/app/icons/KMap-Logo-cropped.png",
             "datePublished": meta.created ? new Date(meta.created) : new Date(),
             "dateModified": meta.modified ? new Date(meta.modified) : undefined,
             "author": meta.author ? {
@@ -201,7 +201,9 @@ const breadCrumbsLd = function(path: string[]) {
       "@type": "ListItem",
       "position": i+1,
       "name": v,
-      "item": "https://kmap.eu" + urls.client + "browser/" + a.slice(0, i+1).map(p => encodeURIComponent(p)).join("/")
+      "item": "https://kmap.eu" + urls.client + "browser/" + (i === 0
+        ? [a[0], a[0]]
+        : a.slice(0, i+1).map(p => encodeURIComponent(p)).join("/"))
     }
   });
 

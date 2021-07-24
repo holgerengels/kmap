@@ -6,19 +6,17 @@ import org.apache.commons.io.IOUtils;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Date;
-import java.util.Locale;
 
 import static kmap.JSON.string;
+import static kmap.Server.readProperties;
 
 // http://jetty:8080/server/index/browser/Mathematik/Differentialrechnung/Differenzierbarkeit
 public class IndexServlet extends JsonServlet {
@@ -47,6 +45,7 @@ public class IndexServlet extends JsonServlet {
         String modified = null;
         String section = null;
         String keywords = null;
+        String jsonld = null;
 
         try {
             Server.CLIENT.set(extractClient(req));
@@ -78,10 +77,11 @@ public class IndexServlet extends JsonServlet {
                             description = cardSummary != null ? cardSummary : description;
                             text = cardDescription != null ? cardDescription : cardSummary;
                             author = string(card, "author");
-                            created = date(card, "created");
-                            modified = date(card, "modified");
+                            created = JSON.date(card, "created");
+                            modified = JSON.date(card, "modified");
                             section = title;
                             keywords = string(card, "keywords");
+                            jsonld = new JsonLD().jsonld(card);
                         }
                         Server.CLIENT.remove();
                     }
@@ -139,11 +139,5 @@ public class IndexServlet extends JsonServlet {
         resp.setContentType("text/html");
         resp.setCharacterEncoding("utf-8");
         resp.getWriter().print(string);
-    }
-
-    DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
-    private String date(JsonObject object, String name) {
-        JsonPrimitive primitive = object.getAsJsonPrimitive(name);
-        return primitive != null ? format.format(new Date(primitive.getAsLong())) : null;
     }
 }

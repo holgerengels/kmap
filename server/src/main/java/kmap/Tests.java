@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.StreamSupport;
 
-import static kmap.JsonServlet.encode;
+import static kmap.URLs.encode;
 import static kmap.JSON.*;
 
 public class Tests {

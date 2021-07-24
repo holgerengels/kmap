@@ -3,7 +3,6 @@ package kmap;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import org.apache.commons.codec.digest.DigestUtils;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,8 +13,6 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.*;
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -74,7 +71,7 @@ public class SitemapServlet extends JsonServlet {
                     Long modified = loong(card, "modified");
                     if (modified == null)
                         modified = start;
-                    createNode(eventWriter, "loc", "https://kmap.eu/app/browser/" + encode(subject) + "/" + encode(chapter) + "/" + encode(topic));
+                    createNode(eventWriter, "loc", "https://kmap.eu/app/browser/" + URLs.encode(subject) + "/" + URLs.encode(chapter) + "/" + URLs.encode(topic));
                     createNode(eventWriter, "lastmod", date_format.format(new Date(modified)));
 
                     eventWriter.add(end);
@@ -92,7 +89,7 @@ public class SitemapServlet extends JsonServlet {
                     eventWriter.add(eventFactory.createStartElement("", "", "url"));
                     eventWriter.add(end);
 
-                    createNode(eventWriter, "loc", "https://kmap.eu/app/browser/" + encode(subject) + "/" + encode(chapter));
+                    createNode(eventWriter, "loc", "https://kmap.eu/app/browser/" + URLs.encode(subject) + "/" + URLs.encode(chapter));
                     createNode(eventWriter, "lastmod", date_format.format(new Date(modified)));
 
                     eventWriter.add(end);
@@ -112,7 +109,7 @@ public class SitemapServlet extends JsonServlet {
                     Long modified = loong(test, "modified");
                     if (modified == null)
                         modified = start;
-                    createNode(eventWriter, "loc", "https://kmap.eu/app/exercise/" + encode(subject) + "/" + encode(chapter) + "/" + encode(topic) + "/" + encode(key));
+                    createNode(eventWriter, "loc", "https://kmap.eu/app/exercise/" + URLs.encode(subject) + "/" + URLs.encode(chapter) + "/" + URLs.encode(topic) + "/" + URLs.encode(key));
                     createNode(eventWriter, "lastmod", date_format.format(new Date(modified)));
 
                     eventWriter.add(end);

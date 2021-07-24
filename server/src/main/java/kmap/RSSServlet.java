@@ -84,7 +84,7 @@ public class RSSServlet extends JsonServlet {
                     String keywords = string(card, "keywords");
                     createNode(eventWriter, "title", chapter + " - " + topic);
                     createNode(eventWriter, "description", string(card, "summary"));
-                    createNode(eventWriter, "link", "https://kmap.eu/app/browser/" + encode(subject) + "/" + encode(chapter) + "/" + encode(topic));
+                    createNode(eventWriter, "link", "https://kmap.eu/app/browser/" + URLs.encode(subject) + "/" + URLs.encode(chapter) + "/" + URLs.encode(topic));
                     createNode(eventWriter, "author", author);
                     createNode(eventWriter, "guid", DigestUtils.md5Hex(subject + "/" + chapter + "/" + topic), Collections.singletonMap("isPermaLink", "false"));
                     if (modified != null)
@@ -93,7 +93,7 @@ public class RSSServlet extends JsonServlet {
                     keywords = keywords == null ? chapter + ", " + topic : chapter + ", " + topic + ", " + keywords;
                     createNode(eventWriter, "itunes:keywords", keywords, null, false);
 
-                    createNode(eventWriter, "itunes:image", null, Map.of("href", "https://kmap.eu/snappy/" + encode(subject) + "/" + encode(chapter) + "/" + encode(topic)), false);
+                    createNode(eventWriter, "itunes:image", null, Map.of("href", "https://kmap.eu/snappy/" + URLs.encode(subject) + "/" + URLs.encode(chapter) + "/" + URLs.encode(topic)), false);
 
                     eventWriter.add(end);
                     eventWriter.add(eventFactory.createEndElement("", "", "item"));
