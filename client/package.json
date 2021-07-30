@@ -30,8 +30,8 @@
     "rollup-plugin-copy": "^3.4.0",
     "rollup-plugin-workbox": "^6.1.1",
     "source-map-explorer": "^2.5.2",
-    "tslib": "^2.2.0",
-    "typescript": "^4.2.4"
+    "tslib": "^2.3.0",
+    "typescript": "^4.3.5"
   },
   "browserslist": [
     "last 1 version",
@@ -86,6 +86,7 @@
     "resize-observer-polyfill": "^1.5.1",
     "web-animations-js": "^2.3.2",
     "workbox-broadcast-update": "^6.1.5",
-    "workbox-core": "^6.1.5"
+    "workbox-core": "^6.1.5",
+    "kmap-term-tree": "^0.9.9"
   }
 }

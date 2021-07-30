@@ -11,6 +11,9 @@ import {DndAssign} from "./dnd-assign";
 import './dnd-fillin';
 import {DndFillin} from "./dnd-fillin";
 
+import {KmapTermTree} from "kmap-term-tree";
+window.customElements.define('kmap-term-tree', KmapTermTree);
+
 @customElement('kmap-test-card-content')
 export class KMapTestCardContent extends LitElement {
   @property({type: String})
