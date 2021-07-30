@@ -81,8 +81,9 @@ function determineHeight(url) {
         }
         catch (err) {
             console.log(err);
-            res.writeHead(500);
-            res.end(err);
+            res.statusCode = 500;
+            res.setHeader('Content-Type', 'text/plain');
+            res.end(err.stack);
         }
     };
 
