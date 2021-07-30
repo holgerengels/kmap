@@ -134,7 +134,7 @@ public class MundoServlet extends JsonServlet {
         if (string == null)
             return "";
 
-        List<Integer> list = Arrays.stream(string.split("/")).map(String::trim).map(Integer::parseInt).sorted().collect(Collectors.toList());
+        List<Integer> list = Arrays.stream(string.split(",")).map(String::trim).map(Integer::parseInt).sorted().collect(Collectors.toList());
         Optional<Integer> min = list.stream().min(Integer::compare);
         Optional<Integer> max = list.stream().max(Integer::compare);
         return min.equals(max) ? "" + min : min + "-" + max;
