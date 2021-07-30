@@ -28,6 +28,9 @@ import {Meta} from "./models/shell";
 import {Timeline} from "./models/courses";
 import {timelineClosed, timelineOpen} from "./components/icons";
 
+import {KmapTermTree} from "kmap-term-tree";
+window.customElements.define('kmap-term-tree', KmapTermTree);
+
 // @ts-ignore
 //const _standalone = (window.matchMedia('(display-mode: standalone)').matches) || (window.navigator.standalone) || document.referrer.includes('android-app://');
 

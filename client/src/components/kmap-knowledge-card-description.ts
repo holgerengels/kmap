@@ -5,9 +5,6 @@ import {colorStyles, fontStyles} from "./kmap-styles";
 import {katexStyles} from "../katex-css";
 import {math} from "../math";
 
-import {KmapTermTree} from "kmap-term-tree";
-window.customElements.define('kmap-term-tree', KmapTermTree);
-
 @customElement('kmap-knowledge-card-description')
 export class KMapKnowledgeCardDescription extends LitElement {
   @property({type: String})
