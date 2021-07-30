@@ -70,7 +70,7 @@ public class MundoServlet extends JsonServlet {
             if (subject != null) {
                 JsonArray array = couch.latest(subject, count);
                 for (JsonElement element : array) {
-                    JsonObject card = (JsonObject) element;
+                    JsonObject card = (JsonObject)element;
                     eventWriter.add(eventFactory.createStartElement("", "", "item"));
                     eventWriter.add(end);
 
@@ -95,13 +95,23 @@ public class MundoServlet extends JsonServlet {
 
                     keywords = keywords == null ? chapter + ", " + topic : chapter + ", " + topic + ", " + keywords;
                     createNode(eventWriter, "itunes:keywords", keywords, null, false);
-
                     createNode(eventWriter, "itunes:image", null, Map.of("href", "https://kmap.eu/snappy/" + URLs.encode(subject) + "/" + URLs.encode(chapter) + "/" + URLs.encode(topic)), false);
+
+                    createNode(eventWriter, "sdx:userGroups", "pupils");
+                    createNode(eventWriter, "sdx:learnResourceType", "Text");
+                    createNode(eventWriter, "sdx:educationalLevel", string(card, "educationalContext"));
+                    createNode(eventWriter, "sdx:classLevel", minmax(string(card, "educationalLevel")));
+                    createNode(eventWriter, "sdx:schoolType", "Gymnasium, Fachoberschule");
+                    createNode(eventWriter, "sdx:subject", string(card, "sgs"));
+                    createNode(eventWriter, "sdx:licenseName", "CC BY-SA");
+                    createNode(eventWriter, "sdx:licenseVersion", "4.0");
+                    createNode(eventWriter, "sdx:costs", "FREE");
 
                     eventWriter.add(end);
                     eventWriter.add(eventFactory.createEndElement("", "", "item"));
                     eventWriter.add(end);
 
+                    // sdx:learnResourceType: Text? Webseite, Webtool, App
                 }
             }
 
@@ -118,6 +128,16 @@ public class MundoServlet extends JsonServlet {
         } finally {
             Server.CLIENT.remove();
         }
+    }
+
+    private String minmax(String string) {
+        if (string == null)
+            return "";
+
+        List<Integer> list = Arrays.stream(string.split("/")).map(String::trim).map(Integer::parseInt).sorted().collect(Collectors.toList());
+        Optional<Integer> min = list.stream().min(Integer::compare);
+        Optional<Integer> max = list.stream().max(Integer::compare);
+        return min.equals(max) ? "" + min : min + "-" + max;
     }
 
     private Integer extractCount(HttpServletRequest req) {
