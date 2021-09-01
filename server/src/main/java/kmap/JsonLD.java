@@ -77,7 +77,7 @@ public class JsonLD {
                         .add("audience", Json.createArrayBuilder().add("Lerner/in"))
                         .add("about", Json.createArrayBuilder().add(subject))
                         .add("learningResourceType", Json.createArrayBuilder().add("Text"))
-                        .add("thumbnailUrl", SERVER + encodePath("snappy", subject, chapter, topic))
+                        .add("thumbnailUrl", SERVER + encodePath("snappy", subject, chapter, topic) + ".png")
                         .addAll(arrayFromString("educationalLevel", string(card, "educationalLevel")))
                         .addAll(arrayFromString("oeh:educationalContext", string(card, "educationalContext")))
                         .addAll(optional("typicalAgeRange", string(card, "typicalAgeRange")))

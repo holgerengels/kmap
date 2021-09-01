@@ -93,7 +93,7 @@ public class RSSServlet extends JsonServlet {
                     keywords = keywords == null ? chapter + ", " + topic : chapter + ", " + topic + ", " + keywords;
                     createNode(eventWriter, "itunes:keywords", keywords, null, false);
 
-                    createNode(eventWriter, "itunes:image", null, Map.of("href", "https://kmap.eu/snappy/" + URLs.encode(subject) + "/" + URLs.encode(chapter) + "/" + URLs.encode(topic)), false);
+                    createNode(eventWriter, "itunes:image", null, Map.of("href", "https://kmap.eu/snappy/" + URLs.encode(subject) + "/" + URLs.encode(chapter) + "/" + URLs.encode(topic) + ".png"), false);
 
                     eventWriter.add(end);
                     eventWriter.add(eventFactory.createEndElement("", "", "item"));

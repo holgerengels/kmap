@@ -364,7 +364,7 @@ export default createModel({
             breadcrumbs: ["browser", subject, chapter, topic],
             about: [subject],
             type: ["Text"],
-            thumb: `${urls.snappy}${encodePath(subject, chapter, topic)}`,
+            thumb: `${urls.snappy}${encodePath(subject, chapter, topic)}.png`,
             educationalLevel: card.educationalLevel?.split(",").map(l => l.trim()),
             educationalContext: card.educationalContext?.split(",").map(l => l.trim()),
             typicalAgeRange: card.typicalAgeRange,

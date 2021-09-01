@@ -25,6 +25,9 @@ const job = schedule.scheduleJob('22 12,21 * * *', async function() {
         const path = entry[0];
         const parts = path.split("/").map(p => decodeURIComponent(p));
 
+        if (parts[parts.length-1].endsWith(".png"))
+            parts[parts.length-1] = parts[parts.length-1].substr(0, parts[parts.length-1].length - 4);
+
         const lastModified = modified(parts);
         if (lastModified !== entry[1]) {
             const directory = config.path + path;

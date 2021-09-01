@@ -53,6 +53,8 @@ public class MundoServlet extends JsonServlet {
 
             StartElement rssStart = eventFactory.createStartElement("", "", "rss");
             eventWriter.add(rssStart);
+            eventWriter.add(eventFactory.createAttribute("xmlns:itunes", "http://www.itunes.com/dtds/podcast-1.0.dtd"));
+            eventWriter.add(eventFactory.createAttribute("xmlns:sdx", "sodix.dtd"));
             eventWriter.add(eventFactory.createAttribute("version", "2.0"));
             eventWriter.add(end);
 
@@ -83,7 +85,7 @@ public class MundoServlet extends JsonServlet {
                     String keywords = string(card, "keywords");
                     createNode(eventWriter, "title", chapter + " - " + topic);
                     createNode(eventWriter, "description", string(card, "summary"));
-                    createNode(eventWriter, "link", "https://kmap.eu/app/browser/" + URLs.encode(subject) + "/" + URLs.encode(chapter) + "/" + URLs.encode(topic));
+                    createNode(eventWriter, "link", "https://kmap.eu/app/browser/" + URLs.encode(subject) + "/" + URLs.encode(chapter) + "/" + URLs.encode(topic) + ".png");
                     createNode(eventWriter, "author", author);
                     createNode(eventWriter, "guid", DigestUtils.md5Hex(subject + "/" + chapter + "/" + topic), Collections.singletonMap("isPermaLink", "false"));
                     if (modified != null)
@@ -98,7 +100,7 @@ public class MundoServlet extends JsonServlet {
                     createNode(eventWriter, "itunes:image", null, Map.of("href", "https://kmap.eu/snappy/" + URLs.encode(subject) + "/" + URLs.encode(chapter) + "/" + URLs.encode(topic)), false);
 
                     createNode(eventWriter, "sdx:userGroups", "pupils");
-                    createNode(eventWriter, "sdx:learnResourceType", "Text");
+                    createNode(eventWriter, "sdx:learnResourceType", "Unterrichtsbaustein");
                     createNode(eventWriter, "sdx:educationalLevel", string(card, "educationalContext"));
                     createNode(eventWriter, "sdx:classLevel", minmax(string(card, "educationalLevel")));
                     createNode(eventWriter, "sdx:schoolType", "Gymnasium, Fachoberschule");
