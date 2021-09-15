@@ -5,15 +5,15 @@ const parser = new AsciiMathParser();
 
 // ″
 export function math(code: string, setter: (string) => void) {
-  var segments = code.split('`');
+  let segments = code.split('`');
   if (segments.length % 2 === 1)
     segments.push('');
 
   let buffer = '';
   for (let i=0; i < segments.length; i+=2) {
     const text = segments[i];
-    var ascii = segments[i+1];
-    var display = false
+    let ascii = segments[i+1];
+    let display = false
     if (ascii.startsWith("\\display\\")) {
       ascii = ascii.substr("\\display\\".length)
       display = true;
@@ -21,11 +21,11 @@ export function math(code: string, setter: (string) => void) {
     let tex = parser.parse(ascii);
     tex = tex.replace(/\\color/g, "\\textcolor");
     if (display)
-      tex = "\\displaystyle " + tex;
-    const math = katex.renderToString(tex, { output: "html", throwOnError: false, trust: true, displayMode: false });
+      tex = `\\displaystyle ${tex}`;
+    const html = katex.renderToString(tex, { output: "html", throwOnError: false, trust: true, displayMode: false });
     buffer += text;
-    //buffer += math;
-    buffer += "<span style='display: none'>" + tex + "</span>" + math;
+    // buffer += math;
+    buffer += `<span style='display: none'>${tex}</span>${html}`;
   }
   segments = buffer.split('´');
   if (segments.length % 2 === 1)
@@ -37,8 +37,8 @@ export function math(code: string, setter: (string) => void) {
     const tex = segments[i+1];
     const math = katex.renderToString(tex, { output: "html", throwOnError: false, trust: true });
     buffer += text;
-    //buffer += math;
-    buffer += "<span style='display: none'>" + tex + "</span>" + math;
+    // buffer += math;
+    buffer += `<span style='display: none'>${tex}</span>${math}`;
   }
 
   setter(buffer);
