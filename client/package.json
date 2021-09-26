@@ -78,7 +78,7 @@
     "event-target": "^1.2.3",
     "firebase": "^8.6.8",
     "katex": "^0.13.18",
-    "kmap-term-tree": "^0.9.13",
+    "kmap-term-tree": "^0.9.15",
     "kmap-ascii-math": "^0.9.4",
     "lit-element": "~2.4.0",
     "lit-html": "^1.4.1",
