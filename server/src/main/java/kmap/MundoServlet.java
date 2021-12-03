@@ -103,7 +103,7 @@ public class MundoServlet extends JsonServlet {
                     createNode(eventWriter, "sdx:learnResourceType", "Unterrichtsbaustein");
                     createNode(eventWriter, "sdx:educationalLevel", string(card, "educationalContext"));
                     createNode(eventWriter, "sdx:classLevel", minmax(string(card, "educationalLevel")));
-                    createNode(eventWriter, "sdx:schoolType", "Gymnasium, Fachoberschule");
+                    createNode(eventWriter, "sdx:schoolType", typeFromLevel(string(card, "educationalContext")));
                     createNode(eventWriter, "sdx:subject", string(card, "sgs"));
                     createNode(eventWriter, "sdx:licenseName", "CC BY-SA");
                     createNode(eventWriter, "sdx:licenseVersion", "4.0");
@@ -130,6 +130,17 @@ public class MundoServlet extends JsonServlet {
         } finally {
             Server.CLIENT.remove();
         }
+    }
+
+    private String typeFromLevel(String educationalContext) {
+        String type = "Gymnasium, Gesamtschule";
+        if (educationalContext == null)
+            return type;
+        if (educationalContext.contains("Sekundarstufe I"))
+            type += ", Realschule";
+        if (educationalContext.contains("Sekundarstufe II"))
+            type += ", Fachoberschule";
+        return type;
     }
 
     private String minmax(String string) {
