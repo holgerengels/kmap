@@ -136,9 +136,11 @@ public class MundoServlet extends JsonServlet {
         String type = "Gymnasium, Gesamtschule";
         if (educationalContext == null)
             return type;
-        if (educationalContext.contains("Sekundarstufe I"))
+
+        List<String> contexts = Arrays.stream(educationalContext.split(",")).map(String::trim).collect(Collectors.toList());
+        if (contexts.contains("Sekundarstufe I"))
             type += ", Realschule";
-        if (educationalContext.contains("Sekundarstufe II"))
+        if (contexts.contains("Sekundarstufe II"))
             type += ", Fachoberschule";
         return type;
     }
