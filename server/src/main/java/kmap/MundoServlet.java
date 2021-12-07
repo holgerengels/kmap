@@ -133,7 +133,7 @@ public class MundoServlet extends JsonServlet {
     }
 
     private String typeFromLevel(String educationalContext) {
-        String type = "Gymnasium, Gesamtschule";
+        String type = "Gymnasium";
         if (educationalContext == null)
             return type;
 
