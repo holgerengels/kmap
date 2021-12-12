@@ -10,6 +10,7 @@ import './dnd-assign';
 import {DndAssign} from "./dnd-assign";
 import './dnd-fillin';
 import {DndFillin} from "./dnd-fillin";
+import {KmapSolveTree} from "kmap-solve-tree";
 
 @customElement('kmap-test-card-content')
 export class KMapTestCardContent extends LitElement {
@@ -105,6 +106,11 @@ export class KMapTestCardContent extends LitElement {
       const fillin: DndFillin = element as DndFillin;
       fillin.clear();
     }
+    var solves = element.getElementsByTagName("kmap-solve-tree");
+    for (const element of solves) {
+      const solve: KmapSolveTree = element as KmapSolveTree;
+      solve.clear();
+    }
   }
 
   checkValues(): boolean {
@@ -142,6 +148,13 @@ export class KMapTestCardContent extends LitElement {
       fillin.setAttribute("correction", fillin.valid ? "correct" : "incorrect");
       fillin.bark();
     }
+    var solves = element.getElementsByTagName("kmap-solve-tree");
+    for (const element of solves) {
+      const solve: KmapSolveTree = element as KmapSolveTree;
+      everythingCorrect = everythingCorrect && solve.valid === true;
+      solve.setAttribute("correction", solve.valid ? "correct" : "incorrect");
+      solve.bark();
+    }
     return everythingCorrect;
   }
 
@@ -170,6 +183,11 @@ export class KMapTestCardContent extends LitElement {
     for (const element of fillins) {
       const fillin: DndFillin = element as DndFillin;
       fillin.showAnswer();
+    }
+    var solves = element.getElementsByTagName("kmap-solve-tree");
+    for (const element of solves) {
+      const solve: KmapSolveTree = element as KmapSolveTree;
+      solve.showAnswer();
     }
   }
 

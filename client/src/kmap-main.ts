@@ -32,6 +32,8 @@ import {KmapTermTree} from "kmap-term-tree";
 window.customElements.define('kmap-term-tree', KmapTermTree);
 import {KmapAsciiMath} from "kmap-ascii-math";
 window.customElements.define('kmap-ascii-math', KmapAsciiMath);
+import {KmapSolveTree} from "kmap-solve-tree";
+window.customElements.define('kmap-solve-tree', KmapSolveTree);
 
 // @ts-ignore
 //const _standalone = (window.matchMedia('(display-mode: standalone)').matches) || (window.navigator.standalone) || document.referrer.includes('android-app://');
