@@ -17,6 +17,9 @@ export class KmapTestExercise extends Connected {
   private _tests?: Test[] = undefined;
 
   @property()
+  private _order: "shuffled" | "increasing difficulty" = "shuffled";
+
+  @property()
   private _currentIndex: number = 0;
   @property()
   private _currentTest?: Test = undefined;
@@ -27,12 +30,15 @@ export class KmapTestExercise extends Connected {
 
   mapState(state: State) {
     return {
+      _order: state.tests.order,
       _allTests: state.tests.tests,
     };
   }
 
   updated(changedProperties) {
-    if (changedProperties.has("_allTests") && this._allTests) {
+    if ((changedProperties.has("_allTests") || changedProperties.has("_order")) && this._allTests) {
+      if (this._currentTest)
+        store.dispatch.shell.showMessage("Die Aufgabenreihe startet von vorne!")
         this._start();
     }
   }
@@ -47,7 +53,10 @@ export class KmapTestExercise extends Connected {
         test.balance = 4;
     }
 
-    this._tests = shuffleArray([...this._allTests]);
+    this._tests = this._order
+      ? shuffleArray([...this._allTests])
+      : this._allTests.sort((a, b) => (a.level ? a.level : 4) - (b.level ? b.level : 4));
+
     this._currentIndex = 0;
     this._currentTest = this._tests[0];
     store.dispatch.tests.clearResults();

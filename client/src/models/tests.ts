@@ -40,6 +40,7 @@ export interface TopicCount {
 }
 
 export interface TestsState {
+  order: "shuffled" | "increasing difficulty";
   topics?: TopicCount[],
   chapters?: string[],
   subject?: string,
@@ -67,6 +68,7 @@ export interface TestsState {
 
 export default createModel({
   state: <TestsState>{
+    order: "increasing difficulty",
     results: [],
     loadingTopics: false,
     loadingChapters: false,
@@ -88,6 +90,9 @@ export default createModel({
         topic: routing.params["topic"] ? decodeURIComponent(routing.params["topic"]) : undefined,
       }
       : state;
+    },
+    setOrder(state, order) {
+      return { ...state, order: order };
     },
     requestTopics(state) {
       return { ...state, loadingTopics: true,
