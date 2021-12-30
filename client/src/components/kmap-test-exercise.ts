@@ -37,9 +37,9 @@ export class KmapTestExercise extends Connected {
 
   updated(changedProperties) {
     if ((changedProperties.has("_allTests") || changedProperties.has("_order")) && this._allTests) {
-      if (this._currentTest)
-        store.dispatch.shell.showMessage("Die Aufgabenreihe startet von vorne!")
-        this._start();
+      if (this._currentIndex !== 0)
+        store.dispatch.shell.showMessage("Die Aufgabenreihe startet von vorne!");
+      this._start();
     }
   }
 
