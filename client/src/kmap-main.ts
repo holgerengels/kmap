@@ -60,6 +60,9 @@ export class KmapMain extends connect(store, LitElement) {
   private _timelines: Timeline[] = [];
 
   @property()
+  private _order: "shuffled" | "increasing difficulty" = "shuffled";
+
+  @property()
   private _drawerOpen: boolean = false;
   @property()
   private _narrow: boolean = false;
@@ -95,6 +98,7 @@ export class KmapMain extends connect(store, LitElement) {
       _userid: state.app.userid,
       _roles: state.app.roles,
       _layers: state.shell.layers,
+      _order: state.tests.order,
       _timelines: state.courses.timelines,
       _meta: state.shell.meta,
       _narrow: state.shell.narrow,
@@ -309,6 +313,9 @@ export class KmapMain extends connect(store, LitElement) {
       span:hover mwc-icon-button[icon="polymer"] {
         color: var(--color-primary-dark);
       }
+      mwc-radio {
+        margin: -16px -1px;
+      }
 
       main {
         width: 100%;
@@ -389,6 +396,18 @@ export class KmapMain extends connect(store, LitElement) {
       </nav>
       <!--googleoff: all-->
       <hr/>
+      ${this._page === 'test' ? html`
+        <nav class="drawer-list">
+          <label>Aufgaben Schwierigkeit</label>
+          <mwc-formfield label="aufsteigend">
+            <mwc-radio name="order" value="increasing difficulty" ?checked="${this._order === "increasing difficulty"}" @change="${() => this._switchOrder('increasing difficulty')}"></mwc-radio>
+          </mwc-formfield>
+          <mwc-formfield label="zufällig">
+            <mwc-radio name="order" value="shuffled" ?checked="${this._order === "shuffled"}" @change="${() => this._switchOrder('shuffled')}"></mwc-radio>
+          </mwc-formfield>
+        </nav>
+        <hr/>
+      ` : ''}
       <nav class="drawer-list">
         <label section>Layer ein-/ausblenden</label>
         <mwc-formfield label="Kurztexte">
@@ -425,6 +444,10 @@ export class KmapMain extends connect(store, LitElement) {
         <share-facebook></share-facebook>
       </div>
     `;
+  }
+
+  private _switchOrder(order) {
+    store.dispatch.tests.setOrder(order);
   }
 }
 

@@ -15,8 +15,6 @@ export class KmapTest extends Connected {
   @property()
   private _page: string = 'chooser';
   @property()
-  private _order: "shuffled" | "increasing difficulty" = "shuffled";
-  @property()
   private _layers: string[] = [];
   @property()
   private _noRoute?: string = 'chooser';
@@ -39,7 +37,6 @@ export class KmapTest extends Connected {
     return {
       route: state.routing,
       _layers: state.shell.layers,
-      _order: state.tests.order,
       _results: state.tests.results,
     };
   }
@@ -107,17 +104,6 @@ export class KmapTest extends Connected {
   render() {
     // language=HTML
     return html`
-      ${this._page === 'exercise' ? html`
-        <div class="settings">
-          <label>Schwierigkeit</label>
-          <mwc-formfield label="aufsteigend">
-            <mwc-radio name="order" value="increasing difficulty" ?checked="${this._order === "increasing difficulty"}" @change="${() => this._switchOrder('increasing difficulty')}"></mwc-radio>
-          </mwc-formfield>
-          <mwc-formfield label="zufällig">
-            <mwc-radio name="order" value="shuffled" ?checked="${this._order === "shuffled"}" @change="${() => this._switchOrder('shuffled')}"></mwc-radio>
-          </mwc-formfield>
-        </div>
-      ` : ''}
       <div class="modules" @end="${this._goResults}">
         ${!this._layers.includes('editor') ? html`
             ${this._page === 'chooser' ? html`<kmap-test-chooser id="chooser" class="page"></kmap-test-chooser>` : ''}
@@ -133,9 +119,5 @@ export class KmapTest extends Connected {
         <mwc-button ?hidden="${this._page === 'results' || this._results.length === 0}" @click="${this._goResults}">Auswertung</mwc-button>
       </div>
     `;
-  }
-
-  private _switchOrder(order) {
-    store.dispatch.tests.setOrder(order);
   }
 }
