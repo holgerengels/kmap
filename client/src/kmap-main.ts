@@ -413,25 +413,25 @@ export class KmapMain extends connect(store, LitElement) {
       <nav class="drawer-list">
         <label section>Layer ein-/ausblenden</label>
         <mwc-formfield label="Kurztexte">
-          <mwc-switch ?checked="${this._layers.includes('summaries')}" @click="${e => this._switchLayer('summaries', e.target.selected)}"></mwc-switch>
+          <mwc-switch ?selected="${this._layers.includes('summaries')}" @click="${e => this._switchLayer('summaries', e.target.selected)}"></mwc-switch>
         </mwc-formfield>
         <mwc-formfield label="Selbsteinschätzungen">
-          <mwc-switch ?checked="${this._layers.includes('ratings')}" @click="${e => this._switchLayer('ratings', e.target.selected)}"></mwc-switch>
+          <mwc-switch ?selected="${this._layers.includes('ratings')}" @click="${e => this._switchLayer('ratings', e.target.selected)}"></mwc-switch>
         </mwc-formfield>
         <mwc-formfield label="Pfeile">
-          <mwc-switch ?checked="${this._layers.includes('dependencies')}" @click="${e => this._switchLayer('dependencies', e.target.selected)}"></mwc-switch>
+          <mwc-switch ?selected="${this._layers.includes('dependencies')}" @click="${e => this._switchLayer('dependencies', e.target.selected)}"></mwc-switch>
         </mwc-formfield>
         ${this._roles.includes("teacher") ? html`
           <mwc-formfield label="Wochenplan">
-            <mwc-switch ?checked="${this._layers.includes('timeline')}" @click="${e => this._switchLayer('timeline', e.target.selected)}"></mwc-switch>
+            <mwc-switch ?selected="${this._layers.includes('timeline')}" @click="${e => this._switchLayer('timeline', e.target.selected)}"></mwc-switch>
           </mwc-formfield>
           ${this._layers.includes('timeline') ? html`<kmap-timeline-selector class="nomargin"></kmap-timeline-selector>` : ''}
           <mwc-formfield label="Mittelwerte">
-            <mwc-switch ?checked="${this._layers.includes('averages')}" @click="${e => this._switchLayer('averages', e.target.selected)}"></mwc-switch>
+            <mwc-switch ?selected="${this._layers.includes('averages')}" @click="${e => this._switchLayer('averages', e.target.selected)}"></mwc-switch>
           </mwc-formfield>
           ${this._layers.includes('averages') ? html`<kmap-course-selector class="nomargin"></kmap-course-selector>` : ''}
           <mwc-formfield label="Editor">
-            <mwc-switch ?checked="${this._layers.includes('editor')}" @click="${e => this._switchLayer('editor', e.target.selected)}"></mwc-switch>
+            <mwc-switch ?selected="${this._layers.includes('editor')}" @click="${e => this._switchLayer('editor', e.target.selected)}"></mwc-switch>
           </mwc-formfield>
           ${this._layers.includes('editor') ? html`
             ${this._page === 'home' || this._page === 'browser' ? html`<kmap-module-selector class="nomargin"></kmap-module-selector>` : ''}
