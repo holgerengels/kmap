@@ -40,7 +40,9 @@ export class KMapTimeline extends LitElement {
   }
 
   _markWeek(e) {
-    this.mark(this._sw == e.target.id ? -1 : e.target.id);
+    const target = e.currentTarget;
+    const id = target.id;
+    this.mark(this._sw == id ? -1 : id);
   }
 
   mark(sw, scroll?) {

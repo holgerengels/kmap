@@ -29,6 +29,9 @@ export class KMapSummaryCard extends Connected {
   @property({type: Boolean})
   private highlighted: boolean = false;
 
+  @state()
+  private _targeted: string[] = [];
+
   @property()
   private grayedOut: boolean = false;
 
@@ -56,24 +59,19 @@ export class KMapSummaryCard extends Connected {
       _layers: state.shell.layers,
       _selectedDependencies: state.maps.selectedDependencies,
       selected: this.card !== undefined && state.maps.selected === this.card.topic,
-      grayedOut:  this.card !== undefined && state.maps.targeted
-        && !(state.maps.targeted.includes(this.card.chapter + "/" + this.card.topic)
-          || state.maps.targeted.includes(this.card.chapter)
-          || (this.card.links && state.maps.targeted.filter(t => t.startsWith(this.card?.links || "!!!")).length > 0))
+      _targeted: state.maps.targeted,
     };
   }
 
-  updated(changedProperties) {
+  willUpdate(changedProperties) {
+    if (changedProperties.has("_targeted"))
+      this.grayedOut = this.card !== undefined && this._targeted
+        && !(this._targeted.includes(this.card.chapter + "/" + this.card.topic)
+          || this._targeted.includes(this.card.chapter)
+          || (this.card.links && this._targeted.filter(t => t.startsWith(this.card?.links || "!!!")).length > 0))
+
     if (changedProperties.has("card") && this.card !== undefined) {
       this._key = this.card.links ? this.card.links : this.card.chapter + "." + this.card.topic;
-      /*
-      this._thumbStyles = this.card.thumb !== undefined ? {
-        "background-image": `url('${urls.server}${encodePath("data", this.subject, this.chapter, this.card.topic, this.card.thumb)}?instance=${this._instance}')`,
-        "background-position": "center",
-        "background-size": "contain",
-        "background-repeat": "no-repeat",
-      } : undefined;
-      */
     }
 
     if (changedProperties.has("card") || changedProperties.has("_topics"))

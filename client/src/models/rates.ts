@@ -11,7 +11,7 @@ export interface Rate {
 
 export interface RateState {
   subject: string,
-  rates: {},
+  rates: object,
   timestamp: number,
   loading: boolean,
   storing: boolean,
@@ -21,7 +21,7 @@ export interface RateState {
 export default createModel({
   state: <RateState>{
     subject: "",
-    rates: {},
+    rates: {empty: true},
     timestamp: -1,
     loading: false,
     storing: false,
@@ -44,7 +44,7 @@ export default createModel({
     },
     forget(state) {
       return { ...state,
-        rates: {},
+        rates: {empty: true},
         timestamp: Date.now(),
         error: "",
       };
@@ -85,7 +85,7 @@ export default createModel({
           return;
 
         // @ts-ignore
-        if (state.rates.subject !== subject || !state.rates.rates) {
+        if (state.rates.subject !== subject || state.rates.rates.empty) {
           dispatch.rates.requestLoad();
           fetchjson(`${urls.server}state?load=${userid}&subject=${subject}`, endpoint.get(state),
             (json) => {
