@@ -62,6 +62,9 @@ export class KmapMain extends connect(store, LitElement) {
   private _timelines: Timeline[] = [];
 
   @state()
+  private _selectedTimeline?: Timeline;
+
+  @state()
   private _order: "shuffled" | "increasing difficulty" = "shuffled";
 
   @state()
@@ -102,6 +105,7 @@ export class KmapMain extends connect(store, LitElement) {
       _layers: state.shell.layers,
       _order: state.tests.order,
       _timelines: state.courses.timelines,
+      _selectedTimeline: state.courses.selectedTimeline,
       _meta: state.shell.meta,
       _narrow: state.shell.narrow,
       _messages: state.shell.messages,
@@ -351,7 +355,7 @@ export class KmapMain extends connect(store, LitElement) {
       <mwc-top-app-bar id="bar" dense>
         <mwc-icon-button style="color: white" icon="menu" slot="navigationIcon" @click="${() => this._drawerOpen = !this._drawerOpen}"></mwc-icon-button>
         <h1 slot="title">${this._barTitle}</h1>
-        <mwc-icon-button-toggle slot="actionItems" @click="${this._toggleTimeline}" ?hidden="${this._timelines.length !== 1 || this._page !== 'browser'}" title="Wochenplan">${timelineOpen}${timelineClosed}</mwc-icon-button-toggle>
+        <mwc-icon-button-toggle slot="actionItems" @click="${this._toggleTimeline}" ?hidden="${this._timelines.length !== 1 || this._page !== 'browser'}" ?on="${this._selectedTimeline}" title="Wochenplan">${timelineOpen}${timelineClosed}</mwc-icon-button-toggle>
         <kmap-login-button slot="actionItems" @click="${this._showLogin}" title="Anmeldung"></kmap-login-button>
       </mwc-top-app-bar>
 
