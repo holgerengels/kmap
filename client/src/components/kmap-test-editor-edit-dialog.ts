@@ -1,4 +1,5 @@
-import {html, css, customElement, property, query} from 'lit-element';
+import {html, css} from 'lit';
+import {customElement, query, state} from 'lit/decorators.js';
 import {Connected} from "./connected";
 import {State, store} from "../store";
 
@@ -27,54 +28,54 @@ import {Attachment, Upload} from "../models/types";
 
 @customElement('kmap-test-editor-edit-dialog')
 export class KMapTestEditorEditDialog extends Connected {
-  @property()
+  @state()
   private _allTopics?: string[] = undefined;
-  @property()
+  @state()
   private _chapters: string[] = [];
-  @property()
+  @state()
   private _topics: string[] = [];
 
-  @property()
+  @state()
   private _tab: string = 'editor';
 
-  @property()
+  @state()
   private _test?: Test = undefined;
-  @property()
+  @state()
   private _question: string = '';
-  @property()
+  @state()
   private _answer: string = '';
-  @property()
+  @state()
   private _hint: string = '';
-  @property()
+  @state()
   private _solution: string = '';
-  @property()
+  @state()
   private _subject: string = '';
-  @property()
+  @state()
   private _set: string = '';
-  @property()
+  @state()
   private _chapter: string = '';
-  @property()
+  @state()
   private _topic: string = '';
-  @property()
+  @state()
   private _key: string = '';
-  @property()
+  @state()
   private _level: string = "1";
-  @property()
+  @state()
   private _balance: number = 3;
 
-  @property()
+  @state()
   private _oldValues: string[] = [];
-  @property()
+  @state()
   private _values: string[] = [];
 
-  @property()
+  @state()
   private _attachmentFile?: File = undefined;
 
-  @property()
+  @state()
   private _attachments: Attachment[] = [];
-  @property()
+  @state()
   private _uploads: Upload[] = [];
-  @property()
+  @state()
   private _pendingUploads: boolean = false;
 
   @query('#editDialog')
@@ -90,7 +91,7 @@ export class KMapTestEditorEditDialog extends Connected {
   @query('#tabBar')
   private _tabBar: TabBar;
 
-  @property()
+  @state()
   private _valid: boolean = false;
 
   mapState(state: State) {

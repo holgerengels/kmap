@@ -1,4 +1,5 @@
-import {html, css, customElement, property} from 'lit-element';
+import {html, css} from 'lit';
+import {customElement, property, state} from 'lit/decorators.js';
 import {Connected} from "./connected";
 import {State} from "../store";
 
@@ -11,9 +12,9 @@ export class KMapSummaryCardRating extends Connected {
 
   @property({type: String})
   private key: string = '';
-  @property()
+  @state()
   private _states: object = {};
-  @property()
+  @state()
   private _state: number = 0;
 
   mapState(state: State) {

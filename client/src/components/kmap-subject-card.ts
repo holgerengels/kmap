@@ -1,24 +1,25 @@
-import {LitElement, html, customElement, property, css} from 'lit-element';
+import {LitElement, html, css} from 'lit';
+import {customElement, property, state} from 'lit/decorators.js';
 
 import {Subject} from "../models/subjects";
 import './kmap-card';
-import {StyleInfo, styleMap} from "lit-html/directives/style-map";
+import {StyleInfo, styleMap} from 'lit/directives/style-map.js';
 
 @customElement('kmap-subject-card')
 export class KMapSubjectCard extends LitElement {
 
   @property()
   private subject?: Subject;
-  @property()
+  @state()
   private _states: object = {};
-  @property()
+  @state()
   private _hasStates: boolean = false;
   @property()
   // @ts-ignore
   private _state: number = 0;
-  @property()
+  @state()
   private _progressNum: number = 0;
-  @property()
+  @state()
   private _progressOf: number = 0;
   @property()
   // @ts-ignore

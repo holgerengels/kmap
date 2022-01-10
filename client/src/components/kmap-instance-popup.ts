@@ -1,4 +1,5 @@
-import {html, css, customElement, query, property} from 'lit-element';
+import {html, css} from 'lit';
+import {customElement, query, state} from 'lit/decorators.js';
 import {Connected} from "./connected";
 import {State, store} from "../store";
 
@@ -10,28 +11,28 @@ import 'pwa-helper-components/pwa-install-button';
 import 'pwa-helper-components/pwa-update-available';
 import './datalist-textfield';
 import {Dialog} from "@material/mwc-dialog/mwc-dialog";
-import {TextField} from "@material/mwc-textfield/mwc-textfield";
 import {Instance} from "../models/instances";
 import {DatalistTextField} from "./datalist-textfield";
 import {colorStyles, fontStyles} from "./kmap-styles";
 
 @customElement('kmap-instance-popup')
 export class KMapInstancePopup extends Connected {
-  @property()
+  @state()
   private _instances: Instance[] = [];
-  @property()
+  @state()
   private _instance: string = '';
 
   @query('#instanceDialog')
   // @ts-ignore
   private _instanceDialog: Dialog;
+
   @query('#instance')
   // @ts-ignore
   private _instanceTextField: DatalistTextField;
 
-  @property()
+  @state()
   private _radio: string = 'root';
-  @property()
+  @state()
   private _valid: boolean = true;
 
   mapState(state: State) {
@@ -43,7 +44,7 @@ export class KMapInstancePopup extends Connected {
 
   updated(changedProps) {
     if (changedProps.has('_radio') && this._radio === 'dedicated') {
-      setTimeout(function(textfield: TextField){
+      setTimeout(function(textfield: DatalistTextField){
         textfield.focus();
       }.bind(undefined, this._instanceTextField), 300);
     }

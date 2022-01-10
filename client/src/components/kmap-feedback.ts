@@ -1,4 +1,5 @@
-import {LitElement, html, css, customElement, property, query, queryAll} from 'lit-element';
+import {LitElement, html, css} from 'lit';
+import {customElement, property, query, queryAll, state} from 'lit/decorators.js';
 import {store} from "../store";
 
 import '@material/mwc-button';
@@ -22,11 +23,11 @@ export class KMapFeedback extends LitElement {
   @property()
   private test?: string = undefined;
 
-  @property()
+  @state()
   private _type: string = '';
-  @property()
+  @state()
   private _title: string = '';
-  @property()
+  @state()
   private _text: string = '';
 
   @query('#dialog')

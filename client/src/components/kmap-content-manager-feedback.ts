@@ -1,4 +1,5 @@
-import {html, css, customElement, property} from 'lit-element';
+import {html, css} from 'lit';
+import {customElement, state} from 'lit/decorators.js';
 import {Connected} from "./connected";
 import {State, store} from "../store";
 
@@ -14,13 +15,13 @@ import {Feedback} from "../models/feedback";
 
 @customElement('kmap-content-manager-feedback')
 export class KMapContentManagerFeedback extends Connected {
-  @property()
+  @state()
   private _issues: Feedback[] = [];
-  @property()
+  @state()
   private _page: string = '';
-  @property()
+  @state()
   private _selectedIndex: number = -1;
-  @property()
+  @state()
   private _selected?: Feedback = undefined;
 
   mapState(state: State) {

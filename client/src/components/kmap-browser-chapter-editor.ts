@@ -1,4 +1,5 @@
-import {html, css, customElement, property} from 'lit-element';
+import {html, css} from 'lit';
+import {customElement, property, state} from 'lit/decorators.js';
 import {State, store} from "../store";
 
 import '@material/mwc-button';
@@ -19,9 +20,9 @@ export class KMapBrowserChapterEditor extends Connected {
   private chapter: string = '';
   @property()
   private chapterCard?: Card = undefined;
-  @property()
+  @state()
   private _selectedModule?: Module = undefined;
-  @property()
+  @state()
   private _enabled: boolean = false;
 
   mapState(state: State) {

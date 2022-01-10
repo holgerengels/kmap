@@ -1,4 +1,4 @@
-import {svg} from "lit-html";
+import {svg} from "lit";
 
 export const iconTest = svg`
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" x="0px" y="0px" width="20" height="20" viewBox="10 10 80 80" xml:space="preserve" style="fill: var(--foreground, black)">

@@ -1,4 +1,5 @@
-import {html, css, customElement, property} from 'lit-element';
+import {html, css} from 'lit';
+import {customElement, property, state} from 'lit/decorators.js';
 import {Connected} from "./connected";
 import {State} from "../store";
 
@@ -7,17 +8,17 @@ export class KMapSummaryCardAverages extends Connected {
 
   @property({type: String})
   private key: string = '';
-  @property()
+  @state()
   private _states: object = {};
-  @property()
+  @state()
   private _hasStates: boolean = false;
-  @property()
+  @state()
   private _averageState: number = 0;
-  @property()
+  @state()
   private _averageNum: number = 0;
-  @property()
+  @state()
   private _averageOf: number = 0;
-  @property()
+  @state()
   private _averagePercent: number = 0;
 
   mapState(state: State) {

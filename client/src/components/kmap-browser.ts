@@ -1,4 +1,5 @@
-import {html, css, customElement, property, query} from 'lit-element';
+import {html, css} from 'lit';
+import {customElement, property, query, state} from 'lit/decorators.js';
 import {State, store} from "../store";
 
 import {colorStyles, elevationStyles, fontStyles} from "./kmap-styles";
@@ -18,7 +19,7 @@ import {encodePath} from "../urls";
 import {KMapTimelineAside} from "./kmap-timeline-aside";
 import {throttle} from "../debounce";
 import {Timeline} from "../models/courses";
-import {StyleInfo, styleMap} from "lit-html/directives/style-map";
+import {StyleInfo, styleMap} from 'lit/directives/style-map.js';
 import {Connected} from "./connected";
 import {includes, TopicCount} from "../models/tests";
 
@@ -27,52 +28,52 @@ type SideBarState = "hidden" | "collapsed" | "open";
 @customElement('kmap-browser')
 export class KMapBrowser extends Connected {
 
-  @property()
+  @state()
   private _userid: string = '';
-  @property()
+  @state()
   private _layers: string[] = [];
-  @property()
+  @state()
   private _subject: string = '';
-  @property()
+  @state()
   private _chapter: string = '';
-  @property()
+  @state()
   private _chapterCard?: Card = undefined;
   @property()
   // @ts-ignore
   private _topic: string = '';
-  @property()
+  @state()
   private _topicCard?: Card = undefined;
-  @property()
+  @state()
   private _lines: Line[] = [];
-  @property()
+  @state()
   private _maxCols: number = 0;
-  @property()
+  @state()
   private _hasTests: boolean = false;
-  @property()
+  @state()
   private _testTopics?: TopicCount[];
 
-  @property()
+  @state()
   private _page: string = '';
 
-  @property()
+  @state()
   private _loading: boolean = false;
-  @property()
+  @state()
   private _faded: boolean = false;
 
-  @property()
+  @state()
   private _animFrom?: DOMRect = undefined;
-  @property()
+  @state()
   private _animTo?: DOMRect = undefined;
 
-  @property()
+  @state()
   private _selected: string = '';
-  @property()
+  @state()
   private _highlighted: string[] = [];
 
   @property({reflect: true, type: String, attribute: "timeline-state"})
   private timelineState: SideBarState = "hidden";
 
-  @property()
+  @state()
   private _timeline?: Timeline;
 
   @property({reflect: true, type: Boolean})
@@ -83,7 +84,7 @@ export class KMapBrowser extends Connected {
   // @ts-ignore
   private wide: boolean = false;
 
-  @property()
+  @state()
   private _passiveEventListeners: boolean = false;
 
   @query('#timeline')
@@ -169,24 +170,24 @@ export class KMapBrowser extends Connected {
         return;
 
       const connector: Connector = this.shadowRoot.getElementById("connector") as Connector;
-      if (!connector) return;
+      if (connector) {
+        connector.clear();
+        connector.setAttribute("faded", "true");
 
-      connector.clear();
-      connector.setAttribute("faded", "true");
-
-      if (this._selected && this._highlighted) {
-        let selected = this._findCard(this._selected);
-        if (selected === undefined)
-          return;
-        for (const topic of this._highlighted) {
-          let highlighted = this._findCard(topic);
-          if (highlighted === undefined)
-            continue;
-          connector.add(highlighted, selected);
+        if (this._selected && this._highlighted) {
+          let selected = this._findCard(this._selected);
+          if (selected === undefined)
+            return;
+          for (const topic of this._highlighted) {
+            let highlighted = this._findCard(topic);
+            if (highlighted === undefined)
+              continue;
+            connector.add(highlighted, selected);
+          }
+          setTimeout(function () {
+            connector.removeAttribute("faded");
+          });
         }
-        setTimeout(function () {
-          connector.removeAttribute("faded");
-        });
       }
     }
 
@@ -199,8 +200,10 @@ export class KMapBrowser extends Connected {
       this._hasTests = this._testTopics !== undefined && includes(this._testTopics, this._chapter);
       // @ts-ignore
       const connector: Connector = this.shadowRoot.getElementById("connector") as Connector;
-      connector.clear();
-      connector.setAttribute("faded", "true");
+      if (connector) {
+        connector.clear();
+        connector.setAttribute("faded", "true");
+      }
     }
 
     if (changedProperties.has("_timeline")) {

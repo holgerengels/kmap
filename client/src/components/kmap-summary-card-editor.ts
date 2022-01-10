@@ -1,4 +1,5 @@
-import {html, css, customElement, property} from 'lit-element';
+import {html, css} from 'lit';
+import {customElement, property, state} from 'lit/decorators.js';
 import {Connected} from "./connected";
 import {State, store} from "../store";
 
@@ -10,14 +11,14 @@ import {Card} from "../models/types";
 @customElement('kmap-summary-card-editor')
 export class KMapSummaryCardEditor extends Connected {
 
-  @property()
+  @state()
   private _subject: string = '';
-  @property()
+  @state()
   private _selectedModule?: Module = undefined;
   @property()
   private card?: Card = undefined;
 
-  @property()
+  @state()
   private _enabled: boolean = false;
 
   mapState(state: State) {

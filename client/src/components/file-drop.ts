@@ -1,10 +1,11 @@
-import {LitElement, html, css, customElement, property} from 'lit-element';
+import {LitElement, html, css} from 'lit';
+import {customElement, property, state} from 'lit/decorators.js';
 import '@material/mwc-icon';
 
 @customElement('file-drop')
 export class FileDrop extends LitElement {
 
-  @property()
+  @state()
   private _file?: File = undefined;
 
   @property({type: String, reflect: true})

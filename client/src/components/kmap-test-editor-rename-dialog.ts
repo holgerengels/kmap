@@ -1,4 +1,5 @@
-import {html, css, customElement, property, query} from 'lit-element';
+import {html, css} from 'lit';
+import {customElement, query, state} from 'lit/decorators.js';
 import {Connected} from "./connected";
 import {State, store} from "../store";
 
@@ -12,16 +13,16 @@ import {Test} from "../models/tests";
 
 @customElement('kmap-test-editor-rename-dialog')
 export class KMapTestEditorRenameDialog extends Connected {
-  @property()
+  @state()
   private _test?: Test = undefined;
-  @property()
+  @state()
   private _newName: string = '';
 
   @query('#renameDialog')
   // @ts-ignore
   private _renameDialog: Dialog;
 
-  @property()
+  @state()
   private _valid: boolean = false;
 
   mapState(state: State) {

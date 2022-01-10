@@ -1,4 +1,5 @@
-import {html, css, customElement, property, query} from 'lit-element';
+import {html, css} from 'lit';
+import {customElement, query, state} from 'lit/decorators.js';
 import {Connected} from "./connected";
 import {State, store} from "../store";
 
@@ -12,16 +13,16 @@ import {Module} from "../models/contentMaps";
 
 @customElement('kmap-content-manager-modules')
 export class KMapContentManagerModules extends Connected {
-  @property()
+  @state()
   private _modules: Module[] = [];
-  @property()
+  @state()
   private _page: string = '';
-  @property()
+  @state()
   private _selectedIndex: number = -1;
-  @property()
+  @state()
   private _selected?: Module = undefined;
 
-  @property()
+  @state()
   private _working: boolean = false;
 
   @query("#file")
@@ -30,7 +31,7 @@ export class KMapContentManagerModules extends Connected {
 
   mapState(state: State) {
     return {
-      _modules: state.contentMaps.modules,
+      _modules: state.contentMaps.modules || [],
       _working: state.contentMaps.importing || state.contentMaps.exporting || state.contentMaps.deleting,
     };
   }

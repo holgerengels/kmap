@@ -1,10 +1,12 @@
-import {css, customElement, html, LitElement, property, query} from 'lit-element';
+import {css, html, LitElement} from 'lit';
+import {customElement, property, state, query} from 'lit/decorators.js';
 import {installMediaQueryWatcher} from 'pwa-helpers/media-query.js';
 import {installOfflineWatcher} from 'pwa-helpers/network.js';
 import "web-animations-js/web-animations.min";
 import {connect, RoutingState} from '@captaincodeman/rdx'
 import {State, store} from './store'
 
+import '@material/mwc-button';
 import '@material/mwc-button';
 import '@material/mwc-drawer';
 import '@material/mwc-icon-button';
@@ -40,33 +42,33 @@ window.customElements.define('kmap-solve-tree', KmapSolveTree);
 
 @customElement('kmap-main')
 export class KmapMain extends connect(store, LitElement) {
-  @property()
+  @state()
   private _page: string = '';
-  @property()
+  @state()
   private _meta: Meta = {};
-  @property()
+  @state()
   private _barTitle: string = '';
-  @property()
+  @state()
   private _instance: string = '';
   @property()
   // @ts-ignore
   private _userid: string = '';
-  @property()
+  @state()
   private _roles: string[] = [];
-  @property()
+  @state()
   private _layers: string[] = [];
 
-  @property()
+  @state()
   private _timelines: Timeline[] = [];
 
-  @property()
+  @state()
   private _order: "shuffled" | "increasing difficulty" = "shuffled";
 
-  @property()
+  @state()
   private _drawerOpen: boolean = false;
-  @property()
+  @state()
   private _narrow: boolean = false;
-  @property()
+  @state()
   private _messages: string[] = [];
 
   @query('#snackbar')
@@ -211,10 +213,10 @@ export class KmapMain extends connect(store, LitElement) {
     return this._messages.join("\n");
   }
 
-  _switchLayer(layer, checked) {
-    if (!checked && this._layers.includes(layer))
+  _switchLayer(layer, selected) {
+    if (!selected && this._layers.includes(layer))
       store.dispatch.shell.removeLayer(layer);
-    else if (checked && !this._layers.includes(layer))
+    else if (selected && !this._layers.includes(layer))
       store.dispatch.shell.addLayer(layer);
   }
 
@@ -411,25 +413,25 @@ export class KmapMain extends connect(store, LitElement) {
       <nav class="drawer-list">
         <label section>Layer ein-/ausblenden</label>
         <mwc-formfield label="Kurztexte">
-          <mwc-switch ?checked="${this._layers.includes('summaries')}" @change="${e => this._switchLayer('summaries', e.target.checked)}"></mwc-switch>
+          <mwc-switch ?checked="${this._layers.includes('summaries')}" @click="${e => this._switchLayer('summaries', e.target.selected)}"></mwc-switch>
         </mwc-formfield>
         <mwc-formfield label="Selbsteinschätzungen">
-          <mwc-switch ?checked="${this._layers.includes('ratings')}" @change="${e => this._switchLayer('ratings', e.target.checked)}"></mwc-switch>
+          <mwc-switch ?checked="${this._layers.includes('ratings')}" @click="${e => this._switchLayer('ratings', e.target.selected)}"></mwc-switch>
         </mwc-formfield>
         <mwc-formfield label="Pfeile">
-          <mwc-switch ?checked="${this._layers.includes('dependencies')}" @change="${e => this._switchLayer('dependencies', e.target.checked)}"></mwc-switch>
+          <mwc-switch ?checked="${this._layers.includes('dependencies')}" @click="${e => this._switchLayer('dependencies', e.target.selected)}"></mwc-switch>
         </mwc-formfield>
         ${this._roles.includes("teacher") ? html`
           <mwc-formfield label="Wochenplan">
-            <mwc-switch ?checked="${this._layers.includes('timeline')}" @change="${e => this._switchLayer('timeline', e.target.checked)}"></mwc-switch>
+            <mwc-switch ?checked="${this._layers.includes('timeline')}" @click="${e => this._switchLayer('timeline', e.target.selected)}"></mwc-switch>
           </mwc-formfield>
           ${this._layers.includes('timeline') ? html`<kmap-timeline-selector class="nomargin"></kmap-timeline-selector>` : ''}
           <mwc-formfield label="Mittelwerte">
-            <mwc-switch ?checked="${this._layers.includes('averages')}" @change="${e => this._switchLayer('averages', e.target.checked)}"></mwc-switch>
+            <mwc-switch ?checked="${this._layers.includes('averages')}" @click="${e => this._switchLayer('averages', e.target.selected)}"></mwc-switch>
           </mwc-formfield>
           ${this._layers.includes('averages') ? html`<kmap-course-selector class="nomargin"></kmap-course-selector>` : ''}
           <mwc-formfield label="Editor">
-            <mwc-switch ?checked="${this._layers.includes('editor')}" @change="${e => this._switchLayer('editor', e.target.checked)}"></mwc-switch>
+            <mwc-switch ?checked="${this._layers.includes('editor')}" @click="${e => this._switchLayer('editor', e.target.selected)}"></mwc-switch>
           </mwc-formfield>
           ${this._layers.includes('editor') ? html`
             ${this._page === 'home' || this._page === 'browser' ? html`<kmap-module-selector class="nomargin"></kmap-module-selector>` : ''}

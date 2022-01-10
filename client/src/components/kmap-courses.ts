@@ -1,4 +1,5 @@
-import {html, css, customElement, property, query} from 'lit-element';
+import {html, css} from 'lit';
+import {customElement, query, state} from 'lit/decorators.js';
 import {Connected} from "./connected";
 import {State, store} from "../store";
 
@@ -20,32 +21,32 @@ import {KMapCurriculumEditDialog} from "./kmap-curriculum-edit-dialog";
 
 @customElement('kmap-courses')
 export class KMapCourses extends Connected {
-  @property()
+  @state()
   private _subjects: Subject[] = [];
 
-  @property()
+  @state()
   private _page: string = '';
-  @property()
+  @state()
   private _courses: Course[] = [];
-  @property()
+  @state()
   private _selectedIndex: number = -1;
-  @property()
+  @state()
   private _selected?: Course;
-  @property()
+  @state()
   private _newSubject: string = '';
-  @property()
+  @state()
   private _newName: string = '';
-  @property()
+  @state()
   private _newStudents: string = '';
-  @property()
+  @state()
   private _newCurriculum: string = '';
-  @property()
+  @state()
   private _editSubject: string = '';
-  @property()
+  @state()
   private _editName: string = '';
-  @property()
+  @state()
   private _editStudents: string = '';
-  @property()
+  @state()
   private _editCurriculum: string = '';
 
   @query(`#newCurriculum`)

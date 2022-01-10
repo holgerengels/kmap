@@ -1,4 +1,5 @@
-import {html, css, customElement, property, query} from 'lit-element';
+import {html, css} from 'lit';
+import {customElement, property, query, state} from 'lit/decorators.js';
 import {Connected} from "./connected";
 import {State, store} from "../store";
 
@@ -15,26 +16,26 @@ import {ValidatingForm} from "./validating-form";
 
 @customElement('kmap-test-editor-add-fabs')
 export class KMapTestEditorAddFabs extends Connected {
-  @property()
+  @state()
   private _currentSet: string = '';
-  @property()
+  @state()
   private _currentSubject: string = '';
 
-  @property()
+  @state()
   private _opened: boolean = false;
-  @property()
+  @state()
   private _set: string = '';
-  @property()
+  @state()
   private _subject: string = '';
-  @property()
+  @state()
   private _key: string = '';
 
-  @property()
+  @state()
   private _mode: string = 'test';
   @property()
   // @ts-ignore
   private _layers: string[] = [];
-  @property()
+  @state()
   private _fabs: boolean = false;
 
   @query('#addDialog')
@@ -43,7 +44,7 @@ export class KMapTestEditorAddFabs extends Connected {
   @query('#addForm')
   private _addForm: ValidatingForm;
 
-  @property()
+  @state()
   private _valid: boolean = false;
 
   mapState(state: State) {

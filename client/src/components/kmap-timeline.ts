@@ -1,4 +1,5 @@
-import {css, customElement, html, LitElement, property} from 'lit-element';
+import {css, CSSResult, html, LitElement} from 'lit';
+import {customElement, property, state} from 'lit/decorators.js';
 import {store} from "../store";
 
 import {colorStyles, fontStyles} from "./kmap-styles";
@@ -14,13 +15,13 @@ export class KMapTimeline extends LitElement {
   private subject: string = '';
   @property()
   private curriculum: Week[] = [];
-  @property()
+  @state()
   private _sw: number = -1;
-  @property()
+  @state()
   private _requirements?: Week;
-  @property()
+  @state()
   private _weeks: Week[] = [];
-  @property()
+  @state()
   private _target?: string[];
 
   updated(changedProperties) {
@@ -76,7 +77,7 @@ export class KMapTimeline extends LitElement {
     return [
       fontStyles,
       colorStyles,
-      cardStyles,
+      cardStyles as CSSResult,
       css`
         :host {
           display: block;

@@ -1,7 +1,8 @@
-import {customElement, html, property} from "lit-element";
+import {html} from "lit";
+import {customElement, property} from 'lit/decorators.js';
 import {TextField} from "@material/mwc-textfield/mwc-textfield";
-import {ifDefined} from "lit-html/directives/if-defined";
-import {live} from "lit-html/directives/live";
+import {ifDefined} from 'lit/directives/if-defined.js';
+import {live} from 'lit/directives/live.js';
 
 export interface Option {
   value: string,
@@ -14,6 +15,7 @@ export class DatalistTextField extends TextField {
   private datalist: Option[] = [];
 
   /** @soyTemplate */
+  // @ts-ignore
   renderInput(shouldRenderHelperText) {
     const minOrUndef = this.minLength === -1 ? undefined : this.minLength;
     const maxOrUndef = this.maxLength === -1 ? undefined : this.maxLength;
@@ -21,20 +23,19 @@ export class DatalistTextField extends TextField {
       this.autocapitalize :
       undefined;
     const showValidationMessage = this.validationMessage && !this.isUiValid;
+    const ariaLabelledbyOrUndef = !!this.label ? 'label' : undefined;
     const ariaControlsOrUndef = shouldRenderHelperText ? 'helper-text' : undefined;
     const ariaDescribedbyOrUndef = this.focused || this.helperPersistent || showValidationMessage ?
       'helper-text' :
       undefined;
-    const ariaErrortextOrUndef = showValidationMessage ? 'helper-text' : undefined;
     // TODO: live() directive needs casting for lit-analyzer
     // https://github.com/runem/lit-analyzer/pull/91/files
     // TODO: lit-analyzer labels min/max as (number|string) instead of string
     return html `
       <input
-          aria-labelledby="label"
+          aria-labelledby=${ifDefined(ariaLabelledbyOrUndef)}
           aria-controls="${ifDefined(ariaControlsOrUndef)}"
           aria-describedby="${ifDefined(ariaDescribedbyOrUndef)}"
-          aria-errortext="${ifDefined(ariaErrortextOrUndef)}"
           class="mdc-text-field__input"
           type="${this.type}"
           .value="${live(this.value)}"

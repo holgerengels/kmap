@@ -1,4 +1,5 @@
-import {html, css, customElement, property} from 'lit-element';
+import {html, css} from 'lit';
+import {customElement, state} from 'lit/decorators.js';
 import {Connected} from "./connected";
 import {State} from "../store";
 
@@ -15,15 +16,15 @@ import {Card} from "../models/types";
 
 @customElement('kmap-subjects')
 export class KMapSubjects extends Connected {
-  @property()
+  @state()
   private _subjects: Subject[] = [];
-  @property()
+  @state()
   private _randomTests?: Test[] = undefined;
-  @property()
+  @state()
   private _latestCards?: Card[] = undefined;
-  @property()
+  @state()
   private _currentTest?: Test;
-  @property()
+  @state()
   private _index: number = 0;
 
   mapState(state: State) {

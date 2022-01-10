@@ -1,4 +1,5 @@
-import {html, css, customElement, property, query} from 'lit-element';
+import {html, css} from 'lit';
+import {customElement, property, query, state} from 'lit/decorators.js';
 import {Connected} from "./connected";
 import {State, store} from "../store";
 
@@ -14,37 +15,37 @@ import {Card} from "../models/types";
 
 @customElement('kmap-editor-add-fabs')
 export class KMapEditorAddFabs extends Connected {
-  @property()
+  @state()
   private _currentModule: string = '';
-  @property()
+  @state()
   private _currentSubject: string = '';
-  @property()
+  @state()
   private _currentChapter: string = '';
 
-  @property()
+  @state()
   private _opened: boolean = false;
-  @property()
+  @state()
   private _module: string = '';
-  @property()
+  @state()
   private _subject: string = '';
-  @property()
+  @state()
   private _chapter: string = '';
-  @property()
+  @state()
   private _topic: string = '';
 
-  @property()
+  @state()
   private _mode: string = 'topic';
   @property()
   // @ts-ignore
   private _layers: string[] = [];
-  @property()
+  @state()
   private _fabs: boolean = false;
 
   @query('#addDialog')
   // @ts-ignore
   private _addDialog: Dialog;
 
-  @property()
+  @state()
   private _valid: boolean = false;
 
   mapState(state: State) {

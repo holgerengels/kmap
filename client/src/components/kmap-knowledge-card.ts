@@ -1,8 +1,9 @@
-import {html, css, customElement, property, query} from 'lit-element';
+import {html, css} from 'lit';
+import {customElement, property, query, state} from 'lit/decorators.js';
 import {Connected} from "./connected";
 import {State, store} from "../store";
 
-import {StyleInfo, styleMap} from 'lit-html/directives/style-map.js';
+import {StyleInfo, styleMap} from 'lit/directives/style-map.js';
 import '@material/mwc-icon';
 import './star-rating';
 import './kmap-card'
@@ -21,9 +22,9 @@ import {includes, TopicCount} from "../models/tests";
 @customElement('kmap-knowledge-card')
 export class KMapKnowledgeCard extends Connected {
 
-  @property()
+  @state()
   private _instance: string = '';
-  @property()
+  @state()
   private _userid: string = '';
   @property({type: Object})
   private card?: Card;
@@ -33,25 +34,25 @@ export class KMapKnowledgeCard extends Connected {
   private progressNum: number = 0;
   @property({type: Number})
   private progressOf: number = 0;
-  @property()
+  @state()
   private _explanations: Attachment[] = [];
-  @property()
+  @state()
   private _examples: Attachment[] = [];
-  @property()
+  @state()
   private _usages: Attachment[] = [];
-  @property()
+  @state()
   private _ideas: Attachment[] = [];
-  @property()
+  @state()
   private _exercises: Attachment[] = [];
-  @property()
+  @state()
   private _colorStyles: StyleInfo = { backgroundColor: "white" };
-  @property()
+  @state()
   private _hasTests: boolean = false;
-  @property()
+  @state()
   private _topics?: TopicCount[];
-  @property()
+  @state()
   private _rates: object = {};
-  @property()
+  @state()
   private _compactCards: boolean = false;
 
   @query('#feedbackDialog')

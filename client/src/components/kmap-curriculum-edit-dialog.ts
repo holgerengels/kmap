@@ -1,4 +1,5 @@
-import {css, customElement, html, property, query} from 'lit-element';
+import {css, CSSResult, html} from 'lit';
+import {customElement, property, query, state} from 'lit/decorators.js';
 import {Connected} from "./connected";
 import {State} from "../store";
 
@@ -26,40 +27,40 @@ import {TabBar} from "@material/mwc-tab-bar/mwc-tab-bar";
 
 @customElement('kmap-curriculum-edit-dialog')
 export class KMapCurriculumEditDialog extends Connected {
-  @property()
+  @state()
   private _tab: string = 'editor';
 
-  @property()
+  @state()
   private _firstCW: number = 38;
-  @property()
+  @state()
   private _maxCW: number = 52;
-  @property()
+  @state()
   private _lastCW: number = 31;
 
-  @property()
+  @state()
   private _numCWeeks?: number;
-  @property()
+  @state()
   private _numSWeeks?: number;
-  @property()
+  @state()
   private _numHWeeks?: number;
 
-  @property()
+  @state()
   private _curriculum?: Week[] = undefined;
 
-  @property()
+  @state()
   private _selectedIndex: number = -1;
-  @property()
+  @state()
   private _selectedWeek?: Week;
 
-  @property()
+  @state()
   private _weekType: string = 'school';
-  @property()
+  @state()
   private _weekCW: string = '';
-  @property()
+  @state()
   private _weekSW: string = '';
-  @property()
+  @state()
   private _weekTops: string = '';
-  @property()
+  @state()
   private _weekHolidays: string = '';
 
   @property()
@@ -71,10 +72,10 @@ export class KMapCurriculumEditDialog extends Connected {
   @query('#tabBar')
   private _tabBar: TabBar;
 
-  @property()
+  @state()
   private _valid: boolean = false;
 
-  @property()
+  @state()
   private _menuIndex: number = -1;
   @query('#menu')
   private _menu: Menu;
@@ -256,51 +257,49 @@ export class KMapCurriculumEditDialog extends Connected {
       this._selectedIndex = -1;
   }
 
-  static get styles() {
-    // language=CSS
-    return [
-      fontStyles,
-      colorStyles,
-      formStyles,
-      cardStyles,
-      css`
-        mwc-dialog {
-          --mdc-dialog-min-width: 810px;
-          --mdc-dialog-max-width: 810px;
-        }
-        mwc-icon-button, mwc-button {
-          vertical-align: middle
-        }
-        mwc-textfield, mwc-textarea {
-          margin-bottom: 4px;
-        }
-        .content {
-          display: grid;
-          grid-template-rows: auto 1fr;
-        }
-        .weeks {
-          scroll-snap-type: y mandatory;
-        }
-        .mdc-card {
-          scroll-snap-align: start;
-          display: grid;
-          margin: 8px 0px;
-          padding: 12px;
-        }
-        [hidden] {
-          display: none;
-        }
-        .week_editor {
-          align-items: start
-        }
-        .week_editor[type=school], .week_editor[type=preconds] {
-          grid-template-columns: 40px 50px 50px 1fr 40px;
-        }
-        .week_editor[type=holidays] {
-          grid-template-columns: 40px 50px 1fr 40px;
-        }
-    `];
-  }
+  // language=CSS
+  static styles = [
+    fontStyles,
+    colorStyles,
+    formStyles,
+    cardStyles as CSSResult,
+    css`
+      mwc-dialog {
+        --mdc-dialog-min-width: 810px;
+        --mdc-dialog-max-width: 810px;
+      }
+      mwc-icon-button, mwc-button {
+        vertical-align: middle
+      }
+      mwc-textfield, mwc-textarea {
+        margin-bottom: 4px;
+      }
+      .content {
+        display: grid;
+        grid-template-rows: auto 1fr;
+      }
+      .weeks {
+        scroll-snap-type: y mandatory;
+      }
+      .mdc-card {
+        scroll-snap-align: start;
+        display: grid;
+        margin: 8px 0px;
+        padding: 12px;
+      }
+      [hidden] {
+        display: none;
+      }
+      .week_editor {
+        align-items: start
+      }
+      .week_editor[type=school], .week_editor[type=preconds] {
+        grid-template-columns: 40px 50px 50px 1fr 40px;
+      }
+      .week_editor[type=holidays] {
+        grid-template-columns: 40px 50px 1fr 40px;
+      }
+  `];
 
   render() {
     // language=HTML

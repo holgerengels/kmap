@@ -1,4 +1,5 @@
-import {html, customElement, property, css} from 'lit-element';
+import {html, css} from 'lit';
+import {customElement, state} from 'lit/decorators.js';
 import {Connected} from "./connected";
 import {State, store} from "../store";
 
@@ -9,11 +10,11 @@ import {Set} from "../models/contentSets";
 
 @customElement('kmap-set-selector')
 export class KMapSetSelector extends Connected {
-  @property()
+  @state()
   private _sets: Set[] = [];
-  @property()
+  @state()
   private _selectedIndex: number = -1;
-  @property()
+  @state()
   private _selectedSet?: Set = undefined;
 
   mapState(state: State) {

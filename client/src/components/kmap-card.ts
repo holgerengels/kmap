@@ -1,11 +1,12 @@
-import {LitElement, html, css, customElement, property, query, PropertyValues} from 'lit-element';
+import {LitElement, html, css, PropertyValues} from 'lit';
+import {customElement, property, query, state} from 'lit/decorators.js';
 
 import '@material/mwc-icon';
 import '@material/mwc-ripple/mwc-ripple';
 import {Ripple} from '@material/mwc-ripple/mwc-ripple';
 import {RippleHandlers} from '@material/mwc-ripple/ripple-handlers';
 import {fontStyles, colorStyles, elevationStyles} from "./kmap-styles";
-import {StyleInfo, styleMap} from "lit-html/directives/style-map";
+import {StyleInfo, styleMap} from 'lit/directives/style-map.js';
 
 @customElement('kmap-card')
 export class KMapCard extends LitElement {
@@ -32,11 +33,11 @@ export class KMapCard extends LitElement {
   private _buttonElements: Element[] = [];
   private _iconElements: Element[] = [];
 
-  @property()
+  @state()
   private _primaryStyles: StyleInfo = { padding: "0" };
-  @property()
+  @state()
   private _secondaryStyles: StyleInfo = { padding: "0" };
-  @property()
+  @state()
   private _actionStyles: StyleInfo = { padding: "0" };
 
   protected firstUpdated(_changedProperties: PropertyValues) {

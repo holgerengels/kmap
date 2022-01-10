@@ -1,4 +1,5 @@
-import {html, customElement, property, css} from 'lit-element';
+import {html, css} from 'lit';
+import {customElement, state} from 'lit/decorators.js';
 import {Connected} from "./connected";
 import {State, store} from "../store";
 
@@ -9,9 +10,9 @@ import {Module} from "../models/contentMaps";
 
 @customElement('kmap-module-selector')
 export class KMapModuleSelector extends Connected {
-  @property()
+  @state()
   private _modules: Module[] = [];
-  @property()
+  @state()
   private _selectedIndex: number = -1;
 
   mapState(state: State) {

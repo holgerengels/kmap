@@ -1,4 +1,5 @@
-import {html, css, customElement, property} from 'lit-element';
+import {html, css} from 'lit';
+import {customElement, state} from 'lit/decorators.js';
 import {Connected} from "./connected";
 import {State} from "../store";
 
@@ -15,7 +16,7 @@ import {colorStyles, fontStyles} from "./kmap-styles";
 
 @customElement('kmap-content-manager')
 export class KMapContentManager extends Connected {
-  @property()
+  @state()
   private _roles: string[] = [];
 
 

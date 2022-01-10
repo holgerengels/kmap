@@ -1,4 +1,5 @@
-import {html, css, customElement, query, property} from 'lit-element';
+import {html, css} from 'lit';
+import {customElement, query, state} from 'lit/decorators.js';
 import {Connected} from "./connected";
 import {State, store} from "../store";
 
@@ -15,25 +16,25 @@ import {DatalistTextField} from "./datalist-textfield";
 
 @customElement('kmap-login-popup')
 export class KMapLoginPopup extends Connected {
-  @property()
+  @state()
   private _instances: Instance[] = [];
-  @property()
+  @state()
   private _showInstanceChooser: boolean = false;
 
-  @property()
+  @state()
   private _instance: string = '';
-  @property()
+  @state()
   private _userid: string = '';
-  @property()
+  @state()
   private _username?: string;
-  @property()
+  @state()
   private _message: string = '';
 
-  @property()
+  @state()
   private _valid: boolean = false;
-  @property()
+  @state()
   private _instanceValid: boolean = true;
-  @property()
+  @state()
   private _formValid: boolean = false;
 
   @query('#loginDialog')

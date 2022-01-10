@@ -1,4 +1,5 @@
-import {html, css, customElement, property, query} from 'lit-element';
+import {html, css} from 'lit';
+import {customElement, property, query} from 'lit/decorators.js';
 import {Connected, store} from "./connected";
 import {State} from "../store";
 

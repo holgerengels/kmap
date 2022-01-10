@@ -1,4 +1,5 @@
-import {LitElement, html, css, customElement, property, query} from 'lit-element';
+import {LitElement, html, css} from 'lit';
+import {customElement, property, query} from 'lit/decorators.js';
 import '@material/mwc-icon';
 
 @customElement('validating-form')

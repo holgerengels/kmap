@@ -1,4 +1,5 @@
-import {LitElement, svg, customElement, property, css} from 'lit-element';
+import {LitElement, svg, css} from 'lit';
+import {customElement, state} from 'lit/decorators.js';
 
 export interface Connection {
   fromx: number;
@@ -9,10 +10,10 @@ export interface Connection {
 
 @customElement('svg-connector')
 export class Connector extends LitElement {
-  @property()
+  @state()
   private _tension: number = .5;
 
-  @property()
+  @state()
   private _connections: Connection[] = [];
 
   _findAbsolutePosition(element: HTMLElement) {

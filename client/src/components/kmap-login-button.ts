@@ -1,4 +1,5 @@
-import {html, css, customElement, property} from 'lit-element';
+import {html, css} from 'lit';
+import {customElement, state} from 'lit/decorators.js';
 import {Connected} from "./connected";
 import {State} from "../store";
 
@@ -7,9 +8,9 @@ import {fontStyles, colorStyles} from "./kmap-styles";
 
 @customElement('kmap-login-button')
 export class KMapLoginButton extends Connected {
-  @property()
+  @state()
   private _userid: string = '';
-  @property()
+  @state()
   private _initials: string = '';
 
   mapState(state: State) {

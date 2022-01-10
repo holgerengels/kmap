@@ -1,5 +1,6 @@
-import {LitElement, html, css, customElement, property} from 'lit-element';
-import {unsafeHTML} from 'lit-html/directives/unsafe-html';
+import {LitElement, html, css} from 'lit';
+import {customElement, property, state} from 'lit/decorators.js';
+import {unsafeHTML} from 'lit/directives/unsafe-html.js';
 import {urls} from "../urls";
 import {colorStyles, fontStyles} from "./kmap-styles";
 import {katexStyles} from "../katex-css";
@@ -17,7 +18,7 @@ export class KMapKnowledgeCardDescription extends LitElement {
   private topic: string = '';
   @property({type: String})
   private description: string = '';
-  @property()
+  @state()
   private _description: string = '';
 
   constructor() {

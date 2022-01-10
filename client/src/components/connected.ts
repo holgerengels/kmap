@@ -1,4 +1,4 @@
-import { LitElement } from 'lit-element';
+import { LitElement } from 'lit';
 import { connect } from '@captaincodeman/rdx';
 import { store } from '../store';
 

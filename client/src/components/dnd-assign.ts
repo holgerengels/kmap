@@ -1,7 +1,8 @@
-import {LitElement, html, css, customElement, property, PropertyValues} from 'lit-element';
+import {LitElement, html, css, PropertyValues} from 'lit';
+import {customElement, property, state} from 'lit/decorators.js';
 import {colorStyles, elevationStyles, fontStyles} from "./kmap-styles";
-import {unsafeHTML} from "lit-html/directives/unsafe-html";
-import {styleMap} from "lit-html/directives/style-map";
+import {unsafeHTML} from 'lit/directives/unsafe-html.js';
+import {styleMap} from 'lit/directives/style-map.js';
 import {katexStyles} from "../katex-css";
 
 @customElement('dnd-assign')
@@ -11,19 +12,19 @@ export class DndAssign extends LitElement {
   private orientation: "vertical" | "horizontal" = "vertical";
   @property()
   private layout: string = "repeat(3, 1fr)";
-  @property()
+  @state()
   private _targets: string[] = [];
-  @property()
+  @state()
   private _items: string[] = [];
-  @property()
+  @state()
   private _drags: string[] = [];
-  @property()
+  @state()
   private _drops: string[] = [];
-  @property()
+  @state()
   private _order: string[] = [];
   @property()
   public valid?: boolean;
-  @property()
+  @state()
   private _bark: boolean = false;
   private _sid?: string;
   private _tid?: string;

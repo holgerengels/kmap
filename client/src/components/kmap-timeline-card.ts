@@ -1,4 +1,5 @@
-import {css, customElement, html, LitElement, property} from 'lit-element';
+import {css, CSSResult, html, LitElement} from 'lit';
+import {customElement, property} from 'lit/decorators.js';
 
 import {colorStyles, fontStyles} from "./kmap-styles";
 import '@material/mwc-icon';
@@ -17,7 +18,7 @@ export class KMapTimelineCard extends LitElement {
     return [
       fontStyles,
       colorStyles,
-      cardStyles,
+      cardStyles as CSSResult,
       css`
         .mdc-card {
           margin: 6px 8px 6px 0px;

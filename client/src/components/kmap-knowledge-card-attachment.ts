@@ -1,4 +1,5 @@
-import {css, customElement, html, LitElement, property} from 'lit-element';
+import {css, html, LitElement} from 'lit';
+import {customElement, property, state} from 'lit/decorators.js';
 import {urls} from '../urls';
 
 import '@material/mwc-icon';
@@ -9,17 +10,17 @@ import {fontStyles} from "./kmap-styles";
 export class KMapKnowledgeCardAttachment extends LitElement {
   @property({type: String})
   private instance: string = '';
-  @property()
+  @state()
   private _supportsDownload: boolean = !(/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream);
   @property({type: Object})
   private attachment?: Attachment;
-  @property()
+  @state()
   private _handler: string = '';
-  @property()
+  @state()
   private _mimeIcon: string = '';
-  @property()
+  @state()
   private _isDownload?: string = undefined;
-  @property()
+  @state()
   private _isTarget?: string = undefined;
 
   updated(changedProperties) {

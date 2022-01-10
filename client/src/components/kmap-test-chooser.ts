@@ -1,4 +1,5 @@
-import {html, css, customElement, property} from 'lit-element';
+import {html, css} from 'lit';
+import {customElement, state} from 'lit/decorators.js';
 import {Connected} from "./connected";
 import {State, store} from "../store";
 
@@ -18,26 +19,26 @@ import {count, TopicCount} from "../models/tests";
 
 @customElement('kmap-test-chooser')
 export class KmapTestChooser extends Connected {
-  @property()
+  @state()
   private _subjects: Subject[] = [];
-  @property()
+  @state()
   private _subject: string = '';
-  @property()
+  @state()
   private _tree?: string[] = undefined;
-  @property()
+  @state()
   private _chapters?: string[] = undefined;
-  @property()
+  @state()
   private _chaptersLoading: boolean = false;
-  @property()
+  @state()
   private _testTopics?: TopicCount[];
 
-  @property()
+  @state()
   private _arrangedChapters: string[] = [];
 
-  @property()
+  @state()
   private _chapter: string = '';
 
-  @property()
+  @state()
   private _maxNumber?: number;
 
   mapState(state: State) {

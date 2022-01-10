@@ -1,4 +1,5 @@
-import {css, customElement, html, property, query} from 'lit-element';
+import {css, html} from 'lit';
+import {customElement, property, query, state} from 'lit/decorators.js';
 import {Connected} from "./connected";
 import {State, store} from "../store";
 
@@ -22,11 +23,11 @@ export class KMapTimelineAside extends Connected {
   @property()
   public open: boolean = true;
 
-  @property()
+  @state()
   private _selectedTimeline?: Timeline;
-  @property()
+  @state()
   private _curriculum: Week[] = [];
-  @property()
+  @state()
   private _target?: string[];
 
   @query('#timeline')

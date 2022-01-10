@@ -1,7 +1,8 @@
-import {LitElement, html, css, customElement, property} from 'lit-element';
+import {LitElement, html, css} from 'lit';
+import {customElement, property, state} from 'lit/decorators.js';
 
 import {fontStyles, colorStyles, elevationStyles} from "./kmap-styles";
-import {unsafeHTML} from "lit-html/directives/unsafe-html";
+import {unsafeHTML} from 'lit/directives/unsafe-html.js';
 import {math} from "../math";
 import {katexStyles} from "../katex-css";
 import {urls} from "../urls";
@@ -20,7 +21,7 @@ export class KMapTestCardHint extends LitElement {
 
   @property({type: String})
   private hint: string = '';
-  @property()
+  @state()
   private _hint: string = '';
 
   updated(changedProperties) {

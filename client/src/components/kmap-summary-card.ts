@@ -1,8 +1,9 @@
-import {css, customElement, html, property} from 'lit-element';
+import {css, html} from 'lit';
+import {customElement, property, state} from 'lit/decorators.js';
 import {Connected} from "./connected";
 import {State, store} from "../store";
 
-import {StyleInfo, styleMap} from "lit-html/directives/style-map";
+import {StyleInfo, styleMap} from 'lit/directives/style-map.js';
 import '@material/mwc-icon';
 import './kmap-card';
 import './kmap-summary-card-averages';
@@ -17,11 +18,11 @@ import {includes, TopicCount} from "../models/tests";
 @customElement('kmap-summary-card')
 export class KMapSummaryCard extends Connected {
 
-  @property()
+  @state()
   private _userid: string = '';
   @property({type: Object})
   private card?: Card;
-  @property()
+  @state()
   private _key: string = '';
   @property({type: Boolean})
   private selected: boolean = false;
@@ -31,15 +32,15 @@ export class KMapSummaryCard extends Connected {
   @property()
   private grayedOut: boolean = false;
 
-  @property()
+  @state()
   private _layers: string[] = [];
-  @property()
+  @state()
   private _colorStyles: StyleInfo = { backgroundColor: "white" };
-  @property()
+  @state()
   private _hasTests: boolean = false;
-  @property()
+  @state()
   private _topics?: TopicCount[];
-  @property()
+  @state()
   private _selectedDependencies: string[] = [];
 
   constructor() {

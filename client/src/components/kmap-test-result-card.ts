@@ -1,9 +1,10 @@
-import {html, css, customElement, property} from 'lit-element';
+import {html, css} from 'lit';
+import {customElement, property, state} from 'lit/decorators.js';
 import {Connected} from "./connected";
 import {State} from "../store";
 
 
-import {StyleInfo, styleMap} from 'lit-html/directives/style-map.js';
+import {StyleInfo, styleMap} from 'lit/directives/style-map.js';
 import '@material/mwc-icon';
 import './star-rating';
 import {colorStyles, fontStyles} from "./kmap-styles";
@@ -12,21 +13,21 @@ import {encodePath} from "../urls";
 
 @customElement('kmap-test-result-card')
 export class KMapTestResultCard extends Connected {
-  @property()
+  @state()
   private _userid: string = '';
 
   @property()
   private card?: TestResult = undefined;
-  @property()
+  @state()
   private _states: object = {};
   @property({type: Number})
   private state: number = 0;
-  @property()
+  @state()
   private _state: number = 0;
-  @property()
+  @state()
   private _rateModified: boolean = false;
 
-  @property()
+  @state()
   private _colorStyles: StyleInfo = { backgroundColor: "white" };
 
   constructor() {

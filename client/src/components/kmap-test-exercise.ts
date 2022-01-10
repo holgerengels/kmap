@@ -1,4 +1,5 @@
-import {html, css, customElement, property, query} from 'lit-element';
+import {html, css} from 'lit';
+import {customElement, query, state} from 'lit/decorators.js';
 import {Connected} from "./connected";
 import {State, store} from "../store";
 
@@ -11,17 +12,17 @@ import {KMapTestCard} from "./kmap-test-card";
 
 @customElement('kmap-test-exercise')
 export class KmapTestExercise extends Connected {
-  @property()
+  @state()
   private _allTests?: Test[] = undefined;
-  @property()
+  @state()
   private _tests?: Test[] = undefined;
 
-  @property()
+  @state()
   private _order: "shuffled" | "increasing difficulty" = "shuffled";
 
-  @property()
+  @state()
   private _currentIndex: number = 0;
-  @property()
+  @state()
   private _currentTest?: Test = undefined;
 
   @query('#test-card')

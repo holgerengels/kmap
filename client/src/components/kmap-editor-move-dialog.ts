@@ -1,4 +1,5 @@
-import {html, css, customElement, property, query} from 'lit-element';
+import {html, css} from 'lit';
+import {customElement, query, state} from 'lit/decorators.js';
 import {Connected} from "./connected";
 import {State, store} from "../store";
 
@@ -12,16 +13,16 @@ import {Card} from "../models/types";
 
 @customElement('kmap-editor-move-dialog')
 export class KMapEditorMoveDialog extends Connected {
-  @property()
+  @state()
   private _card?: Card = undefined;
-  @property()
+  @state()
   private _newModule: string = '';
 
   @query('#moveDialog')
   // @ts-ignore
   private _moveDialog: Dialog;
 
-  @property()
+  @state()
   private _valid: boolean = false;
 
   mapState(state: State) {

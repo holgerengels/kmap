@@ -1,4 +1,5 @@
-import {html, css, customElement, property, query} from 'lit-element';
+import {html, css} from 'lit';
+import {customElement, query, state} from 'lit/decorators.js';
 import {Connected} from "./connected";
 import {State, store} from "../store";
 
@@ -12,7 +13,7 @@ import {Test} from "../models/tests";
 
 @customElement('kmap-test-editor-delete-dialog')
 export class KMapTestEditorDeleteDialog extends Connected {
-  @property()
+  @state()
   private _test?: Test = undefined;
 
   @query('#deleteDialog')

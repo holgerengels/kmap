@@ -1,4 +1,5 @@
-import {css, customElement, html, property} from 'lit-element';
+import {css, html} from 'lit';
+import {customElement, state} from 'lit/decorators.js';
 import {Connected, store} from "./connected";
 import {State} from "../store";
 
@@ -15,7 +16,7 @@ import {encodePath} from "../urls";
 
 @customElement('kmap-exercise')
 export class KMapExercise extends Connected {
-  @property()
+  @state()
   private _test?: Test;
 
   mapState(state: State) {

@@ -1,8 +1,9 @@
-import {LitElement, html, css, customElement, property, query} from 'lit-element';
+import {LitElement, html, css} from 'lit';
+import {customElement, property, query, state} from 'lit/decorators.js';
 
 import {urls} from '../urls';
 import {fontStyles, colorStyles} from "./kmap-styles";
-import {unsafeHTML} from "lit-html/directives/unsafe-html";
+import {unsafeHTML} from 'lit/directives/unsafe-html.js';
 import {math} from "../math";
 import {katexStyles} from "../katex-css";
 
@@ -37,9 +38,9 @@ export class KMapTestCardContent extends LitElement {
   @property({type: String})
   private _answerFlex: string = '';
 
-  @property()
+  @state()
   private _question: string = '';
-  @property()
+  @state()
   private _answer: string = '';
 
   @query('#question')

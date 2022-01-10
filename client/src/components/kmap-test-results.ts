@@ -1,4 +1,5 @@
-import {html, css, customElement, property} from 'lit-element';
+import {html, css} from 'lit';
+import {customElement, state} from 'lit/decorators.js';
 import {Connected} from "./connected";
 import {State, store} from "../store";
 
@@ -18,13 +19,13 @@ interface Summary {
 
 @customElement('kmap-test-results')
 export class KmapTestResults extends Connected {
-  @property()
+  @state()
   private _userid: string = '';
 
-  @property()
+  @state()
   private _results: TestResult[] = [];
 
-  @property()
+  @state()
   private _summary?: Summary = undefined;
 
   mapState(state: State) {

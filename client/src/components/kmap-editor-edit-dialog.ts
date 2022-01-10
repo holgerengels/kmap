@@ -1,4 +1,5 @@
-import {html, css, customElement, property, query} from 'lit-element';
+import {html, css} from 'lit';
+import {customElement, property, query, state} from 'lit/decorators.js';
 import {Connected} from "./connected";
 import {State, store} from "../store";
 
@@ -26,65 +27,65 @@ import {throttle} from "../debounce";
 import {Upload} from "../models/types";
 import {Attachment, Card} from "../models/types";
 import {FileDrop} from "./file-drop";
-import {styleMap} from "lit-html/directives/style-map.js";
+import {styleMap} from "lit/directives/style-map.js";
 
 @customElement('kmap-editor-edit-dialog')
 export class KMapEditorEditDialog extends Connected {
-  @property()
+  @state()
   private _instance: string = '';
 
-  @property()
+  @state()
   private _card?: Card = undefined;
-  @property()
+  @state()
   private _summary: string = '';
-  @property()
+  @state()
   private _description: string = '';
-  @property()
+  @state()
   private _thumb: string = '';
-  @property()
+  @state()
   private _keywords: string = '';
-  @property()
+  @state()
   private _sgs: string = '';
-  @property()
+  @state()
   private _educationalLevel: string = '';
-  @property()
+  @state()
   private _educationalContext: string = '';
-  @property()
+  @state()
   private _typicalAgeRange: string = '';
-  @property()
+  @state()
   private _tab: string = 'editor';
 
-  @property()
+  @state()
   private _depends: string = '';
-  @property()
+  @state()
   private _links: string = '';
-  @property()
+  @state()
   private _priority: string = '';
 
-  @property()
+  @state()
   private _attachmentType: string = 'link';
-  @property()
+  @state()
   private _attachmentTag: string = '';
-  @property()
+  @state()
   private _attachmentName: string = '';
-  @property()
+  @state()
   private _attachmentMime: string = '';
-  @property()
+  @state()
   private _attachmentHref: string = '';
-  @property()
+  @state()
   private _attachmentFile?: File = undefined;
   @property()
   // @ts-ignore
   private _attachmentValid: boolean = false;
 
-  @property()
+  @state()
   private _attachments: Attachment[] = [];
-  @property()
+  @state()
   private _uploads: Upload[] = [];
-  @property()
+  @state()
   private _pendingUploads: boolean = false;
 
-  @property()
+  @state()
   private _navigateAfterSave?: string = '';
 
   @query('#editDialog')
@@ -96,7 +97,7 @@ export class KMapEditorEditDialog extends Connected {
   @query('#tabBar')
   private _tabBar: TabBar;
 
-  @property()
+  @state()
   private _valid: boolean = false;
 
   @query('#attachmentForm')

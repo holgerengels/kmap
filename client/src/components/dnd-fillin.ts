@@ -1,7 +1,8 @@
-import {LitElement, html, css, customElement, property, PropertyValues} from 'lit-element';
+import {LitElement, html, css, PropertyValues} from 'lit';
+import {customElement, property, state} from 'lit/decorators.js';
 import {colorStyles, elevationStyles, fontStyles} from "./kmap-styles";
-import {unsafeHTML} from "lit-html/directives/unsafe-html";
-import {StyleInfo, styleMap} from "lit-html/directives/style-map";
+import {unsafeHTML} from 'lit/directives/unsafe-html.js';
+import {StyleInfo, styleMap} from 'lit/directives/style-map.js';
 import {katexStyles} from "../katex-css";
 
 @customElement('dnd-fillin')
@@ -13,25 +14,25 @@ export class DndFillin extends LitElement {
   private dropWidth: string = "20px";
   @property()
   private dropHeight: string = "20px";
-  @property()
+  @state()
   private _template: string = '';
-  @property()
+  @state()
   private _dropElements: HTMLElement[] = [];
-  @property()
+  @state()
   private _dragElements: HTMLElement[] = [];
-  @property()
+  @state()
   private _items: string[] = [];
-  @property()
+  @state()
   private _drags: string[] = [];
-  @property()
+  @state()
   private _drops: string[] = [];
-  @property()
+  @state()
   private _order: string[] = [];
-  @property()
+  @state()
   private _doubles: string[] = [];
   @property()
   public valid?: boolean;
-  @property()
+  @state()
   private _bark: boolean = false;
   private _ci?: string;
   private _sid?: string;

@@ -1,4 +1,5 @@
-import {html, css, customElement, property} from 'lit-element';
+import {html, css} from 'lit';
+import {customElement, state} from 'lit/decorators.js';
 import {Connected} from "./connected";
 import {State, store} from "../store";
 
@@ -9,11 +10,11 @@ import {Test} from "../models/tests";
 
 @customElement('kmap-test-editor-scroller')
 export class KMapTestEditorScroller extends Connected {
-  @property()
+  @state()
   private _tests: Test[] = [];
-  @property()
+  @state()
   private _selectedIndex: number = -1;
-  @property()
+  @state()
   private _selected?: Test = undefined;
 
   mapState(state: State) {

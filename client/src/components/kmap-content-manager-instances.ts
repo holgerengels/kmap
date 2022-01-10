@@ -1,4 +1,5 @@
-import {html, css, customElement, property} from 'lit-element';
+import {html, css} from 'lit';
+import {customElement, state} from 'lit/decorators.js';
 import {Connected} from "./connected";
 import {State, store} from "../store";
 
@@ -14,37 +15,37 @@ import {Instance} from "../models/instances";
 
 @customElement('kmap-content-manager-instances')
 export class KMapContentManagerInstances extends Connected {
-  @property()
+  @state()
   private _instances: Instance[] = [];
-  @property()
+  @state()
   private _page: string = '';
-  @property()
+  @state()
   private _selectedIndex: number = -1;
-  @property()
+  @state()
   private _selected?: Instance = undefined;
 
-  @property()
+  @state()
   private _working: boolean = false;
 
-  @property()
+  @state()
   private _syncName: string = '';
 
-  @property()
+  @state()
   private _newName: string = '';
 
-  @property()
+  @state()
   private _newDescription: string = '';
 
-  @property()
+  @state()
   private _newAuthconf: string = '';
 
-  @property()
+  @state()
   private _editDescription: string = '';
 
-  @property()
+  @state()
   private _editAuthconf: string = '';
 
-  @property()
+  @state()
   private _batchJson: string = '';
 
 

@@ -1,4 +1,5 @@
-import {html, customElement, property, css} from 'lit-element';
+import {html, css} from 'lit';
+import {customElement, state} from 'lit/decorators.js';
 import {Connected} from "./connected";
 import {State, store} from "../store";
 
@@ -11,9 +12,9 @@ import {Course} from "../models/courses";
 @customElement('kmap-course-selector')
 export class KMapCourseSelector extends Connected {
 
-  @property()
+  @state()
   private _courses: Course[] = [];
-  @property()
+  @state()
   private _selectedIndex: number = -1;
 
   _select(index) {
