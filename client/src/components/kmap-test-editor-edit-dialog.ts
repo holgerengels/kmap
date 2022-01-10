@@ -346,10 +346,9 @@ ${this._test ? html`
         </mwc-select>
         <mwc-textfield s5 id="key" name="key" label="Titel" dense type="text" required disabled .value="${this._key}" @change="${e => this._key = e.target.value}" pattern="^([^./]*)$"></mwc-textfield>
         <mwc-textfield s1 id="level" name="level" label="Level" dense type="number" inputmode="numeric" min="1" max="3" step="1" .value="${this._level}" @change="${e => this._level = e.target.value}"></mwc-textfield>
-        <mwc-formfield s5 alignEnd spaceBetween label="Layout Verhältnis Frage : Antwort =&nbsp;${this._balance}&nbsp;:&nbsp;${6 - this._balance}">&nbsp;&nbsp;
-          <mwc-slider id="balance" style="vertical-align:middle" .value="${this._balance}" pin markers step="1" min="0" max="5" @change=${e => this._balance = e.target.value}></mwc-slider>
+        <mwc-formfield s6 style="padding-left: 16px" alignEnd nowrap label="Layout Verhältnis Frage : Antwort =&nbsp;${this._balance}&nbsp;:&nbsp;${6 - this._balance}">
+          <mwc-slider id="balance" style="vertical-align:middle; width: min(50%, 200px)" .value="${this._balance}" withTickMarks discrete step="1" min="0" max="5" @input=${e => this._balance = e.target.value}></mwc-slider>
         </mwc-formfield>
-        <div s1></div>
         <mwc-textarea s6 id="question" label="Frage" rows="4" .value=${this._question} @keyup="${this._setQuestion}"></mwc-textarea>
         <mwc-textarea s6 id="answer" label="Antwort" required rows="4" .value=${this._answer} @keyup="${this._setAnswer}"></mwc-textarea>
         <mwc-textarea s6 id="hint" label="Hinweis" rows="2" .value=${this._hint} @keyup="${this._setHint}"></mwc-textarea>
