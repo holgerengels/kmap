@@ -7,18 +7,20 @@ export const katexStyles: CSSResult = css`
     line-height: 1.2;
     text-indent: 0;
     text-rendering: auto;
-    border-color: currentColor;
   }
 
   .katex * {
     -ms-high-contrast-adjust: none !important;
+    border-color: currentColor;
   }
 
   .katex .katex-version::after {
-    content: "0.12.0";
+    content: "0.15.1";
   }
 
   .katex .katex-mathml {
+    /* Accessibility hack to only show to screen readers
+           Found at: http://a11yproject.com/posts/how-to-hide-content/ */
     position: absolute;
     clip: rect(1px, 1px, 1px, 1px);
     padding: 0;
@@ -40,6 +42,8 @@ export const katexStyles: CSSResult = css`
     position: relative;
     display: inline-block;
     white-space: nowrap;
+    width: -webkit-min-content;
+    width: -moz-min-content;
     width: min-content;
   }
 
@@ -185,17 +189,13 @@ export const katexStyles: CSSResult = css`
   }
 
   .katex .vbox {
-    display: -ms-inline-flexbox;
     display: inline-flex;
-    -ms-flex-direction: column;
     flex-direction: column;
     align-items: baseline;
   }
 
   .katex .hbox {
-    display: -ms-inline-flexbox;
     display: inline-flex;
-    -ms-flex-direction: row;
     flex-direction: row;
     width: 100%;
   }
@@ -288,6 +288,8 @@ export const katexStyles: CSSResult = css`
   }
 
   .katex .sqrt > .root {
+    /* These values are taken from the definition of \`\\r@@t\`,
+               \`\\mkern 5mu\` and \`\\mkern -10mu\`. */
     margin-left: 0.27777778em;
     margin-right: -0.55555556em;
   }
@@ -1074,6 +1076,10 @@ export const katexStyles: CSSResult = css`
     padding: 0 0.5em;
   }
 
+  .katex .cd-arrow-pad {
+    padding: 0 0.55556em 0 0.27778em;
+  }
+
   .katex .x-arrow,
   .katex .mover,
   .katex .munder {
@@ -1081,7 +1087,7 @@ export const katexStyles: CSSResult = css`
   }
 
   .katex .boxpad {
-    padding: 0 0.3em 0 0.3em;
+    padding: 0 0.3em;
   }
 
   .katex .fbox,
@@ -1091,7 +1097,7 @@ export const katexStyles: CSSResult = css`
   }
 
   .katex .cancel-pad {
-    padding: 0 0.2em 0 0.2em;
+    padding: 0 0.2em;
   }
 
   .katex .cancel-lap {
@@ -1102,6 +1108,50 @@ export const katexStyles: CSSResult = css`
   .katex .sout {
     border-bottom-style: solid;
     border-bottom-width: 0.08em;
+  }
+
+  .katex .angl {
+    box-sizing: border-box;
+    border-top: 0.049em solid;
+    border-right: 0.049em solid;
+    margin-right: 0.03889em;
+  }
+
+  .katex .anglpad {
+    padding: 0 0.03889em;
+  }
+
+  .katex .eqn-num::before {
+    counter-increment: katexEqnNo;
+    content: "(" counter(katexEqnNo) ")";
+  }
+
+  .katex .mml-eqn-num::before {
+    counter-increment: mmlEqnNo;
+    content: "(" counter(mmlEqnNo) ")";
+  }
+
+  .katex .mtr-glue {
+    width: 50%;
+  }
+
+  .katex .cd-vert-arrow {
+    display: inline-block;
+    position: relative;
+  }
+
+  .katex .cd-label-left {
+    display: inline-block;
+    position: absolute;
+    right: calc(50% + 0.3em);
+    text-align: left;
+  }
+
+  .katex .cd-label-right {
+    display: inline-block;
+    position: absolute;
+    left: calc(50% + 0.3em);
+    text-align: right;
   }
 
   .katex-display {
@@ -1134,5 +1184,9 @@ export const katexStyles: CSSResult = css`
   .katex-display.fleqn > .katex {
     text-align: left;
     padding-left: 2em;
+  }
+
+  body {
+    counter-reset: katexEqnNo mmlEqnNo;
   }
 `;
