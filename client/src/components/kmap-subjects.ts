@@ -35,7 +35,7 @@ export class KMapSubjects extends Connected {
     };
   }
 
-  updated(changedProperties) {
+  willUpdate(changedProperties) {
     if (changedProperties.has("_randomTests")) {
       this._index = 0;
       this._currentTest = this._randomTests ? this._randomTests[0] : undefined;

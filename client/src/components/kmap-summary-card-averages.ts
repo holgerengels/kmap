@@ -27,7 +27,7 @@ export class KMapSummaryCardAverages extends Connected {
     };
   }
 
-  updated(changedProperties) {
+  willUpdate(changedProperties) {
     if (changedProperties.has("_states") || changedProperties.has("key")) {
       this._hasStates = this._states && Object.keys(this._states).length !== 0;
 

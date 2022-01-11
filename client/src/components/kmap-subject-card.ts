@@ -48,7 +48,7 @@ export class KMapSubjectCard extends LitElement {
     };
   }
 
-  updated(changedProperties) {
+  willUpdate(changedProperties) {
     if (changedProperties.has("_states") || changedProperties.has("subject")) {
       this._hasStates = this._states && Object.keys(this._states).length !== 0;
 

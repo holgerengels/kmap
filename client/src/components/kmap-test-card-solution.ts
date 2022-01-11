@@ -24,7 +24,7 @@ export class KMapTestCardsolution extends LitElement {
   @state()
   private _solution: string = '';
 
-  updated(changedProperties) {
+  willUpdate(changedProperties) {
     if (changedProperties.has("solution")) {
       let set = (value:string):void => { this._solution = value };
       this._math(this.solution, set);

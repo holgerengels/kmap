@@ -24,16 +24,18 @@ export class KMapTimeline extends LitElement {
   @state()
   private _target?: string[];
 
-  updated(changedProperties) {
+  willUpdate(changedProperties) {
     if (changedProperties.has("curriculum")) {
       if (this.curriculum) {
         this._weeks = this.curriculum.filter(w => w.sw !== 0);
         const reqs: Week[] = this.curriculum.filter(w => w.sw === 0);
         this._requirements = reqs.length !== 0 ? reqs[0] : undefined;
-      }
-      else
+      } else
         this._weeks = [];
     }
+  }
+
+  updated(changedProperties) {
     if (changedProperties.has("_target")) {
       store.dispatch.maps.setTargeted(this._target);
     }

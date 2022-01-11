@@ -28,7 +28,7 @@ export class KMapSummaryCardEditor extends Connected {
     };
   }
 
-  updated(changedProperties) {
+  willUpdate(changedProperties) {
     if (changedProperties.has("card") || changedProperties.has("_selectedModule")) {
       this._enabled = this.card !== undefined && this._selectedModule !== undefined
         && this._subject === this._selectedModule.subject

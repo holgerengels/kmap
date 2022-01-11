@@ -50,7 +50,7 @@ export class KMapTestCardContent extends LitElement {
   // @ts-ignore
   private _answerElement: HTMLElement;
 
-  updated(changedProperties) {
+  willUpdate(changedProperties) {
     if (changedProperties.has("question")) {
       let set = (value:string):void => { this._question = value };
       this._math(this.question, set);

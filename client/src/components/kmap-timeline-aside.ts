@@ -1,4 +1,4 @@
-import {css, html} from 'lit';
+import {css, html, PropertyValues} from 'lit';
 import {customElement, property, query, state} from 'lit/decorators.js';
 import {Connected} from "./connected";
 import {State, store} from "../store";
@@ -42,6 +42,16 @@ export class KMapTimelineAside extends Connected {
     };
   }
 
+  willUpdate(changedProperties: PropertyValues) {
+    if (changedProperties.has("_selectedTimeline")) {
+      if (this._selectedTimeline) {
+        this._curriculum = JSON.parse(this._selectedTimeline.curriculum);
+      }
+      else
+        this._curriculum = [];
+    }
+  }
+
   updated(changedProperties) {
     if (changedProperties.has("_curriculum")) {
       const cw = this._cw();
@@ -59,13 +69,6 @@ export class KMapTimelineAside extends Connected {
 
       console.log(cw);
       console.log(sw)
-    }
-    if (changedProperties.has("_selectedTimeline")) {
-      if (this._selectedTimeline) {
-        this._curriculum = JSON.parse(this._selectedTimeline.curriculum);
-      }
-      else
-        this._curriculum = [];
     }
     if (changedProperties.has("_target")) {
       store.dispatch.maps.setTargeted(this._target);

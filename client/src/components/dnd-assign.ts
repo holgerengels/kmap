@@ -29,7 +29,7 @@ export class DndAssign extends LitElement {
   private _sid?: string;
   private _tid?: string;
 
-  protected updated(changedProperties: PropertyValues) {
+  protected willUpdate(changedProperties: PropertyValues) {
     if (changedProperties.has("_items")) {
       this._drags = shuffleArray([...this._items]);
       this._drops = this._items.map(() => "");

@@ -1,4 +1,4 @@
-import {css, html, LitElement} from 'lit';
+import {css, html, LitElement, PropertyValues} from 'lit';
 import {customElement, property, state, query} from 'lit/decorators.js';
 import {installMediaQueryWatcher} from 'pwa-helpers/media-query.js';
 import {installOfflineWatcher} from 'pwa-helpers/network.js';
@@ -159,7 +159,7 @@ export class KmapMain extends connect(store, LitElement) {
     store.dispatch.shell.updatePassiveEventListeners(supportsPassive);
   }
 
-  updated(changedProps) {
+  willUpdate(changedProps: PropertyValues) {
     if (changedProps.has('_meta')) {
       console.log(this._meta);
 
@@ -168,14 +168,9 @@ export class KmapMain extends connect(store, LitElement) {
 
     if (changedProps.has('_page') && !this._layers.includes('editor'))
       this._drawerOpen = false;
+  }
 
-    if (changedProps.has('_messages')) {
-      if (this._messages.length > 0) {
-        //this._snackbar.open();
-        console.log(this._messages);
-      }
-    }
-
+  updated(changedProps) {
     if (changedProps.has("_drawerOpen")) {
       store.dispatch.shell.updateDrawerOpen(this._drawerOpen);
     }

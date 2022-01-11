@@ -24,7 +24,7 @@ export class KMapTestCardHint extends LitElement {
   @state()
   private _hint: string = '';
 
-  updated(changedProperties) {
+  willUpdate(changedProperties) {
     if (changedProperties.has("hint")) {
       let set = (value:string):void => { this._hint = value };
       this._math(this.hint, set);

@@ -1,4 +1,4 @@
-import {html, css} from 'lit';
+import {html, css, PropertyValues} from 'lit';
 import {customElement, property, query, state} from 'lit/decorators.js';
 import {State, store} from "../store";
 
@@ -119,7 +119,8 @@ export class KMapBrowser extends Connected {
     this._timelineElement.addEventListener('touchend', this._swipeEnd);
   }
 
-  updated(changedProperties) {
+
+  willUpdate(changedProperties: PropertyValues) {
     if (changedProperties.has("_lines")) {
       var cols = 0;
       for (let line of this._lines) {
@@ -127,7 +128,9 @@ export class KMapBrowser extends Connected {
       }
       this._maxCols = cols;
     }
+  }
 
+  updated(changedProperties) {
     if (changedProperties.has("_page") && this._page === 'topic' && this._animFrom !== undefined) {
       let that = this;
       setTimeout(function () {

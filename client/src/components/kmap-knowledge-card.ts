@@ -75,7 +75,7 @@ export class KMapKnowledgeCard extends Connected {
     };
   }
 
-  updated(changedProperties) {
+  willUpdate(changedProperties) {
     if (changedProperties.has("card") || changedProperties.has("_rates"))
       this._rating();
 

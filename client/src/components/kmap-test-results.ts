@@ -35,7 +35,7 @@ export class KmapTestResults extends Connected {
     };
   }
 
-  updated(changedProperties) {
+  willUpdate(changedProperties) {
     if (changedProperties.has("_results"))
       this._buildSummary();
   }

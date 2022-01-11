@@ -46,7 +46,7 @@ export class KMapKnowledgeCardDescription extends LitElement {
     }
   }
 
-  updated(changedProperties) {
+  willUpdate(changedProperties) {
     if (changedProperties.has("description")) {
       let setter = (value:string):void => { this._description = value };
 
