@@ -79,6 +79,7 @@ export default merge(baseConfig, {
           cacheName: 'maps',
           broadcastUpdate: {
             channelName: 'maps',
+            options: {},
           }
         },
       }, {
@@ -88,6 +89,7 @@ export default merge(baseConfig, {
           cacheName: 'tests',
           broadcastUpdate: {
             channelName: 'tests',
+            options: {},
           }
         },
       }, {
