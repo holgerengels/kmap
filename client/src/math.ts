@@ -1,4 +1,4 @@
-import katex from 'katex/dist/katex'
+import katex from 'katex';
 import AsciiMathParser from 'asciimath2tex';
 
 const parser = new AsciiMathParser();
