@@ -31,6 +31,13 @@ export class KMapCurriculumEditDialog extends Connected {
   private _tab: string = 'editor';
 
   @state()
+  private _tempFirstCW: number = 38;
+  @state()
+  private _tempMaxCW: number = 52;
+  @state()
+  private _tempLastCW: number = 31;
+
+  @state()
   private _firstCW: number = 38;
   @state()
   private _maxCW: number = 52;
@@ -157,13 +164,19 @@ export class KMapCurriculumEditDialog extends Connected {
     }
   }
 
+  _adoptWeekLayout() {
+    this._firstCW = this._tempFirstCW;
+    this._lastCW = this._tempLastCW;
+    this._maxCW = this._tempMaxCW;
+  }
+
   edit(curriculum: string) {
     this._curriculum = JSON.parse(curriculum);
     if (!this._curriculum) return;
 
-    this._firstCW = this._curriculum[1].cw;
-    this._lastCW = this._curriculum[this._curriculum.length-1].cw;
-    this._maxCW = this._curriculum.map(w => w.cw).sort().pop() || 52;
+    this._firstCW = this._tempFirstCW = this._curriculum[1].cw;
+    this._lastCW = this._tempLastCW = this._curriculum[this._curriculum.length-1].cw;
+    this._maxCW = this._tempMaxCW = this._curriculum.map(w => parseInt(w.cw + "")).sort((a, b) => a - b).pop() || 52;
 
     this._selectedIndex = -1;
 
@@ -278,6 +291,11 @@ export class KMapCurriculumEditDialog extends Connected {
         display: grid;
         grid-template-rows: auto 1fr;
       }
+      .layout {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
       .weeks {
         scroll-snap-type: y mandatory;
       }
@@ -311,14 +329,15 @@ export class KMapCurriculumEditDialog extends Connected {
       <mwc-tab label="Preview"></mwc-tab>
     </mwc-tab-bar>
     <div class="content" ?hidden="${this._tab === 'preview'}">
-      <div>
-        <label>Kalenderwochen</label>
-        <mwc-textfield .value="${this._firstCW}" label="von" type="number" min="1" max="53" step="1" @change="${e => this._firstCW = parseInt(e.target.value)}"></mwc-textfield>
-        <mwc-textfield .value="${this._maxCW}" label="max" type="number" min="52" max="53" step="1" @change="${e => this._maxCW = parseInt(e.target.value)}"></mwc-textfield>
-        <mwc-textfield .value="${this._lastCW}" label="bis" type="number" min="1" max="53" step="1" @change="${e => this._lastCW = parseInt(e.target.value)}"></mwc-textfield>
+      <label>Kalenderwochen</label>
+      <div class="layout">
+        <mwc-textfield .value="${this._tempFirstCW}" label="von" type="number" min="1" max="53" step="1" @change="${e => this._tempFirstCW = parseInt(e.target.value)}"></mwc-textfield>
+        <mwc-textfield .value="${this._tempMaxCW}" label="max" type="number" min="52" max="53" step="1" @change="${e => this._tempMaxCW = parseInt(e.target.value)}"></mwc-textfield>
+        <mwc-textfield .value="${this._tempLastCW}" label="bis" type="number" min="1" max="53" step="1" @change="${e => this._tempLastCW = parseInt(e.target.value)}"></mwc-textfield>
         <label>→</label>
         <mwc-textfield .value="${this._numSWeeks}" label="Schulwochen" type="number" min="0" max="9999" step="1" disabled></mwc-textfield>
         <mwc-textfield .value="${this._numHWeeks}" label="Ferienwochen" type="number" min="0" max="9999" step="1" disabled></mwc-textfield>
+        <mwc-button label="Anwenden" @click="${this._adoptWeekLayout}"/>
       </div>
       <div class="weeks">
         ${this._curriculum.map((week, i) => this._renderWeek(week, i))}
@@ -351,7 +370,7 @@ export class KMapCurriculumEditDialog extends Connected {
       return html`
         <validating-form id="topForm" @validity="${e => this._weekValid = e.target.valid}">
           <div class="form mdc-card week_editor" type="${this._weekType}">
-            <mwc-icon-button-toggle onIcon="school" offIcon="beach_access" ?on="${this._weekType === 'school'}" @MDCIconButtonToggle:change="${e => this._weekType = e.detail.isOn ? 'school' : 'holidays'}" ?disabled="${this._weekType === 'preconds'}"></mwc-icon-button-toggle>
+            <mwc-icon-button-toggle onIcon="school" offIcon="beach_access" ?on="${this._weekType === 'school'}" @icon-button-toggle-change="${e => this._weekType = e.detail.isOn ? 'school' : 'holidays'}" ?disabled="${this._weekType === 'preconds'}"></mwc-icon-button-toggle>
             <mwc-textfield id="cw" type="text" label="KW" .value="${this._weekCW}" @change="${e => this._weekCW = e.target.value}" ?disabled="${this._weekType === 'preconds'}"></mwc-textfield>
             <mwc-textfield id="sw" type="text" label="SW" ?hidden="${this._weekType === 'holidays'}" .value="${this._weekSW}" @change="${e => this._weekSW = e.target.value}"  ?disabled="${this._weekType === 'preconds'}"></mwc-textfield>
             <mwc-textarea id="tops" type="text" label="Tops" rows="3" ?hidden="${this._weekType === 'holidays'}" .value="${this._weekTops}" @change="${e => this._weekTops = e.target.value}"></mwc-textarea>

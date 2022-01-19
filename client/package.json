@@ -13,7 +13,7 @@
     "@commitlint/cli": "^16.0.2",
     "@commitlint/config-conventional": "^16.0.0",
     "@open-wc/building-rollup": "^2.0.1",
-    "@open-wc/eslint-config": "^7.0.0",
+    "@open-wc/eslint-config": "^4.3.0",
     "@open-wc/prettier-config": "^1.1.0",
     "@open-wc/rollup-plugin-html": "^1.2.5",
     "@open-wc/rollup-plugin-polyfills-loader": "^1.1.8",
