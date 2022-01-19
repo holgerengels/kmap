@@ -52,7 +52,7 @@ public class Feedback {
             object.addProperty("type", "bug");
             object.addProperty("state", "open");
             object.addProperty("timestamp", System.currentTimeMillis());
-            client.save(object);
+            System.out.println(object);
         }
         else {
             throw new RuntimeException("property missing");
