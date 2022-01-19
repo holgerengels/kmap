@@ -53,10 +53,12 @@ export class KmapTestExercise extends Connected {
       if (test.balance === "" || test.balance === undefined)
         test.balance = 4;
     }
-
-    this._tests = this._order
+    const collator = new Intl.Collator();
+    this._tests = this._order === "shuffled"
       ? shuffleArray([...this._allTests])
-      : this._allTests.sort((a, b) => (a.level ? a.level : 4) - (b.level ? b.level : 4));
+      : this._allTests.sort((a, b) =>
+        (a.level ? a.level : 4) - (b.level ? b.level : 4)
+        || collator.compare(a.key, b.key));
 
     this._currentIndex = 0;
     this._currentTest = this._tests[0];
