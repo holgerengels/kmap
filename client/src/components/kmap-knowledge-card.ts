@@ -17,7 +17,6 @@ import {fontStyles, colorStyles} from "./kmap-styles";
 import {KMapFeedback} from "./kmap-feedback";
 import {Attachment, Card} from "../models/types";
 import {encodePath} from "../urls";
-import {includes, TopicCount} from "../models/tests";
 
 @customElement('kmap-knowledge-card')
 export class KMapKnowledgeCard extends Connected {
@@ -47,9 +46,9 @@ export class KMapKnowledgeCard extends Connected {
   @state()
   private _colorStyles: StyleInfo = { backgroundColor: "white" };
   @state()
-  private _hasTests: boolean = false;
+  private _testCount?: number;
   @state()
-  private _topics?: TopicCount[];
+  private _topicCounts: {};
   @state()
   private _rates: object = {};
   @state()
@@ -69,7 +68,7 @@ export class KMapKnowledgeCard extends Connected {
     return {
       _instance: state.app.instance,
       _userid: state.app.userid,
-      _topics: state.tests.topics,
+      _topicCounts: state.tests.topicCounts,
       _rates: state.rates.rates,
       _compactCards: state.shell.compactCards,
     };
@@ -83,7 +82,7 @@ export class KMapKnowledgeCard extends Connected {
       this.divideAttachments(this.card ? this.card.attachments : []);
 
     if (changedProperties.has("card") || changedProperties.has("_topics"))
-      this._hasTests = this.card !== undefined && this._topics !== undefined && includes(this._topics, this.card.chapter, this.card.topic);
+      this._testCount = (this.card !== undefined) ? this._topicCounts[this.card.chapter + "/"+ this.card.topic] : 0;
   }
 
   _colorize(rate) {
@@ -331,8 +330,8 @@ export class KMapKnowledgeCard extends Connected {
           ${!this.card.links && false ? html`
             <star-rating slot="button" .rate="${this.state}" @clicked="${this._rated}"></star-rating>
           ` : '' }
-          ${this._hasTests ? html`
-            <mwc-icon-button slot="icon" icon="quiz" title="Aufgaben zum Thema ${this.card.topic}" @click="${this._test}"></mwc-icon-button>
+          ${this._testCount ? html`
+            <mwc-icon-button slot="icon" icon="quiz" title="${this._testCount} Aufgaben zum Thema ${this.card.topic}" @click="${this._test}"></mwc-icon-button>
           `:'' }
             <mwc-icon-button slot="icon" icon="feedback" title="Feedback" @click="${this._feedback}"></mwc-icon-button>
             <mwc-icon-button slot="icon" icon="share" title="Teilen..." ?hidden="${typeof navigator['share'] !== 'function'}" @click="${this._share}"></mwc-icon-button>

@@ -44,6 +44,8 @@ export class KMapLoginPopup extends Connected {
   // @ts-ignore
   private _loginInstance: DatalistTextField;
 
+  declare shadowRoot: ShadowRoot;
+
   mapState(state: State) {
     return {
       _instances: state.instances.instances,
@@ -84,8 +86,6 @@ export class KMapLoginPopup extends Connected {
   }
 
   _login() {
-    if (!this.shadowRoot)
-      return;
     const loginId = this.shadowRoot.getElementById("loginId") as HTMLInputElement;
     const loginPassword = this.shadowRoot.getElementById("loginPassword") as HTMLInputElement;
 

@@ -15,7 +15,6 @@ import '@material/mwc-top-app-bar';
 import '@material/menu-surface';
 import {colorStyles, elevationStyles, fontStyles} from "./kmap-styles";
 import {Subject} from "../models/subjects";
-import {count, TopicCount} from "../models/tests";
 
 @customElement('kmap-test-chooser')
 export class KmapTestChooser extends Connected {
@@ -30,7 +29,7 @@ export class KmapTestChooser extends Connected {
   @state()
   private _chaptersLoading: boolean = false;
   @state()
-  private _testTopics?: TopicCount[];
+  private _chapterCounts: {};
 
   @state()
   private _arrangedChapters: string[] = [];
@@ -47,7 +46,7 @@ export class KmapTestChooser extends Connected {
       _chapters: state.tests.chapters,
       _tree: state.tests.tree,
       _chaptersLoading: state.tests.loadingChapters || state.tests.loadingTree,
-      _testTopics: state.tests.topics,
+      _chapterCounts: state.tests.chapterCounts,
     };
   }
 
@@ -63,10 +62,7 @@ export class KmapTestChooser extends Connected {
       this.arrange(this._chapters, this._tree);
 
     if (changedProperties.has("_chapter")) {
-      if (this._chapter)
-        this._maxNumber = this._testTopics !== undefined ? count(this._testTopics, this._chapter) : undefined;
-      else
-        this._maxNumber = undefined;
+      this._maxNumber = (this._chapter && this._chapterCounts !== undefined) ? this._chapterCounts[this._chapter] : 0;
     }
   }
 

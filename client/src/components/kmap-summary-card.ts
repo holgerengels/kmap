@@ -13,7 +13,6 @@ import './kmap-summary-card-ratecolors';
 import {colorStyles, elevationStyles, fontStyles} from "./kmap-styles";
 import {encodePath} from "../urls";
 import {Card} from "../models/types";
-import {includes, TopicCount} from "../models/tests";
 
 @customElement('kmap-summary-card')
 export class KMapSummaryCard extends Connected {
@@ -40,9 +39,9 @@ export class KMapSummaryCard extends Connected {
   @state()
   private _colorStyles: StyleInfo = { backgroundColor: "white" };
   @state()
-  private _hasTests: boolean = false;
+  private _testCount?: number;
   @state()
-  private _topics?: TopicCount[];
+  private _topicCounts: {};
   @state()
   private _selectedDependencies: string[] = [];
 
@@ -55,7 +54,7 @@ export class KMapSummaryCard extends Connected {
     return {
       _instance: state.app.instance,
       _userid: state.app.userid,
-      _topics: state.tests.topics,
+      _topicCounts: state.tests.topicCounts,
       _layers: state.shell.layers,
       _selectedDependencies: state.maps.selectedDependencies,
       selected: this.card !== undefined && state.maps.selected === this.card.topic,
@@ -74,8 +73,8 @@ export class KMapSummaryCard extends Connected {
       this._key = this.card.links ? this.card.links : this.card.chapter + "." + this.card.topic;
     }
 
-    if (changedProperties.has("card") || changedProperties.has("_topics"))
-      this._hasTests = this.card !== undefined && this._topics !== undefined && includes(this._topics, this.card.chapter, this.card.topic);
+    if (changedProperties.has("card") || changedProperties.has("_topicCounts"))
+      this._testCount = (this.card !== undefined) ? this._topicCounts[this.card.chapter + "/"+ this.card.topic] : 0;
 
     if (changedProperties.has("_userid") || changedProperties.has("_layers") || changedProperties.has("_key"))
       this._colorizeEvent( );
@@ -187,8 +186,8 @@ export class KMapSummaryCard extends Connected {
           ${this._layers.includes('ratings') && !this.card.links && !this._layers.includes('averages') ? html`
             <kmap-summary-card-rating slot="button" .key="${this._key}" style="padding-left: 8px"></kmap-summary-card-rating>
           ` : '' }
-          ${this._hasTests ? html`
-            <mwc-icon-button slot="icon" icon="quiz" title="Aufgaben zum Thema ${this.card.topic}" @click="${this._test}"></mwc-icon-button>
+          ${this._testCount ? html`
+            <mwc-icon-button slot="icon" icon="quiz" title="${this._testCount} Aufgaben zum Thema ${this.card.topic}" @click="${this._test}"></mwc-icon-button>
           ` : '' }
         </kmap-card>
     `;

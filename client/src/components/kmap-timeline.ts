@@ -24,6 +24,8 @@ export class KMapTimeline extends LitElement {
   @state()
   private _target?: string[];
 
+  declare shadowRoot: ShadowRoot;
+
   willUpdate(changedProperties) {
     if (changedProperties.has("curriculum")) {
       if (this.curriculum) {
@@ -48,8 +50,6 @@ export class KMapTimeline extends LitElement {
   }
 
   mark(sw, scroll?) {
-    if (!this.shadowRoot) return;
-
     this.shadowRoot.querySelectorAll("mwc-icon-button").forEach(e => e.removeAttribute("selected"));
 
     if (sw != -1) {

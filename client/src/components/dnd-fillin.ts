@@ -38,6 +38,8 @@ export class DndFillin extends LitElement {
   private _sid?: string;
   private _tid?: string;
 
+  declare shadowRoot: ShadowRoot;
+
   protected willUpdate(changedProperties: PropertyValues) {
     if (changedProperties.has("_items")) {
       this._drags = shuffleArray([...this._items]);
@@ -176,8 +178,6 @@ export class DndFillin extends LitElement {
     document.body.appendChild(item);
 
     const moveItem = (event) => {
-      if (this.shadowRoot === null) return;
-
       let itemAbsoluteLeft = getPageX(event);
       let itemAbsoluteTop = getPageY(event);
       item.style.left = itemAbsoluteLeft + containerX + 'px'
@@ -210,8 +210,6 @@ export class DndFillin extends LitElement {
   }
 
   private _hover(mark?: Element) {
-    if (!this.shadowRoot) return;
-
     this.shadowRoot.querySelectorAll("drag, drop").forEach(e => {
       if (e === mark)
         e.classList.add("hover");
@@ -222,7 +220,6 @@ export class DndFillin extends LitElement {
 
   _drop() {
     if (!this._sid || !this._tid) return;
-    if (!this.shadowRoot) return;
 
     const sid = this._sid;
     // @ts-ignore

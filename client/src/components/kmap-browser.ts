@@ -21,7 +21,6 @@ import {throttle} from "../debounce";
 import {Timeline} from "../models/courses";
 import {StyleInfo, styleMap} from 'lit/directives/style-map.js';
 import {Connected} from "./connected";
-import {includes, TopicCount} from "../models/tests";
 
 type SideBarState = "hidden" | "collapsed" | "open";
 
@@ -48,9 +47,9 @@ export class KMapBrowser extends Connected {
   @state()
   private _maxCols: number = 0;
   @state()
-  private _hasTests: boolean = false;
+  private _testCount?: number;
   @state()
-  private _testTopics?: TopicCount[];
+  private _chapterCounts: {};
 
   @state()
   private _page: string = '';
@@ -90,6 +89,8 @@ export class KMapBrowser extends Connected {
   @query('#timeline')
   private _timelineElement: KMapTimelineAside;
 
+  declare shadowRoot: ShadowRoot;
+
   mapState(state: State) {
     return {
       _userid: state.app.userid,
@@ -105,7 +106,7 @@ export class KMapBrowser extends Connected {
       _chapterCard: state.maps.chapterCard,
       _topicCard: state.maps.topicCard,
       _loading: state.maps.loading,
-      _testTopics: state.tests.topics,
+      _chapterCounts: state.tests.chapterCounts,
       _selected: state.maps.selected,
       _highlighted: state.maps.selectedDependencies,
       _timeline: state.courses.selectedTimeline,
@@ -169,9 +170,6 @@ export class KMapBrowser extends Connected {
     }
 
     if (this._layers.includes("dependencies") && (changedProperties.has("_selected") || changedProperties.has("_highlighted"))) {
-      if (!this.shadowRoot)
-        return;
-
       const connector: Connector = this.shadowRoot.getElementById("connector") as Connector;
       if (connector) {
         connector.clear();
@@ -200,7 +198,7 @@ export class KMapBrowser extends Connected {
     }
 
     if (changedProperties.has("_chapter")) {
-      this._hasTests = this._testTopics !== undefined && includes(this._testTopics, this._chapter);
+      this._testCount = (this._chapterCounts !== undefined) ? this._chapterCounts[this._chapter] : 0;
       // @ts-ignore
       const connector: Connector = this.shadowRoot.getElementById("connector") as Connector;
       if (connector) {
@@ -411,8 +409,8 @@ export class KMapBrowser extends Connected {
         ${this._chapterCard.description ? html`
           <a class="button" slot="button" href="/app/browser/${encodePath(this._subject, this._chapter, '_')}" title="Wissenskarte ${this._chapter}">Mehr</a>
         ` : ''}
-        ${this._hasTests ? html`
-          <span slot="icon" class="print-show">Gemischte Aufgaben →&nbsp;</span><mwc-icon-button slot="icon" icon="quiz" title="Aufgaben zum Kapitel ${this._chapter}" @click="${this._test}"></mwc-icon-button>
+        ${this._testCount ? html`
+          <span slot="icon" class="print-show">Gemischte Aufgaben →&nbsp;</span><mwc-icon-button slot="icon" icon="quiz" title="${this._testCount} Aufgaben zum Kapitel ${this._chapter}" @click="${this._test}"></mwc-icon-button>
         ` : '' }
       </kmap-card>
     ` : '';

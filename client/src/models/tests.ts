@@ -42,6 +42,8 @@ export interface TopicCount {
 export interface TestsState {
   order: "shuffled" | "increasing difficulty";
   topics?: TopicCount[],
+  topicCounts: object,
+  chapterCounts: object,
   chapters?: string[],
   subject?: string,
   chapter?: string,
@@ -69,6 +71,8 @@ export interface TestsState {
 export default createModel({
   state: <TestsState>{
     order: "increasing difficulty",
+    topicCounts: {},
+    chapterCounts: {},
     results: [],
     loadingTopics: false,
     loadingChapters: false,
@@ -102,6 +106,14 @@ export default createModel({
     receivedTopics(state, payload: TopicCount[]) {
       return { ...state,
         topics: payload,
+        topicCounts: Object.fromEntries(payload.map(tc => [tc.topic ? tc.chapter + "/" + tc.topic : tc.chapter, tc.count])),
+        chapterCounts: payload.reduce((o, tc) => {
+          const name = tc.chapter;
+          if (!o.hasOwnProperty(name))
+            o[name] = 0;
+          o[name] += tc.count;
+          return o;
+        }, {}),
         loadingTopics: false,
       };
     },
@@ -159,6 +171,8 @@ export default createModel({
         testForRename: undefined,
         testForEdit: undefined,
         topics: undefined,
+        topicCounts: {},
+        chapterCounts: {},
       };
     },
 
@@ -474,15 +488,3 @@ export default createModel({
     }
   }
 })
-
-export const includes = (topics: TopicCount[], chapter: string, topic?: string): boolean => {
-  for (const count of topics) {
-    if (count.chapter === chapter && (topic === undefined || count.topic === topic))
-      return true;
-  }
-  return false;
-};
-
-export const count = (topics: TopicCount[], chapter: string, topic?: string): number | undefined => {
-  return topics.filter(t => t.chapter === chapter && (topic === undefined || t.topic === topic)).map(t => t.count).reduce((sum, c) => sum + c, 0)
-};
