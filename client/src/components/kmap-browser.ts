@@ -198,7 +198,7 @@ export class KMapBrowser extends Connected {
     }
 
     if (changedProperties.has("_chapter")) {
-      this._testCount = (this._chapterCounts !== undefined) ? this._chapterCounts[this._chapter] : 0;
+      this._testCount = (this._chapterCounts !== undefined && this._chapterCounts !== undefined) ? this._chapterCounts[this._chapter] : 0;
       // @ts-ignore
       const connector: Connector = this.shadowRoot.getElementById("connector") as Connector;
       if (connector) {

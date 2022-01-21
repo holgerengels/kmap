@@ -82,7 +82,7 @@ export class KMapKnowledgeCard extends Connected {
       this.divideAttachments(this.card ? this.card.attachments : []);
 
     if (changedProperties.has("card") || changedProperties.has("_topics"))
-      this._testCount = (this.card !== undefined) ? this._topicCounts[this.card.chapter + "/"+ this.card.topic] : 0;
+      this._testCount = (this.card !== undefined && this._topicCounts !== undefined) ? this._topicCounts[this.card.chapter + "/"+ this.card.topic] : 0;
   }
 
   _colorize(rate) {

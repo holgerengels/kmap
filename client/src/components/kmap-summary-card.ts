@@ -74,7 +74,7 @@ export class KMapSummaryCard extends Connected {
     }
 
     if (changedProperties.has("card") || changedProperties.has("_topicCounts"))
-      this._testCount = (this.card !== undefined) ? this._topicCounts[this.card.chapter + "/"+ this.card.topic] : 0;
+      this._testCount = (this.card !== undefined && this._topicCounts !== undefined) ? this._topicCounts[this.card.chapter + "/"+ this.card.topic] : 0;
 
     if (changedProperties.has("_userid") || changedProperties.has("_layers") || changedProperties.has("_key"))
       this._colorizeEvent( );
