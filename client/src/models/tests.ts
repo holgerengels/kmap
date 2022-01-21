@@ -298,7 +298,7 @@ export default createModel({
           return;
 
         // @ts-ignore
-        if (!state.tests.topics || state.tests.loadedTopics != subject) {
+        if (!state.tests.topics || !state.tests.topicCounts || !state.tests.chapterCounts || state.tests.loadedTopics != subject) {
           dispatch.tests.requestTopics();
           await fetchjson(`${urls.server}tests?topics=all&subject=${subject}`, endpoint.get(state),
             dispatch.tests.receivedTopics,
