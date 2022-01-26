@@ -145,6 +145,7 @@ export class KmapMain extends connect(store, LitElement) {
 
     installOfflineWatcher((offline) => store.dispatch.app.updateOffline(offline));
     installMediaQueryWatcher(`(max-width: 500px)`, (matches) => store.dispatch.shell.updateNarrow(matches));
+    installMediaQueryWatcher(`(min-width: 1600px)`, (matches) => store.dispatch.shell.updateWide(matches));
     this.installOnErrorHandler();
 
     var supportsPassive = false;

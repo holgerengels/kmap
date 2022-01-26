@@ -22,6 +22,7 @@ export interface Meta {
 export interface ShellState {
   meta: Meta,
   narrow: boolean,
+  wide: boolean,
   drawerOpen: boolean,
   passiveEventListeners: boolean,
   messages: string[],
@@ -33,6 +34,7 @@ export default createModel({
   state: <ShellState>{
     meta: {},
     narrow: false,
+    wide: false,
     drawerOpen: false,
     passiveEventListeners: false,
     messages: [],
@@ -45,6 +47,9 @@ export default createModel({
     },
     updateNarrow(state, narrow: boolean) {
       return { ...state, narrow: narrow }
+    },
+    updateWide(state, wide: boolean) {
+      return { ...state, wide: wide }
     },
     updateDrawerOpen(state, drawerOpen: boolean) {
       return { ...state, drawerOpen: drawerOpen }

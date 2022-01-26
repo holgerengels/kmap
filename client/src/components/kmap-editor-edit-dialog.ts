@@ -54,6 +54,15 @@ export class KMapEditorEditDialog extends Connected {
   private _typicalAgeRange: string = '';
   @state()
   private _tab: string = 'editor';
+  @state()
+  private _innerTab: string = 'meta';
+
+  @state()
+  private _metaVisible: boolean = false;
+  @state()
+  private _contentVisible: boolean = false;
+  @state()
+  private _previewVisible: boolean = false;
 
   @state()
   private _depends: string = '';
@@ -88,6 +97,9 @@ export class KMapEditorEditDialog extends Connected {
   @state()
   private _navigateAfterSave?: string = '';
 
+  @state()
+  private _wide: boolean = false;
+
   @query('#editDialog')
   private _editDialog: Dialog;
   @query('#summary')
@@ -98,7 +110,9 @@ export class KMapEditorEditDialog extends Connected {
   private _tabBar: TabBar;
 
   @state()
-  private _valid: boolean = false;
+  private _metaValid: boolean = false;
+  @state()
+  private _contentValid: boolean = false;
 
   @query('#attachmentForm')
   private _attachmentForm: HTMLFormElement;
@@ -108,6 +122,7 @@ export class KMapEditorEditDialog extends Connected {
 
   mapState(state: State) {
     return {
+      _wide: state.shell.wide,
       _instance: state.app.instance,
       _card: state.maps.editAction?.action === "edit" ? state.maps.editAction.card : undefined,
       _uploads: state.uploads.uploads,
@@ -145,7 +160,9 @@ export class KMapEditorEditDialog extends Connected {
       this._attachments = this._card.attachments;
 
       this._editDialog.show();
-      this._editDialog.forceLayout();
+
+      this._metaValid = true;
+      this._contentValid = true;
     }
 
     if (changedProperties.has("_uploads")) {
@@ -160,6 +177,19 @@ export class KMapEditorEditDialog extends Connected {
         const min = Math.min(...levels) + 5;
         const max = Math.max(...levels) + 5;
         this._typicalAgeRange = min === max ? "" + min : min + "-" + max;
+      }
+    }
+
+    if (changedProperties.has("_tab") || changedProperties.has("_innerTab") || changedProperties.has("_wide")) {
+      if (this._wide) {
+        this._metaVisible = this._innerTab === 'meta';
+        this._contentVisible = this._innerTab === 'content';
+        this._previewVisible = true;
+      }
+      else {
+        this._metaVisible = this._tab === 'meta';
+        this._contentVisible = this._tab === 'content';
+        this._previewVisible = this._tab === 'preview';
       }
     }
   }
@@ -259,19 +289,28 @@ export class KMapEditorEditDialog extends Connected {
     this.requestUpdate();
   }
 
-  _captureEnter(e) {
+  _captureKeys(e) {
     if (!e.metaKey && e.key === "Enter")
       e.cancelBubble = true;
+    else if (e.key === "p" && e.altKey === true) {
+      if (!this._wide)
+        this._tabBar.activeIndex = 2;
+    }
   }
 
   _switchTab(e) {
-    const old = this._tab;
     if (e.type === "MDCTabBar:activated")
-      this._tab = e.detail.index === 0 ? 'editor' : 'preview';
-    else if (e.key === "p" && e.altKey === true)
-      this._tabBar.activeIndex = this._tab === 'editor' ? 1 : 0;
+      this._tab = !this._wide ? ['meta', 'content', 'preview'][e.detail.index] : ['editor', 'preview'][e.detail.index];
 
-    if (old !== this._tab && this._tab === 'editor')
+    if (this._contentVisible)
+      this._descriptionTextArea.focus();
+  }
+
+  _switchInnerTab(e) {
+    if (e.type === "MDCTabBar:activated")
+      this._innerTab = e.detail.index === 0 ? 'meta' : 'content';
+
+    if (this._contentVisible)
       this._descriptionTextArea.focus();
   }
 
@@ -290,6 +329,30 @@ export class KMapEditorEditDialog extends Connected {
         mwc-dialog {
           --mdc-dialog-min-width: calc(100vw - 64px);
           --mdc-dialog-max-width: calc(100vw - 64px);
+          --mdc-dialog-min-height: calc(100vh - 64px);
+          --mdc-dialog-max-height: calc(100vh - 64px);
+        }
+        .dialog {
+          height: calc(100vh - 198px);
+        }
+        .tab {
+          display: grid;
+          grid-template-rows: min-content 1fr;
+        }
+        .wide {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          column-gap: 32px;
+          justify-items: stretch;
+          height: inherit;
+        }
+        .lala {
+          display: grid;
+          grid-template-rows: min-content 1fr;
+          height: 100%;
+        }
+        .preview {
+          overflow-y: auto;
         }
         mwc-icon-button, mwc-button {
           vertical-align: middle
@@ -322,6 +385,60 @@ export class KMapEditorEditDialog extends Connected {
   }
 
   render() {
+    // language=HTML
+    return this._card ? html`
+      <mwc-dialog id="editDialog" heading="Editor ${this._tab} ${this._innerTab}" @keydown="${this._switchTab}">
+          <div class="dialog tab">
+            ${!this._wide ? html`
+              <mwc-tab-bar id="tabBar" @MDCTabBar:activated="${this._switchTab}">
+                <mwc-tab label="Metadaten" ?hidden="${this._wide}"></mwc-tab>
+                <mwc-tab label="${this._wide ? 'Editor' : 'Inhalt'}"></mwc-tab>
+                <mwc-tab label="Preview"></mwc-tab>
+              </mwc-tab-bar>
+              ${this.renderMeta()}
+              ${this.renderContent()}
+              ${this.renderPreview()}
+              ` : html`
+                <div class="wide">
+                  <div class="tab">
+                    <mwc-tab-bar id="innerTabBar" @MDCTabBar:activated="${this._switchInnerTab}" ?hidden="${!this._wide}">
+                      <mwc-tab label="Metadaten"></mwc-tab>
+                      <mwc-tab label="Inhalt"></mwc-tab>
+                    </mwc-tab-bar>
+                    ${this.renderMeta()}
+                    ${this.renderContent()}
+                  </div>
+                  ${this.renderPreview()}
+                </div>
+              `}
+          </div>
+
+        <mwc-button slot="secondaryAction" @click=${this._cancel}>Abbrechen</mwc-button>
+        <mwc-button ?disabled="${this._pendingUploads || !this._metaValid || !this._contentValid}" slot="primaryAction" @click=${this._save}>Speichern</mwc-button>
+      </mwc-dialog>` : '';
+  }
+
+  renderMeta() {
+    // language=HTML
+    return this._card ? html`
+      <validating-form @keydown="${this._captureKeys}" @validity="${e => this._metaValid = e.target.valid}" ?hidden="${!this._metaVisible}">
+        <div class="form">
+          <mwc-textfield s3 id="topic" name="topic" disabled label="Thema" dense type="text" .value="${this._card.topic !== '_' ? this._card.topic : "Allgemeines zu " + this._card.chapter}"></mwc-textfield>
+          <mwc-textfield s2 ?hidden="${this._card.topic === '_'}" id="links" name="links" label="Verweist auf ..." dense type="text" .value="${this._links}" @change="${e => this._links = e.target.value}" pattern="^([^/.]*)$"></mwc-textfield>
+          <mwc-textfield s1 ?hidden="${this._card.topic === '_'}" id="priority" name="priority" label="Priorität" dense type="number" inputmode="numeric" min="0" step="1" .value="${this._priority}" @change="${e => this._priority = e.target.value}"></mwc-textfield>
+          <mwc-textfield s5 ?hidden="${this._card.topic === '_'}" ?dialogInitialFocus="${this._card.topic !== '_'}" id="depends" label="Basiert auf ..." dense .value=${this._depends} @change="${e => this._depends = e.target.value}"></mwc-textfield>
+          <mwc-textfield s1 ?hidden="${this._card.topic === '_'}" id="thumb" label="Thumbnail" dense .value=${this._thumb} @change="${e => this._thumb = e.target.value}"></mwc-textfield>
+          <mwc-textfield s5 ?hidden="${this._card.topic === '_'}" id="keywords" label="Keywords" dense .value=${this._keywords} @change="${e => this._keywords = e.target.value}"></mwc-textfield>
+          <mwc-textfield s1 ?hidden="${this._card.topic === '_'}" id="sgs" label="SGS" dense .value=${this._sgs} @change="${e => this._sgs = e.target.value}" required></mwc-textfield>
+          <mwc-textfield s2 ?hidden="${this._card.topic === '_'}" id="educationalLevel" label="Klassenstufe" helper="Z.B. 11, 12" dense .value=${this._educationalLevel} @change="${e => this._educationalLevel = e.target.value}" pattern="^ ?[0-9]{1,2} ?(, ?[0-9]{1,2} ?)*" required></mwc-textfield>
+          <mwc-textfield s2 ?hidden="${this._card.topic === '_'}" id="educationalContext" label="Kontext" helper="Z.B. Primarstufe, Sekundarstufe I" dense .value=${this._educationalContext} @change="${e => this._educationalContext = e.target.value}" required></mwc-textfield>
+          <mwc-textfield s2 ?hidden="${this._card.topic === '_'}" id="typicalAgeRange" label="Alter" disabled dense .value=${this._typicalAgeRange}></mwc-textfield>
+        </div>
+      </validating-form>
+    ` : '';
+  }
+
+  renderContent() {
     const styles = this._attachmentType === "link"
       ? {
         gridTemplateColumns: "1fr 1fr 36px 2fr 36px"
@@ -330,33 +447,16 @@ export class KMapEditorEditDialog extends Connected {
       };
 
     // language=HTML
-    return html`
-<mwc-dialog id="editDialog" heading="Editor" @keydown="${this._switchTab}">
-${this._card ? html`
-  <mwc-tab-bar id="tabBar" @MDCTabBar:activated="${this._switchTab}">
-    <mwc-tab label="Editor"></mwc-tab>
-    <mwc-tab label="Preview"></mwc-tab>
-  </mwc-tab-bar>
-  <div ?hidden="${this._tab === 'preview'}">
-    <validating-form @keydown="${this._captureEnter}" @validity="${e => this._valid = e.target.valid}">
-      <div class="form">
-        <mwc-textfield s3 id="topic" name="topic" disabled label="Thema" dense type="text" .value="${this._card.topic !== '_' ? this._card.topic : "Allgemeines zu " + this._card.chapter}"></mwc-textfield>
-        <mwc-textfield s2 ?hidden="${this._card.topic === '_'}" id="links" name="links" label="Verweist auf ..." dense type="text" .value="${this._links}" @change="${e => this._links = e.target.value}" pattern="^([^/.]*)$"></mwc-textfield>
-        <mwc-textfield s1 ?hidden="${this._card.topic === '_'}" id="priority" name="priority" label="Priorität" dense type="number" inputmode="numeric" min="0" step="1" .value="${this._priority}" @change="${e => this._priority = e.target.value}"></mwc-textfield>
-        <mwc-textfield s5 ?hidden="${this._card.topic === '_'}" ?dialogInitialFocus="${this._card.topic !== '_'}" id="depends" label="Basiert auf ..." dense .value=${this._depends} @change="${e => this._depends = e.target.value}"></mwc-textfield>
-        <mwc-textfield s1 ?hidden="${this._card.topic === '_'}" id="thumb" label="Thumbnail" dense .value=${this._thumb} @change="${e => this._thumb = e.target.value}"></mwc-textfield>
-        <mwc-textfield s5 ?hidden="${this._card.topic === '_'}" id="keywords" label="Keywords" dense .value=${this._keywords} @change="${e => this._keywords = e.target.value}"></mwc-textfield>
-        <mwc-textfield s1 ?hidden="${this._card.topic === '_'}" id="sgs" label="SGS" dense .value=${this._sgs} @change="${e => this._sgs = e.target.value}"></mwc-textfield>
-        <mwc-textfield s2 ?hidden="${this._card.topic === '_'}" id="educationalLevel" label="Klassenstufe" helper="Z.B. 11, 12" dense .value=${this._educationalLevel} @change="${e => this._educationalLevel = e.target.value}" pattern="^ ?[0-9]{1,2} ?(, ?[0-9]{1,2} ?)*"></mwc-textfield>
-        <mwc-textfield s2 ?hidden="${this._card.topic === '_'}" id="educationalContext" label="Kontext" helper="Z.B. Primarstufe, Sekundarstufe I" dense .value=${this._educationalContext} @change="${e => this._educationalContext = e.target.value}"></mwc-textfield>
-        <mwc-textfield s2 ?hidden="${this._card.topic === '_'}" id="typicalAgeRange" label="Alter" disabled dense .value=${this._typicalAgeRange}></mwc-textfield>
-        <mwc-textarea s6 id="summary" label="Kurztext" ?dialogInitialFocus="${this._card.topic === '_'}" dense ?required=${this._description} fullwidth rows="2" .value=${this._card.summary} @keyup="${this._setSummary}"></mwc-textarea>
-        <mwc-textarea s6 id="description" label="Langtext" dense fullwidth rows="9" .value=${this._card.description} @keyup="${this._setDescription}"></mwc-textarea>
-      </div>
-    </validating-form>
+    return this._card ? html`
+      <validating-form @keydown="${this._captureKeys}" @validity="${e => this._contentValid = e.target.valid}" ?hidden="${!this._contentVisible}">
+        <div class="lala">
+          <mwc-textarea id="summary" label="Kurztext" ?dialogInitialFocus="${this._card.topic === '_'}" dense ?required=${this._description} fullwidth rows="1" .value=${this._card.summary} @keyup="${this._setSummary}"></mwc-textarea>
+          <mwc-textarea id="description" label="Langtext" dense fullwidth drows="9" .value=${this._card.description} @keyup="${this._setDescription}"></mwc-textarea>
+        </div>
+      </validating-form>
 
-    <div class="attachments">
-      <label for="attachments">Materialien</label><br/>
+      <div class="attachments" ?hidden="${!this._contentVisible}">
+        <label for="attachments">Materialien</label><br/>
       ${this._attachments.map((attachment) => html`
         <div class="form" style="grid-template-columns: 1fr 36px">
           <div @click="${() => this._copy(attachment)}">
@@ -370,26 +470,31 @@ ${this._card ? html`
           <mwc-icon-button icon="delete" @click="${() => this._deleteAttachment(attachment)}"></mwc-icon-button>
         </div>
       `)}
-    </div>
-    <validating-form id="attachmentForm" @validity="${e => this._attachmentValid = e.target.valid}">
-      <div class="form" style="${styleMap(styles)}" @dragover="${() => this._attachmentType = 'file'}">
-        <mwc-select id="tag" label="Tag" .value="${this._attachmentTag}" @change="${e => this._attachmentTag = e.target.value}">
-          <mwc-list-item value="">Kein Tag</mwc-list-item>
-          ${Array.from(_tags).map(([key, value]) => html`
+      </div>
+      <validating-form id="attachmentForm" @validity="${e => this._attachmentValid = e.target.valid}" ?hidden="${!this._contentVisible}">
+        <div class="form" style="${styleMap(styles)}" @dragover="${() => this._attachmentType = 'file'}">
+          <mwc-select id="tag" label="Tag" .value="${this._attachmentTag}" @change="${e => this._attachmentTag = e.target.value}">
+            <mwc-list-item value="">Kein Tag</mwc-list-item>
+        ${Array.from(_tags).map(([key, value]) => html`
             <mwc-list-item value="${key}">${value}</mwc-list-item>
           `)}
-        </mwc-select>
-        <mwc-textfield id="name" type="text" label="Name" .value="${this._attachmentName}" @change="${e => this._attachmentName = e.target.value}"></mwc-textfield>
-        <mwc-icon-button-toggle ?on="${this._attachmentType === 'file'}" onIcon="attachment" offIcon="link" @MDCIconButtonToggle:change="${e => this._attachmentType = e.detail.isOn ? 'file' : 'link'}"></mwc-icon-button-toggle>
-        <mwc-textfield ?hidden="${this._attachmentType === "file"}" id="href" type="url" label="Link" .value="${this._attachmentHref}" @change="${e => this._attachmentHref = e.target.value}"></mwc-textfield>
-        <file-drop ?hidden="${this._attachmentType === "link"}" id="file" @filedrop="${this._fileDrop}"></file-drop>
-        <mwc-textfield ?hidden="${this._attachmentType === "link"}" id="mime" type="text" label="MimeType" .value="${this._attachmentMime}" @change="${e => this._attachmentMime = e.target.value}"></mwc-textfield>
-        <mwc-icon-button class="add" icon="add_circle" @click="${this._addAttachment}"></mwc-icon-button>
+      </mwc-select>
+      <mwc-textfield id="name" type="text" label="Name" .value="${this._attachmentName}" @change="${e => this._attachmentName = e.target.value}"></mwc-textfield>
+      <mwc-icon-button-toggle ?on="${this._attachmentType === 'file'}" onIcon="attachment" offIcon="link" @MDCIconButtonToggle:change="${e => this._attachmentType = e.detail.isOn ? 'file' : 'link'}"></mwc-icon-button-toggle>
+      <mwc-textfield ?hidden="${this._attachmentType === "file"}" id="href" type="url" label="Link" .value="${this._attachmentHref}" @change="${e => this._attachmentHref = e.target.value}"></mwc-textfield>
+      <file-drop ?hidden="${this._attachmentType === "link"}" id="file" @filedrop="${this._fileDrop}"></file-drop>
+      <mwc-textfield ?hidden="${this._attachmentType === "link"}" id="mime" type="text" label="MimeType" .value="${this._attachmentMime}" @change="${e => this._attachmentMime = e.target.value}"></mwc-textfield>
+      <mwc-icon-button class="add" icon="add_circle" @click="${this._addAttachment}"></mwc-icon-button>
       </div>
-    </validating-form>
-  </div>
-    <div ?hidden="${this._tab === 'editor'}">
-      <kmap-summary-card-summary .summary="${this._summary}"></kmap-summary-card-summary>
+      </validating-form>
+    ` : '';
+  }
+
+  renderPreview() {
+    return this._card ? html`
+    <div class="preview" ?hidden="${!this._previewVisible}">
+      <br/>
+      ${this._summary}
       <hr/>
       <kmap-knowledge-card-description
         .subject="${this._card.subject}"
@@ -399,12 +504,7 @@ ${this._card ? html`
         .instance="${this._instance}">
       </kmap-knowledge-card-description>
     </div>
-` : ''}
-
-  <mwc-button slot="secondaryAction" @click=${this._cancel}>Abbrechen</mwc-button>
-  <mwc-button ?disabled="${this._pendingUploads || !this._valid}" slot="primaryAction" @click=${this._save}>Speichern</mwc-button>
-</mwc-dialog>
-    `;
+    ` : '';
   }
 
   private _fileDrop(e) {

@@ -13,11 +13,6 @@ export class ValidatingForm extends LitElement {
   // @ts-ignore
   private _form: HTMLFormElement;
 
-  _slotchange() {
-    this._validates = this.querySelectorAll('[required],[pattern]');
-    //console.log(this._validates)
-  }
-
   reset() {
     this._form.reset();
     if (!this._validates)
@@ -31,8 +26,7 @@ export class ValidatingForm extends LitElement {
   }
 
   _checkValidity() {
-    if (this._validates === undefined)
-      return;
+    this._validates = this.querySelectorAll('[required],[pattern]');
 
     let valid = true;
     for (const validate of this._validates)
@@ -58,7 +52,7 @@ export class ValidatingForm extends LitElement {
     //language=HTML
     return html`
       <form @input="${this._checkValidity}">
-        <slot @slotchange="${this._slotchange}"></slot>
+        <slot></slot>
       </form>
     `;
   }
