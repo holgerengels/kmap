@@ -23,8 +23,9 @@ import {Dialog} from "@material/mwc-dialog/mwc-dialog";
 import {TextArea} from "@material/mwc-textarea/mwc-textarea";
 import {TabBar} from "@material/mwc-tab-bar/mwc-tab-bar";
 import {throttle} from "../debounce";
-import {Test} from "../models/tests";
 import {Attachment, Upload} from "../models/types";
+import {Test} from "../models/tests";
+import {FileDrop} from "./file-drop";
 
 @customElement('kmap-test-editor-edit-dialog')
 export class KMapTestEditorEditDialog extends Connected {
@@ -34,9 +35,6 @@ export class KMapTestEditorEditDialog extends Connected {
   private _chapters: string[] = [];
   @state()
   private _topics: string[] = [];
-
-  @state()
-  private _tab: string = 'editor';
 
   @state()
   private _test?: Test = undefined;
@@ -78,6 +76,19 @@ export class KMapTestEditorEditDialog extends Connected {
   @state()
   private _pendingUploads: boolean = false;
 
+  @state()
+  private _wide: boolean = false;
+  @state()
+  private _tab: string = 'editor';
+  @state()
+  private _innerTab: string = 'meta';
+  @state()
+  private _metaVisible: boolean = false;
+  @state()
+  private _contentVisible: boolean = false;
+  @state()
+  private _previewVisible: boolean = false;
+
   @query('#editDialog')
   private _editDialog: Dialog;
   @query('#question')
@@ -92,12 +103,19 @@ export class KMapTestEditorEditDialog extends Connected {
   private _tabBar: TabBar;
 
   @state()
-  private _valid: boolean = false;
+  private _metaValid: boolean = false;
+  @state()
+  private _contentValid: boolean = false;
+
+  @query('#file')
+  private _file: FileDrop;
 
   mapState(state: State) {
     return {
+      _wide: state.shell.wide,
       _test: state.tests.testForEdit,
       _allTopics: state.maps.allTopics,
+      _uploads: state.uploads.uploads,
     };
   }
 
@@ -140,7 +158,9 @@ export class KMapTestEditorEditDialog extends Connected {
       this._attachments = this._test.attachments || [];
 
       this._editDialog.show();
-      this._editDialog.forceLayout();
+
+      this._metaValid = true;
+      this._contentValid = true;
     }
 
     if (changedProperties.has('_answer')) {
@@ -162,31 +182,45 @@ export class KMapTestEditorEditDialog extends Connected {
     if (changedProperties.has("_uploads")) {
       this._pendingUploads = this._uploads.some(u => u.uploading);
     }
+
+    if (changedProperties.has("_tab") || changedProperties.has("_innerTab") || changedProperties.has("_wide")) {
+      if (this._wide) {
+        this._metaVisible = this._innerTab === 'meta';
+        this._contentVisible = this._innerTab === 'content';
+        this._previewVisible = true;
+      }
+      else {
+        this._metaVisible = this._tab === 'meta';
+        this._contentVisible = this._tab === 'content';
+        this._previewVisible = this._tab === 'preview';
+      }
+    }
   }
 
-  _save() {
+  async _save() {
     this._editDialog.close();
     if (!this._test)
       return;
 
-    this._test.subject = this._subject;
-    this._test.chapter = this._chapter;
-    this._test.topic = this._topic;
-    this._test.key = this._key;
-    this._test.level = this._level ? parseInt(this._level, 10) : undefined;
-    this._test.balance = this._balance;
-    this._test.question = this._question;
-    this._test.answer = this._answer;
-    this._test.hint = this._hint;
-    this._test.solution = this._solution;
-    this._test.values = this._values;
-    this._test.attachments = this._attachments;
-    if (!this._test.author)
-      this._test.author = store.state.app.username;
+    const test: Test = this._test;
+    test.subject = this._subject;
+    test.chapter = this._chapter;
+    test.topic = this._topic;
+    test.key = this._key;
+    test.level = this._level ? parseInt(this._level, 10) : undefined;
+    test.balance = this._balance;
+    test.question = this._question;
+    test.answer = this._answer;
+    test.hint = this._hint;
+    test.solution = this._solution;
+    test.values = this._values;
+    test.attachments = this._attachments;
+    if (!test.author)
+      test.author = store.state.app.username;
 
-    let test = this._test;
     console.log(test);
-    store.dispatch.tests.saveTest(this._test);
+
+    await store.dispatch.tests.saveTest(test);
 
     store.dispatch.testUploads.clearUploads();
   }
@@ -233,6 +267,7 @@ export class KMapTestEditorEditDialog extends Connected {
     }
 
     this._attachmentFile = undefined;
+    this._file.clear();
     this.requestUpdate();
   }
 
@@ -245,16 +280,29 @@ export class KMapTestEditorEditDialog extends Connected {
     this.requestUpdate();
   }
 
-  _captureEnter(e) {
+  _captureKeys(e) {
     if (!e.metaKey && e.key === "Enter")
       e.cancelBubble = true;
+    else if (e.key === "p" && e.altKey === true) {
+      if (!this._wide)
+        this._tabBar.activeIndex = 2;
+    }
   }
 
   _switchTab(e) {
     if (e.type === "MDCTabBar:activated")
-      this._tab = e.detail.index === 0 ? 'editor' : 'preview';
-    else if (e.key === "p" && e.altKey === true)
-      this._tabBar.activeIndex = this._tab === 'editor' ? 1 : 0;
+      this._tab = !this._wide ? ['meta', 'content', 'preview'][e.detail.index] : ['editor', 'preview'][e.detail.index];
+
+    if (this._contentVisible)
+      this._answerTextArea.focus();
+  }
+
+  _switchInnerTab(e) {
+    if (e.type === "MDCTabBar:activated")
+      this._innerTab = e.detail.index === 0 ? 'meta' : 'content';
+
+    if (this._contentVisible)
+      this._answerTextArea.focus();
   }
 
   _copy(attachment: Attachment) {
@@ -272,6 +320,30 @@ export class KMapTestEditorEditDialog extends Connected {
         mwc-dialog {
           --mdc-dialog-min-width: calc(100vw - 64px);
           --mdc-dialog-max-width: calc(100vw - 64px);
+          --mdc-dialog-min-height: calc(100vh - 64px);
+          --mdc-dialog-max-height: calc(100vh - 64px);
+        }
+        .dialog {
+          height: calc(100vh - 198px);
+        }
+        .tab {
+          display: grid;
+          grid-template-rows: min-content 1fr;
+        }
+        .wide {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          column-gap: 32px;
+          justify-items: stretch;
+          height: inherit;
+        }
+        .lala {
+          display: grid;
+          grid-template-rows: 1fr 2fr  1fr 1fr min-content;
+          height: 100%;
+        }
+        .preview {
+          overflow-y: auto;
         }
         mwc-icon-button, mwc-button {
           vertical-align: middle
@@ -279,22 +351,16 @@ export class KMapTestEditorEditDialog extends Connected {
         mwc-textfield, mwc-textarea, file-drop {
           margin-bottom: 4px;
         }
-        .preview-scroller {
-          z-index: 10000000;
-          position: fixed;
-          top: 16px;
-          left: 16px;
-          right: 16px;
-          max-height: 360px;
-          overflow-y: auto;
-          pointer-events: all;
-          border-radius: 3px;
-          box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
-          0 1px 5px 0 rgba(0, 0, 0, 0.12),
-          0 3px 1px -2px rgba(0, 0, 0, 0.2);
+        mwc-select { width: 100% }
+        .attachment {
+          display: block;
         }
-        .preview {
-          display: flex; justify-content: center; padding: 16px;
+        .attachment span[slot=secondary] {
+          display: block;
+          width: 100%;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          font-size: small;
         }
         kmap-test-card {
           display: block;
@@ -305,12 +371,6 @@ export class KMapTestEditorEditDialog extends Connected {
           0 1px 5px 0 rgba(0, 0, 0, 0.12),
           0 3px 1px -2px rgba(0, 0, 0, 0.2);
         }
-        .grid {
-          display: grid;
-          grid-template-columns: repeat(6, 1fr);
-          grid-gap: 8px;
-        }
-        mwc-select { width: 100% }
         input[type="text"] {
           border: 1px solid var(--color-mediumgray);
           background-color: var(--color-lightgray);
@@ -328,15 +388,42 @@ export class KMapTestEditorEditDialog extends Connected {
 
   render() {
     // language=HTML
-    return html`
-<mwc-dialog id="editDialog" heading="Test Editor" @keydown="${this._switchTab}">
-${this._test ? html`
-  <mwc-tab-bar id="tabBar" @MDCTabBar:activated="${this._switchTab}">
-    <mwc-tab label="Editor"></mwc-tab>
-    <mwc-tab label="Preview"></mwc-tab>
-  </mwc-tab-bar>
-  <div ?hidden="${this._tab === 'preview'}">
-    <validating-form @keydown="${this._captureEnter}" @validity="${e => this._valid = e.target.valid}">
+    return this._test ? html`
+      <mwc-dialog id="editDialog" heading="Test Editor" @keydown="${this._captureKeys}">
+        <div class="dialog tab">
+          ${!this._wide ? html`
+            <mwc-tab-bar id="tabBar" @MDCTabBar:activated="${this._switchTab}">
+              <mwc-tab label="Metadaten" ?hidden="${this._wide}"></mwc-tab>
+              <mwc-tab label="${this._wide ? 'Editor' : 'Inhalt'}"></mwc-tab>
+              <mwc-tab label="Preview"></mwc-tab>
+            </mwc-tab-bar>
+            ${this.renderMeta()}
+            ${this.renderContent()}
+            ${this.renderPreview()}
+          ` : html`
+            <div class="wide">
+              <div class="tab">
+                <mwc-tab-bar id="innerTabBar" @MDCTabBar:activated="${this._switchInnerTab}" ?hidden="${!this._wide}">
+                  <mwc-tab label="Metadaten"></mwc-tab>
+                  <mwc-tab label="Inhalt"></mwc-tab>
+                </mwc-tab-bar>
+                ${this.renderMeta()}
+                ${this.renderContent()}
+              </div>
+              ${this.renderPreview()}
+            </div>
+          `}
+        </div>
+
+        <mwc-button slot="secondaryAction" @click=${this._cancel}>Abbrechen</mwc-button>
+        <mwc-button ?disabled="${this._pendingUploads || !this._metaValid || !this._contentValid}" slot="primaryAction" @click=${this._save}>Speichern</mwc-button>
+      </mwc-dialog>` : '';
+  }
+
+  renderMeta() {
+    // language=HTML
+    return this._test ? html`
+    <validating-form @keydown="${this._captureKeys}" @validity="${e => this._metaValid = e.target.valid}" ?hidden="${!this._metaVisible}">
       <div class="form">
         <mwc-select s3 required label="Kapitel" @change="${e => this._chapter = e.target.value}">
           ${this._chapters.map((chapter) => html`<mwc-list-item value="${chapter}" ?selected="${chapter === this._chapter}">${chapter}</mwc-list-item>`)}
@@ -349,57 +436,66 @@ ${this._test ? html`
         <mwc-formfield s6 style="padding-left: 16px" alignEnd nowrap label="Layout Verhältnis Frage : Antwort =&nbsp;${this._balance}&nbsp;:&nbsp;${6 - this._balance}">
           <mwc-slider id="balance" style="vertical-align:middle; width: min(50%, 200px)" .value="${this._balance}" withTickMarks discrete step="1" min="0" max="5" @input=${e => this._balance = e.target.value}></mwc-slider>
         </mwc-formfield>
-        <mwc-textarea s6 id="question" label="Frage" rows="4" .value=${this._question} @keyup="${this._setQuestion}"></mwc-textarea>
-        <mwc-textarea s6 id="answer" label="Antwort" required rows="4" .value=${this._answer} @keyup="${this._setAnswer}"></mwc-textarea>
-        <mwc-textarea s6 id="hint" label="Hinweis" rows="2" .value=${this._hint} @keyup="${this._setHint}"></mwc-textarea>
-        <mwc-textarea s6 id="solution" label="Lösungsweg" rows="4" .value=${this._solution} @keyup="${this._setSolution}"></mwc-textarea>
-        <div s6 class="field values">
-          <label secondary>Werte (Checkboxen: true/false, Dezimalzahlen mit Punkt statt Komma)</label><br/>
-
-          ${this._values.map((value, i) => html`<input type="text" .value="${value}" @change="${e => this._values[i] = e.target.value}"/>`)}
-        </div>
       </div>
     </validating-form>
+    ` : '';
+  }
 
-    <div class="form">
-      <div s6 class="attachments">
-      <label for="attachments">Materialien</label><br/>
-      ${this._attachments.map((attachment) => html`
-        <div class="form" style="grid-template-columns: 1fr 36px">
-          <div @click="${() => this._copy(attachment)}">
-            <span>${attachment.file} (${attachment.mime})</span>
+  renderContent() {
+    // language=HTML
+    return this._test ? html`
+      <validating-form @keydown="${this._captureKeys}" @validity="${e => this._contentValid = e.target.valid}" ?hidden="${!this._contentVisible}">
+        <div class="lala">
+          <mwc-textarea id="question" label="Frage" rows="4" .value=${this._question} @keyup="${this._setQuestion}"></mwc-textarea>
+          <mwc-textarea id="answer" label="Antwort" required rows="4" .value=${this._answer} @keyup="${this._setAnswer}"></mwc-textarea>
+          <mwc-textarea id="hint" label="Hinweis" rows="2" .value=${this._hint} @keyup="${this._setHint}"></mwc-textarea>
+          <mwc-textarea id="solution" label="Lösungsweg" rows="4" .value=${this._solution} @keyup="${this._setSolution}"></mwc-textarea>
+          <div class="field values">
+            <label secondary>Werte (Checkboxen: true/false, Dezimalzahlen mit Punkt statt Komma)</label><br/>
+            ${this._values.map((value, i) => html`<input type="text" .value="${value}" @change="${e => this._values[i] = e.target.value}"/>`)}
           </div>
-          <mwc-icon-button icon="delete" @click="${() => this._deleteAttachment(attachment)}"></mwc-icon-button>
         </div>
-      `)}
-    </div>
-    <div s6 class="form" style="grid-template-columns: 1fr 36px">
-      <file-drop id="file" @filedrop="${e => this._attachmentFile = e.detail.file}"></file-drop>
-      <mwc-icon-button class="add" icon="add_circle" @click="${this._addAttachment}"></mwc-icon-button>
-    </div>
-    </div>
-  </div>
-  <div class="preview" ?hidden="${this._tab === 'editor'}">
-    <kmap-test-card hideHeader hideActions ?hintVisible="${this._hint}" ?solutionVisible="${this._solution}"
-        .subject="${this._subject}"
-        .set="${this._set}"
-        .chapter="${this._chapter}"
-        .topic="${this._topic}"
-        .key="${this._key}"
-        .level="${this._level}"
-        .balance="${this._balance}"
-        .question="${this._question}"
-        .answer="${this._answer}"
-        .hint="${this._hint}"
-        .solution="${this._solution}"
-        .num="1" .of="1">
-    </kmap-test-card>
-  </div>
-` : ''}
+      </validating-form>
 
-  <mwc-button slot="secondaryAction" @click=${this._cancel}>Abbrechen</mwc-button>
-  <mwc-button ?disabled="${this._pendingUploads || !this._valid}" slot="primaryAction" @click=${this._save}>Speichern</mwc-button>
-</mwc-dialog>
-    `;
+      <div class="attachments" ?hidden="${!this._contentVisible}">
+        <label for="attachments">Materialien</label><br/>
+        ${this._attachments.map((attachment) => html`
+          <div class="form" style="grid-template-columns: 1fr 36px">
+            <div @click="${() => this._copy(attachment)}">
+              <span slot="secondary">${attachment.file} (${attachment.mime})</span>
+            </div>
+            <mwc-icon-button icon="delete" @click="${() => this._deleteAttachment(attachment)}"></mwc-icon-button>
+          </div>
+        `)}
+      </div>
+      <div class="form" style="grid-template-columns: 1fr 36px"  ?hidden="${!this._contentVisible}">
+        <file-drop id="file" @filedrop="${e => this._attachmentFile = e.detail.file}"></file-drop>
+        <mwc-icon-button class="add" icon="add_circle" @click="${this._addAttachment}"></mwc-icon-button>
+      </div>
+    ` : '';
+  }
+
+  renderPreview() {
+    // language=HTML
+    return this._test ? html`
+      <div class="preview" ?hidden="${!this._previewVisible}">
+        <br/>
+        <kmap-test-card
+          hideHeader hideActions ?hintVisible="${this._hint}" ?solutionVisible="${this._solution}"
+          .set="${this._set}"
+          .subject="${this._subject}"
+          .chapter="${this._chapter}"
+          .topic="${this._topic}"
+          .key="${this._key}"
+          .level="${this._level}"
+          .balance="${this._balance}"
+          .question="${this._question}"
+          .answer="${this._answer}"
+          .hint="${this._hint}"
+          .solution="${this._solution}"
+          .num="1" .of="1">
+        </kmap-test-card>
+      </div>
+    ` : '';
   }
 }

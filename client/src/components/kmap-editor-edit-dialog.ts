@@ -24,8 +24,7 @@ import {Dialog} from "@material/mwc-dialog/mwc-dialog";
 import {TextArea} from "@material/mwc-textarea/mwc-textarea";
 import {TabBar} from "@material/mwc-tab-bar/mwc-tab-bar";
 import {throttle} from "../debounce";
-import {Upload} from "../models/types";
-import {Attachment, Card} from "../models/types";
+import {Attachment, Upload, Card} from "../models/types";
 import {FileDrop} from "./file-drop";
 import {styleMap} from "lit/directives/style-map.js";
 
@@ -52,17 +51,6 @@ export class KMapEditorEditDialog extends Connected {
   private _educationalContext: string = '';
   @state()
   private _typicalAgeRange: string = '';
-  @state()
-  private _tab: string = 'editor';
-  @state()
-  private _innerTab: string = 'meta';
-
-  @state()
-  private _metaVisible: boolean = false;
-  @state()
-  private _contentVisible: boolean = false;
-  @state()
-  private _previewVisible: boolean = false;
 
   @state()
   private _depends: string = '';
@@ -83,9 +71,6 @@ export class KMapEditorEditDialog extends Connected {
   private _attachmentHref: string = '';
   @state()
   private _attachmentFile?: File = undefined;
-  @property()
-  // @ts-ignore
-  private _attachmentValid: boolean = false;
 
   @state()
   private _attachments: Attachment[] = [];
@@ -99,6 +84,16 @@ export class KMapEditorEditDialog extends Connected {
 
   @state()
   private _wide: boolean = false;
+  @state()
+  private _tab: string = 'editor';
+  @state()
+  private _innerTab: string = 'meta';
+  @state()
+  private _metaVisible: boolean = false;
+  @state()
+  private _contentVisible: boolean = false;
+  @state()
+  private _previewVisible: boolean = false;
 
   @query('#editDialog')
   private _editDialog: Dialog;
@@ -113,6 +108,9 @@ export class KMapEditorEditDialog extends Connected {
   private _metaValid: boolean = false;
   @state()
   private _contentValid: boolean = false;
+  @property()
+  // @ts-ignore
+  private _attachmentValid: boolean = false;
 
   @query('#attachmentForm')
   private _attachmentForm: HTMLFormElement;
@@ -165,10 +163,6 @@ export class KMapEditorEditDialog extends Connected {
       this._contentValid = true;
     }
 
-    if (changedProperties.has("_uploads")) {
-      this._pendingUploads = this._uploads.some(u => u.uploading);
-    }
-
     if (changedProperties.has("_educationalLevel")) {
       const levels = this._educationalLevel?.split(",").map(l => l.trim()).map(l => Number.parseInt(l));
       if (!levels)
@@ -178,6 +172,10 @@ export class KMapEditorEditDialog extends Connected {
         const max = Math.max(...levels) + 5;
         this._typicalAgeRange = min === max ? "" + min : min + "-" + max;
       }
+    }
+
+    if (changedProperties.has("_uploads")) {
+      this._pendingUploads = this._uploads.some(u => u.uploading);
     }
 
     if (changedProperties.has("_tab") || changedProperties.has("_innerTab") || changedProperties.has("_wide")) {
@@ -218,6 +216,7 @@ export class KMapEditorEditDialog extends Connected {
     console.log(card);
 
     await store.dispatch.maps.saveTopic(card);
+
     window.setTimeout(function (navigateAfterSafe) {
       if (navigateAfterSafe) {
         store.dispatch.routing.replace(navigateAfterSafe);
@@ -270,11 +269,11 @@ export class KMapEditorEditDialog extends Connected {
       store.dispatch.uploads.upload(this._attachmentFile);
     }
 
+    this._attachmentFile = undefined;
     this._attachmentTag = '';
     this._attachmentName = '';
     this._attachmentMime = '';
     this._attachmentHref = '';
-    this._attachmentFile = undefined;
     this._attachmentForm.reset();
     this._file.clear();
     this.requestUpdate();
@@ -378,40 +377,38 @@ export class KMapEditorEditDialog extends Connected {
           letter-spacing: 0px;
           vertical-align: middle;
         }
-        [hidden] {
-          display: none;
-        }
+        [hidden] { display: none }
     `];
   }
 
   render() {
     // language=HTML
     return this._card ? html`
-      <mwc-dialog id="editDialog" heading="Editor ${this._tab} ${this._innerTab}" @keydown="${this._switchTab}">
-          <div class="dialog tab">
-            ${!this._wide ? html`
-              <mwc-tab-bar id="tabBar" @MDCTabBar:activated="${this._switchTab}">
-                <mwc-tab label="Metadaten" ?hidden="${this._wide}"></mwc-tab>
-                <mwc-tab label="${this._wide ? 'Editor' : 'Inhalt'}"></mwc-tab>
-                <mwc-tab label="Preview"></mwc-tab>
-              </mwc-tab-bar>
-              ${this.renderMeta()}
-              ${this.renderContent()}
+      <mwc-dialog id="editDialog" heading="Editor" @keydown="${this._captureKeys}">
+        <div class="dialog tab">
+          ${!this._wide ? html`
+            <mwc-tab-bar id="tabBar" @MDCTabBar:activated="${this._switchTab}">
+              <mwc-tab label="Metadaten" ?hidden="${this._wide}"></mwc-tab>
+              <mwc-tab label="${this._wide ? 'Editor' : 'Inhalt'}"></mwc-tab>
+              <mwc-tab label="Preview"></mwc-tab>
+            </mwc-tab-bar>
+            ${this.renderMeta()}
+            ${this.renderContent()}
+            ${this.renderPreview()}
+          ` : html`
+            <div class="wide">
+              <div class="tab">
+                <mwc-tab-bar id="innerTabBar" @MDCTabBar:activated="${this._switchInnerTab}" ?hidden="${!this._wide}">
+                  <mwc-tab label="Metadaten"></mwc-tab>
+                  <mwc-tab label="Inhalt"></mwc-tab>
+                </mwc-tab-bar>
+                ${this.renderMeta()}
+                ${this.renderContent()}
+              </div>
               ${this.renderPreview()}
-              ` : html`
-                <div class="wide">
-                  <div class="tab">
-                    <mwc-tab-bar id="innerTabBar" @MDCTabBar:activated="${this._switchInnerTab}" ?hidden="${!this._wide}">
-                      <mwc-tab label="Metadaten"></mwc-tab>
-                      <mwc-tab label="Inhalt"></mwc-tab>
-                    </mwc-tab-bar>
-                    ${this.renderMeta()}
-                    ${this.renderContent()}
-                  </div>
-                  ${this.renderPreview()}
-                </div>
-              `}
-          </div>
+            </div>
+          `}
+        </div>
 
         <mwc-button slot="secondaryAction" @click=${this._cancel}>Abbrechen</mwc-button>
         <mwc-button ?disabled="${this._pendingUploads || !this._metaValid || !this._contentValid}" slot="primaryAction" @click=${this._save}>Speichern</mwc-button>
@@ -439,13 +436,6 @@ export class KMapEditorEditDialog extends Connected {
   }
 
   renderContent() {
-    const styles = this._attachmentType === "link"
-      ? {
-        gridTemplateColumns: "1fr 1fr 36px 2fr 36px"
-      } : {
-        gridTemplateColumns: "1fr 1fr 36px 1fr 1fr 36px"
-      };
-
     // language=HTML
     return this._card ? html`
       <validating-form @keydown="${this._captureKeys}" @validity="${e => this._contentValid = e.target.valid}" ?hidden="${!this._contentVisible}">
@@ -457,54 +447,64 @@ export class KMapEditorEditDialog extends Connected {
 
       <div class="attachments" ?hidden="${!this._contentVisible}">
         <label for="attachments">Materialien</label><br/>
-      ${this._attachments.map((attachment) => html`
-        <div class="form" style="grid-template-columns: 1fr 36px">
-          <div @click="${() => this._copy(attachment)}">
-            <span>[${this._tag(attachment.tag)}] ${attachment.name}</span><br/>
-            ${attachment.type === 'link' ? html`
-              <span slot="secondary">${attachment.href}</span>
-            ` : html`
-              <span slot="secondary">${attachment.file} (${attachment.mime})</span>
-            `}
+        ${this._attachments.map((attachment) => html`
+          <div class="form" style="grid-template-columns: 1fr 36px">
+            <div @click="${() => this._copy(attachment)}">
+              <span>[${this._tag(attachment.tag)}] ${attachment.name}</span><br/>
+              ${attachment.type === 'link' ? html`
+                <span slot="secondary">${attachment.href}</span>
+              ` : html`
+                <span slot="secondary">${attachment.file} (${attachment.mime})</span>
+              `}
+            </div>
+            <mwc-icon-button icon="delete" @click="${() => this._deleteAttachment(attachment)}"></mwc-icon-button>
           </div>
-          <mwc-icon-button icon="delete" @click="${() => this._deleteAttachment(attachment)}"></mwc-icon-button>
-        </div>
-      `)}
+        `)}
       </div>
       <validating-form id="attachmentForm" @validity="${e => this._attachmentValid = e.target.valid}" ?hidden="${!this._contentVisible}">
-        <div class="form" style="${styleMap(styles)}" @dragover="${() => this._attachmentType = 'file'}">
+        <div class="form" style="${styleMap(this._attachmentFormStyles(this._attachmentType))}" @dragover="${() => this._attachmentType = 'file'}">
           <mwc-select id="tag" label="Tag" .value="${this._attachmentTag}" @change="${e => this._attachmentTag = e.target.value}">
             <mwc-list-item value="">Kein Tag</mwc-list-item>
-        ${Array.from(_tags).map(([key, value]) => html`
-            <mwc-list-item value="${key}">${value}</mwc-list-item>
-          `)}
-      </mwc-select>
-      <mwc-textfield id="name" type="text" label="Name" .value="${this._attachmentName}" @change="${e => this._attachmentName = e.target.value}"></mwc-textfield>
-      <mwc-icon-button-toggle ?on="${this._attachmentType === 'file'}" onIcon="attachment" offIcon="link" @MDCIconButtonToggle:change="${e => this._attachmentType = e.detail.isOn ? 'file' : 'link'}"></mwc-icon-button-toggle>
-      <mwc-textfield ?hidden="${this._attachmentType === "file"}" id="href" type="url" label="Link" .value="${this._attachmentHref}" @change="${e => this._attachmentHref = e.target.value}"></mwc-textfield>
-      <file-drop ?hidden="${this._attachmentType === "link"}" id="file" @filedrop="${this._fileDrop}"></file-drop>
-      <mwc-textfield ?hidden="${this._attachmentType === "link"}" id="mime" type="text" label="MimeType" .value="${this._attachmentMime}" @change="${e => this._attachmentMime = e.target.value}"></mwc-textfield>
-      <mwc-icon-button class="add" icon="add_circle" @click="${this._addAttachment}"></mwc-icon-button>
-      </div>
+            ${Array.from(_tags).map(([key, value]) => html`
+              <mwc-list-item value="${key}">${value}</mwc-list-item>
+            `)}
+          </mwc-select>
+          <mwc-textfield id="name" type="text" label="Name" .value="${this._attachmentName}" @change="${e => this._attachmentName = e.target.value}"></mwc-textfield>
+          <mwc-icon-button-toggle ?on="${this._attachmentType === 'file'}" onIcon="attachment" offIcon="link" @MDCIconButtonToggle:change="${e => this._attachmentType = e.detail.isOn ? 'file' : 'link'}"></mwc-icon-button-toggle>
+          <mwc-textfield ?hidden="${this._attachmentType === "file"}" id="href" type="url" label="Link" .value="${this._attachmentHref}" @change="${e => this._attachmentHref = e.target.value}"></mwc-textfield>
+          <file-drop ?hidden="${this._attachmentType === "link"}" id="file" @filedrop="${this._fileDrop}"></file-drop>
+          <mwc-textfield ?hidden="${this._attachmentType === "link"}" id="mime" type="text" label="MimeType" .value="${this._attachmentMime}" @change="${e => this._attachmentMime = e.target.value}"></mwc-textfield>
+          <mwc-icon-button class="add" icon="add_circle" @click="${this._addAttachment}"></mwc-icon-button>
+        </div>
       </validating-form>
     ` : '';
   }
 
   renderPreview() {
+    // language=HTML
     return this._card ? html`
-    <div class="preview" ?hidden="${!this._previewVisible}">
-      <br/>
-      ${this._summary}
-      <hr/>
-      <kmap-knowledge-card-description
-        .subject="${this._card.subject}"
-        .chapter="${this._card.chapter}"
-        .topic="${this._card.topic}"
-        .description="${this._description}"
-        .instance="${this._instance}">
-      </kmap-knowledge-card-description>
-    </div>
+      <div class="preview" ?hidden="${!this._previewVisible}">
+        <br/>
+        ${this._summary}
+        <hr/>
+        <kmap-knowledge-card-description
+          .subject="${this._card.subject}"
+          .chapter="${this._card.chapter}"
+          .topic="${this._card.topic}"
+          .description="${this._description}"
+          .instance="${this._instance}">
+        </kmap-knowledge-card-description>
+      </div>
     ` : '';
+  }
+
+  private _attachmentFormStyles(type) {
+    return type === "link"
+      ? {
+        gridTemplateColumns: "1fr 1fr 36px 2fr 36px"
+      } : {
+        gridTemplateColumns: "1fr 1fr 36px 1fr 1fr 36px"
+      };
   }
 
   private _fileDrop(e) {
