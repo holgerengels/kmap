@@ -1,0 +1,18 @@
+{
+  "_id": "_design/feedback",
+  "views": {
+    "byTimestamp": {
+      "map": "function (doc) {\n  if (doc.timestamp)\n  emit(doc.timestamp);\n}"
+    },
+    "bugsByTimestamp": {
+      "map": "function (doc) {\n  if (doc.timestamp && doc.type === 'bug')\n    emit(doc.timestamp);\n}"
+    },
+    "errorsByTimestamp": {
+      "map": "function (doc) {\n  if (doc.timestamp && doc.type === 'error')\n    emit(doc.timestamp);\n}"
+    },
+    "proposalsByTimestamp": {
+      "map": "function (doc) {\n  if (doc.timestamp && doc.type === 'proposal')\n    emit(doc.timestamp);\n}"
+    }
+  },
+  "language": "javascript"
+}

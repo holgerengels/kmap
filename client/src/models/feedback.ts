@@ -3,6 +3,8 @@ import { Store } from '../store';
 import {endpoint, fetchjson} from "../endpoint";
 import {urls} from "../urls";
 
+export interface PurgeRequest {until: string, types: string[]}
+
 export interface ErrorReport {
   message: string,
   detail: string,
@@ -12,7 +14,7 @@ export interface Feedback {
   chapter?: string,
   topic?: string,
   test?: string,
-  type: string,
+  type: 'bug' | 'error' | 'proposal',
   title: string,
   text: string,
   state?: 'open' | 'closed',
@@ -24,6 +26,7 @@ export interface FeedbackState {
   timestamp: number,
   submitting: boolean,
   resolving: boolean,
+  purging: boolean,
   error: string,
 }
 
@@ -32,6 +35,7 @@ export default createModel({
     timestamp: -1,
     submitting: false,
     resolving: false,
+    purging: false,
     error: "",
   },
   reducers: {
@@ -69,6 +73,14 @@ export default createModel({
     receivedResolve(state, feedback: Feedback) {
       return { ...state, resolving: false,
         issues: state.issues ? state.issues.filter(i => i !== feedback) : undefined
+      };
+    },
+    requestPurge(state) {
+      return { ...state, purging: true, error: "" };
+    },
+    receivedPurge(state, payload: Feedback[]) {
+      return { ...state, purging: false,
+        issues: payload,
       };
     },
 
@@ -145,6 +157,20 @@ export default createModel({
           },
           () => {
             dispatch.feedback.receivedResolve(feedback);
+          },
+          dispatch.app.handleError,
+          dispatch.feedback.error);
+      },
+      async purge(purge: PurgeRequest) {
+        const state = store.getState();
+
+        dispatch.feedback.requestPurge();
+        fetchjson(`${urls.server}feedback?purge=${purge.until}`, {
+            ...endpoint.post(state),
+            body: JSON.stringify(purge)
+          },
+          (json) => {
+            dispatch.feedback.receivedLoad(json);
           },
           dispatch.app.handleError,
           dispatch.feedback.error);

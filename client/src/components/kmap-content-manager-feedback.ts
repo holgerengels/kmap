@@ -5,12 +5,14 @@ import {State, store} from "../store";
 
 import {colorStyles, fontStyles, elevationStyles,} from "./kmap-styles";
 
+import '@material/mwc-checkbox';
 import '@material/mwc-icon';
 import '@material/mwc-icon-button';
 import '@material/mwc-list/mwc-list';
 import '@material/mwc-list/mwc-list-item';
 import '@material/mwc-select';
 import '@material/mwc-textfield';
+import './validating-form';
 import {Feedback} from "../models/feedback";
 
 @customElement('kmap-content-manager-feedback')
@@ -23,6 +25,15 @@ export class KMapContentManagerFeedback extends Connected {
   private _selectedIndex: number = -1;
   @state()
   private _selected?: Feedback = undefined;
+
+  @state()
+  private _purgeUntil: string = '';
+  private _purgeBugs: string = '';
+  private _purgeErrors: string = '';
+  private _purgeProposals: string = '';
+
+  @state()
+  private _purgeValid: boolean = false;
 
   mapState(state: State) {
     return {
@@ -54,6 +65,16 @@ export class KMapContentManagerFeedback extends Connected {
 
     console.log("resolve issue");
     store.dispatch.feedback.resolve(this._selected);
+  }
+
+  _purge() {
+    const types: string[] = [];
+    if (this._purgeBugs) types.push("bug");
+    if (this._purgeErrors) types.push("error");
+    if (this._purgeProposals) types.push("proposal");
+    console.log("purge issues before " + this._purgeUntil);
+    console.log("purge issues of type " + types);
+    store.dispatch.feedback.purge({until: this._purgeUntil, types: types});
   }
 
   static get styles() {
@@ -115,6 +136,7 @@ export class KMapContentManagerFeedback extends Connected {
           <label>Feedback</label>
           <span style="float: right">
           <mwc-icon @click="${() => this._showPage('resolve')}" ?disabled="${this._selectedIndex === -1}">check</mwc-icon>
+          <mwc-icon @click="${() => this._showPage('purge')}">auto_delete</mwc-icon>
           </span>
           <br style="clear: right"/>
           <div class="scroll">
@@ -155,6 +177,21 @@ export class KMapContentManagerFeedback extends Connected {
                 <mwc-button outlined @click="${this._resolve}">Bearbeitet</mwc-button>
               </div>
             ` : ''}
+          </div>
+          <div class="page" ?active="${this._page === 'purge'}">
+            <label>Altes Feedback löschen</label>
+            <validating-form @validity="${e => this._purgeValid = e.target.valid}">
+              <div style="display: flex; flex-flow: column">
+                <mwc-textfield label="Bis Datum" type="date" @change="${e => this._purgeUntil = e.target.value}" required></mwc-textfield>
+                <mwc-formfield label="Exceptions"><mwc-checkbox @change="${e => this._purgeBugs = e.target.value}"></mwc-checkbox></mwc-formfield>
+                <mwc-formfield label="Fehlermeldungen"><mwc-checkbox @change="${e => this._purgeErrors = e.target.value}"></mwc-checkbox></mwc-formfield>
+                <mwc-formfield label="Verbesserungsvorschläge"><mwc-checkbox @change="${e => this._purgeProposals = e.target.value}"></mwc-checkbox></mwc-formfield>
+              </div>
+            </validating-form>
+            <div>
+              <mwc-button @click="${() => this._showPage('')}">Abbrechen</mwc-button>
+              <mwc-button outlined @click="${this._purge}" ?disabled="${!this._purgeValid}">Löschen</mwc-button>
+            </div>
           </div>
         </div>
       </div>

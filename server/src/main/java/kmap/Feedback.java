@@ -6,6 +6,8 @@ import org.lightcouch.View;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -71,6 +73,31 @@ public class Feedback {
         client.update(object);
     }
 
+    public synchronized List<JsonObject> purge(String date, Set<String> types) {
+        try {
+            long time = new SimpleDateFormat("yyyy-MM-dd").parse(date).getTime();
+            CouchDbClient client = getClient();
+            for (String type : types) {
+                View view = client.view("feedback/" + type + "sByTimestamp")
+                        .startKey(0)
+                        .endKey(time)
+                        .reduce(false)
+                        .includeDocs(true);
+                List<JsonObject> objects = view.query(JsonObject.class);
+                if (!objects.isEmpty()) {
+                    for (JsonObject object : objects) {
+                        object.addProperty("_deleted", true);
+                    }
+                    client.bulk(objects, true);
+                }
+            }
+        }
+        catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return load(null);
+    }
+
     List<JsonObject> load(String state) {
         View view = getClient().view("_all_docs").includeDocs(true);
         List<JsonObject> objects = view.query(JsonObject.class).stream().filter(o -> "open".equals(string(o, "state"))).collect(Collectors.toList());
@@ -80,8 +107,9 @@ public class Feedback {
     }
 
     public static void main(String[] args) throws IOException {
-        Server.CLIENT.set("lala");
+        Server.CLIENT.set("vu");
         Feedback feedback = new Feedback(new Couch(readProperties(args[0])));
+        /*
         JsonObject object = new JsonObject();
         object.addProperty("subject", "Mathematik");
         object.addProperty("chapter", "Differentialrechnung");
@@ -91,6 +119,8 @@ public class Feedback {
         object.addProperty("text", "Hallo");
         feedback.submit("test", object.toString());
         System.out.println(feedback.load(""));
+         */
+        feedback.purge("2022-01-30", Set.of("bug"));
     }
 
     private static Properties readProperties(String fileName) throws IOException {

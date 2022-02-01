@@ -24,7 +24,7 @@ export class KMapFeedback extends LitElement {
   private test?: string = undefined;
 
   @state()
-  private _type: string = '';
+  private _type?: 'bug' | 'error' | 'proposal';
   @state()
   private _title: string = '';
   @state()
@@ -58,7 +58,7 @@ export class KMapFeedback extends LitElement {
   }
 
   show() {
-    this._type = '';
+    this._type = undefined;
     this._title = '';
     this._text = '';
     for (const radio of this._radios)
@@ -70,6 +70,8 @@ export class KMapFeedback extends LitElement {
     this._dialog.close();
   }
   _send() {
+    if (!this._type)
+      return;
     this._dialog.close();
     store.dispatch.feedback.submit({subject: this.subject, chapter: this.chapter, topic: this.topic, test: this.test, type: this._type, title: this._title, text: this._text});
     store.dispatch.shell.showMessage("Vielen Dank für Dein Feedback!")
@@ -85,14 +87,14 @@ export class KMapFeedback extends LitElement {
         <br/><label secondary>Aufgabe '${this.test}'</label>
       ` : ''}
       <div>
-        <mwc-formfield label="Fehler"><mwc-radio id="error" name="type" value="error" dialogInitialFocus @change="${() => this._type = 'error'}"></mwc-radio></mwc-formfield>
+        <mwc-formfield label="Fehlermeldung"><mwc-radio id="error" name="type" value="error" dialogInitialFocus @change="${() => this._type = 'error'}"></mwc-radio></mwc-formfield>
         <mwc-formfield label="Verbesserungsvorschlag"><mwc-radio id="proposal" name="type" value="proposal" @change="${() => this._type = 'proposal'}"></mwc-radio></mwc-formfield>
       </div>
       <mwc-textfield id="title" label="Titel" dense .value=${this._title} @input="${e => this._title = e.target.value}"></mwc-textfield>
       <mwc-textarea id="text" label="Text" dense fullwidth rows="7" .value=${this._text} @input="${e => this._text = e.target.value}"></mwc-textarea>
     </form>
     <mwc-button slot="secondaryAction" @click=${this._cancel}>Abbrechen</mwc-button>
-    <mwc-button slot="primaryAction" ?disabled=${this._type === '' || this._title === '' || this._text === ''} @click=${this._send}>Abschicken</mwc-button>
+    <mwc-button slot="primaryAction" ?disabled=${this._type === undefined || this._title === '' || this._text === ''} @click=${this._send}>Abschicken</mwc-button>
   </mwc-dialog>
     `;
   }
