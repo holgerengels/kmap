@@ -56,7 +56,7 @@ export default createModel({
       return { ...state,
         userid: payload.userid,
         username: payload.username,
-        roles: payload.roles,
+        roles: payload.roles.sort(),
         authenticating: false,
       };
     },

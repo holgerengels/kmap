@@ -15,6 +15,7 @@ import '@material/mwc-tab';
 import '@material/mwc-tab-bar';
 import '@material/mwc-textarea';
 import '@material/mwc-textfield';
+import { KmapHtmlEditor } from "kmap-html-editor";
 import './kmap-knowledge-card-description';
 import './file-drop';
 import './validating-form';
@@ -100,7 +101,7 @@ export class KMapEditorEditDialog extends Connected {
   @query('#summary')
   private _summaryTextArea: TextArea;
   @query('#description')
-  private _descriptionTextArea: TextArea;
+  private _descriptionEditor: KmapHtmlEditor;
   @query('#tabBar')
   private _tabBar: TabBar;
 
@@ -117,7 +118,6 @@ export class KMapEditorEditDialog extends Connected {
   @query('#file')
   private _file: FileDrop;
 
-
   mapState(state: State) {
     return {
       _wide: state.shell.wide,
@@ -130,7 +130,7 @@ export class KMapEditorEditDialog extends Connected {
   constructor() {
     super();
     this._setSummary = throttle(this._setSummary, 1000, this);
-    this._setDescription = throttle(this._setDescription, 1000, this);
+    //this._setDescription = throttle(this._setDescription, 1000, this);
   }
 
   updated(changedProperties) {
@@ -238,9 +238,11 @@ export class KMapEditorEditDialog extends Connected {
     this._summary = this._summaryTextArea.value;
   }
 
+  /*
   _setDescription() {
-    this._description = this._descriptionTextArea.value;
+    this._description = this._descriptionEditor.value;
   }
+   */
 
   _addAttachment() {
     if (!this._card) return;
@@ -302,7 +304,7 @@ export class KMapEditorEditDialog extends Connected {
       this._tab = !this._wide ? ['meta', 'content', 'preview'][e.detail.index] : ['editor', 'preview'][e.detail.index];
 
     if (this._contentVisible)
-      this._descriptionTextArea.focus();
+      this._descriptionEditor.focus();
   }
 
   _switchInnerTab(e) {
@@ -310,7 +312,7 @@ export class KMapEditorEditDialog extends Connected {
       this._innerTab = e.detail.index === 0 ? 'meta' : 'content';
 
     if (this._contentVisible)
-      this._descriptionTextArea.focus();
+      this._descriptionEditor.focus();
   }
 
   _copy(attachment: Attachment) {
@@ -345,23 +347,26 @@ export class KMapEditorEditDialog extends Connected {
           justify-items: stretch;
           height: inherit;
         }
-        .lala {
+        .content {
           display: grid;
-          grid-template-rows: min-content 1fr;
-          height: 100%;
+          grid-template-rows: min-content 3fr 1fr min-content;
         }
         .preview {
           overflow-y: auto;
         }
-        mwc-icon-button, mwc-button {
-          vertical-align: middle
+        .form {
+          align-self: start;
         }
-        mwc-textfield, mwc-textarea, file-drop {
-          margin-bottom: 4px;
+        .scrollcontainer {
+          position: relative; height: 100%; width: 100%
         }
-        mwc-select { width: 100% }
-        .attachment {
-          display: block;
+        .scrollcontainer > * {
+          position: absolute; inset: 0 0 0 0;
+        }
+        .attachments {
+          overflow-y: auto;
+          overflow-x: hidden;
+          padding: 16px 8px;
         }
         .attachment span[slot=secondary] {
           display: block;
@@ -376,6 +381,16 @@ export class KMapEditorEditDialog extends Connected {
           font-size: small;
           letter-spacing: 0px;
           vertical-align: middle;
+        }
+        mwc-icon-button, mwc-button {
+          vertical-align: middle
+        }
+        mwc-textfield, mwc-textarea, file-drop {
+          margin-bottom: 4px;
+        }
+        mwc-select { width: 100% }
+        .attachment {
+          display: block;
         }
         [hidden] { display: none }
     `];
@@ -438,48 +453,69 @@ export class KMapEditorEditDialog extends Connected {
   renderContent() {
     // language=HTML
     return this._card ? html`
-      <validating-form @keydown="${this._captureKeys}" @validity="${e => this._contentValid = e.target.valid}" ?hidden="${!this._contentVisible}">
-        <div class="lala">
-          <mwc-textarea id="summary" label="Kurztext" ?dialogInitialFocus="${this._card.topic === '_'}" dense ?required=${this._description} fullwidth rows="1" .value=${this._card.summary} @keyup="${this._setSummary}"></mwc-textarea>
-          <mwc-textarea id="description" label="Langtext" dense fullwidth drows="9" .value=${this._card.description} @keyup="${this._setDescription}"></mwc-textarea>
-        </div>
-      </validating-form>
-
-      <div class="attachments" ?hidden="${!this._contentVisible}">
-        <label for="attachments">Materialien</label><br/>
-        ${this._attachments.map((attachment) => html`
-          <div class="form" style="grid-template-columns: 1fr 36px">
-            <div @click="${() => this._copy(attachment)}">
-              <span>[${this._tag(attachment.tag)}] ${attachment.name}</span><br/>
-              ${attachment.type === 'link' ? html`
-                <span slot="secondary">${attachment.href}</span>
-              ` : html`
-                <span slot="secondary">${attachment.file} (${attachment.mime})</span>
-              `}
-            </div>
-            <mwc-icon-button icon="delete" @click="${() => this._deleteAttachment(attachment)}"></mwc-icon-button>
+      <div class="content" ?hidden="${!this._contentVisible}">
+        <validating-form @keydown="${this._captureKeys}" @validity="${e => this._contentValid = e.target.valid}">
+          <mwc-textarea id="summary" label="Kurztext" ?dialogInitialFocus="${this._card.topic === '_'}" dense
+                        ?required=${this._description} fullwidth rows="1" .value=${this._card.summary}
+                        @keyup="${this._setSummary}"></mwc-textarea>
+          <div class="scrollcontainer">
+            <kmap-html-editor id="description" placeholder="Inhalt" .value=${this._card.description} @change="${e => this._description = e.detail.value}"></kmap-html-editor>
           </div>
-        `)}
+        </validating-form>
+
+        ${this.renderAttachments()}
       </div>
-      <validating-form id="attachmentForm" @validity="${e => this._attachmentValid = e.target.valid}" ?hidden="${!this._contentVisible}">
-        <div class="form" style="${styleMap(this._attachmentFormStyles(this._attachmentType))}" @dragover="${() => this._attachmentType = 'file'}">
-          <mwc-select id="tag" label="Tag" .value="${this._attachmentTag}" @change="${e => this._attachmentTag = e.target.value}">
-            <mwc-list-item value="">Kein Tag</mwc-list-item>
-            ${Array.from(_tags).map(([key, value]) => html`
-              <mwc-list-item value="${key}">${value}</mwc-list-item>
-            `)}
-          </mwc-select>
-          <mwc-textfield id="name" type="text" label="Name" .value="${this._attachmentName}" @change="${e => this._attachmentName = e.target.value}"></mwc-textfield>
-          <mwc-icon-button-toggle ?on="${this._attachmentType === 'file'}" onIcon="attachment" offIcon="link" @MDCIconButtonToggle:change="${e => this._attachmentType = e.detail.isOn ? 'file' : 'link'}"></mwc-icon-button-toggle>
-          <mwc-textfield ?hidden="${this._attachmentType === "file"}" id="href" type="url" label="Link" .value="${this._attachmentHref}" @change="${e => this._attachmentHref = e.target.value}"></mwc-textfield>
-          <file-drop ?hidden="${this._attachmentType === "link"}" id="file" @filedrop="${this._fileDrop}"></file-drop>
-          <mwc-textfield ?hidden="${this._attachmentType === "link"}" id="mime" type="text" label="MimeType" .value="${this._attachmentMime}" @change="${e => this._attachmentMime = e.target.value}"></mwc-textfield>
-          <mwc-icon-button class="add" icon="add_circle" @click="${this._addAttachment}"></mwc-icon-button>
-        </div>
-      </validating-form>
     ` : '';
   }
 
+  renderAttachments() {
+    // language=HTML
+    return html`
+        <div class="scrollcontainer attachmentscontainer" ?hidden="${!this._contentVisible}">
+          <div class="attachments">
+            <label for="attachments">Materialien</label><br/>
+            ${this._attachments.map((attachment) => html`
+            <div class="form" style="grid-template-columns: 1fr 36px">
+              <div @click="${() => this._copy(attachment)}">
+                <span>[${this._tag(attachment.tag)}] ${attachment.name}</span><br/>
+                ${attachment.type === 'link' ? html`
+                  <span slot="secondary">${attachment.href}</span>
+                ` : html`
+                  <span slot="secondary">${attachment.file} (${attachment.mime})</span>
+                `}
+              </div>
+              <mwc-icon-button icon="delete" @click="${() => this._deleteAttachment(attachment)}"></mwc-icon-button>
+            </div>
+          `)}
+          </div>
+        </div>
+        <validating-form id="attachmentForm" @validity="${e => this._attachmentValid = e.target.valid}"
+                         ?hidden="${!this._contentVisible}">
+          <div class="form" style="${styleMap(this._attachmentFormStyles(this._attachmentType))}"
+               @dragover="${() => this._attachmentType = 'file'}">
+            <mwc-select id="tag" label="Tag" .value="${this._attachmentTag}"
+                        @change="${e => this._attachmentTag = e.target.value}">
+              <mwc-list-item value="">Kein Tag</mwc-list-item>
+              ${Array.from(_tags).map(([key, value]) => html`
+                <mwc-list-item value="${key}">${value}</mwc-list-item>
+              `)}
+            </mwc-select>
+            <mwc-textfield id="name" type="text" label="Name" .value="${this._attachmentName}"
+                           @change="${e => this._attachmentName = e.target.value}"></mwc-textfield>
+            <mwc-icon-button-toggle ?on="${this._attachmentType === 'file'}" onIcon="attachment" offIcon="link"
+                                    @MDCIconButtonToggle:change="${e => this._attachmentType = e.detail.isOn ? 'file' : 'link'}"></mwc-icon-button-toggle>
+            <mwc-textfield ?hidden="${this._attachmentType === "file"}" id="href" type="url" label="Link"
+                           .value="${this._attachmentHref}"
+                           @change="${e => this._attachmentHref = e.target.value}"></mwc-textfield>
+            <file-drop ?hidden="${this._attachmentType === "link"}" id="file" @filedrop="${this._fileDrop}"></file-drop>
+            <mwc-textfield ?hidden="${this._attachmentType === "link"}" id="mime" type="text" label="MimeType"
+                           .value="${this._attachmentMime}"
+                           @change="${e => this._attachmentMime = e.target.value}"></mwc-textfield>
+            <mwc-icon-button class="add" icon="add_circle" @click="${this._addAttachment}"></mwc-icon-button>
+          </div>
+        </validating-form>
+    `;
+  }
   renderPreview() {
     // language=HTML
     return this._card ? html`

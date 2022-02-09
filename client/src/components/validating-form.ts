@@ -42,7 +42,7 @@ export class ValidatingForm extends LitElement {
     // language=CSS
     return [
       css`
-        :host {
+        :host, form {
           display: contents;
         }
       `];

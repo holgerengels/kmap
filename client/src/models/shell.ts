@@ -1,6 +1,7 @@
 import {createModel, RoutingState} from '@captaincodeman/rdx';
 import {Store} from '../store';
 import {urls} from "../urls";
+import {KmapHtmlEditor} from "kmap-html-editor";
 
 export interface Meta {
   title?: string,
@@ -38,7 +39,7 @@ export default createModel({
     drawerOpen: false,
     passiveEventListeners: false,
     messages: [],
-    layers: ["summaries", "ratings"],
+    layers: ["ratings", "summaries"],
     compactCards: false,
   },
   reducers: {
@@ -67,7 +68,7 @@ export default createModel({
       return { ...state, passiveEventListeners: passiveEventListeners }
     },
     addLayer(state, layer: string) {
-      return { ...state, layers: state.layers.includes(layer) ? state.layers : [...state.layers, layer] }
+      return { ...state, layers: state.layers.includes(layer) ? state.layers : [...state.layers, layer].sort() }
     },
     removeLayer(state, layer: string) {
       return { ...state, layers: state.layers.filter(m => m !== layer) }
@@ -153,26 +154,13 @@ export default createModel({
           import('../components/kmap-content-manager').then(() => console.log("loaded content-manager"));
         }
       },
-
+      'shell/addLayer': function () {
+        const state = store.getState();
+        checkCustomElements(state.shell.layers, state.app.roles);
+      },
       'app/receivedLogin': async function () {
         const state = store.getState();
-        if (state.app.roles.includes("teacher") || state.app.roles.includes("admin")) {
-          console.log("loading components")
-          await import('../components/kmap-module-selector');
-          await import('../components/kmap-editor-add-fabs');
-          await import('../components/kmap-editor-edit-dialog');
-          await import('../components/kmap-editor-rename-dialog');
-          await import('../components/kmap-editor-move-dialog');
-          await import('../components/kmap-editor-delete-dialog');
-
-          await import('../components/kmap-set-selector');
-          await import('../components/kmap-test-editor-add-fabs');
-          await import('../components/kmap-test-editor-delete-dialog');
-          await import('../components/kmap-test-editor-rename-dialog');
-          await import('../components/kmap-test-editor-edit-dialog');
-
-          await import('../components/kmap-course-selector');
-        }
+        checkCustomElements(state.shell.layers, state.app.roles);
       },
       'app/receivedLogout': async function () {
         dispatch.shell.removeLayer("averages");
@@ -255,4 +243,34 @@ function setMetaTag(attrName, attrValue, content) {
     document.head.appendChild(element);
   }
   element.setAttribute('content', content || '');
+}
+
+async function checkCustomElements(layers: string[], roles: string[]) {
+  console.log("loading components")
+  if (roles.includes("teacher") || roles.includes("admin")) {
+    if (layers.includes("editor")) {
+      if (customElements.get("kmap-editor-add-fabs") === undefined) {
+        await import('../components/kmap-editor-add-fabs');
+        await import('../components/kmap-editor-edit-dialog');
+        await import('../components/kmap-editor-rename-dialog');
+        await import('../components/kmap-editor-move-dialog');
+        await import('../components/kmap-editor-delete-dialog');
+
+        await import('../components/kmap-test-editor-add-fabs');
+        await import('../components/kmap-test-editor-delete-dialog');
+        await import('../components/kmap-test-editor-rename-dialog');
+        await import('../components/kmap-test-editor-edit-dialog');
+      }
+      if (customElements.get("kmap-html-editor") === undefined) {
+        await import('kmap-html-editor');
+        window.customElements.define('kmap-html-editor', KmapHtmlEditor);
+      }
+    }
+
+    if (customElements.get("kmap-module-selector") === undefined) {
+      await import('../components/kmap-module-selector');
+      await import('../components/kmap-set-selector');
+      await import('../components/kmap-course-selector');
+    }
+  }
 }

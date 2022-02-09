@@ -14,15 +14,14 @@ import '@material/mwc-tab';
 import '@material/mwc-tab-bar';
 import '@material/mwc-textarea';
 import '@material/mwc-textfield';
+import { KmapHtmlEditor } from "kmap-html-editor";
 import './kmap-knowledge-card-description';
 import './file-drop';
 import './validating-form';
 import {colorStyles, fontStyles, formStyles} from "./kmap-styles";
 
 import {Dialog} from "@material/mwc-dialog/mwc-dialog";
-import {TextArea} from "@material/mwc-textarea/mwc-textarea";
 import {TabBar} from "@material/mwc-tab-bar/mwc-tab-bar";
-import {throttle} from "../debounce";
 import {Attachment, Upload} from "../models/types";
 import {Test} from "../models/tests";
 import {FileDrop} from "./file-drop";
@@ -85,20 +84,22 @@ export class KMapTestEditorEditDialog extends Connected {
   @state()
   private _metaVisible: boolean = false;
   @state()
-  private _contentVisible: boolean = false;
+  private _qnaVisible: boolean = false;
+  @state()
+  private _hnsVisible: boolean = false;
   @state()
   private _previewVisible: boolean = false;
 
   @query('#editDialog')
   private _editDialog: Dialog;
-  @query('#question')
-  private _questionTextArea: TextArea;
+  //@query('#question')
+  //private _questionEditor: KmapHtmlEditor;
   @query('#answer')
-  private _answerTextArea: TextArea;
-  @query('#hint')
-  private _hintTextArea: TextArea;
-  @query('#solution')
-  private _solutionTextArea: TextArea;
+  private _answerEditor: KmapHtmlEditor;
+  //@query('#hint')
+  //private _hintEditor: KmapHtmlEditor;
+  //@query('#solution')
+  //private _solutionEditor: KmapHtmlEditor;
   @query('#tabBar')
   private _tabBar: TabBar;
 
@@ -121,8 +122,8 @@ export class KMapTestEditorEditDialog extends Connected {
 
   constructor() {
     super();
-    this._setQuestion = throttle(this._setQuestion, 1000, this);
-    this._setAnswer = throttle(this._setAnswer, 1000, this);
+    //this._setQuestion = throttle(this._setQuestion, 1000, this);
+    //this._setAnswer = throttle(this._setAnswer, 1000, this);
   }
 
   updated(changedProperties) {
@@ -186,12 +187,14 @@ export class KMapTestEditorEditDialog extends Connected {
     if (changedProperties.has("_tab") || changedProperties.has("_innerTab") || changedProperties.has("_wide")) {
       if (this._wide) {
         this._metaVisible = this._innerTab === 'meta';
-        this._contentVisible = this._innerTab === 'content';
+        this._qnaVisible = this._innerTab === 'qna';
+        this._hnsVisible = this._innerTab === 'hns';
         this._previewVisible = true;
       }
       else {
         this._metaVisible = this._tab === 'meta';
-        this._contentVisible = this._tab === 'content';
+        this._qnaVisible = this._tab === 'qna';
+        this._hnsVisible = this._tab === 'hns';
         this._previewVisible = this._tab === 'preview';
       }
     }
@@ -231,21 +234,23 @@ export class KMapTestEditorEditDialog extends Connected {
     store.dispatch.testUploads.clearUploads();
   }
 
+  /*
   _setQuestion() {
-    this._question = this._questionTextArea.value;
+    this._question = this._questionEditor.value;
   }
 
   _setAnswer() {
-    this._answer = this._answerTextArea.value;
+    this._answer = this._answerEditor.value;
   }
 
   _setHint() {
-    this._hint = this._hintTextArea.value;
+    this._hint = this._hintEditor.value;
   }
 
   _setSolution() {
-    this._solution = this._solutionTextArea.value;
+    this._solution = this._solutionEditor.value;
   }
+   */
 
   _addAttachment() {
     if (!this._test) return;
@@ -291,23 +296,23 @@ export class KMapTestEditorEditDialog extends Connected {
 
   _switchTab(e) {
     if (e.type === "MDCTabBar:activated")
-      this._tab = !this._wide ? ['meta', 'content', 'preview'][e.detail.index] : ['editor', 'preview'][e.detail.index];
+      this._tab = !this._wide ? ['meta', 'qna', 'hns', 'preview'][e.detail.index] : ['editor', 'preview'][e.detail.index];
 
-    if (this._contentVisible)
-      this._answerTextArea.focus();
+    if (this._qnaVisible)
+      this._answerEditor.focus();
   }
 
   _switchInnerTab(e) {
     if (e.type === "MDCTabBar:activated")
-      this._innerTab = e.detail.index === 0 ? 'meta' : 'content';
+      this._innerTab = ['meta', 'qna', 'hns'][e.detail.index];
 
-    if (this._contentVisible)
-      this._answerTextArea.focus();
+    if (this._qnaVisible)
+      this._answerEditor.focus();
   }
 
   _copy(attachment: Attachment) {
     if (attachment.file)
-      navigator.clipboard.writeText(`<img width="" height="" src="inline:${attachment.file}"/>`);
+      navigator.clipboard.writeText(`<img width="" height="" src="inline:${attachment.file}" alt=""/>`);
   }
 
   static get styles() {
@@ -337,23 +342,30 @@ export class KMapTestEditorEditDialog extends Connected {
           justify-items: stretch;
           height: inherit;
         }
-        .lala {
+        .qna {
           display: grid;
-          grid-template-rows: 1fr 2fr  1fr 1fr min-content;
-          height: 100%;
+          grid-template-rows: 2fr 2fr min-content 1fr min-content;
+        }
+        .hns {
+          display: grid;
+          grid-template-rows: 2fr 2fr 1fr min-content;
         }
         .preview {
           overflow-y: auto;
         }
-        mwc-icon-button, mwc-button {
-          vertical-align: middle
+        .form {
+          align-self: start;
         }
-        mwc-textfield, mwc-textarea, file-drop {
-          margin-bottom: 4px;
+        .scrollcontainer {
+          position: relative; height: 100%; width: 100%
         }
-        mwc-select { width: 100% }
-        .attachment {
-          display: block;
+        .scrollcontainer > * {
+          position: absolute; inset: 0 0 0 0;
+        }
+        .attachments {
+          overflow-y: auto;
+          overflow-x: hidden;
+          padding: 16px 8px;
         }
         .attachment span[slot=secondary] {
           display: block;
@@ -382,6 +394,16 @@ export class KMapTestEditorEditDialog extends Connected {
           border-bottom: 2px solid var(--color-primary-dark);
           margin-bottom: 3px;
         }
+        mwc-icon-button, mwc-button {
+          vertical-align: middle
+        }
+        mwc-textfield, mwc-textarea, file-drop {
+          margin-bottom: 4px;
+        }
+        mwc-select { width: 100% }
+        .attachment {
+          display: block;
+        }
         [hidden] { display: none }
     `];
   }
@@ -394,21 +416,25 @@ export class KMapTestEditorEditDialog extends Connected {
           ${!this._wide ? html`
             <mwc-tab-bar id="tabBar" @MDCTabBar:activated="${this._switchTab}">
               <mwc-tab label="Metadaten" ?hidden="${this._wide}"></mwc-tab>
-              <mwc-tab label="${this._wide ? 'Editor' : 'Inhalt'}"></mwc-tab>
+              <mwc-tab label="${this._wide ? 'Editor' : 'Frage & Antwort'}"></mwc-tab>
+              <mwc-tab label="${this._wide ? 'Editor' : 'Hinweis & Lösung'}"></mwc-tab>
               <mwc-tab label="Preview"></mwc-tab>
             </mwc-tab-bar>
             ${this.renderMeta()}
-            ${this.renderContent()}
+            ${this.renderQuestionAndAnswer()}
+            ${this.renderHintAndSolution()}
             ${this.renderPreview()}
           ` : html`
             <div class="wide">
               <div class="tab">
                 <mwc-tab-bar id="innerTabBar" @MDCTabBar:activated="${this._switchInnerTab}" ?hidden="${!this._wide}">
                   <mwc-tab label="Metadaten"></mwc-tab>
-                  <mwc-tab label="Inhalt"></mwc-tab>
+                  <mwc-tab label="Frage & Antwort"></mwc-tab>
+                  <mwc-tab label="Hinweis & Lösung"></mwc-tab>
                 </mwc-tab-bar>
                 ${this.renderMeta()}
-                ${this.renderContent()}
+                ${this.renderQuestionAndAnswer()}
+                ${this.renderHintAndSolution()}
               </div>
               ${this.renderPreview()}
             </div>
@@ -441,25 +467,53 @@ export class KMapTestEditorEditDialog extends Connected {
     ` : '';
   }
 
-  renderContent() {
+  renderQuestionAndAnswer() {
     // language=HTML
     return this._test ? html`
-      <validating-form @keydown="${this._captureKeys}" @validity="${e => this._contentValid = e.target.valid}" ?hidden="${!this._contentVisible}">
-        <div class="lala">
-          <mwc-textarea id="question" label="Frage" rows="4" .value=${this._question} @keyup="${this._setQuestion}"></mwc-textarea>
-          <mwc-textarea id="answer" label="Antwort" required rows="4" .value=${this._answer} @keyup="${this._setAnswer}"></mwc-textarea>
-          <mwc-textarea id="hint" label="Hinweis" rows="2" .value=${this._hint} @keyup="${this._setHint}"></mwc-textarea>
-          <mwc-textarea id="solution" label="Lösungsweg" rows="4" .value=${this._solution} @keyup="${this._setSolution}"></mwc-textarea>
+      <div class="qna" ?hidden="${!this._qnaVisible}">
+        <validating-form @keydown="${this._captureKeys}" @validity="${e => this._contentValid = e.target.valid}">
+          <div class="scrollcontainer">
+            <kmap-html-editor id="question" placeholder="Frage" .value=${this._question} @change="${e => this._question = e.detail.value}"></kmap-html-editor>
+          </div>
+          <div class="scrollcontainer">
+            <kmap-html-editor id="answer" placeholder="Antwort" .value=${this._answer} @change="${e => this._answer = e.detail.value}"></kmap-html-editor>
+          </div>
           <div class="field values">
             <label secondary>Werte (Checkboxen: true/false, Dezimalzahlen mit Punkt statt Komma)</label><br/>
             ${this._values.map((value, i) => html`<input type="text" .value="${value}" @change="${e => this._values[i] = e.target.value}"/>`)}
           </div>
-        </div>
-      </validating-form>
+        </validating-form>
 
-      <div class="attachments" ?hidden="${!this._contentVisible}">
-        <label for="attachments">Materialien</label><br/>
-        ${this._attachments.map((attachment) => html`
+        ${this.renderAttachments()}
+      </div>
+    ` : '';
+  }
+
+  renderHintAndSolution() {
+    // language=HTML
+    return this._test ? html`
+      <div class="hns" ?hidden="${!this._hnsVisible}">
+        <validating-form @keydown="${this._captureKeys}" @validity="${e => this._contentValid = e.target.valid}">
+          <div class="scrollcontainer">
+            <kmap-html-editor id="hint" placeholder="Tipp" .value=${this._hint} @change="${e => this._hint = e.detail.value}"></kmap-html-editor>
+          </div>
+          <div class="scrollcontainer">
+            <kmap-html-editor id="solution" placeholder="Lösung" .value=${this._solution} @change="${e => this._solution = e.detail.value}"></kmap-html-editor>
+          </div>
+        </validating-form>
+
+        ${this.renderAttachments()}
+      </div>
+    ` : '';
+  }
+
+  renderAttachments() {
+    // language=HTML
+    return html`
+      <div class="scrollcontainer attachmentscontainer" ?hidden="${!(this._qnaVisible || this._hnsVisible)}">
+        <div class="attachments">
+          <label for="attachments">Materialien</label><br/>
+          ${this._attachments.map((attachment) => html`
           <div class="form" style="grid-template-columns: 1fr 36px">
             <div @click="${() => this._copy(attachment)}">
               <span slot="secondary">${attachment.file} (${attachment.mime})</span>
@@ -467,14 +521,14 @@ export class KMapTestEditorEditDialog extends Connected {
             <mwc-icon-button icon="delete" @click="${() => this._deleteAttachment(attachment)}"></mwc-icon-button>
           </div>
         `)}
+        </div>
       </div>
-      <div class="form" style="grid-template-columns: 1fr 36px"  ?hidden="${!this._contentVisible}">
+      <div class="form" style="grid-template-columns: 1fr 36px"  ?hidden="${!(this._qnaVisible || this._hnsVisible)}">
         <file-drop id="file" @filedrop="${e => this._attachmentFile = e.detail.file}"></file-drop>
         <mwc-icon-button class="add" icon="add_circle" @click="${this._addAttachment}"></mwc-icon-button>
       </div>
-    ` : '';
+    `;
   }
-
   renderPreview() {
     // language=HTML
     return this._test ? html`
