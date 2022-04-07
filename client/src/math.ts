@@ -18,7 +18,9 @@ export function math(code: string, setter: (string) => void) {
       ascii = ascii.substr("\\display\\".length)
       display = true;
     }
+    ascii = ascii.replace(/([0-9]+),([0-9]+)/g, "$1.$2");
     let tex = parser.parse(ascii);
+    tex = tex.replace(/([0-9]+)\.([0-9]+)/g, "$1{,}$2");
     tex = tex.replace(/\\color/g, "\\textcolor");
     if (display)
       tex = `\\displaystyle ${tex}`;

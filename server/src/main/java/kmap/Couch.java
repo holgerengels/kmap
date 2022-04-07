@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -991,6 +992,22 @@ public class Couch extends Server {
 
     public static void main(String[] args) throws IOException {
         Couch couch = new Couch(readProperties(args[0]));
+        Server.CLIENT.set("root");
+        Pattern pattern = Pattern.compile(".*[0-9]+,[0-9]+.*", Pattern.DOTALL);
+        List<JsonObject> objects = couch.loadModuleAsList("Mathematik", "Analysis");
+        System.out.println("objects.size() = " + objects.size());
+        objects = objects.stream().filter(o -> {
+            String description = string(o, "description");
+            return description != null && pattern.matcher(description).matches();
+        }).collect(Collectors.toList());
+        System.out.println("objects.size() = " + objects.size());
+        System.out.println("objects = " + objects.stream().map(o -> string(o, "chapter") + " " + string(o, "topic") + "\n").collect(Collectors.toList()));
+        Server.CLIENT.remove();
+    }
+
+    /*
+    public static void main(String[] args) throws IOException {
+        Couch couch = new Couch(readProperties(args[0]));
         if (args.length != 4) {
             System.err.println("Usage: <kmap.properties> name value <topics>");
             System.exit(1);
@@ -1011,6 +1028,7 @@ public class Couch extends Server {
         }
         Server.CLIENT.remove();
     }
+    */
 
     public int batchCards(String json) {
         CouchDbClient client = createClient("map");
