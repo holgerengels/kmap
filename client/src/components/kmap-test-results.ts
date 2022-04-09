@@ -160,9 +160,7 @@ export class KmapTestResults extends Connected {
         <svg viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet" focusable="false" style="pointer-events: none; display: inline; width: 16px; height: 16px;"><g><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"></path></g></svg>
         klickst, wird die jeweilige Bewertung entsprechend als Selbsteinschätzung übernommen.
       </label>
-      <label class="secondary" ?hidden="${!this._summary.hasCards}">Wenn Du auf
-        <svg viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet" focusable="false" style="pointer-events: none; display: inline; width: 16px; height: 16px;"><g><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"></path></g></svg>
-        klickst, kommst Du zur Themenkarte.
+      <label class="secondary" ?hidden="${!this._summary.hasCards}">Wenn Du auf den Titel der Ergebniskarte klickst, kommst Du zur Themenkarte.
       </label>
       <br/><br/>`
       : ''}
