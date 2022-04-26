@@ -83,7 +83,7 @@ export class KMapSubjects extends Connected {
     return html`
         <div class="title font-body">
           <p style="color: var(--color-mediumgray)">
-            KMap kartographiert Wissen auf übersichtlichen Wissenslandkarten. So kann man sofort erkennen, wie alles
+            KMap kartografiert Wissen auf übersichtlichen Wissenslandkarten. So kann man sofort erkennen, wie alles
             zusammenhängt und wo welches Wissen vorausgesetzt wird. Durch Einfärben der Wissenskarten kann man seinen
             Lernfortschritt sichtbar machen. So weiß man immer, wo man steht.
           </p>

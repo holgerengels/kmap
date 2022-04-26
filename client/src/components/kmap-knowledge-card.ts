@@ -183,16 +183,12 @@ export class KMapKnowledgeCard extends Connected {
       colorStyles,
       css`
         kmap-card {
-          transition: opacity .1s ease-in-out;
+          max-width: 800px;
+          background-color: white;
           opacity: 1.0;
         }
         :host([faded]) kmap-card {
           opacity: 0.0;
-        }
-        kmap-card {
-          max-width: 800px;
-          background-color: white;
-          transition: background-color 280ms cubic-bezier(0.4, 0, 0.2, 1), border-color 280ms cubic-bezier(0.4, 0, 0.2, 1), opacity 280ms cubic-bezier(0.4, 0, 0.2, 1);
         }
         h2 {
           font-size: 1.0rem;

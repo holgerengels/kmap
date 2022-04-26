@@ -6,6 +6,7 @@
     "tsc": "tsc -w -p tsconfig.build.json"
   },
   "devDependencies": {
+    "concurrently": "^7.1.0",
     "@babel/core": "^7.16.7",
     "@babel/eslint-parser": "^7.16.5",
     "@babel/eslint-plugin": "^7.16.5",

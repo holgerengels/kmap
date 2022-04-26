@@ -41,7 +41,11 @@ export class KMapSummaryCard extends Connected {
   @state()
   private _testCount?: number;
   @state()
+  private _linkedTestCount?: number;
+  @state()
   private _topicCounts: {};
+  @state()
+  private _chapterCounts: {};
   @state()
   private _selectedDependencies: string[] = [];
 
@@ -55,6 +59,7 @@ export class KMapSummaryCard extends Connected {
       _instance: state.app.instance,
       _userid: state.app.userid,
       _topicCounts: state.tests.topicCounts,
+      _chapterCounts: state.tests.chapterCounts,
       _layers: state.shell.layers,
       _selectedDependencies: state.maps.selectedDependencies,
       selected: this.card !== undefined && state.maps.selected === this.card.topic,
@@ -74,7 +79,9 @@ export class KMapSummaryCard extends Connected {
     }
 
     if (changedProperties.has("card") || changedProperties.has("_topicCounts"))
-      this._testCount = (this.card !== undefined && this._topicCounts !== undefined) ? this._topicCounts[this.card.chapter + "/"+ this.card.topic] : 0;
+      this._testCount = (this.card !== undefined && this._topicCounts !== undefined && this.card.links === undefined) ? this._topicCounts[this.card.chapter + "/" + this.card.topic] : 0;
+    if (changedProperties.has("card") || changedProperties.has("_chapterCounts"))
+      this._linkedTestCount = (this.card !== undefined && this._chapterCounts !== undefined && this.card.links !== undefined) ? this._chapterCounts[this.card.links] : 0;
 
     if (changedProperties.has("_userid") || changedProperties.has("_layers") || changedProperties.has("_key"))
       this._colorizeEvent( );
@@ -121,7 +128,9 @@ export class KMapSummaryCard extends Connected {
 
   _test() {
     if (this.card === undefined) return;
-    store.dispatch.routing.push('/app/test/' + encodePath(this.card.subject, this.card.chapter, this.card.topic));
+    store.dispatch.routing.push('/app/test/' + (this.card.links
+      ? encodePath(this.card.subject, this.card.links!)
+      : encodePath(this.card.subject, this.card.chapter, this.card.topic)));
   }
 
   static get styles() {
@@ -132,16 +141,12 @@ export class KMapSummaryCard extends Connected {
       elevationStyles,
       css`
         kmap-card {
-          transition: opacity .1s ease-in-out;
+          width: 300px;
+          background-color: white;
           opacity: 1.0;
         }
         :host([faded]) kmap-card {
           opacity: 0.0;
-        }
-        kmap-card {
-          width: 300px;
-          background-color: white;
-          transition: background-color 280ms cubic-bezier(0.4, 0, 0.2, 1), opacity 280ms cubic-bezier(0.4, 0, 0.2, 1);
         }
         kmap-card[selected] {
         }
@@ -188,6 +193,9 @@ export class KMapSummaryCard extends Connected {
           ` : '' }
           ${this._testCount ? html`
             <mwc-icon-button slot="icon" icon="quiz" title="${this._testCount} Aufgaben zum Thema ${this.card.topic}" @click="${this._test}"></mwc-icon-button>
+          ` : '' }
+          ${this._linkedTestCount ? html`
+            <mwc-icon-button slot="icon" icon="quiz" title="${this._linkedTestCount} Aufgaben zum Kapitel ${this.card.links}" @click="${this._test}"></mwc-icon-button>
           ` : '' }
         </kmap-card>
     `;
