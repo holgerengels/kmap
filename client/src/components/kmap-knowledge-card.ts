@@ -320,7 +320,7 @@ export class KMapKnowledgeCard extends Connected {
         </div>
         ` : '' }
 
-          <a class="button" slot="button" href="/app/browser/${encodePath(this.card.subject, this.card.chapter)}" title="Wissenslandkarte ${this.card.chapter}">🡤  ${this.card.chapter}</a>
+          <a class="button" slot="button" href="/app/browser/${encodePath(this.card.subject, this.card.chapter)}" title="Wissenslandkarte ${this.card.chapter}">↖  ${this.card.chapter}</a>
 
           ${!this.card.links && false ? html`
             <star-rating slot="button" .rate="${this.state}" @clicked="${this._rated}"></star-rating>
