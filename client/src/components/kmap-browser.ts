@@ -375,13 +375,14 @@ export class KMapBrowser extends Connected {
     return this._chapterCard ? html`
       <kmap-card class="chapter-card">
         ${this._chapterCard.links ? html`
-          <kmap-card-text class="print-hide">
+          <kmap-card-text class="print-hide" type="header">
             <b>🡠</b> ${this._chapterCard.links.split("/").map((backlink) => html`
               <a href="/app/browser/${encodePath(this._subject, backlink)}" title="Wissenslandkarte ${backlink}">${backlink}</a>&nbsp;
             `)}
           </kmap-card-text>
+          <kmap-card-spacer></kmap-card-spacer>
         ` : html`
-          <kmap-card-text class="print-hide">
+          <kmap-card-text class="print-hide" type="header">
             <b>Zurück zum</b> <a href="/app/" title="Startseite">Start</a>
           </kmap-card-text>
         ` }
