@@ -197,7 +197,6 @@ export class KMapKnowledgeCard extends Connected {
           letter-spacing: .0125em;
         }
         .button {
-          text-transform: uppercase;
           margin-left: 8px;
         }
         .attachments {
@@ -321,7 +320,7 @@ export class KMapKnowledgeCard extends Connected {
         </div>
         ` : '' }
 
-          <a class="button" slot="button" href="/app/browser/${encodePath(this.card.subject, this.card.chapter)}" title="Wissenslandkarte ${this.card.chapter}"><mwc-icon>expand_less</mwc-icon></a>
+          <a class="button" slot="button" href="/app/browser/${encodePath(this.card.subject, this.card.chapter)}" title="Wissenslandkarte ${this.card.chapter}">🡤  ${this.card.chapter}</a>
 
           ${!this.card.links && false ? html`
             <star-rating slot="button" .rate="${this.state}" @clicked="${this._rated}"></star-rating>
