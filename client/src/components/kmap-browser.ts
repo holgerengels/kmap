@@ -86,8 +86,11 @@ export class KMapBrowser extends Connected {
   @state()
   private _passiveEventListeners: boolean = false;
 
-  @query('#timeline')
+  @query('#timeline', true)
   private _timelineElement: KMapTimelineAside;
+
+  @query('#connector', false)
+  private _connector!: Connector;
 
   declare shadowRoot: ShadowRoot;
 
@@ -170,10 +173,8 @@ export class KMapBrowser extends Connected {
     }
 
     if (this._layers.includes("dependencies") && (changedProperties.has("_selected") || changedProperties.has("_highlighted"))) {
-      const connector: Connector = this.shadowRoot.getElementById("connector") as Connector;
-      if (connector) {
-        connector.clear();
-        connector.setAttribute("faded", "true");
+        this._connector.clear();
+        this._connector.setAttribute("faded", "true");
 
         if (this._selected && this._highlighted) {
           let selected = this._findCard(this._selected);
@@ -183,14 +184,13 @@ export class KMapBrowser extends Connected {
             let highlighted = this._findCard(topic);
             if (highlighted === undefined)
               continue;
-            connector.add(highlighted, selected);
+            this._connector.add(highlighted, selected);
           }
-          setTimeout(function () {
-            connector.removeAttribute("faded");
-          });
+          setTimeout((that) => {
+            that._connector.removeAttribute("faded");
+          }, 0, this);
         }
       }
-    }
 
     if (changedProperties.has("_loading")) {
       let that = this;
@@ -198,13 +198,9 @@ export class KMapBrowser extends Connected {
     }
 
     if (changedProperties.has("_chapter")) {
-      this._testCount = (this._chapterCounts !== undefined && this._chapterCounts !== undefined) ? this._chapterCounts[this._chapter] : 0;
-      // @ts-ignore
-      const connector: Connector = this.shadowRoot.getElementById("connector") as Connector;
-      if (connector) {
-        connector.clear();
-        connector.setAttribute("faded", "true");
-      }
+      this._testCount = (this._chapter !== undefined && this._chapterCounts !== undefined) ? this._chapterCounts[this._chapter] : 0;
+      this._connector.clear();
+      this._connector.setAttribute("faded", "true");
     }
 
     if (changedProperties.has("_timeline")) {
@@ -234,6 +230,8 @@ export class KMapBrowser extends Connected {
   }
 
   _findCard(topic: string) {
+    if (topic.includes("/"))
+      topic = topic.split('/')[1];
     // @ts-ignore
     const elements = this.shadowRoot.querySelectorAll("kmap-summary-card");
     for (const element of elements) {
@@ -274,6 +272,7 @@ export class KMapBrowser extends Connected {
           display: grid;
           grid-template-columns: 1fr;
           --content-width: 100vw;
+          position: relative;
         }
         :host([draweropen]) {
           min-width: 300px;

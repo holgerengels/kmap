@@ -26,7 +26,7 @@ export class Connector extends LitElement {
     }
     return {
       "x": x,
-      "y": y
+      "y": y,
     };
   }
 
@@ -54,7 +54,7 @@ export class Connector extends LitElement {
     let fromy = frompos.y + from.offsetHeight / 2;
     let tox = topos.x + to.offsetWidth / 2;
     let toy = topos.y;
-    this._connections = [...this._connections, { fromx, fromy, tox, toy}]
+    this._connections = [...this._connections, { fromx, fromy, tox, toy}];
   }
 
   clear() {
