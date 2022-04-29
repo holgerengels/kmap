@@ -45,6 +45,10 @@ export class KmapMain extends connect(store, LitElement) {
   @state()
   private _page: string = '';
   @state()
+  private _currentRoutingStateParams: { [p: string]: any } = {};
+  @state()
+  private _scrollToTop = false;
+  @state()
   private _meta: Meta = {};
   @state()
   private _barTitle: string = '';
@@ -89,9 +93,13 @@ export class KmapMain extends connect(store, LitElement) {
   @query('#main')
   private _main: HTMLElement;
 
-  set route(val: RoutingState<string>) {
-    if (val.page !== this._page) {
-      this._page = val.page
+  set route(routingState: RoutingState<string>) {
+    if (routingState.page !== this._page) {
+      this._page = routingState.page
+    }
+    if (routingState.page === "browser" && routingState.params !== this._currentRoutingStateParams) {
+      this._currentRoutingStateParams = routingState.params;
+      this._scrollToTop = true;
     }
   }
 
@@ -165,6 +173,11 @@ export class KmapMain extends connect(store, LitElement) {
       console.log(this._meta);
 
       this._barTitle = this._meta.title || _title.get(this._page) || "KMap";
+    }
+
+    if (this._scrollToTop && this._main !== null) {
+      this._scrollToTop = false;
+      this._main.scrollTo({top: 0, left: 0, behavior: "smooth"})
     }
 
     if (changedProps.has('_page') && !this._layers.includes('editor'))
