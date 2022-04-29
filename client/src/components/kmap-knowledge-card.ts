@@ -221,6 +221,12 @@ export class KMapKnowledgeCard extends Connected {
       // language=HTML
       return html`
       <kmap-card style=${styleMap(this._colorStyles)}>
+        <kmap-card-text>
+          <a href="/app/browser/${encodePath(this.card.subject, this.card.chapter)}" title="Wissenslandkarte ${this.card.chapter}">↖ ${this.card.chapter}</a>
+        </kmap-card-text>
+        <kmap-card-spacer></kmap-card-spacer>
+        <kmap-card-spacer></kmap-card-spacer>
+
         ${this._compactCards ? '' : html`
           <kmap-card-text type="header">
             <h2>${this.card.topic !== "_" ? this.card.topic : this.card.chapter}</h2>
