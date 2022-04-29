@@ -86,7 +86,7 @@ export class KMapSubjectCard extends LitElement {
 
   render() {
     return this.subject ? html`
-      <kmap-card header="${this.subject.name}" subheader="${this.subject.count} Wissenskarten"
+      <kmap-card header="${this.subject.name}  ↘" subheader="${this.subject.count} Wissenskarten"
           primaryLink="/app/browser/${this.subject.name}/${this.subject.name}" primaryLinkTitle="Wissenslandkarte ${this.subject.name}"
           style=${styleMap(this._colorStyles)}>
       </kmap-card>

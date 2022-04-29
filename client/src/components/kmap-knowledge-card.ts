@@ -222,7 +222,7 @@ export class KMapKnowledgeCard extends Connected {
       return html`
       <kmap-card style=${styleMap(this._colorStyles)}>
         <kmap-card-text>
-          <a href="/app/browser/${encodePath(this.card.subject, this.card.chapter)}" title="Wissenslandkarte ${this.card.chapter}">↖ ${this.card.chapter}</a>
+          ← <a href="/app/browser/${encodePath(this.card.subject, this.card.chapter)}" title="Wissenslandkarte ${this.card.chapter}">${this.card.chapter}</a>
         </kmap-card-text>
         <kmap-card-spacer></kmap-card-spacer>
         <kmap-card-spacer></kmap-card-spacer>
@@ -326,7 +326,7 @@ export class KMapKnowledgeCard extends Connected {
         </div>
         ` : '' }
 
-          <a class="button" slot="button" href="/app/browser/${encodePath(this.card.subject, this.card.chapter)}" title="Wissenslandkarte ${this.card.chapter}">↖ ${this.card.chapter}</a>
+          <span class="button" slot="button"><b>←</b> <a href="/app/browser/${encodePath(this.card.subject, this.card.chapter)}" title="Wissenslandkarte ${this.card.chapter}">${this.card.chapter}</a></span>
 
           ${!this.card.links && false ? html`
             <star-rating slot="button" .rate="${this.state}" @clicked="${this._rated}"></star-rating>
