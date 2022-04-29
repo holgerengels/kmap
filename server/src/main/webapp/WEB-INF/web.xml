@@ -77,6 +77,11 @@
         <servlet-class>kmap.SitemapServlet</servlet-class>
     </servlet>
 
+    <servlet>
+        <servlet-name>aiconnector</servlet-name>
+        <servlet-class>kmap.AIConnectorServlet</servlet-class>
+    </servlet>
+
     <servlet-mapping>
         <servlet-name>data</servlet-name>
         <url-pattern>/data</url-pattern>
@@ -140,6 +145,11 @@
     <servlet-mapping>
         <servlet-name>sitemap</servlet-name>
         <url-pattern>/sitemap/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>aiconnector</servlet-name>
+        <url-pattern>/aiconnector/*</url-pattern>
     </servlet-mapping>
 
     <!--session-config>
