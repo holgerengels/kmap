@@ -70,11 +70,16 @@ public class Couch extends Server {
                 .descending(true)
                 .includeDocs(true);
         List<JsonObject> objects = view.query(JsonObject.class);
-        objects.removeIf(o -> string(o, "chapter") == null
-                || string(o,"topic") == null
-                || (includeChapters && "_".equals(string(o, "topic")) && stringTrim(o, "summary") == null)
-                || (!includeChapters && "_".equals(string(o, "topic")))
-                || (!includeChapters && !"_".equals(string(o, "topic")) && stringTrim(o,"description") == null));
+        if (includeChapters)
+            objects.removeIf(o -> string(o, "chapter") == null
+                    || string(o,"topic") == null
+                    || ("_".equals(string(o, "topic")) && stringTrim(o, "summary") == null));
+        else
+            objects.removeIf(o -> string(o, "chapter") == null
+                    || string(o,"topic") == null
+                    || "_".equals(string(o, "topic"))
+                    || stringTrim(o,"description") == null);
+
         if (n < objects.size())
             objects = objects.subList(0, n);
         objects.forEach(JSON::removeEmptyStrings);
