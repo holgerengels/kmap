@@ -59,7 +59,7 @@ public class SitemapServlet extends JsonServlet {
             Long start = new SimpleDateFormat("dd/MM/yyyy").parse("01/01/2020").getTime();
 
             if (subject != null) {
-                JsonArray array = couch.latest(subject, 100000);
+                JsonArray array = couch.latest(subject, 100000, false);
                 Map<String, Long> map = new HashMap<>();
                 for (JsonElement element : array) {
                     JsonObject card = (JsonObject) element;

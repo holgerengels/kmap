@@ -7,21 +7,14 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
-import javax.xml.stream.XMLEventFactory;
-import javax.xml.stream.XMLEventWriter;
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.*;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 
-import static kmap.JSON.loong;
-import static kmap.JSON.string;
+import static kmap.JSON.*;
 
 public class AIConnectorServlet extends JsonServlet {
     private Couch couch;
@@ -42,7 +35,7 @@ public class AIConnectorServlet extends JsonServlet {
             Server.CLIENT.set("root");
 
             if (subject != null) {
-                JsonArray array = couch.latest(subject, 100000);
+                JsonArray array = couch.latest(subject, 100000, true);
 
                 Writer out = new OutputStreamWriter(resp.getOutputStream());
                 for (JsonElement element : array) {
@@ -50,15 +43,27 @@ public class AIConnectorServlet extends JsonServlet {
 
                     String chapter = string(card, "chapter");
                     String topic = string(card, "topic");
+                    String url = "_".equals(topic)
+                            ? "https://kmap.eu/app/browser/" + URLs.encode(subject) + "/" + URLs.encode(chapter)
+                            : "https://kmap.eu/app/browser/" + URLs.encode(subject) + "/" + URLs.encode(chapter) + "/" + URLs.encode(topic);
+
+                    String summary = stringTrim(card, "summary");
                     String description = string(card, "description");
-                    if (description == null)
-                        continue;
-                    String textOnly = Jsoup.parse(description).text();
-                    textOnly = textOnly.replaceAll("\\\\display\\\\", "");
-                    String url =  "https://kmap.eu/app/browser/" + URLs.encode(subject) + "/" + URLs.encode(chapter) + "/" + URLs.encode(topic);
+                    String text = chapter + "\n";
+                    if (!"_".equals(topic))
+                        text +=  topic + "\n";
+                    if (summary != null && summary.length() != 0)
+                        text += summary;
+                    if (description != null) {
+                        text += text.endsWith(".") ? " " : ". ";
+                        Document document = Jsoup.parse(description);
+                        text += new HtmlToText().getPlainText(document.body()).replaceAll("\\\\display\\\\", "");
+                        text = text.replaceAll("\\n{2,100}", "\n");
+                        System.out.println("text = " + text);
+                    }
                     JsonObject line = new JsonObject();
-                    line.addProperty("text", textOnly);
                     line.addProperty("metadata", url);
+                    line.addProperty("text", text);
                     out.write(line.toString());
                     out.write("\n");
                 }

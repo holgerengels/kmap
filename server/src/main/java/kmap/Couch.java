@@ -62,7 +62,7 @@ public class Couch extends Server {
         return objects;
     }
 
-    public JsonArray latest(String subject, int n) {
+    public JsonArray latest(String subject, int n, boolean includeChapters) {
         View view = createClient("map").view("net/byModified")
                 .startKey(subject, Long.MAX_VALUE)
                 .endKey(subject, Long.MIN_VALUE)
@@ -72,9 +72,9 @@ public class Couch extends Server {
         List<JsonObject> objects = view.query(JsonObject.class);
         objects.removeIf(o -> string(o, "chapter") == null
                 || string(o,"topic") == null
-                || "_".equals(string(o, "topic"))
-                || string(o,"description") == null
-                || string(o,"description").trim().length() == 0);
+                || (includeChapters && "_".equals(string(o, "topic")) && stringTrim(o, "summary") == null)
+                || (!includeChapters && "_".equals(string(o, "topic")))
+                || (!includeChapters && !"_".equals(string(o, "topic")) && stringTrim(o,"description") == null));
         if (n < objects.size())
             objects = objects.subList(0, n);
         objects.forEach(JSON::removeEmptyStrings);

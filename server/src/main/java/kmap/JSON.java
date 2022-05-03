@@ -20,6 +20,11 @@ public class JSON {
         return topic.get(name).isJsonNull();
     }
 
+    public static String stringTrim(JsonObject topic, String name) {
+        JsonPrimitive primitive = topic.getAsJsonPrimitive(name);
+        return primitive != null ? primitive.getAsString().trim() : null;
+    }
+
     public static String string(JsonObject topic, String name) {
         JsonPrimitive primitive = topic.getAsJsonPrimitive(name);
         return primitive != null ? primitive.getAsString() : null;

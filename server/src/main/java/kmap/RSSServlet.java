@@ -69,7 +69,7 @@ public class RSSServlet extends JsonServlet {
             createNode(eventWriter, "pubDate", date_format.format(new Date()));
 
             if (subject != null) {
-                JsonArray array = couch.latest(subject, count);
+                JsonArray array = couch.latest(subject, count, false);
                 for (JsonElement element : array) {
                     JsonObject card = (JsonObject) element;
                     eventWriter.add(eventFactory.createStartElement("", "", "item"));
