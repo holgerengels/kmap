@@ -78,7 +78,8 @@ public class Couch extends Server {
             objects.removeIf(o -> string(o, "chapter") == null
                     || string(o,"topic") == null
                     || "_".equals(string(o, "topic"))
-                    || stringTrim(o,"description") == null);
+                    || string(o,"description") == null
+                    || stringTrim(o,"description").length() == 0);
 
         if (n < objects.size())
             objects = objects.subList(0, n);
