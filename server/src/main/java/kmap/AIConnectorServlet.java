@@ -61,9 +61,23 @@ public class AIConnectorServlet extends JsonServlet {
                         text = text.replaceAll("\\n{2,100}", "\n");
                         System.out.println("text = " + text);
                     }
+
+                    StringBuilder builder = new StringBuilder();
+                    String[] paragraphs = text.split("\\n");
+                    for (String paragraph : paragraphs) {
+                        if ((builder.length() + paragraph.length()) / 2 > 2000) {
+                            JsonObject line = new JsonObject();
+                            line.addProperty("metadata", url);
+                            line.addProperty("text", builder.toString());
+                            out.write(line.toString());
+                            out.write("\n");
+                            builder.setLength(0);
+                        }
+                        builder.append(paragraph).append("\n");
+                    }
                     JsonObject line = new JsonObject();
                     line.addProperty("metadata", url);
-                    line.addProperty("text", text);
+                    line.addProperty("text", builder.toString());
                     out.write(line.toString());
                     out.write("\n");
                 }
