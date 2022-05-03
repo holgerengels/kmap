@@ -24,8 +24,6 @@ import java.io.IOException;
  * @author Jonathan Hedley, jonathan@hedley.net
  */
 public class HtmlToText {
-    private static final String userAgent = "Mozilla/5.0 (jsoup)";
-    private static final int timeout = 5 * 1000;
 
     /**
      * Format an Element to plain-text
@@ -41,7 +39,7 @@ public class HtmlToText {
 
     // the formatting rules, implemented in a breadth-first DOM traverse
     private static class FormattingVisitor implements NodeVisitor {
-        private static final int maxWidth = 80;
+        private static final int maxWidth = Integer.MAX_VALUE;
         private int width = 0;
         private StringBuilder accum = new StringBuilder(); // holds the accumulated text
 
