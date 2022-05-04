@@ -89,8 +89,8 @@ export class KMapBrowser extends Connected {
   @query('#timeline', true)
   private _timelineElement: KMapTimelineAside;
 
-  @query('#connector', false)
-  private _connector!: Connector;
+  @query('#connector')
+  private _connector?: Connector;
 
   declare shadowRoot: ShadowRoot;
 
@@ -172,7 +172,7 @@ export class KMapBrowser extends Connected {
 
     }
 
-    if (this._layers.includes("dependencies") && (changedProperties.has("_selected") || changedProperties.has("_highlighted"))) {
+    if (this._connector && this._layers.includes("dependencies") && (changedProperties.has("_selected") || changedProperties.has("_highlighted"))) {
         this._connector.clear();
         this._connector.setAttribute("faded", "true");
 
@@ -187,7 +187,8 @@ export class KMapBrowser extends Connected {
             this._connector.add(highlighted, selected);
           }
           setTimeout((that) => {
-            that._connector.removeAttribute("faded");
+            if (that._connector)
+              that._connector.removeAttribute("faded");
           }, 0, this);
         }
       }
@@ -199,8 +200,10 @@ export class KMapBrowser extends Connected {
 
     if (changedProperties.has("_chapter")) {
       this._testCount = (this._chapter !== undefined && this._chapterCounts !== undefined) ? this._chapterCounts[this._chapter] : 0;
-      this._connector.clear();
-      this._connector.setAttribute("faded", "true");
+      if (this._connector) {
+        this._connector.clear();
+        this._connector.setAttribute("faded", "true");
+      }
     }
 
     if (changedProperties.has("_timeline")) {
