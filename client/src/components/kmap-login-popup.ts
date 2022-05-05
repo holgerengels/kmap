@@ -8,6 +8,7 @@ import '@material/mwc-dialog';
 import '@material/mwc-textfield';
 import 'pwa-helper-components/pwa-install-button';
 import 'pwa-helper-components/pwa-update-available';
+import './datalist-textfield';
 import './validating-form';
 import {Dialog} from "@material/mwc-dialog/mwc-dialog";
 import {colorStyles, fontStyles} from "./kmap-styles";
