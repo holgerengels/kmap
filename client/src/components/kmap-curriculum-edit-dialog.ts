@@ -171,12 +171,34 @@ export class KMapCurriculumEditDialog extends Connected {
   }
 
   edit(curriculum: string) {
-    this._curriculum = JSON.parse(curriculum);
+    this._curriculum = curriculum ? JSON.parse(curriculum) : [  {
+      "cw": 37,
+      "sw": 0,
+      "tops": [
+        ["map", "Tools"],
+        ["map", "Grundwissen"],
+        ["map", "Mengenlehre"],
+        ["map", "Terme"],
+        ["map", "Gleichungen"],
+        ["map", "Geraden"],
+        ["map", "Parabeln"]
+      ]
+    },
+      {
+        "cw": 38,
+        "sw": 1,
+        "tops": [
+        ]
+      },
+    ];
     if (!this._curriculum) return;
 
     this._firstCW = this._tempFirstCW = this._curriculum[1].cw;
     this._lastCW = this._tempLastCW = this._curriculum[this._curriculum.length-1].cw;
-    this._maxCW = this._tempMaxCW = this._curriculum.map(w => parseInt(w.cw + "")).sort((a, b) => a - b).pop() || 52;
+    let max = this._curriculum.map(w => parseInt(w.cw + "")).sort((a, b) => a - b).pop();
+    if (max === undefined || max < 52)
+      max = 52;
+    this._maxCW = this._tempMaxCW = max || 52;
 
     this._selectedIndex = -1;
 
@@ -293,7 +315,7 @@ export class KMapCurriculumEditDialog extends Connected {
       }
       .layout {
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         gap: 8px;
       }
       .weeks {
@@ -331,9 +353,9 @@ export class KMapCurriculumEditDialog extends Connected {
     <div class="content" ?hidden="${this._tab === 'preview'}">
       <label>Kalenderwochen</label>
       <div class="layout">
-        <mwc-textfield .value="${this._tempFirstCW}" label="von" type="number" min="1" max="53" step="1" @change="${e => this._tempFirstCW = parseInt(e.target.value)}"></mwc-textfield>
-        <mwc-textfield .value="${this._tempMaxCW}" label="max" type="number" min="52" max="53" step="1" @change="${e => this._tempMaxCW = parseInt(e.target.value)}"></mwc-textfield>
-        <mwc-textfield .value="${this._tempLastCW}" label="bis" type="number" min="1" max="53" step="1" @change="${e => this._tempLastCW = parseInt(e.target.value)}"></mwc-textfield>
+        <mwc-textfield .value="${this._tempFirstCW}" label="von" type="number" min="1" max="53" step="1" helper="KW erste Schulwoche" helperPersistent @change="${e => this._tempFirstCW = parseInt(e.target.value)}"></mwc-textfield>
+        <mwc-textfield .value="${this._tempMaxCW}" label="max" type="number" min="52" max="53" step="1" helper="Letze KW im Jahr (52 / 53)" helperPersistent @change="${e => this._tempMaxCW = parseInt(e.target.value)}"></mwc-textfield>
+        <mwc-textfield .value="${this._tempLastCW}" label="bis" type="number" min="1" max="53" step="1" helper="KW letzte Schulwoche" helperPersistent @change="${e => this._tempLastCW = parseInt(e.target.value)}"></mwc-textfield>
         <label>→</label>
         <mwc-textfield .value="${this._numSWeeks}" label="Schulwochen" type="number" min="0" max="9999" step="1" disabled></mwc-textfield>
         <mwc-textfield .value="${this._numHWeeks}" label="Ferienwochen" type="number" min="0" max="9999" step="1" disabled></mwc-textfield>
