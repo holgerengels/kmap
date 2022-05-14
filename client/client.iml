@@ -8,5 +8,6 @@
     <orderEntry type="library" name="min" level="application" />
     <orderEntry type="library" name="ResizeObserver.global" level="application" />
     <orderEntry type="library" name="webfontloader" level="application" />
+    <orderEntry type="library" name="jsxgraph" level="application" />
   </component>
 </module>

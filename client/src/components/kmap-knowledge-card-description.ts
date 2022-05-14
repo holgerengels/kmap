@@ -80,16 +80,23 @@ export class KMapKnowledgeCardDescription extends LitElement {
           flex-wrap: wrap;
           margin: -8px;
         }
-        img {
-          max-width: calc(var(--content-width, 100vw) - 64px);
-        }
         box {
-          flex: 0 1 0px;
+          flex: 1 1 100%;
           margin: 8px;
         }
         growbox {
-          flex: 1 1 300px;
+          flex: 1 1 100%;
           margin: 8px;
+        }
+        @media (min-width: 600px) {
+          box {
+            flex: 0 1 auto;
+            margin: 8px;
+          }
+          growbox {
+            flex: 1 1 0px;
+            margin: 8px;
+          }
         }
         calculation {
           display: grid;
@@ -102,6 +109,9 @@ export class KMapKnowledgeCardDescription extends LitElement {
         notes {
           grid-column: 2;
           font-size: 90%;
+        }
+        img {
+          max-width: calc(var(--content-width, 100vw) - 64px);
         }
         figure { margin: 0px; }
       `
