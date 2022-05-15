@@ -69,6 +69,9 @@ a[disabled] {
     pointer-events: none;
     color: var(--color-mediumgray) !important;
 }
+ol, ul {
+  padding-inline-start: 16px;
+}
 `;
 
 // language=CSS

@@ -5,6 +5,7 @@ import {urls} from '../urls';
 import '@material/mwc-icon';
 import {Attachment} from "../models/types";
 import {fontStyles} from "./kmap-styles";
+import {unsafeHTML} from "lit/directives/unsafe-html.js";
 
 @customElement('kmap-knowledge-card-attachment')
 export class KMapKnowledgeCardAttachment extends LitElement {
@@ -49,12 +50,11 @@ export class KMapKnowledgeCardAttachment extends LitElement {
   }
 
   mimeIcon(mimeType) {
+    console.log(mimeType);
     var icon = fileIcons[mimeType];
     if (icon)
       return icon;
 
-    if (mimeType === "link")
-      return "link";
     if (mimeType.startsWith("text"))
       return "description";
     if (mimeType.startsWith("image"))
@@ -73,25 +73,28 @@ export class KMapKnowledgeCardAttachment extends LitElement {
     return [
       fontStyles,
       css`
-            p {
-                margin-top: 16px !important;
-                margin-bottom: 0px;
-            }
-            mwc-icon {
-                font-size: 18px;
-                vertical-align: middle;
-            }
-        `];
+        p {
+          margin-top: 16px !important;
+          margin-bottom: 0px;
+          text-align: start;
+        }
+        mwc-icon {
+          font-size: 18px;
+          vertical-align: middle;
+        }
+      `];
   }
 
   render() {
     // language=HTML
     return html`
-            <p>
-                <mwc-icon>${this._mimeIcon}</mwc-icon>&nbsp;
-                ${this._renderAttachment()}
-            </p>
-        `;
+      <p>
+        ${this.attachment?.type === 'link'
+          ? html`<mwc-icon>link</mwc-icon>`
+          : html`<mwc-icon>${unsafeHTML(this._mimeIcon)}</mwc-icon>&nbsp`}
+        ${this._renderAttachment()}
+      </p>
+    `;
   }
 
   // TODO spread
@@ -133,6 +136,13 @@ export class KMapKnowledgeCardAttachment extends LitElement {
 }
 
 const fileIcons  = {
+    "link": "link",
     "application/octet-stream": "scatter_plot",
-    "application/pdf": "description",
+    "application/pdf": "picture_as_pdf",
+    "application/vnd.geogebra.file": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"18\" height=\"18\" viewBox=\"0 0 28 28\">" +
+      "<path fill=\"none\" stroke=\"#666\" stroke-width=\"2.2\" d=\"m15.3,4.7a11.4,9.1-26 1,0 1,0z\"/>" +
+      "<g stroke-linecap=\"round\">" +
+      "<path stroke=\"#000\" stroke-width=\"6\" d=\"m13.2,4.9h0M3.8,11.8h0M7.2,22.9h0M20.1,21.2h0M24.4,10.1h0\"/>" +
+      "<path stroke=\"#99F\" stroke-width=\"4.3\" d=\"m13.2,4.9h0M3.8,11.8h0M7.2,22.9h0M20.1,21.2h0M24.4,10.1h0\"/>" +
+      "</g></svg>",
 };
