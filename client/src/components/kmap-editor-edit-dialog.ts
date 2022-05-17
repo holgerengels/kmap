@@ -260,7 +260,7 @@ export class KMapEditorEditDialog extends Connected {
       }];
     }
     else if (this._attachmentFile && this._attachmentType === "file") {
-      this._attachments = [...this._attachments, {
+      this._attachments = [...this._attachments.filter(a => a.name !== this._attachmentName), {
         tag: this._attachmentTag,
         name: this._attachmentName,
         file: this._attachmentFile.name,

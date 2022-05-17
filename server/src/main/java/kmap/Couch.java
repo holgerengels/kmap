@@ -274,7 +274,7 @@ public class Couch extends Server {
                 Upload upload = uploads.get(file);
                 if (upload != null) {
                     try {
-                        System.out.println("uploading " + upload);
+                        System.out.println("saving " + upload);
                         response = client.saveAttachment(Files.newInputStream(upload.tmp), encode(upload.fileName), upload.contentType, response.getId(), response.getRev());
                     }
                     catch (IOException e) {
