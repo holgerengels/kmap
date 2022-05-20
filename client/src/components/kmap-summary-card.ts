@@ -169,7 +169,7 @@ export class KMapSummaryCard extends Connected {
     else
       // language=HTML
       return html`
-        <kmap-card primaryLink="${this._link()}" primaryLinkTitle="${this._linkTitle()}" header="${this.card.topic + (this.card.links !== undefined ? '  ↘' : '')}" subheader="${this._layers.includes("summaries") && this.card.summary ? this.card.summary : ''}"
+        <kmap-card primaryLink="${this._link()}" primaryLinkTitle="${this._linkTitle()}" header="${this.card.topic + (this.card.links !== undefined ? '  &#x2198;&#xFE0E;' : '')}" subheader="${this._layers.includes("summaries") && this.card.summary ? this.card.summary : ''}"
                 @hover="${this._hovered}" ?selected="${this.selected}" ?highlighted="${this.highlighted}" ?grayedOut="${this.grayedOut}"
                 style=${styleMap(this._colorStyles)}>
           <div slot="plane" class="marker top"></div>
