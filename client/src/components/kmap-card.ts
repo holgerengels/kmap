@@ -7,6 +7,7 @@ import {Ripple} from '@material/mwc-ripple/mwc-ripple';
 import {RippleHandlers} from '@material/mwc-ripple/ripple-handlers';
 import {fontStyles, colorStyles, elevationStyles} from "./kmap-styles";
 import {StyleInfo, styleMap} from 'lit/directives/style-map.js';
+import {unsafeHTML} from "lit/directives/unsafe-html.js";
 
 @customElement('kmap-card')
 export class KMapCard extends LitElement {
@@ -176,14 +177,14 @@ export class KMapCard extends LitElement {
   _renderPrimary() {
     return this.primaryLink === undefined ? html`
       <div class="primary" style="${styleMap(this._primaryStyles)}" @mouseenter="${this._mouseenter}" @mouseleave="${this._mouseleave}" @mousedown="${this._mousedown}" @touchstart="${this._touchstart}">
-        ${this.header ? html`<kmap-card-text type="header">${this.header}</kmap-card-text>` : ''}
-        ${this.subHeader ? html`<kmap-card-text type="subheader">${this.subHeader}</kmap-card-text>` : ''}
+        ${this.header ? html`<kmap-card-text type="header">${unsafeHTML(this.header)}</kmap-card-text>` : ''}
+        ${this.subHeader ? html`<kmap-card-text type="subheader">${unsafeHTML(this.subHeader)}</kmap-card-text>` : ''}
         <slot name="primary"></slot>
       </div>
     ` : html`
       <a href="${this.primaryLink}" style="${styleMap(this._primaryStyles)}" title="${this.primaryLinkTitle}" class="primary" @mouseenter="${this._mouseenter}" @mouseleave="${this._mouseleave}" @mousedown="${this._mousedown}" @touchstart="${this._touchstart}">
-        ${this.header ? html`<kmap-card-text type="header">${this.header}</kmap-card-text>` : ''}
-        ${this.subHeader ? html`<kmap-card-text type="subheader">${this.subHeader}</kmap-card-text>` : ''}
+        ${this.header ? html`<kmap-card-text type="header">${unsafeHTML(this.header)}</kmap-card-text>` : ''}
+        ${this.subHeader ? html`<kmap-card-text type="subheader">${unsafeHTML(this.subHeader)}</kmap-card-text>` : ''}
         <slot name="primary"></slot>
         <mwc-ripple id="ripple"></mwc-ripple>
       </a>
