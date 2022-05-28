@@ -12,8 +12,8 @@ import "./kmap-test-card-content";
 import "./kmap-test-card-hint";
 import "./kmap-test-card-solution";
 import "./kmap-feedback";
-import {KMapFeedback} from "./kmap-feedback";
 import {KMapTestCardContent} from "./kmap-test-card-content";
+import {KMapFeedback} from "./kmap-feedback";
 
 @customElement('kmap-test-card')
 export class KMapTestCard extends Connected {

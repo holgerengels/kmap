@@ -66,6 +66,7 @@ export class KMapExercise extends Connected {
           .chapter="${this._test.chapter}"
           .topic="${this._test.topic}"
           .key="${this._test.key}"
+          .repetitions="${this._test.repetitions}"
           .level="${this._test.level}"
           .question="${this._test.question}"
           .answer="${this._test.answer}"
