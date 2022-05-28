@@ -103,6 +103,8 @@ public class Tests {
             objects.forEach(o -> {
                 JsonObject _attachments = o.getAsJsonObject("_attachments");
                 o.add("attachments", amendAttachments(_attachments));
+                if (!o.has("repetitions"))
+                    o.addProperty("repetitions", 1);
                 //o.remove("_attachments");
             });
             objects.sort(Comparator
@@ -125,6 +127,8 @@ public class Tests {
         objects.forEach(o -> {
             JsonObject _attachments = o.getAsJsonObject("_attachments");
             o.add("attachments", amendAttachments(_attachments));
+            if (!o.has("repetitions"))
+                o.addProperty("repetitions", 1);
         });
         JsonArray array = new JsonArray();
         objects.forEach(array::add);
@@ -140,6 +144,8 @@ public class Tests {
         objects.forEach(o -> {
             JsonObject _attachments = o.getAsJsonObject("_attachments");
             o.add("attachments", amendAttachments(_attachments));
+            if (!o.has("repetitions"))
+                o.addProperty("repetitions", 1);
         });
         JsonArray array = new JsonArray();
         objects.forEach(array::add);
@@ -155,6 +161,8 @@ public class Tests {
         JsonObject object = objects.get(0);
         JsonObject _attachments = object.getAsJsonObject("_attachments");
         object.add("attachments", amendAttachments(_attachments));
+        if (!object.has("repetitions"))
+            object.addProperty("repetitions", 1);
         return object;
     }
 
@@ -296,9 +304,9 @@ public class Tests {
 
                 JsonObject existing = null;
                 List<JsonObject> array = loadSetAsList(subject, set);
-                for (JsonElement element : array) {
-                    if (key.equals(string((JsonObject)element, "key"))) {
-                        existing = (JsonObject)element;
+                for (JsonObject element : array) {
+                    if (key.equals(string(element, "key"))) {
+                        existing = element;
                     }
                 }
 
@@ -317,6 +325,7 @@ public class Tests {
                     existing.add("values", changed.get("values"));
                     existing.add("balance", changed.get("balance"));
                     existing.add("attachments", changed.get("attachments"));
+                    existing.addProperty("repetitions", JSON.integer(changed, "repetitions", 1));
                     if (checks(existing)) {
                         Response response = client.update(existing);
                         JsonArray attachments = changed.getAsJsonArray("attachments");
@@ -334,6 +343,8 @@ public class Tests {
                 long millis = System.currentTimeMillis();
                 changed.addProperty("created", millis);
                 changed.addProperty("modified", millis);
+                if (!changed.has("repetitions"))
+                    changed.addProperty("repetitions", 1);
                 changed.remove("added");
                 if (checks(changed)) {
                     Response response = client.save(changed);

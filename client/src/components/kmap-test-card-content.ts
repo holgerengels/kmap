@@ -1,4 +1,4 @@
-import {LitElement, html, css} from 'lit';
+import {LitElement, html, css, PropertyValues} from 'lit';
 import {customElement, property, query, state} from 'lit/decorators.js';
 
 import {urls} from '../urls';
@@ -8,10 +8,8 @@ import {math} from "../math";
 import {katexStyles} from "../katex-css";
 
 import './dnd-assign';
-import {DndAssign} from "./dnd-assign";
 import './dnd-fillin';
-import {DndFillin} from "./dnd-fillin";
-import {KmapSolveTree} from "kmap-solve-tree";
+import {TestInteraction} from "./test-interaction";
 
 @customElement('kmap-test-card-content')
 export class KMapTestCardContent extends LitElement {
@@ -47,7 +45,6 @@ export class KMapTestCardContent extends LitElement {
   // @ts-ignore
   private _questionElement: HTMLElement;
   @query('#answer')
-  // @ts-ignore
   private _answerElement: HTMLElement;
 
   willUpdate(changedProperties) {
@@ -61,6 +58,11 @@ export class KMapTestCardContent extends LitElement {
     }
     if (changedProperties.has("balance"))
       this._flexes(this.balance);
+  }
+
+  protected async updated(_changedProperties: PropertyValues) {
+    if (_changedProperties.has("answer") && this.answer)
+      await new Promise<void>((resolve) => setTimeout(() => { this.init(); resolve() }));
   }
 
   _flexes(balance) {
@@ -86,31 +88,27 @@ export class KMapTestCardContent extends LitElement {
       setter("");
   }
 
-  clear() {
+  init() {
     var element = this._answerElement;
     var inputs = element.getElementsByTagName("input");
     for (var i = 0; i < inputs.length; i++) {
       var input: HTMLInputElement = inputs[i];
-      input.removeAttribute("correction");
+      input.removeAttribute("correctness");
       if (input.type === "checkbox")
         input.checked = false;
       else
         input.value = '';
     }
-    var assigns = element.getElementsByTagName("dnd-assign");
-    for (const element of assigns) {
-      const assign: DndAssign = element as DndAssign;
-      assign.clear();
-    }
-    var fillins = element.getElementsByTagName("dnd-fillin");
-    for (const element of fillins) {
-      const fillin: DndFillin = element as DndFillin;
-      fillin.clear();
-    }
-    var solves = element.getElementsByTagName("kmap-solve-tree");
-    for (const element of solves) {
-      const solve: KmapSolveTree = element as KmapSolveTree;
-      solve.clear();
+    var elements = [
+      ...element.getElementsByTagName("dnd-assign"),
+      ...element.getElementsByTagName("dnd-fillin"),
+      ...element.getElementsByTagName("kmap-solve-tree"),
+      ...element.getElementsByTagName("kmap-jsxgraph"),
+    ]
+    for (const element of elements) {
+      const testInteraction: TestInteraction = element as unknown as TestInteraction;
+      testInteraction.init();
+      element.removeAttribute("correctness");
     }
   }
 
@@ -132,29 +130,20 @@ export class KMapTestCardContent extends LitElement {
       }
       var correct = value == expected;
       everythingCorrect = everythingCorrect && correct;
-      input.setAttribute("correction", correct ? "correct" : "incorrect");
+      input.setAttribute("correctness", correct ? "correct" : "incorrect");
     }
 
-    var assigns = element.getElementsByTagName("dnd-assign");
-    for (const element of assigns) {
-      const assign: DndAssign = element as DndAssign;
-      everythingCorrect = everythingCorrect && assign.valid === true;
-      assign.setAttribute("correction", assign.valid ? "correct" : "incorrect");
-      assign.bark();
-    }
-    var fillins = element.getElementsByTagName("dnd-fillin");
-    for (const element of fillins) {
-      const fillin: DndFillin = element as DndFillin;
-      everythingCorrect = everythingCorrect && fillin.valid === true;
-      fillin.setAttribute("correction", fillin.valid ? "correct" : "incorrect");
-      fillin.bark();
-    }
-    var solves = element.getElementsByTagName("kmap-solve-tree");
-    for (const element of solves) {
-      const solve: KmapSolveTree = element as KmapSolveTree;
-      everythingCorrect = everythingCorrect && solve.valid === true;
-      solve.setAttribute("correction", solve.valid ? "correct" : "incorrect");
-      solve.bark();
+    var elements = [
+      ...element.getElementsByTagName("dnd-assign"),
+      ...element.getElementsByTagName("dnd-fillin"),
+      ...element.getElementsByTagName("kmap-solve-tree"),
+      ...element.getElementsByTagName("kmap-jsxgraph"),
+    ]
+    for (const element of elements) {
+      const testInteraction: TestInteraction = element as unknown as TestInteraction;
+      everythingCorrect = everythingCorrect && testInteraction.isValid();
+      element.setAttribute("correctness", testInteraction.isValid() ? "correct" : "incorrect");
+      testInteraction.bark();
     }
     return everythingCorrect;
   }
@@ -172,23 +161,19 @@ export class KMapTestCardContent extends LitElement {
       else
         input.value = expected;
 
-      input.removeAttribute("correction");
+      input.removeAttribute("correctness");
     }
 
-    var assigns = element.getElementsByTagName("dnd-assign");
-    for (const element of assigns) {
-      const assign: DndAssign = element as DndAssign;
-      assign.showAnswer();
-    }
-    var fillins = element.getElementsByTagName("dnd-fillin");
-    for (const element of fillins) {
-      const fillin: DndFillin = element as DndFillin;
-      fillin.showAnswer();
-    }
-    var solves = element.getElementsByTagName("kmap-solve-tree");
-    for (const element of solves) {
-      const solve: KmapSolveTree = element as KmapSolveTree;
-      solve.showAnswer();
+    var elements = [
+      ...element.getElementsByTagName("dnd-assign"),
+      ...element.getElementsByTagName("dnd-fillin"),
+      ...element.getElementsByTagName("kmap-solve-tree"),
+      ...element.getElementsByTagName("kmap-jsxgraph"),
+    ]
+    for (const element of elements) {
+      const testInteraction: TestInteraction = element as unknown as TestInteraction;
+      testInteraction.showAnswer();
+      element.removeAttribute("correctness");
     }
   }
 
@@ -238,10 +223,13 @@ export class KMapTestCardContent extends LitElement {
           transition: outline-color .5s ease-in-out;
           height: 1.3em;
         }
-        input[correction=correct] {
+        kmap-solve-tree, kmap-jsxgraph {
+          outline: 3px solid transparent;
+        }
+        *[correctness=correct] {
           outline-color: var(--color-green);
         }
-        input[correction=incorrect] {
+        *[correctness=incorrect] {
           outline-color: var(--color-red);
         }
       `];

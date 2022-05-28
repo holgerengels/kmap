@@ -37,6 +37,8 @@ export class KMapTestCard extends Connected {
   @property({type: Number})
   private of: number = 0;
   @property({type: Number})
+  private repetitions: number = 1;
+  @property({type: Number})
   private level: number = 0;
   @property({type: String})
   private question: string = '';
@@ -67,7 +69,7 @@ export class KMapTestCard extends Connected {
   private _feedbackDialog: KMapFeedback;
 
   @query('kmap-test-card-content')
-  private _content: KMapTestCardContent;
+  private _content!: KMapTestCardContent;
 
   @property({type: Boolean, reflect: true})
   private hintVisible: boolean = false;
@@ -94,8 +96,8 @@ export class KMapTestCard extends Connected {
     }
   }
 
-  clear() {
-    this._content.clear();
+  init() {
+    this._content.init();
     this.correct = false;
     this.sent = false;
     this.attempts = 0;
@@ -241,12 +243,13 @@ export class KMapTestCard extends Connected {
            ?hidden="${!this.solutionVisible}">
         </kmap-test-card-solution>
 
+        <mwc-button slot="button" ?hidden="${this.repetitions === 1}" @click="${this.init}">Neue Aufgabe</mwc-button>
         <mwc-button slot="button" @click="${this._showAnswer}">Antwort zeigen</mwc-button>
         <mwc-button slot="button" @click="${this._showHint}" ?hidden="${!this.hint}">Tipp</mwc-button>
         <mwc-button slot="button" @click="${this._sendAnswer}" ?hidden="${this.sent}">Antwort abschicken</mwc-button>
         <mwc-button slot="button" @click="${this._next}" ?hidden="${!this.correct}">Weiter</mwc-button>
         <mwc-icon-button slot="icon" icon="info" title="Wissenskarte" @click="${this._card}" id="blinky"></mwc-icon-button>
-        <mwc-icon-button slot="icon" icon="feedback" title="Feedback" @click="${this._feedback}"></mwc-icon-button>
+        <mwc-icon-button slot="icon" icon="feedback" title="Feedback" aria-haspopup="dialog" @click="${this._feedback}"></mwc-icon-button>
         <mwc-icon-button slot="icon" icon="share" title="Teilen..." ?hidden="${typeof navigator['share'] !== 'function'}" @click="${this._share}"></mwc-icon-button>
         <mwc-icon-button slot="icon" icon="link" title="Permalink" ?hidden="${typeof navigator['share'] === 'function'}" @click="${this._permalink}"></mwc-icon-button>
       </kmap-card>

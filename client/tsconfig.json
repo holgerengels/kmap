@@ -5,6 +5,7 @@
     "target": "esnext",
     "moduleResolution": "node",
     "strict": true,
+    "skipLibCheck": true,
     "noUnusedParameters": true,
     "noUnusedLocals": true,
     "noImplicitReturns": true,

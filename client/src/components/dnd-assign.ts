@@ -4,9 +4,10 @@ import {colorStyles, elevationStyles, fontStyles} from "./kmap-styles";
 import {unsafeHTML} from 'lit/directives/unsafe-html.js';
 import {styleMap} from 'lit/directives/style-map.js';
 import {katexStyles} from "../katex-css";
+import {TestInteraction} from "./test-interaction";
 
 @customElement('dnd-assign')
-export class DndAssign extends LitElement {
+export class DndAssign extends LitElement implements TestInteraction{
 
   @property()
   private orientation: "vertical" | "horizontal" = "vertical";
@@ -22,8 +23,10 @@ export class DndAssign extends LitElement {
   private _drops: string[] = [];
   @state()
   private _order: string[] = [];
+  @state()
+  private _doubles: string[] = [];
   @property()
-  public valid?: boolean;
+  public valid: boolean;
   @state()
   private _bark: boolean = false;
   private _sid?: string;
@@ -36,11 +39,36 @@ export class DndAssign extends LitElement {
       this._drags = shuffleArray([...this._items]);
       this._drops = this._items.map(() => "");
       this._order = this._items.map(() => "");
+
+      const doubles: string[] = [];
+      for (var i=0; i < this._items.length-1; i++) {
+        var double = this._items.indexOf(this._items[i], i+1)
+        if (double != -1)
+          doubles.push(i + "=" + double);
+      }
+      this._doubles = doubles;
     }
+  }
+
+  protected updated(changedProperties: PropertyValues) {
     if (changedProperties.has("_order")) {
-      this.valid = this._order.join("") === "0123456789".substr(0, this._order.length);
-      console.log(this.valid);
+      const order = this._givenOrder();
+      var valid = true;
+      for (var i=0; i < this._order.length; i++) {
+        const currentValid = this._order[i] === order[i];
+        valid = valid && currentValid;
+      }
+      this.valid = valid;
     }
+  }
+
+  private _givenOrder() {
+    const order = "0123456789".split("");
+    for (const double of this._doubles) {
+      const cp = double.split("=");
+      order[cp[1]] = cp[0];
+    }
+    return order.slice(0, this._items.length);
   }
 
   _targetsChange(e) {
@@ -108,7 +136,6 @@ export class DndAssign extends LitElement {
       drag.classList.remove("ghost");
       this._hover();
       drop();
-      drop();
       event.cancelBubble = true;
     }
     document.addEventListener(upEvent, onUpEvent);
@@ -126,6 +153,7 @@ export class DndAssign extends LitElement {
 
   _drop() {
     if (!this._sid || !this._tid) return;
+    this._bark = false;
 
     const sid = this._sid;
     // @ts-ignore
@@ -170,7 +198,8 @@ export class DndAssign extends LitElement {
   }
 
   _isCorrect(i: number): boolean {
-    return this._order[i] === "0123456789".charAt(i);
+    const order = this._givenOrder();
+    return this._order[i] === order[i];
   }
 
   showAnswer() {
@@ -185,7 +214,7 @@ export class DndAssign extends LitElement {
     this._bark = false;
   }
 
-  clear() {
+  init() {
     const lalas = [...this._drags];
     const lolos = [...this._drops];
     for (let i = 0; i < this._items.length; i++) {
@@ -199,6 +228,10 @@ export class DndAssign extends LitElement {
 
   bark() {
     this._bark = true;
+  }
+
+  isValid(): boolean {
+    return this.valid;
   }
 
   static get styles() {

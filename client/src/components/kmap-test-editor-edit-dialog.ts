@@ -25,6 +25,7 @@ import {TabBar} from "@material/mwc-tab-bar/mwc-tab-bar";
 import {Attachment, Upload} from "../models/types";
 import {Test} from "../models/tests";
 import {FileDrop} from "./file-drop";
+import {styleMap} from "lit/directives/style-map.js";
 
 @customElement('kmap-test-editor-edit-dialog')
 export class KMapTestEditorEditDialog extends Connected {
@@ -57,6 +58,8 @@ export class KMapTestEditorEditDialog extends Connected {
   private _key: string = '';
   @state()
   private _level: string = "1";
+  @state()
+  private _repetitions: string = "1";
   @state()
   private _balance: number = 3;
 
@@ -147,6 +150,7 @@ export class KMapTestEditorEditDialog extends Connected {
       this._chapter  = this._test.chapter || '';
       this._topic    = this._test.topic || '';
       this._key      = this._test.key || '';
+      this._repetitions    = "" + (this._test.repetitions || 1);
       this._level    = "" + (this._test.level || 1);
       // @ts-ignore
       this._balance  = this._test.balance === "" || this._test.balance === undefined ? 3 : this._test.balance;
@@ -210,6 +214,7 @@ export class KMapTestEditorEditDialog extends Connected {
     test.chapter = this._chapter;
     test.topic = this._topic;
     test.key = this._key;
+    test.repetitions = this._repetitions ? parseInt(this._repetitions, 10) : 1;
     test.level = this._level ? parseInt(this._level, 10) : undefined;
     test.balance = this._balance;
     test.question = this._question;
@@ -459,7 +464,8 @@ export class KMapTestEditorEditDialog extends Connected {
         </mwc-select>
         <mwc-textfield s5 id="key" name="key" label="Titel" dense type="text" required disabled .value="${this._key}" @change="${e => this._key = e.target.value}" pattern="^([^./]*)$"></mwc-textfield>
         <mwc-textfield s1 id="level" name="level" label="Level" dense type="number" inputmode="numeric" min="1" max="3" step="1" .value="${this._level}" @change="${e => this._level = e.target.value}"></mwc-textfield>
-        <mwc-formfield s6 style="padding-left: 16px" alignEnd nowrap label="Layout Verhältnis Frage : Antwort =&nbsp;${this._balance}&nbsp;:&nbsp;${6 - this._balance}">
+        <mwc-textfield s1 id="repetitions" name="repetitions" label="Wiederholungen" dense type="number" inputmode="numeric" min="1" max="3" step="1" .value="${this._repetitions}" @change="${e => this._repetitions = e.target.value}"></mwc-textfield>
+        <mwc-formfield s4 style="padding-left: 16px" alignEnd nowrap label="Layout Verhältnis Frage : Antwort =&nbsp;${this._balance}&nbsp;:&nbsp;${6 - this._balance}">
           <mwc-slider id="balance" style="vertical-align:middle; width: min(50%, 200px)" .value="${this._balance}" withTickMarks discrete step="1" min="0" max="5" @input=${e => this._balance = e.target.value}></mwc-slider>
         </mwc-formfield>
       </div>
@@ -468,9 +474,12 @@ export class KMapTestEditorEditDialog extends Connected {
   }
 
   renderQuestionAndAnswer() {
+    const styles = { display: 'grid', gridTemplateRows: `${2*this._balance}fr ${2*(6-this._balance)}fr min-content 1fr min-content`,
+
+  };
     // language=HTML
     return this._test ? html`
-      <div class="qna" ?hidden="${!this._qnaVisible}">
+      <div style="${styleMap(styles)}" ?hidden="${!this._qnaVisible}">
         <validating-form @keydown="${this._captureKeys}" @validity="${e => this._contentValid = e.target.valid}">
           <div class="scrollcontainer">
             <kmap-html-editor id="question" placeholder="Frage" .value=${this._question} @change="${e => this._question = e.detail.value}"></kmap-html-editor>
@@ -541,6 +550,7 @@ export class KMapTestEditorEditDialog extends Connected {
           .chapter="${this._chapter}"
           .topic="${this._topic}"
           .key="${this._key}"
+          .repetitions="${this._repetitions}"
           .level="${this._level}"
           .balance="${this._balance}"
           .question="${this._question}"

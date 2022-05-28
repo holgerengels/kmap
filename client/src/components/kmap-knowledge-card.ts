@@ -334,7 +334,7 @@ export class KMapKnowledgeCard extends Connected {
           ${this._testCount ? html`
             <mwc-icon-button slot="icon" icon="quiz" title="${this._testCount} Aufgaben zum Thema ${this.card.topic}" @click="${this._test}"></mwc-icon-button>
           `:'' }
-            <mwc-icon-button slot="icon" icon="feedback" title="Feedback" @click="${this._feedback}"></mwc-icon-button>
+            <mwc-icon-button slot="icon" icon="feedback" title="Feedback" aria-haspopup="dialog" @click="${this._feedback}"></mwc-icon-button>
             <mwc-icon-button slot="icon" icon="share" title="Teilen..." ?hidden="${typeof navigator['share'] !== 'function'}" @click="${this._share}"></mwc-icon-button>
             <mwc-icon-button slot="icon" icon="link" title="Permalink" ?hidden="${typeof navigator['share'] === 'function'}"  @click="${this._permalink}"></mwc-icon-button>
          </kmap-card>

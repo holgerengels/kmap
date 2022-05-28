@@ -95,19 +95,20 @@ export class KMapTestEditorScroller extends Connected {
           `)}
     </div>` : ''}
     <div style="margin: 32px">
-    ${this._selected ? html`<kmap-test-card hideActions
-                                .subject="${this._selected.subject}"
-                                .set="${this._selected.set}"
-                                .key="${this._selected.key}"
-                                .chapter="${this._selected.chapter}"
-                                .topic="${this._selected.topic}"
-                                .level="${this._selected.level}"
-                                .balance="${this._selected.balance}"
-                                .question="${this._selected.question}"
-                                .answer="${this._selected.answer}"
-                                .hint="${this._selected.hint}"
-                                .solution="${this._selected.solution}"
-                                .num="1" .of="1"></kmap-test-card>` : ''}
+      <kmap-test-card hideActions
+                      .subject="${this._selected?.subject}"
+                      .set="${this._selected?.set}"
+                      .key="${this._selected?.key}"
+                      .chapter="${this._selected?.chapter}"
+                      .topic="${this._selected?.topic}"
+                      .repetitions="${this._selected?.repetitions}"
+                      .level="${this._selected?.level}"
+                      .balance="${this._selected?.balance}"
+                      .question="${this._selected?.question}"
+                      .answer="${this._selected?.answer}"
+                      .hint="${this._selected?.hint}"
+                      .solution="${this._selected?.solution}"
+                      .num="1" .of="1"></kmap-test-card>
     </div>
   </div>
     `;

@@ -27,6 +27,7 @@ export interface Test {
   answer: string,
   hint: string,
   solution: string,
+  repetitions: number,
   attachments: Attachment[];
   created?: number,
   modified?: number,
@@ -51,7 +52,7 @@ export interface TestsState {
   loaded?: string,
   loadedTopics?: string,
   tree?: string[],
-  tests?: object[],
+  tests?: Test[],
   results: object[],
   loadingTopics: boolean,
   loadingChapters: boolean,
@@ -150,7 +151,7 @@ export default createModel({
         error: "",
       };
     },
-    received(state, tests: object[]) {
+    received(state, tests: Test[]) {
       return { ...state,
         tests: tests,
         loaded: "" + state.subject + state.chapter + state.topic,

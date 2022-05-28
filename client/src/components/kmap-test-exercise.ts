@@ -15,6 +15,8 @@ export class KmapTestExercise extends Connected {
   @state()
   private _allTests?: Test[] = undefined;
   @state()
+  private _expandedTests?: Test[] = undefined;
+  @state()
   private _tests?: Test[] = undefined;
 
   @state()
@@ -36,8 +38,20 @@ export class KmapTestExercise extends Connected {
     };
   }
 
+  private static repetitions(tests: Test[]) {
+    const expanded: Test[] = [];
+    for (const test of tests)
+      for (let i=0; i < test.repetitions; i++)
+        expanded.push(test);
+
+    return expanded;
+  }
+
   updated(changedProperties) {
-    if ((changedProperties.has("_allTests") || changedProperties.has("_order")) && this._allTests) {
+    if ((changedProperties.has("_allTests") && this._allTests)) {
+      this._expandedTests = KmapTestExercise.repetitions(this._allTests);
+    }
+    if ((changedProperties.has("_expandedTests") || changedProperties.has("_order")) && this._expandedTests) {
       if (this._currentIndex !== 0)
         store.dispatch.shell.showMessage("Die Aufgabenreihe startet von vorne!");
       this._start();
@@ -45,18 +59,18 @@ export class KmapTestExercise extends Connected {
   }
 
   _start() {
-    if (!this._allTests)
+    if (!this._expandedTests)
       return;
 
-    for (var test of this._allTests) {
+    for (var test of this._expandedTests) {
       // @ts-ignore
       if (test.balance === "" || test.balance === undefined)
         test.balance = 4;
     }
     const collator = new Intl.Collator();
     this._tests = this._order === "shuffled"
-      ? shuffleArray([...this._allTests])
-      : this._allTests.sort((a, b) =>
+      ? shuffleArray([...this._expandedTests])
+      : this._expandedTests.sort((a, b) =>
         (a.level ? a.level : 4) - (b.level ? b.level : 4)
         || collator.compare(a.key, b.key));
 
@@ -79,7 +93,7 @@ export class KmapTestExercise extends Connected {
     this._currentIndex++;
     if (this._currentIndex < this._tests.length) {
       this._currentTest = this._tests[this._currentIndex];
-      this._testCard.clear();
+      this._testCard.init();
     }
     else
       this.dispatchEvent(new CustomEvent('end', {bubbles: true, composed: true}));
@@ -111,6 +125,7 @@ export class KmapTestExercise extends Connected {
         .topic="${this._currentTest.topic}"
         .key="${this._currentTest.key}"
         .num="${this._currentIndex}" of="${this._tests ? this._tests.length : 0}"
+        .repetitions="${this._currentTest.repetitions}"
         .level="${this._currentTest.level}"
         .question="${this._currentTest.question}"
         .answer="${this._currentTest.answer}"

@@ -4,9 +4,10 @@ import {colorStyles, elevationStyles, fontStyles} from "./kmap-styles";
 import {unsafeHTML} from 'lit/directives/unsafe-html.js';
 import {StyleInfo, styleMap} from 'lit/directives/style-map.js';
 import {katexStyles} from "../katex-css";
+import {TestInteraction} from "./test-interaction";
 
 @customElement('dnd-fillin')
-export class DndFillin extends LitElement {
+export class DndFillin extends LitElement implements TestInteraction {
 
   @property()
   private orientation: "vertical" | "horizontal" = "vertical";
@@ -31,7 +32,7 @@ export class DndFillin extends LitElement {
   @state()
   private _doubles: string[] = [];
   @property()
-  public valid?: boolean;
+  public valid: boolean;
   @state()
   private _bark: boolean = false;
   private _ci?: string;
@@ -220,6 +221,7 @@ export class DndFillin extends LitElement {
 
   _drop() {
     if (!this._sid || !this._tid) return;
+    this._bark = false;
 
     const sid = this._sid;
     // @ts-ignore
@@ -276,7 +278,7 @@ export class DndFillin extends LitElement {
     this._bark = false;
   }
 
-  clear() {
+  init() {
     const lalas = [...this._drags];
     const lolos = [...this._drops];
     for (let i = 0; i < this._items.length; i++) {
@@ -290,6 +292,10 @@ export class DndFillin extends LitElement {
 
   bark() {
     this._bark = true;
+  }
+
+  isValid(): boolean {
+    return this.valid;
   }
 
   static get styles() {

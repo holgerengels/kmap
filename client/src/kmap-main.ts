@@ -36,6 +36,8 @@ import {KmapAsciiMath} from "kmap-ascii-math";
 window.customElements.define('kmap-ascii-math', KmapAsciiMath);
 import {KmapSolveTree} from "kmap-solve-tree";
 window.customElements.define('kmap-solve-tree', KmapSolveTree);
+import {KmapJsxGraph} from "kmap-jsxgraph";
+window.customElements.define('kmap-jsxgraph', KmapJsxGraph);
 
 // @ts-ignore
 //const _standalone = (window.matchMedia('(display-mode: standalone)').matches) || (window.navigator.standalone) || document.referrer.includes('android-app://');
@@ -357,7 +359,7 @@ export class KmapMain extends connect(store, LitElement) {
     return html`
   <mwc-drawer id="drawer" hasheader type="${this._narrow ? 'modal' : 'dismissible'}" ?open="${this._drawerOpen}" @MDCDrawer:closed="${() => this._drawerOpen = false}">
     <span slot="title">Knowledge Map</span>
-    <span slot="subtitle">[<span>&nbsp;<b>Instanz:</b> ${this._instance}</span><mwc-icon-button icon="polymer" @click="${this._showChooseInstance}" title="Instanz wechseln"></mwc-icon-button>]</span>
+    <span slot="subtitle">[<span>&nbsp;<b>Instanz:</b> ${this._instance}</span><mwc-icon-button aria-haspopup="dialog" icon="polymer" @click="${this._showChooseInstance}" title="Instanz wechseln"></mwc-icon-button>]</span>
     ${this._renderDrawer()}
 
     <main id="main" slot="appContent" role="main">

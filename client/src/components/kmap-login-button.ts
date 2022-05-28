@@ -70,8 +70,8 @@ export class KMapLoginButton extends Connected {
   render() {
     // language=HTML
     return html`
-<div class="fab font-body" ?hidden="${!this._userid}"><span>${this._initials}</span></div>
-<div class="fab" ?hidden="${this._userid}"><mwc-icon>person_outline</mwc-icon></div>
+<div class="fab" aria-haspopup="dialog" font-body" ?hidden="${!this._userid}"><span>${this._initials}</span></div>
+<div class="fab" aria-haspopup="dialog" ?hidden="${this._userid}"><mwc-icon>person_outline</mwc-icon></div>
     `;
   }
 }
