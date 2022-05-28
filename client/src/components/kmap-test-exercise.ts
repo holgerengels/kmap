@@ -1,4 +1,4 @@
-import {html, css} from 'lit';
+import {html, css, PropertyValues} from 'lit';
 import {customElement, query, state} from 'lit/decorators.js';
 import {Connected} from "./connected";
 import {State, store} from "../store";
@@ -47,10 +47,13 @@ export class KmapTestExercise extends Connected {
     return expanded;
   }
 
-  updated(changedProperties) {
-    if ((changedProperties.has("_allTests") && this._allTests)) {
+
+  protected willUpdate(_changedProperties: PropertyValues) {
+    if ((_changedProperties.has("_allTests") && this._allTests))
       this._expandedTests = KmapTestExercise.repetitions(this._allTests);
-    }
+  }
+
+  updated(changedProperties) {
     if ((changedProperties.has("_expandedTests") || changedProperties.has("_order")) && this._expandedTests) {
       if (this._currentIndex !== 0)
         store.dispatch.shell.showMessage("Die Aufgabenreihe startet von vorne!");
