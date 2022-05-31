@@ -28,7 +28,7 @@ const baseConfig = createSpaConfig({
       ],
     ],
   },
-
+/*
   polyfillsLoader: {
     polyfills: {
       dynamicImport: true,
@@ -43,6 +43,7 @@ const baseConfig = createSpaConfig({
       ],
     },
   },
+  */
 });
 
 export default merge(baseConfig, {
