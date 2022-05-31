@@ -40,10 +40,12 @@ export class KmapTestExercise extends Connected {
 
   private static repetitions(tests: Test[]) {
     const expanded: Test[] = [];
-    for (const test of tests)
-      for (let i=0; i < test.repetitions; i++)
+    for (const test of tests) {
+      if (!test.repetitions)
+        test.repetitions = 1;
+      for (let i = 0; i < test.repetitions; i++)
         expanded.push(test);
-
+    }
     return expanded;
   }
 

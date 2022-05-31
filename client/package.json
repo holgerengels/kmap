@@ -83,7 +83,7 @@
     "katex": "^0.15.6",
     "kmap-ascii-math": "^0.9.13",
     "kmap-html-editor": "^0.9.9",
-    "kmap-jsxgraph": "^0.9.7",
+    "kmap-jsxgraph": "^0.9.8",
     "kmap-solve-tree": "^0.9.13",
     "kmap-term-tree": "^0.9.18",
     "lit": "^2.2.4",

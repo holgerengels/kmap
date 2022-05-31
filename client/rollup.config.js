@@ -3,7 +3,6 @@ import { createSpaConfig } from '@open-wc/building-rollup';
 import copy from 'rollup-plugin-copy';
 const { generateSW } = require('rollup-plugin-workbox');
 import merge from 'deepmerge';
-import nodeResolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
 
 // use createBasicConfig to do regular JS to JS bundling
