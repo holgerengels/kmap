@@ -29,6 +29,7 @@ export class KMapCard extends LitElement {
   private _ripple: Ripple;
   private _rippleHandlers: RippleHandlers;
 
+  private _teaserElements: Element[] = [];
   private _primaryElements: Element[] = [];
   private _secondaryElements: Element[] = [];
   private _buttonElements: Element[] = [];
@@ -52,7 +53,11 @@ export class KMapCard extends LitElement {
   }
 
   _slotChange(e) {
+    console.log(e)
     switch (e.target.name) {
+      case "teaser":
+        this._teaserElements = (e.target as HTMLSlotElement).assignedElements({flatten: true});
+        break;
       case "primary":
         this._primaryElements = (e.target as HTMLSlotElement).assignedElements({flatten: true});
         break;
@@ -136,6 +141,15 @@ export class KMapCard extends LitElement {
           display: flex;
           flex-direction: column;
         }
+        .teaser {
+          position: absolute; top: 16px; right: 16px;
+          z-index: 2;
+          color: var(--color-mediumgray);
+          font-size: 12px;
+          display: flex;
+          align-items: center;
+          opacity: .6;
+        }
         .actions {
           position: relative;
           display: flex;
@@ -147,6 +161,7 @@ export class KMapCard extends LitElement {
         }
         .buttons {
           display: flex;
+          flex-wrap: wrap;
           flex-direction: row;
           align-items: center;
           justify-content: flex-start;
@@ -154,6 +169,7 @@ export class KMapCard extends LitElement {
         .icons {
           display: flex;
           flex-direction: row;
+          align-self: end;
           align-items: center;
           justify-content: flex-end;
           --mdc-icon-button-size: 32px;
@@ -168,11 +184,17 @@ export class KMapCard extends LitElement {
     // language=HTML
     return html`
       <mwc-ripple id="ripple"></mwc-ripple>
+      ${this._renderTeaser()}
       ${this._renderPrimary()}
       ${this._renderSecondary()}
       ${this._renderActions()}
       <slot name="plane">
     `;
+  }
+  _renderTeaser() {
+    return this._teaserElements.length !== 0 ? html`
+      <div class="teaser"><slot name="teaser" @slotchange=${this._slotChange}></slot></div>
+    ` : html`<slot name="teaser" @slotchange=${this._slotChange}></slot>`;
   }
   _renderPrimary() {
     return this.primaryLink === undefined ? html`

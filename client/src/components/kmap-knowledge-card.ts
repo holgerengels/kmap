@@ -17,6 +17,8 @@ import {fontStyles, colorStyles} from "./kmap-styles";
 import {KMapFeedback} from "./kmap-feedback";
 import {Attachment, Card} from "../models/types";
 import {encodePath} from "../urls";
+import {ifDefined} from "lit/directives/if-defined.js";
+import {by} from "./icons";
 
 @customElement('kmap-knowledge-card')
 export class KMapKnowledgeCard extends Connected {
@@ -326,6 +328,7 @@ export class KMapKnowledgeCard extends Connected {
         </div>
         ` : '' }
 
+          <div slot="teaser" title="${ifDefined(this.card.author ? 'Autor: ' + this.card.author : undefined)}">${by}</div>
           <span class="button" slot="button"><b>←</b> <a href="/app/browser/${encodePath(this.card.subject, this.card.chapter)}" title="Wissenslandkarte ${this.card.chapter}">${this.card.chapter}</a></span>
 
           ${!this.card.links && false ? html`

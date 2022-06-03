@@ -59,6 +59,8 @@ export class KMapEditorEditDialog extends Connected {
   private _links: string = '';
   @state()
   private _priority: string = '';
+  @state()
+  private _author: string = '';
 
   @state()
   private _attachmentType: string = 'link';
@@ -155,6 +157,7 @@ export class KMapEditorEditDialog extends Connected {
       this._depends = this._card.depends ? this._card.depends.join(" / ") : '';
       this._links = this._card.links || '';
       this._priority = this._card.priority !== undefined ? this._card.priority + '' : '';
+      this._author      = this._card.author || store.state.app.username || '';
       this._attachments = this._card.attachments;
 
       this._editDialog.show();
@@ -210,8 +213,7 @@ export class KMapEditorEditDialog extends Connected {
     card.links = this._links;
     card.priority = this._priority !== '' ? parseInt(this._priority) : undefined;
     card.attachments = this._attachments;
-    if (!card.author)
-      card.author = store.state.app.username;
+    card.author = this._author;
 
     console.log(card);
 
@@ -328,13 +330,13 @@ export class KMapEditorEditDialog extends Connected {
       formStyles,
       css`
         mwc-dialog {
-          --mdc-dialog-min-width: calc(100vw - 64px);
-          --mdc-dialog-max-width: calc(100vw - 64px);
-          --mdc-dialog-min-height: calc(100vh - 64px);
-          --mdc-dialog-max-height: calc(100vh - 64px);
+          --mdc-dialog-min-width: calc(100vw - 32px);
+          --mdc-dialog-max-width: calc(100vw - 32px);
+          --mdc-dialog-min-height: calc(100vh - 32px);
+          --mdc-dialog-max-height: calc(100vh - 32px);
         }
         .dialog {
-          height: calc(100vh - 198px);
+          height: calc(100vh - 166px);
         }
         .tab {
           display: grid;
@@ -445,6 +447,7 @@ export class KMapEditorEditDialog extends Connected {
           <mwc-textfield s2 ?hidden="${this._card.topic === '_'}" id="educationalLevel" label="Klassenstufe" helper="Z.B. 11, 12" dense .value=${this._educationalLevel} @change="${e => this._educationalLevel = e.target.value}" pattern="^ ?[0-9]{1,2} ?(, ?[0-9]{1,2} ?)*" required></mwc-textfield>
           <mwc-textfield s2 ?hidden="${this._card.topic === '_'}" id="educationalContext" label="Kontext" helper="Z.B. Primarstufe, Sekundarstufe I" dense .value=${this._educationalContext} @change="${e => this._educationalContext = e.target.value}" required></mwc-textfield>
           <mwc-textfield s2 ?hidden="${this._card.topic === '_'}" id="typicalAgeRange" label="Alter" disabled dense .value=${this._typicalAgeRange}></mwc-textfield>
+          <mwc-textfield s2 ?hidden="${this._card.topic === '_'}" id="author" label="Autor" dense .value=${this._author} @change="${e => this._author = e.target.value}" required></mwc-textfield>
         </div>
       </validating-form>
     ` : '';

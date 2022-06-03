@@ -14,6 +14,8 @@ import "./kmap-test-card-solution";
 import "./kmap-feedback";
 import {KMapTestCardContent} from "./kmap-test-card-content";
 import {KMapFeedback} from "./kmap-feedback";
+import {by} from "./icons";
+import {ifDefined} from "lit/directives/if-defined.js";
 
 @customElement('kmap-test-card')
 export class KMapTestCard extends Connected {
@@ -32,6 +34,8 @@ export class KMapTestCard extends Connected {
   private chapter: string = '';
   @property({type: String})
   private topic: string = '';
+  @property({type: String})
+  private author: string = '';
   @property({type: Number})
   private num: number = 0;
   @property({type: Number})
@@ -243,6 +247,7 @@ export class KMapTestCard extends Connected {
            ?hidden="${!this.solutionVisible}">
         </kmap-test-card-solution>
 
+        <div slot="teaser" title="${ifDefined(this.author ? 'Autor: ' + this.author : undefined)}">${by}</div>
         <mwc-button slot="button" ?hidden="${this.repetitions === 1}" @click="${this.init}">Neue Aufgabe</mwc-button>
         <mwc-button slot="button" @click="${this._showAnswer}">Antwort zeigen</mwc-button>
         <mwc-button slot="button" @click="${this._showHint}" ?hidden="${!this.hint}">Tipp</mwc-button>
