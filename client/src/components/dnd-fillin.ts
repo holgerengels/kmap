@@ -279,10 +279,9 @@ export class DndFillin extends LitElement implements TestInteraction {
   }
 
   init() {
-    const lalas = [...this._drags];
+    const lalas = shuffleArray([...this._items]);
     const lolos = [...this._drops];
     for (let i = 0; i < this._items.length; i++) {
-      lalas[i] = this._items[i];
       lolos[i] = "";
     }
     this._drags = lalas;
