@@ -141,14 +141,11 @@ export class KMapCard extends LitElement {
           display: flex;
           flex-direction: column;
         }
-        .teaser {
+        div.teaser {
           position: absolute; top: 16px; right: 16px;
           z-index: 2;
-          color: var(--color-mediumgray);
-          font-size: 12px;
-          display: flex;
+          --foreground: rgba(0, 0, 0, 0.2);
           align-items: center;
-          opacity: .6;
         }
         .actions {
           position: relative;
