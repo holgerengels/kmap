@@ -28,22 +28,6 @@ const baseConfig = createSpaConfig({
       ],
     ],
   },
-/*
-  polyfillsLoader: {
-    polyfills: {
-      dynamicImport: true,
-      resizeObserver: true,
-      custom: [
-        {
-          name: 'event-target',
-          test: "true || !('EventTarget' in window) || !('constructor' in window.EventTarget.prototype)",
-          path: require.resolve('event-target/min.js'),
-          minify: true,
-        },
-      ],
-    },
-  },
-  */
 });
 
 export default merge(baseConfig, {

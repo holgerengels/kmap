@@ -10,6 +10,7 @@
     "noUnusedLocals": true,
     "noImplicitReturns": true,
     "strictPropertyInitialization": false,
+    "useUnknownInCatchVariables": false,
     "noImplicitAny": false,
     "importHelpers": true,
     "noEmitHelpers": true,
