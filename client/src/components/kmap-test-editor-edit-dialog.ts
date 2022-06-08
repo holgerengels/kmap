@@ -275,7 +275,7 @@ export class KMapTestEditorEditDialog extends Connected {
   }
 
   _captureKeys(e) {
-    if (!e.metaKey && e.key === "Enter")
+    if (!e.metaKey && (e.key === "Enter" || e.key === 'Esc'))
       e.cancelBubble = true;
     else if (e.key === "p" && e.altKey === true) {
       if (!this._wide)
@@ -459,12 +459,10 @@ export class KMapTestEditorEditDialog extends Connected {
   }
 
   renderQuestionAndAnswer() {
-    const styles = { display: 'grid', gridTemplateRows: `${2*this._balance}fr ${2*(6-this._balance)}fr min-content 1fr min-content`,
-
-  };
+    const styles = { gridTemplateRows: `${2*this._balance}fr ${2*(6-this._balance)}fr min-content 1fr min-content` };
     // language=HTML
     return this._test ? html`
-      <div style="${styleMap(styles)}" ?hidden="${!this._qnaVisible}">
+      <div class="qna" style="${styleMap(styles)}" ?hidden="${!this._qnaVisible}">
         <validating-form @keydown="${this._captureKeys}" @validity="${e => this._contentValid = e.target.valid}">
           <div class="scrollcontainer">
             <kmap-html-editor id="question" placeholder="Frage" .value=${this._question} @change="${e => this._question = e.detail.value}"></kmap-html-editor>

@@ -293,7 +293,7 @@ export class KMapEditorEditDialog extends Connected {
   }
 
   _captureKeys(e) {
-    if (!e.metaKey && e.key === "Enter")
+    if (!e.metaKey && (e.key === "Enter" || e.key === 'Esc'))
       e.cancelBubble = true;
     else if (e.key === "p" && e.altKey === true) {
       if (!this._wide)
