@@ -59,6 +59,7 @@ export default merge(baseConfig, {
       globPatterns: ['**/*.{html,js,css,png,svg,woff2}'],
       navigateFallback: 'index.html',
       navigateFallbackDenylist: [/geogebra.html/],
+      skipWaiting: true,
       runtimeCaching: [{
         urlPattern: /data/,
         handler: 'StaleWhileRevalidate',
@@ -86,6 +87,12 @@ export default merge(baseConfig, {
           cacheName: 'subjects',
         },
       }],
+    }, function render({ swDest, count, size }) {
+      console.log(
+        '📦', swDest,
+        '#️⃣', count,
+        '🐘', size,
+      );
     }),
   ],
 });

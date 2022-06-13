@@ -284,6 +284,9 @@ export class KmapMain extends connect(store, LitElement) {
       .drawer-list {
         display: flex;
         flex-direction: column;
+        padding-top: 8px;
+        padding-bottom: 8px;
+        border-top: 1px solid rgba(0, 0, 0, 0.12);
       }
       .drawer-list > * {
         margin: 8px 16px;
@@ -359,7 +362,7 @@ export class KmapMain extends connect(store, LitElement) {
     return html`
   <mwc-drawer id="drawer" hasheader type="${this._narrow ? 'modal' : 'dismissible'}" ?open="${this._drawerOpen}" @MDCDrawer:closed="${() => this._drawerOpen = false}">
     <span slot="title">Knowledge Map</span>
-    <span slot="subtitle">[<span>&nbsp;<b>Instanz:</b> ${this._instance}</span><mwc-icon-button aria-haspopup="dialog" icon="polymer" @click="${this._showChooseInstance}" title="Instanz wechseln"></mwc-icon-button>]</span>
+    <span slot="subtitle">[<span>&nbsp;<b>Instanz:</b> ${this._instance}</span><mwc-icon-button aria-haspopup="dialog" icon="polymer" @click="${this._showChooseInstance}" title="Instanz wechseln"></mwc-icon-button>]<br/><br/></span>
     ${this._renderDrawer()}
 
     <main id="main" slot="appContent" role="main">
@@ -412,7 +415,7 @@ export class KmapMain extends connect(store, LitElement) {
         <pwa-update-available @pwa-update-available="${this._updateAvailable}"><mwc-button outlined style="--mdc-theme-primary: var(--color-secondary-dark);">App aktualisieren</mwc-button></pwa-update-available>
       </nav>
       <!--googleoff: all-->
-      <hr/>
+
       ${this._page === 'test' ? html`
         <nav class="drawer-list">
           <label>Aufgaben Schwierigkeit</label>
