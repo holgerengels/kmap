@@ -59,6 +59,7 @@ export default merge(baseConfig, {
       globPatterns: ['**/*.{html,js,css,png,svg,woff2}'],
       navigateFallback: 'index.html',
       navigateFallbackDenylist: [/geogebra.html/],
+      inlineWorkboxRuntime: true,
       skipWaiting: true,
       runtimeCaching: [{
         urlPattern: /data/,
