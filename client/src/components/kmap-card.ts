@@ -53,7 +53,6 @@ export class KMapCard extends LitElement {
   }
 
   _slotChange(e) {
-    console.log(e)
     switch (e.target.name) {
       case "teaser":
         this._teaserElements = (e.target as HTMLSlotElement).assignedElements({flatten: true});
