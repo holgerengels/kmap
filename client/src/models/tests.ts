@@ -298,15 +298,12 @@ export default createModel({
         if (!subject)
           return;
 
-        // @ts-ignore
-        if (!state.tests.topics || !state.tests.topicCounts || !state.tests.chapterCounts || state.tests.loadedTopics != subject) {
-          dispatch.tests.requestTopics();
-          await fetchjson(`${urls.server}tests?topics=all&subject=${subject}`, endpoint.get(state),
-            dispatch.tests.receivedTopics,
-            dispatch.app.handleError,
-            dispatch.tests.error);
-          dispatch.tests.loadedTopics(subject);
-        }
+        dispatch.tests.requestTopics();
+        await fetchjson(`${urls.server}tests?topics=all&subject=${subject}`, endpoint.get(state),
+          dispatch.tests.receivedTopics,
+          dispatch.app.handleError,
+          dispatch.tests.error);
+        dispatch.tests.loadedTopics(subject);
       },
       async loadChapters(subject: string) {
         const state = store.getState();
