@@ -61,7 +61,11 @@ export default merge(baseConfig, {
       navigateFallbackDenylist: [/geogebra.html/],
       inlineWorkboxRuntime: false,
       skipWaiting: true,
+      cleanupOutdatedCaches: true,
       runtimeCaching: [{
+        urlPattern: /[^.]*/,
+        handler: 'NetworkOnly',
+      }, {
         urlPattern: /data/,
         handler: 'StaleWhileRevalidate',
         options: {
