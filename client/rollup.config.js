@@ -63,9 +63,6 @@ export default merge(baseConfig, {
       skipWaiting: true,
       cleanupOutdatedCaches: true,
       runtimeCaching: [{
-        urlPattern: /[^.]*/,
-        handler: 'NetworkOnly',
-      }, {
         urlPattern: /data/,
         handler: 'StaleWhileRevalidate',
         options: {
@@ -101,3 +98,9 @@ export default merge(baseConfig, {
     }),
   ],
 });
+
+
+// {
+//         urlPattern: /[^.]*/,
+//         handler: 'NetworkOnly',
+//       },
