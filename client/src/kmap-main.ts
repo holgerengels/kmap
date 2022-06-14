@@ -313,6 +313,10 @@ export class KmapMain extends connect(store, LitElement) {
       span[slot=subtitle] {
         display: flex;
         align-content: center;
+        transition: color ease-in-out .3s;
+      }
+      span[slot=subtitle]:hover {
+        color: var(--color-primary-dark);
       }
       span[slot=subtitle] > * {
         margin-right: 8px;
@@ -328,7 +332,6 @@ export class KmapMain extends connect(store, LitElement) {
       mwc-icon-button[icon="polymer"] {
         --mdc-icon-size: 18px;
         --mdc-icon-button-size: 18px;
-        transition: color ease-in-out .3s;
       }
       span:hover mwc-icon-button[icon="polymer"] {
         color: var(--color-primary-dark);
