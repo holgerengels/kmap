@@ -57,7 +57,7 @@ export default merge(baseConfig, {
       swDest: 'dist/sw.js',
       globDirectory: 'dist/',
       globPatterns: ['**/*.{html,js,css,png,svg,woff2}'],
-      navigateFallback: 'index.html',
+      navigateFallback: '/app/index.html',
       navigateFallbackDenylist: [/geogebra.html/],
       inlineWorkboxRuntime: false,
       skipWaiting: true,
