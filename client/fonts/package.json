@@ -1,0 +1,37 @@
+{
+  "name": "@material-design-icons/font",
+  "version": "0.11.2",
+  "description": "Latest icon fonts and CSS for material design icons.",
+  "browser": "index.css",
+  "sass": "index.scss",
+  "files": [
+    "*.{css,scss,woff2}"
+  ],
+  "scripts": {
+    "build": "sass --no-source-map --no-error-css ."
+  },
+  "devDependencies": {
+    "sass": "1.35.1"
+  },
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marella/material-design-icons.git",
+    "directory": "font"
+  },
+  "bugs": {
+    "url": "https://github.com/marella/material-design-icons/issues"
+  },
+  "homepage": "https://marella.github.io/material-design-icons/demo/font/",
+  "keywords": [
+    "material-design-icons",
+    "material-icons",
+    "material-design",
+    "material",
+    "icons",
+    "font"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}

@@ -55,6 +55,7 @@
     "@babel/plugin-transform-typescript": "^7.18.4",
     "@captaincodeman/rdx": "^1.0.0-rc.9",
     "@captaincodeman/router": "^1.0.3",
+    "@material-design-icons/font": "^0.11.2",
     "@material/mwc-button": "^0.26.1",
     "@material/mwc-dialog": "^0.26.1",
     "@material/mwc-drawer": "^0.26.1",
