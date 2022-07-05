@@ -40,19 +40,6 @@ export default merge(baseConfig, {
       'process.env.DEPLOY_CLIENT': JSON.stringify(process.env.DEPLOY_CLIENT || 'http://127.0.0.1:8080/app/'),
     }),
     */
-    copy({
-      targets: [
-        {src: 'src/icons/*', dest: 'dist'},
-        {src: 'fonts/*', dest: 'dist/fonts'},
-        {src: 'favicon.ico', dest: 'dist'},
-        {src: 'robots.txt', dest: 'dist'},
-        {src: '*.css', dest: 'dist'},
-        {src: 'manifest.json', dest: 'dist'},
-        {src: 'browserconfig.xml', dest: 'dist'},
-        {src: 'geogebra.html', dest: 'dist'},
-      ],
-      flatten: false,
-    }),
     generateSW({
       swDest: 'dist/sw.js',
       globDirectory: 'dist/',
@@ -95,6 +82,19 @@ export default merge(baseConfig, {
         '#️⃣', count,
         '🐘', size,
       );
+    }),
+    copy({
+      targets: [
+        {src: 'src/icons/*', dest: 'dist'},
+        {src: 'fonts/*', dest: 'dist/fonts'},
+        {src: 'favicon.ico', dest: 'dist'},
+        {src: 'robots.txt', dest: 'dist'},
+        {src: '*.css', dest: 'dist'},
+        {src: 'manifest.json', dest: 'dist'},
+        {src: 'browserconfig.xml', dest: 'dist'},
+        {src: 'geogebra.html', dest: 'dist'},
+      ],
+      flatten: false,
     }),
   ],
 });

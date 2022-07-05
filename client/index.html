@@ -74,7 +74,9 @@
     }
 
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js');
+      navigator.serviceWorker.register('./sw.js').then(() => {
+        navigator.serviceWorker.addEventListener('message', (e) => console.log(e));
+      });
     });
   </script>
 
@@ -129,10 +131,10 @@
   <scraper id="scraper" style="position: absolute; color: #ededed">
     <ogtext/>
   </scraper>
-  <script>
+  <!--script>
     const element = document.getElementById('scraper');
     //element.parentElement.removeChild(element);
-  </script>
+  </script-->
 </body>
 
 </html>

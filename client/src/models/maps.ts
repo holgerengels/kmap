@@ -178,32 +178,31 @@ export default createModel({
     const dispatch = store.getDispatch();
     return {
       async init() {
-        navigator.serviceWorker.addEventListener('message', async (event: MessageEvent) => {
-          console.log(event);
-          if (event.data.meta === 'workbox-broadcast-update') {
-            const {cacheName, updatedURL}: { cacheName: string; updatedURL: string } = event.data.payload;
-            const cache = await caches.open(cacheName);
-            console.log(updatedURL);
-            if (updatedURL.includes("data?load")) {
-              const updatedResponse = await cache.match(updatedURL);
-              const json = await updatedResponse?.json();
-              console.log("CACHE UPDATE MAPS LOAD MAP");
-              dispatch.maps.loadedMap(json);
-            }
-            else if (updatedURL.includes("data?latest")) {
-              const updatedResponse = await cache.match(updatedURL);
-              const json = await updatedResponse?.json();
-              console.log("CACHE UPDATE MAPS LATEST");
-              dispatch.maps.receivedLatest(json);
-            }
-            else if (updatedURL.includes("data?topics=all")) {
-              const updatedResponse = await cache.match(updatedURL);
-              const json = await updatedResponse?.json();
-              console.log("CACHE UPDATE MAPS ALL TOPICS");
-              dispatch.maps.receivedAllTopics(json);
-            }
+        navigator.serviceWorker.addEventListener('message', dispatch.maps.cacheUpdate);
+      },
+      async cacheUpdate(event: MessageEvent) {
+        console.log(event);
+        if (event.data.meta === 'workbox-broadcast-update') {
+          const {cacheName, updatedURL}: { cacheName: string; updatedURL: string } = event.data.payload;
+          const cache = await caches.open(cacheName);
+          console.log(updatedURL);
+          if (updatedURL.includes("data?load")) {
+            const updatedResponse = await cache.match(updatedURL);
+            const json = await updatedResponse?.json();
+            console.log("CACHE UPDATE MAPS LOAD MAP");
+            dispatch.maps.loadedMap(json);
+          } else if (updatedURL.includes("data?latest")) {
+            const updatedResponse = await cache.match(updatedURL);
+            const json = await updatedResponse?.json();
+            console.log("CACHE UPDATE MAPS LATEST");
+            dispatch.maps.receivedLatest(json);
+          } else if (updatedURL.includes("data?topics=all")) {
+            const updatedResponse = await cache.match(updatedURL);
+            const json = await updatedResponse?.json();
+            console.log("CACHE UPDATE MAPS ALL TOPICS");
+            dispatch.maps.receivedAllTopics(json);
           }
-        });
+        }
       },
       async load() {
         const state = store.getState();

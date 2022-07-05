@@ -193,7 +193,11 @@ export class KmapMain extends connect(store, LitElement) {
   }
 
   private installOnErrorHandler() {
+    window.addEventListener('error', (e) => {
+      console.log(e);
+    });
     window.onerror = function (message, source, lineno, colno, error) {
+      console.log(error?.stack);
       if (error)
         store.dispatch.feedback.bug({message: error.name + ": " + error.message, detail: error.stack as string});
       else {
