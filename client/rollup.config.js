@@ -34,9 +34,11 @@ export default merge(baseConfig, {
   input: './index.html',
   plugins: [
     commonjs(),
+    /*
     replace({
       'process.env.NODE_ENV': 'development',
     }),
+     */
     generateSW({
       swDest: 'dist/sw.js',
       globDirectory: 'dist/',
