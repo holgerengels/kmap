@@ -5,13 +5,10 @@ const { generateSW } = require('rollup-plugin-workbox');
 import merge from 'deepmerge';
 import commonjs from "@rollup/plugin-commonjs";
 
-// use createBasicConfig to do regular JS to JS bundling
-// import { createBasicConfig } from '@open-wc/building-rollup';
-
 const baseConfig = createSpaConfig({
 
   developmentMode: process.env.ROLLUP_WATCH === 'true',
-  injectServiceWorker: false,
+  injectServiceWorker: true,
 
   babel: {
     plugins: [
@@ -34,15 +31,15 @@ export default merge(baseConfig, {
   input: './index.html',
   plugins: [
     commonjs(),
-    /*
     replace({
       'process.env.NODE_ENV': 'development',
     }),
-     */
     generateSW({
-      swDest: 'dist/sw.js',
-      globDirectory: 'dist/',
+      mode: 'development',
+      swDest: './sw.js',
+      globDirectory: './',
       globPatterns: ['**/*.{html,js,css,png,svg,woff2}'],
+      globIgnores: ["**\/node_modules\/**\/*", "**\/test\/**\/*"],
       navigateFallback: '/app/index.html',
       navigateFallbackDenylist: [/geogebra.html/],
       inlineWorkboxRuntime: false,
@@ -84,7 +81,7 @@ export default merge(baseConfig, {
     }),
     copy({
       targets: [
-        {src: 'src/icons/*', dest: 'dist'},
+        {src: 'icons/*', dest: 'dist/icons'},
         {src: 'fonts/*', dest: 'dist/fonts'},
         {src: 'favicon.ico', dest: 'dist'},
         {src: 'robots.txt', dest: 'dist'},

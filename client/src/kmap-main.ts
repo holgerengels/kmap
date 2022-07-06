@@ -415,12 +415,17 @@ export class KmapMain extends connect(store, LitElement) {
           <a ?selected="${this._page === 'test'}" href="/app/test">Test</a>
         ` : ''}
         <a ?selected="${this._page === 'courses'}" ?disabled="${!this._roles.includes("teacher")}" href="/app/courses">Kurse</a>
-        <a ?selected="${this._page === 'content-manager'}" ?disabled="${!this._roles.includes("teacher")}" href="/app/content-manager">Content Manager</a>
+        <a ?selected="${this._page === 'content-manager'}" ?disabled="${!this._roles.includes("teacher")}"
+           href="/app/content-manager">Content Manager</a>
         <a href="/app/browser/Hilfe/Hilfe">Hilfe</a>
         <a href="/app/browser/Hilfe/Blog">Blog</a>
         <a href="/app/browser/Hilfe/Hilfe/Impressum">Impressum</a>
-        <pwa-install-button><mwc-button outlined style="--mdc-theme-primary: var(--color-secondary-dark);">App installieren</mwc-button></pwa-install-button>
-        <pwa-update-available @pwa-update-available="${this._updateAvailable}"><mwc-button outlined style="--mdc-theme-primary: var(--color-secondary-dark);">App aktualisieren</mwc-button></pwa-update-available>
+        <pwa-install-button>
+          <mwc-button outlined style="--mdc-theme-primary: var(--color-secondary-dark);">App installieren</mwc-button>
+        </pwa-install-button>
+        <pwa-update-available @pwa-update-available="${this._updateAvailable}">
+          <mwc-button outlined style="--mdc-theme-primary: var(--color-secondary-dark);">App aktualisieren</mwc-button>
+        </pwa-update-available>
       </nav>
       <!--googleoff: all-->
 
@@ -439,36 +444,46 @@ export class KmapMain extends connect(store, LitElement) {
       <nav class="drawer-list">
         <label section>Layer ein-/ausblenden</label>
         <mwc-formfield label="Kurztexte">
-          <mwc-switch ?selected="${this._layers.includes('summaries')}" @click="${e => this._switchLayer('summaries', e.target.selected)}"></mwc-switch>
+          <mwc-switch ?selected="${this._layers.includes('summaries')}"
+                      @click="${e => this._switchLayer('summaries', e.target.selected)}"></mwc-switch>
         </mwc-formfield>
         <mwc-formfield label="Selbsteinschätzungen">
-          <mwc-switch ?selected="${this._layers.includes('ratings')}" @click="${e => this._switchLayer('ratings', e.target.selected)}"></mwc-switch>
+          <mwc-switch ?selected="${this._layers.includes('ratings')}"
+                      @click="${e => this._switchLayer('ratings', e.target.selected)}"></mwc-switch>
         </mwc-formfield>
         <mwc-formfield label="Pfeile">
-          <mwc-switch ?selected="${this._layers.includes('dependencies')}" @click="${e => this._switchLayer('dependencies', e.target.selected)}"></mwc-switch>
+          <mwc-switch ?selected="${this._layers.includes('dependencies')}"
+                      @click="${e => this._switchLayer('dependencies', e.target.selected)}"></mwc-switch>
         </mwc-formfield>
         ${this._roles.includes("teacher") ? html`
           <mwc-formfield label="Wochenplan">
             <mwc-switch ?selected="${this._layers.includes('timeline')}" @click="${e => this._switchLayer('timeline', e.target.selected)}"></mwc-switch>
           </mwc-formfield>
-          ${this._layers.includes('timeline') ? html`<kmap-timeline-selector class="nomargin"></kmap-timeline-selector>` : ''}
+          ${this._layers.includes('timeline') ? html`
+          <kmap-timeline-selector class="nomargin"></kmap-timeline-selector>` : ''}
           <mwc-formfield label="Mittelwerte">
             <mwc-switch ?selected="${this._layers.includes('averages')}" @click="${e => this._switchLayer('averages', e.target.selected)}"></mwc-switch>
           </mwc-formfield>
-          ${this._layers.includes('averages') ? html`<kmap-course-selector class="nomargin"></kmap-course-selector>` : ''}
+          ${this._layers.includes('averages') ? html`
+          <kmap-course-selector class="nomargin"></kmap-course-selector>` : ''}
           <mwc-formfield label="Editor">
             <mwc-switch ?selected="${this._layers.includes('editor')}" @click="${e => this._switchLayer('editor', e.target.selected)}"></mwc-switch>
           </mwc-formfield>
           ${this._layers.includes('editor') ? html`
-            ${this._page === 'home' || this._page === 'browser' ? html`<kmap-module-selector class="nomargin"></kmap-module-selector>` : ''}
-            ${this._page === 'test' ? html`<kmap-set-selector class="nomargin"></kmap-set-selector>` : ''}
-          ` : ''}
+          ${this._page === 'home' || this._page === 'browser' ? html`
+            <kmap-module-selector class="nomargin"></kmap-module-selector>` : ''}
+          ${this._page === 'test' ? html`
+            <kmap-set-selector class="nomargin"></kmap-set-selector>` : ''}
+        ` : ''}
         ` : ''}
       </nav>
       <hr/>
       <!--googleon: all-->
       <div class="cc-fb">
-        <a class="license" rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/deed.de"><img width="88" height="31" src="icons/cc-by-sa.png" alt="CC BY-SA 4.0"></a>
+        <a class="license" rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/deed.de"><img width="88"
+                                                                                                           height="31"
+                                                                                                           src="../icons/cc-by-sa.png"
+                                                                                                           alt="CC BY-SA 4.0"></a>
         <share-facebook></share-facebook>
       </div>
     `;

@@ -138,6 +138,7 @@ export default createModel({
         });
       },
       showMessage(payload: string) {
+        console.trace()
         window.setTimeout(() => dispatch.shell.removeMessage(payload), 3000);
         dispatch.shell.addMessage(payload);
       },
