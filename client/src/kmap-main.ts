@@ -482,7 +482,7 @@ export class KmapMain extends connect(store, LitElement) {
       <div class="cc-fb">
         <a class="license" rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/deed.de"><img width="88"
                                                                                                            height="31"
-                                                                                                           src="../icons/cc-by-sa.png"
+                                                                                                           src="/app/icons/cc-by-sa.png"
                                                                                                            alt="CC BY-SA 4.0"></a>
         <share-facebook></share-facebook>
       </div>
