@@ -1,5 +1,5 @@
 import { createSpaConfig } from '@open-wc/building-rollup';
-//import replace from '@rollup/plugin-replace'
+import replace from '@rollup/plugin-replace'
 import copy from 'rollup-plugin-copy';
 const { generateSW } = require('rollup-plugin-workbox');
 import merge from 'deepmerge';
@@ -34,12 +34,9 @@ export default merge(baseConfig, {
   input: './index.html',
   plugins: [
     commonjs(),
-    /*
     replace({
-      'process.env.DEPLOY_SERVER': JSON.stringify(process.env.DEPLOY_SERVER || 'http://127.0.0.1:8081/server/'),
-      'process.env.DEPLOY_CLIENT': JSON.stringify(process.env.DEPLOY_CLIENT || 'http://127.0.0.1:8080/app/'),
+      'process.env.NODE_ENV': 'development',
     }),
-    */
     generateSW({
       swDest: 'dist/sw.js',
       globDirectory: 'dist/',
