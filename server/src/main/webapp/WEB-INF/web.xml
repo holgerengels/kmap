@@ -152,10 +152,10 @@
         <url-pattern>/aiconnector/*</url-pattern>
     </servlet-mapping>
 
-    <!--session-config>
+    <session-config>
         <cookie-config>
             <http-only>true</http-only>
             <secure>true</secure>
         </cookie-config>
-    </session-config-->
+    </session-config>
 </web-app>
