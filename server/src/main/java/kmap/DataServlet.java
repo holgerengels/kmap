@@ -101,7 +101,10 @@ public class DataServlet
             }
         }
         catch (Exception e) {
-            e.printStackTrace();
+            String referrer = req.getHeader("referer");
+            if (referrer != null)
+                System.err.println(referrer);
+            e.printStackTrace(System.err);
             sendError(req, resp, e);
         }
         finally {
@@ -126,7 +129,7 @@ public class DataServlet
             System.out.println("millis = " + (System.currentTimeMillis() - millis));
         }
         catch (Exception e) {
-            e.printStackTrace();
+            e.printStackTrace(System.err);
             throw new RuntimeException(e);
         }
     }
