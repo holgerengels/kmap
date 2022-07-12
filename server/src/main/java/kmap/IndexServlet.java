@@ -17,6 +17,7 @@ import java.util.Arrays;
 
 import static kmap.JSON.string;
 import static kmap.Server.readProperties;
+import static kmap.URLs.encodePath;
 
 // http://jetty:8080/server/index/browser/Mathematik/Differentialrechnung/Differenzierbarkeit
 public class IndexServlet extends JsonServlet {
@@ -39,6 +40,7 @@ public class IndexServlet extends JsonServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String title = "KMap";
         String description = "KMap kartographiert Wissen mit Zusammenhang";
+        String image = null;
         String author = "KMap Team";
         String text = "";
         String created = null;
@@ -72,9 +74,14 @@ public class IndexServlet extends JsonServlet {
                             card = couch.loadTopic(subject, chapter, "_");
                         }
                         if (card != null) {
+                            String topic = path[3];
                             String cardSummary = string(card, "summary");
                             String cardDescription = string(card, "description");
                             description = cardSummary != null ? cardSummary : description;
+                            image = JSON.string(card, "thumb") != null
+                                    ? "https://kmap.eu/" + encodePath("server", "data", subject, chapter, topic, JSON.string(card, "thumb")) + "?instance=root"
+                                    : "https://kmap.eu/app/icons/KMap-Logo-cropped.png";
+
                             text = cardDescription != null ? cardDescription : cardSummary;
                             author = string(card, "author");
                             created = JSON.date(card, "created");
@@ -118,6 +125,7 @@ public class IndexServlet extends JsonServlet {
         string = string.replace("<title>KMap</title>", "<title>" + title + "</title>");
         string = string.replace("<meta ogtitle=\"\">", "<meta property=\"og:title\" content=\"" + title + "\">");
         string = string.replace("<meta ogdescription=\"\">", "<meta property=\"og:description\" content=\"" + description + "\">");
+        string = string.replace("<meta ogimage=\"\">", "<meta property=\"og:image\" content=\"" + image + "\">");
         string = string.replace("<meta author=\"\">", "<meta name=\"author\" content=\"" + author + "\">");
         StringBuilder builder = new StringBuilder();
         if (created != null)
@@ -136,7 +144,7 @@ public class IndexServlet extends JsonServlet {
             string = string.replace("<meta type=\"\">", "<meta name=\"og:type\" content=\"website\">");
 
         string = string.replace("<meta jsonld=\"\">", jsonld != null
-                ? "<script id=\"ld\" type=\"application/ld+json\">" + jsonld + "</script>"
+                ? "<script id=\"ld\" type=\"application/ld+json\">" + jsonld + "</script><meta name=\"ld+generation\" content=\"server\">"
                 : "");
 
         // if (text == null) text = "";
