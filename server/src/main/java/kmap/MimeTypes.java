@@ -13,6 +13,7 @@ public class MimeTypes
         MimeTypes.MIME_TYPES.put("gif", "image/gif");
         MimeTypes.MIME_TYPES.put("jpg", "image/jpeg");
         MimeTypes.MIME_TYPES.put("png", "image/png");
+        MimeTypes.MIME_TYPES.put("svg", "image/svg+xml");
         MimeTypes.MIME_TYPES.put("txt", "text/plain");
         MimeTypes.MIME_TYPES.put("mpeg", "video/mpeg");
         MimeTypes.MIME_TYPES.put("mpg", "video/mpeg");
