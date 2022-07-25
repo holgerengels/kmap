@@ -68,20 +68,19 @@ public class IndexServlet extends JsonServlet {
                             String topic = path[3];
                             title = subject + " - " + chapter + " - " + topic;
                             card = couch.loadTopic(subject, chapter, topic);
+                            image = JSON.string(card, "thumb") != null
+                                    ? "https://kmap.eu/" + encodePath("server", "data", subject, chapter, topic, JSON.string(card, "thumb")) + "?instance=root"
+                                    : "https://kmap.eu/app/icons/KMap-Logo-cropped.png";
                         }
                         else {
                             title = subject + " - " + chapter;
                             card = couch.loadTopic(subject, chapter, "_");
+                            image = "https://kmap.eu/app/icons/KMap-Logo-cropped.png";
                         }
                         if (card != null) {
-                            String topic = path[3];
                             String cardSummary = string(card, "summary");
                             String cardDescription = string(card, "description");
                             description = cardSummary != null ? cardSummary : description;
-                            image = JSON.string(card, "thumb") != null
-                                    ? "https://kmap.eu/" + encodePath("server", "data", subject, chapter, topic, JSON.string(card, "thumb")) + "?instance=root"
-                                    : "https://kmap.eu/app/icons/KMap-Logo-cropped.png";
-
                             text = cardDescription != null ? cardDescription : cardSummary;
                             author = string(card, "author");
                             created = JSON.date(card, "created");
