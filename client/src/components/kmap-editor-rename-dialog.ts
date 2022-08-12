@@ -16,7 +16,9 @@ export class KMapEditorRenameDialog extends Connected {
   @state()
   private _card?: Card = undefined;
   @state()
-  private _newName: string = '';
+  private _newChapter: string = '';
+  @state()
+  private _newTopic: string = '';
 
   @query('#renameDialog')
   // @ts-ignore
@@ -38,7 +40,8 @@ export class KMapEditorRenameDialog extends Connected {
       if (!this._card.chapter)
         this._card.chapter = store.state.maps.chapter || '';
 
-      this._newName = '';
+      this._newChapter = this._card.chapter;
+      this._newTopic = this._card.topic;
       this._renameDialog.show();
 
     }
@@ -50,9 +53,10 @@ export class KMapEditorRenameDialog extends Connected {
       return;
 
     const card: Card | any = this._card;
-    card.newName = this._newName;
+    card.newChapter = this._newChapter;
+    card.newTopic = this._newTopic;
 
-    await store.dispatch.maps.renameTopic(card);
+    await store.dispatch.maps.renameCard(card);
     window.setTimeout(function () {
       store.dispatch.maps.load();
     }, 1000);
@@ -87,14 +91,19 @@ export class KMapEditorRenameDialog extends Connected {
     return html`
         <mwc-dialog id="renameDialog" title="Umbenennen">
         ${this._card ? html`
-        <validating-form @keyup="${this._maybeEnter}" @validity="${e => this._valid = e.target.valid}">
+          <validating-form @keyup="${this._maybeEnter}" @validity="${e => this._valid = e.target.valid}">
             <div class="field">
-              <label for="topic">Thema</label>
-              <span id="topic">${this._card.topic}</span>
+              <label for="chaptertopic">Umbenennen: </label>
+              <span id="chaptertopic">${this._card.chapter} / ${this._card.topic}</span>
             </div>
-            <mwc-textfield label="Umbenennen in ..." type="text" .value="${this._newName}" @change="${e => this._newName = e.target.value}" pattern="^([^/.]*)$" required></mwc-textfield>
+            <mwc-textfield label="Neues Kapitel ..." type="text" .value="${this._newChapter}"
+                           @change="${e => this._newChapter = e.target.value}" pattern="^([^/.]*)$"
+                           required></mwc-textfield>
+            <mwc-textfield label="Neues Thema ..." type="text" .value="${this._newTopic}"
+                           @change="${e => this._newTopic = e.target.value}" pattern="^([^/.]*)$"
+                           required></mwc-textfield>
           </validating-form>
-          ` : '' }
+        ` : '' }
           <mwc-button slot="secondaryAction" @click=${this._cancel}>Abbrechen</mwc-button>
           <mwc-button slot="primaryAction" @click=${this._rename} ?disabled="${!this._valid}">Umbenennen</mwc-button>
         </mwc-dialog>

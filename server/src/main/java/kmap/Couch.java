@@ -146,11 +146,11 @@ public class Couch extends Server {
             String topic = string(old, "topic");
             assert chapter != null;
             assert topic != null;
-            JsonArray array = loadModule(subject, module);
+            List<JsonObject> array = loadModuleAsList(subject, module);
             int pos = -1;
-            for (JsonElement element : array) {
+            for (JsonObject element : array) {
                 pos++;
-                if (equals((JsonObject)element, subject, chapter, topic)) {
+                if (equals(element, subject, chapter, topic)) {
                     client.remove(element);
                     return "delete:" + pos;
                 }
@@ -161,27 +161,38 @@ public class Couch extends Server {
             JsonObject rename = (JsonObject)object.get("rename");
             String chapter = string(rename, "chapter");
             String topic = string(rename, "topic");
-            String name = string(object, "name");
+            String newChapter = string(object, "newChapter");
+            String newTopic = string(object, "newTopic");
             assert chapter != null;
             assert topic != null;
-            assert name != null;
-            JsonArray array = loadModule(subject, module);
-            for (JsonElement element : array) {
-                if (equals((JsonObject)element, subject, chapter, topic)) {
-                    ((JsonObject)element).addProperty("topic", name);
+            assert newChapter != null;
+            assert newTopic != null;
+            boolean chapterChange = !chapter.equals(newChapter);
+            List<JsonObject> list = loadChapterAsList(subject, chapter);
+            for (JsonObject element : list) {
+                if (equals(element, subject, chapter, topic)) {
+                    element.addProperty("chapter", newChapter);
+                    element.addProperty("topic", newTopic);
+                    element.remove("depends");
                     client.update(element);
                 }
-                else if (equals((JsonObject)element, subject, chapter, null)) {
+                else if (equals(element, subject, chapter, null)) {
                     boolean change = false;
-                    JsonArray depends = ((JsonObject)element).getAsJsonArray("depends");
+                    JsonArray depends = element.getAsJsonArray("depends");
+                    JsonArray newDepends = new JsonArray(depends.size());
                     for (int i = 0; i < depends.size(); i++) {
                         if (depends.get(i).getAsString().equals(topic)) {
-                            depends.set(i, new JsonPrimitive(name));
+                            if (!chapterChange)
+                                newDepends.add(new JsonPrimitive(newTopic));
                             change = true;
                         }
+                        else
+                            newDepends.add(depends.get(i));
                     }
-                    if (change)
+                    if (change) {
+                        element.add("depends", newDepends);
                         client.update(element);
+                    }
                 }
             }
             return "reload:";
@@ -194,10 +205,10 @@ public class Couch extends Server {
             assert chapter != null;
             assert topic != null;
             assert nmodule != null;
-            JsonArray array = loadModule(subject, module);
-            for (JsonElement element : array) {
-                if (equals((JsonObject)element, subject, chapter, topic)) {
-                    ((JsonObject)element).addProperty("module", nmodule);
+            List<JsonObject> array = loadModuleAsList(subject, module);
+            for (JsonObject element : array) {
+                if (equals(element, subject, chapter, topic)) {
+                    element.addProperty("module", nmodule);
                     client.update(element);
                 }
             }
@@ -332,11 +343,7 @@ public class Couch extends Server {
     }
 
     public synchronized JsonObject chapter(String subject, String name) {
-        View view = createClient("map").view("net/byChapter")
-            .key(subject, name)
-            .reduce(false)
-            .includeDocs(true);
-        List<JsonObject> objects = view.query(JsonObject.class);
+        List<JsonObject> objects = loadChapterAsList(subject, name);
         Map<String, Node> nodes = new HashMap<>();
         Map<String, Connection> connections = new HashMap<>();
 
@@ -508,6 +515,14 @@ public class Couch extends Server {
             board.add("chapterCard", card);
         }
         return board;
+    }
+
+    private List<JsonObject> loadChapterAsList(String subject, String name) {
+        View view = createClient("map").view("net/byChapter")
+            .key(subject, name)
+            .reduce(false)
+            .includeDocs(true);
+        return view.query(JsonObject.class);
     }
 
     private List<String> backlinks(Map<String, String> links, String name) {

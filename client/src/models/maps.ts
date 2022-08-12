@@ -111,10 +111,10 @@ export default createModel({
     receivedDeleteTopic(state) {
       return { ...state, deleting: false, editAction: undefined, loaded: undefined };
     },
-    requestRenameTopic(state) {
+    requestRenameCard(state) {
       return { ...state, renaiming: true };
     },
-    receivedRenameTopic(state) {
+    receivedRenameCard(state) {
       return { ...state, renaiming: false, editAction: undefined, loaded: undefined };
     },
     requestMoveTopic(state) {
@@ -275,16 +275,16 @@ export default createModel({
           dispatch.app.handleError,
           dispatch.maps.error);
       },
-      async renameTopic(card: Card) {
+      async renameCard(card: Card) {
         const state = store.getState();
         const userid = state.app.userid;
 
-        dispatch.maps.requestRenameTopic();
+        dispatch.maps.requestRenameCard();
         fetchjson(`${urls.server}edit?userid=${userid}&subject=${card.subject}&save=${card.module}`,
           // @ts-ignore
-          {...endpoint.post(state), body: JSON.stringify({rename: card, name: card.newName})},
+          {...endpoint.post(state), body: JSON.stringify({rename: card, newChapter: card.newChapter, newTopic: card.newTopic})},
           () => {
-            dispatch.maps.receivedRenameTopic();
+            dispatch.maps.receivedRenameCard();
             dispatch.maps.unsetEditAction();
           },
           dispatch.app.handleError,
