@@ -46,17 +46,59 @@ export class KMapKnowledgeCardDescription extends LitElement {
     }
   }
 
-  willUpdate(changedProperties) {
-    if (changedProperties.has("description")) {
+  willUpdate(_changedProperties) {
+    if (_changedProperties.has("description")) {
       let setter = (value:string):void => { this._description = value };
 
       if (this.description) {
         let code = this.description.replace(/inline:([^"]*)/g, urls.server + "data/" + this.subject + "/" + this.chapter + "/" + this.topic + "/$1?instance=" + this.instance);
         code = code.replace(/link:/g, urls.client + "browser/");
+        code = code.replace(/(<h3>(.*)<\/h3>)/g, (m) => {
+          let text = m.substring(4, m.length - 5)
+          let id = text;
+          id = id.toLowerCase();
+          id = id.replaceAll(/["'`´§$%#|^°()<>{}\[\]]/g, "");
+          id = id.replace(/[*~+-_ .,:;!?=&\/\\|äöüÄÖÜß]/g, (m) => {
+            switch (m) {
+              case 'ä': return 'ae';
+              case 'ö': return 'oe';
+              case 'ü': return 'ue';
+              case 'Ä': return 'Ae';
+              case 'Ö': return 'Oe';
+              case 'Ü': return 'Ue';
+              case 'ß': return 'ss';
+              default: return '-';
+            }
+          });
+          id = id.replaceAll(/ö/g, "oe");
+          id = id.replaceAll(/ü/g, "ue");
+          id = id.replaceAll(/Ä/g, "Ae");
+          id = id.replaceAll(/Ö/g, "Oe");
+          id = id.replaceAll(/Ü/g, "Ue");
+          id = id.replaceAll(/ß/g, "ss");
+          id = id.replaceAll(/[-_ ]/g, "-");
+          return `<h3><a href="${urls.client}browser/${this.subject}/${this.chapter}/${this.topic}#${id}" id="${id}">${text}<span class="fragment">&nbsp;¶</span></a></h3>`;
+        });
         math(code, setter);
       }
       else
         setter("");
+    }
+  }
+
+  protected updated(_changedProperties) {
+    if (_changedProperties.has("_description")) {
+      const { hash } = window.location;
+
+      if (hash) {
+        const element = this.shadowRoot!.querySelector(`[id="${hash.substring(1)}"]`);
+        if (element) {
+          console.log("scroll to " + element)
+          window.setTimeout(() => {
+            window.requestAnimationFrame(() => element.scrollIntoView({block: 'start', behavior: 'smooth'}));
+          }, 200);
+        }
+      }
     }
   }
 
@@ -114,6 +156,25 @@ export class KMapKnowledgeCardDescription extends LitElement {
           max-width: calc(var(--content-width, 100vw) - 64px);
         }
         figure { margin: 0px; }
+
+        h3 .fragment {
+          color: transparent;
+          transition: color .3s ease-in-out;
+        }
+        h3:hover .fragment {
+          text-decoration: none;
+          color: var(--color-mediumgray);
+        }
+        h3 a {
+          font-family: inherit;
+          font-size: inherit;
+          font-weight: inherit;
+          text-decoration: underline solid transparent;
+          transition: text-decoration .3s ease-in-out;
+        }
+        h3:hover a {
+          text-decoration: underline solid var(--color-mediumgray);
+        }
       `
     ];
   }
