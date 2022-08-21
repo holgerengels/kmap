@@ -70,7 +70,7 @@ public class IndexServlet extends JsonServlet {
                             card = couch.loadTopic(subject, chapter, topic);
                             image = JSON.string(card, "thumb") != null
                                     ? "https://kmap.eu/" + encodePath("server", "data", subject, chapter, topic, JSON.string(card, "thumb")) + "?instance=root"
-                                    : "https://kmap.eu/app/icons/KMap-Logo-cropped.png";
+                                    : "https://kmap.eu/" + encodePath("snappy", subject, chapter, topic + ".png");
                         }
                         else {
                             title = subject + " - " + chapter;
