@@ -121,6 +121,10 @@ export default createModel({
       'app/receivedLogout': async function () {
         dispatch.rates.forget();
       },
+      'app/receivedDeleteData': async function () {
+        dispatch.rates.forget();
+        dispatch.shell.showMessage("Deine Daten wurden gelöscht");
+      },
       'app/chooseInstance': async function () {
         dispatch.rates.forget();
       },

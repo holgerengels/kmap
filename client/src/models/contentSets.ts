@@ -197,7 +197,7 @@ export default createModel({
           },
           () => {
             dispatch.contentSets.receivedImport();
-            dispatch.shell.addMessage("Import von " + names.join(", ") + " abgeschlossen");
+            dispatch.shell.showMessage("Import von " + names.join(", ") + " abgeschlossen");
           },
           dispatch.app.handleError,
           dispatch.contentSets.error);

@@ -73,6 +73,14 @@ export default createModel({
     logout(state) {
       return { ...state, userid: "", roles: [] };
     },
+    requestDeleteData(state) {
+      return { ...state, authenticating: true, error: "" };
+    },
+    receivedDeleteData(state) {
+      return { ...state,
+        authenticating: false,
+      };
+    },
     error(state, message) {
       return { ...state,
         authenticating: false,
@@ -124,6 +132,21 @@ export default createModel({
             body: JSON.stringify({userid: state.app.userid})
           },
           () => {
+            dispatch.app.receivedLogout();
+          },
+          dispatch.app.handleError,
+          dispatch.app.error);
+      },
+      async deleteData() {
+        const state = store.getState();
+
+        dispatch.app.requestDeleteData();
+        fetchjson(`${urls.server}state?delete=${state.app.userid}`, {
+            ...endpoint.post(state),
+            body: JSON.stringify({userid: state.app.userid})
+          },
+          () => {
+            dispatch.app.receivedDeleteData();
             dispatch.app.receivedLogout();
           },
           dispatch.app.handleError,

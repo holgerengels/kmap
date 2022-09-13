@@ -38,6 +38,9 @@ export class KMapLoginPopup extends Connected {
   @state()
   private _formValid: boolean = false;
 
+  @state()
+  private _deleting: boolean = false;
+
   @query('#loginDialog')
   // @ts-ignore
   private _loginDialog: Dialog;
@@ -104,6 +107,15 @@ export class KMapLoginPopup extends Connected {
     store.dispatch.app.logout();
   }
 
+  _delete() {
+    this._deleting = true;
+  }
+
+  _deleteData() {
+    this._deleting = false;
+    store.dispatch.app.deleteData();
+  }
+
   _maybeEnter(event) {
     if (event.key === "Enter" && this._valid) {
       event.preventDefault();
@@ -138,6 +150,9 @@ export class KMapLoginPopup extends Connected {
         form {
           width: 300px;
           display: block;
+        }
+        .deleting > div {
+          margin: 16px 0px;
         }
         [hidden] {
           display: none !important;
@@ -200,16 +215,26 @@ export class KMapLoginPopup extends Connected {
     <form id="logoutForm" ?hidden="${!this._userid}">
       Angemeldet als ${this._username} ..
     </form>
+    <div class="deleting">
+      <div ?hidden="${!this._deleting}">
+        Möchtest du wirklich alle persönlichen Daten unwiederbringlich löschen?
+      </div>
+      <div ?hidden="${!this._deleting}">
+        <mwc-button outlined @click=${this._deleteData} style="--mdc-theme-primary: var(--color-red)">Löschen</mwc-button>
+        <mwc-button outlined @click="${() => this._deleting = false}">Nicht löschen</mwc-button>
+      </div>
+    </div>
     <div class="layout horizontal">
       <div id="message" style="height: 32px; padding-top: 10px">${this._message}</div>
     </div>
     <pwa-install-button slot="secondaryAction"><mwc-button outlined style="--mdc-theme-primary: var(--color-secondary-dark);">App installieren</mwc-button></pwa-install-button>
     <pwa-update-available slot="secondaryAction"><mwc-button outlined style="--mdc-theme-primary: var(--color-secondary-dark);">App aktualisieren</mwc-button></pwa-update-available>
     <mwc-button slot="primaryAction" ?hidden="${this._userid}" @click=${this._login} ?disabled="${!this._valid}">Anmelden</mwc-button>
+    <mwc-button slot="secondaryAction" ?hidden="${!this._userid}" @click=${this._delete}>Daten löschen</mwc-button>
     ${this._instance !== 'root' ? html`
-      <mwc-button slot="secondaryAction" ?hidden="${!this._userid}" @click=${this._logout}>Abmelden</mwc-button>
+      <mwc-button slot="primaryAction" ?hidden="${!this._userid}" @click=${this._logout}>Abmelden</mwc-button>
     ` : html`
-      <mwc-button slot="secondaryAction" ?hidden="${!this._userid}" @click=${this._signOut}>Abmelden</mwc-button>
+      <mwc-button slot="primaryAction" ?hidden="${!this._userid}" @click=${this._signOut}>Abmelden</mwc-button>
     `}
   </mwc-dialog>
   <!--googleon: all-->

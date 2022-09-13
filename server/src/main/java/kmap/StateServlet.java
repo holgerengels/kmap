@@ -37,10 +37,16 @@ public class StateServlet
                 String subject = req.getParameter("subject");
                 String deleteCourse = req.getParameter("deleteCourse");
                 String saveCourse = req.getParameter("saveCourse");
+                String delete = req.getParameter("delete");
                 if (save != null) {
                     String json = IOUtils.toString(new InputStreamReader(req.getInputStream(), StandardCharsets.UTF_8));
                     JsonObject states = this.states.store(save, subject, json);
                     writeResponse(req, resp, states);
+                }
+                else if (delete != null && delete.equals(userid)) {
+                    authentication.checkRole(req, "user");
+                    states.delete(userid);
+                    writeResponse(req, resp, new JsonPrimitive(userid));
                 }
                 else if (deleteCourse != null) {
                     log("delete Course = " + deleteCourse);

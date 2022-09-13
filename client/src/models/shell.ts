@@ -138,8 +138,9 @@ export default createModel({
         });
       },
       showMessage(payload: string) {
+        const state = store.getState();
         console.trace()
-        window.setTimeout(() => dispatch.shell.removeMessage(payload), 3000);
+        window.setTimeout(() => dispatch.shell.removeMessage(payload), 2000 + state.shell.messages.length * payload.length * 50);
         dispatch.shell.addMessage(payload);
       },
       'routing/change': async function (routing: RoutingState<string>) {

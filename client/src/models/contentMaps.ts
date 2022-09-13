@@ -109,7 +109,7 @@ export default createModel({
           },
           () => {
             dispatch.contentMaps.receivedImport();
-            dispatch.shell.addMessage("Import von " + names.join(", ") + " abgeschlossen");
+            dispatch.shell.showMessage("Import von " + names.join(", ") + " abgeschlossen");
           },
           dispatch.app.handleError,
           dispatch.contentMaps.error);

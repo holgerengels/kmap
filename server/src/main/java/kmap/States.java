@@ -1,5 +1,6 @@
 package kmap;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
@@ -15,7 +16,7 @@ import static kmap.JSON.string;
  * Created by holger on 04.04.17.
  */
 public class States {
-    private Couch couch;
+    private final Couch couch;
 
     public States(Couch couch) {
         this.couch = couch;
@@ -166,8 +167,24 @@ public class States {
             client.bulk(added, true);
     }
 
+    public void delete(String user) {
+        CouchDbClient client = getClient();
+        JsonArray result = couch.loadSubjects();
+        for (Object element : result) {
+            String subject = JSON.string((JsonObject)element, "name");
+            try {
+                JsonObject states = client.find(JsonObject.class, user + "." + subject);
+                client.remove(states);
+                System.out.println("Deleted states for " + user + "." + subject);
+            }
+            catch (NoDocumentException e) {
+                System.out.println("No states for " + user + "." + subject);
+            }
+        }
+    }
+
     public static void main(String[] args) throws IOException {
-        Server.CLIENT.set(args[1]);
+        Server.CLIENT.set("root");
         States couch = new States(new Couch(readProperties(args[0])));
         //JsonObject object = couch.chapter("mathe", "Mathematik");
         //System.out.println("object = " + object);
@@ -175,6 +192,7 @@ public class States {
         //System.out.println("states = " + states);
         //JsonObject states = couch.courseStates("lala", "test", "Mathematik");
         //System.out.println("states = " + states);
-        couch.fixStates();
+        //couch.fixStates();
+        couch.delete("h.engels");
     }
 }

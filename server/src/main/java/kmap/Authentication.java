@@ -119,6 +119,7 @@ public class Authentication {
         boolean authenticate = Boolean.parseBoolean(getProperty("auth.authenticate"));
         if (!authenticate && "admin".equals(password)) {
             Set<String> roles = new HashSet<>();
+            roles.add("user");
             roles.add("admin");
             roles.add("teacher");
             roles.add("student");
@@ -152,6 +153,7 @@ public class Authentication {
             FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(token);
             //System.out.println("uid = " + decodedToken.getUid());
             Set<String> roles = new HashSet<>(2);
+            roles.add("user");
             roles.add("student");
             roles.add("displayName:" + decodedToken.getName());
             return roles;
