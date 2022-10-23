@@ -1,5 +1,5 @@
 import {LitElement, html, css, PropertyValues} from 'lit';
-import {customElement, property, query, state} from 'lit/decorators.js';
+import {customElement, property, query, state, eventOptions} from 'lit/decorators.js';
 
 import '@material/mwc-icon';
 import '@material/mwc-ripple/mwc-ripple';
@@ -98,6 +98,8 @@ export class KMapCard extends LitElement {
     window.addEventListener('mouseup', onMouseUp);
     this._rippleHandlers.startPress(e);
   }
+
+  @eventOptions({passive: true})
   _touchstart(e) {
     //e.preventDefault();
     const onTouchEnd = () => {

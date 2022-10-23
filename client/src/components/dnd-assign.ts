@@ -1,5 +1,5 @@
 import {LitElement, html, css, PropertyValues} from 'lit';
-import {customElement, property, state} from 'lit/decorators.js';
+import {customElement, eventOptions, property, state} from 'lit/decorators.js';
 import {colorStyles, elevationStyles, fontStyles} from "./kmap-styles";
 import {unsafeHTML} from 'lit/directives/unsafe-html.js';
 import {styleMap} from 'lit/directives/style-map.js';
@@ -81,6 +81,7 @@ export class DndAssign extends LitElement implements TestInteraction{
     this._items = childNodes.map((node) => node.outerHTML);
   }
 
+  @eventOptions({passive: true})
   _start(event) {
     let moveEvent, upEvent, getPageX, getPageY
     if (window.TouchEvent && event instanceof TouchEvent) {
