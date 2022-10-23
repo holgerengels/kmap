@@ -77,7 +77,7 @@ export class KMapKnowledgeCardDescription extends LitElement {
           id = id.replaceAll(/Ü/g, "Ue");
           id = id.replaceAll(/ß/g, "ss");
           id = id.replaceAll(/[-_ ]/g, "-");
-          return `<h3><a href="${urls.client}browser/${this.subject}/${this.chapter}/${this.topic}#${id}" id="${id}">${text}<span class="fragment">&nbsp;¶</span></a></h3>`;
+          return `<h3><a href="${urls.client}browser/${this.subject}/${this.chapter}/${this.topic}#${id}" id="${id}">${text}</a></h3>`;
         });
         math(code, setter);
       }
@@ -157,11 +157,12 @@ export class KMapKnowledgeCardDescription extends LitElement {
         }
         figure { margin: 0px; }
 
-        h3 .fragment {
+        h3:after {
           color: transparent;
           transition: color .3s ease-in-out;
+          content: '\\a0 ¶';
         }
-        h3:hover .fragment {
+        h3:hover:after {
           text-decoration: none;
           color: var(--color-mediumgray);
         }
