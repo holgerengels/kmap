@@ -172,6 +172,7 @@ export class KMapKnowledgeCardDescription extends LitElement {
           font-weight: inherit;
           text-decoration: underline solid transparent;
           transition: text-decoration .3s ease-in-out;
+          color: inherit;
         }
         h3:hover a {
           text-decoration: underline solid var(--color-mediumgray);

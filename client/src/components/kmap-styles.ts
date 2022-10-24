@@ -47,8 +47,13 @@ p, .font-body, td, dd, .secondary {
 p {
   text-align: justify;
 }
+h1, h2, h3, h4, h5, p {
+  margin-block-start: 1.2rem;
+  margin-block-end: 1.2rem;
+  line-height: 1.2rem;
+}
 h1:first-child, h2:first-child, h3:first-child, h4:first-child, h5:first-child, p:first-child {
-  margin-top: 0px;
+  margin-block-start: 0px;
 }
 figcaption {
   font-family: Roboto,sans-serif;
