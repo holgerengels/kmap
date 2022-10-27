@@ -259,7 +259,7 @@ export class KMapTestCard extends Connected {
         <mwc-icon-button slot="icon" icon="link" title="Permalink" ?hidden="${typeof navigator['share'] === 'function'}" @click="${this._permalink}"></mwc-icon-button>
       </kmap-card>
 
-      <kmap-feedback id="feedbackDialog" .subject="${this.subject}" .chapter="${this.chapter}" .topic="${this.topic}" .test="${this.key}"></kmap-feedback>
+      ${this._userid ? html`<kmap-feedback id="feedbackDialog" .subject="${this.subject}" .chapter="${this.chapter}" .topic="${this.topic}" .test="${this.key}"></kmap-feedback>` : ''}
     `;
   }
 }

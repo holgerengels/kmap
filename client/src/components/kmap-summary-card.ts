@@ -172,8 +172,8 @@ export class KMapSummaryCard extends Connected {
         <kmap-card primaryLink="${this._link()}" primaryLinkTitle="${this._linkTitle()}" header="${this.card.topic + (this.card.links !== undefined ? '  &#x2198;&#xFE0E;' : '')}" subheader="${this._layers.includes("summaries") && this.card.summary ? this.card.summary : ''}"
                 @hover="${this._hovered}" ?selected="${this.selected}" ?highlighted="${this.highlighted}" ?grayedOut="${this.grayedOut}"
                 style=${styleMap(this._colorStyles)}>
-          <div slot="plane" class="marker top"></div>
-          <div slot="plane" class="marker bottom"></div>
+          <!--div slot="plane" class="marker top"></div>
+          <div slot="plane" class="marker bottom"></div-->
           ${this._layers.includes('averages') ? html`
             <kmap-card-element>
               <kmap-summary-card-averages id="averages" .key="${this._key}" @statecolor="${this._colorizeEvent}"></kmap-summary-card-averages>

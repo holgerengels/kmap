@@ -367,10 +367,9 @@ export class KMapBrowser extends Connected {
         `)}
       </div>
 
-      ${this._topicCard ? html`
-        <kmap-knowledge-card @rated="${this._rated}" .card="${this._topicCard}"></kmap-knowledge-card>
-      ` : '' }
-      <kmap-timeline-aside id="timeline" class="elevation-02" @open="${() => this.timelineState = 'open'}"></kmap-timeline-aside>
+      ${this._topicCard ? html`<kmap-knowledge-card @rated="${this._rated}" .card="${this._topicCard}"></kmap-knowledge-card>` : '' }
+
+      ${this._userid ? html`<kmap-timeline-aside id="timeline" class="elevation-02" @open="${() => this.timelineState = 'open'}"></kmap-timeline-aside>` : ''}
     `;
   }
 

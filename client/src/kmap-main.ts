@@ -384,18 +384,20 @@ export class KmapMain extends connect(store, LitElement) {
     </main>
   </mwc-drawer>
 
-  ${this._page === 'home' || this._page === 'browser' ? html`
-      ${this._layers.includes('editor') ? html`<kmap-editor-edit-dialog></kmap-editor-edit-dialog>` : ''}
-      ${this._layers.includes('editor') ? html`<kmap-editor-rename-dialog></kmap-editor-rename-dialog>` : ''}
-      ${this._layers.includes('editor') ? html`<kmap-editor-move-dialog></kmap-editor-move-dialog>` : ''}
-      ${this._layers.includes('editor') ? html`<kmap-editor-delete-dialog></kmap-editor-delete-dialog>` : ''}
-      ${this._layers.includes('editor') ? html`<kmap-editor-add-fabs></kmap-editor-add-fabs>` : ''}
-  ` : ''}
-  ${this._page === 'test' ? html`
-    ${this._layers.includes('editor') ? html`<kmap-test-editor-edit-dialog></kmap-test-editor-edit-dialog>` : ''}
-    ${this._layers.includes('editor') ? html`<kmap-test-editor-rename-dialog></kmap-test-editor-rename-dialog>` : ''}
-    ${this._layers.includes('editor') ? html`<kmap-test-editor-delete-dialog></kmap-test-editor-delete-dialog>` : ''}
-    ${this._layers.includes('editor') ? html`<kmap-test-editor-add-fabs></kmap-test-editor-add-fabs>` : ''}
+  ${this._userid ? html`
+    ${this._page === 'home' || this._page === 'browser' ? html`
+        ${this._layers.includes('editor') ? html`<kmap-editor-edit-dialog></kmap-editor-edit-dialog>` : ''}
+        ${this._layers.includes('editor') ? html`<kmap-editor-rename-dialog></kmap-editor-rename-dialog>` : ''}
+        ${this._layers.includes('editor') ? html`<kmap-editor-move-dialog></kmap-editor-move-dialog>` : ''}
+        ${this._layers.includes('editor') ? html`<kmap-editor-delete-dialog></kmap-editor-delete-dialog>` : ''}
+        ${this._layers.includes('editor') ? html`<kmap-editor-add-fabs></kmap-editor-add-fabs>` : ''}
+    ` : ''}
+    ${this._page === 'test' ? html`
+      ${this._layers.includes('editor') ? html`<kmap-test-editor-edit-dialog></kmap-test-editor-edit-dialog>` : ''}
+      ${this._layers.includes('editor') ? html`<kmap-test-editor-rename-dialog></kmap-test-editor-rename-dialog>` : ''}
+      ${this._layers.includes('editor') ? html`<kmap-test-editor-delete-dialog></kmap-test-editor-delete-dialog>` : ''}
+      ${this._layers.includes('editor') ? html`<kmap-test-editor-add-fabs></kmap-test-editor-add-fabs>` : ''}
+    ` : ''}
   ` : ''}
 
   <kmap-instance-popup id="instance-popup"></kmap-instance-popup>
