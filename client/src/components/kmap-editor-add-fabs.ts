@@ -9,7 +9,7 @@ import '@material/mwc-fab';
 import '@material/mwc-textfield';
 import './validating-form';
 
-import {fontStyles, colorStyles} from "./kmap-styles";
+import {resetStyles, fontStyles, colorStyles} from "./kmap-styles";
 import {Dialog} from "@material/mwc-dialog/mwc-dialog";
 import {Card} from "../models/types";
 
@@ -168,6 +168,7 @@ export class KMapEditorAddFabs extends Connected {
   static get styles() {
     // language=CSS
     return [
+      resetStyles,
       fontStyles,
       colorStyles,
       css`

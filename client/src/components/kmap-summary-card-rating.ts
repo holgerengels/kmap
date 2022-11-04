@@ -4,7 +4,7 @@ import {Connected} from "./connected";
 import {State} from "../store";
 
 import './star-rating';
-import { fontStyles, colorStyles } from "./kmap-styles";
+import {resetStyles, fontStyles, colorStyles} from "./kmap-styles";
 
 
 @customElement('kmap-summary-card-rating')
@@ -49,6 +49,7 @@ export class KMapSummaryCardRating extends Connected {
   static get styles() {
     // language=CSS
     return [
+      resetStyles,
       fontStyles,
       colorStyles,
       css`

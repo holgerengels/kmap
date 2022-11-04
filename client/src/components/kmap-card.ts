@@ -5,7 +5,7 @@ import '@material/mwc-icon';
 import '@material/mwc-ripple/mwc-ripple';
 import {Ripple} from '@material/mwc-ripple/mwc-ripple';
 import {RippleHandlers} from '@material/mwc-ripple/ripple-handlers';
-import {fontStyles, colorStyles, elevationStyles} from "./kmap-styles";
+import {resetStyles, fontStyles, colorStyles, elevationStyles} from "./kmap-styles";
 import {StyleInfo, styleMap} from 'lit/directives/style-map.js';
 import {unsafeHTML} from "lit/directives/unsafe-html.js";
 
@@ -114,6 +114,7 @@ export class KMapCard extends LitElement {
   static get styles() {
     // language=CSS
     return [
+      resetStyles,
       fontStyles,
       colorStyles,
       elevationStyles,
@@ -124,11 +125,11 @@ export class KMapCard extends LitElement {
           flex-direction: column;
           border-radius: 4px;
           background-color: var(--mdc-theme-surface, #fff);
-          box-shadow: 0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 1px 3px 0px rgba(0,0,0,.12);
-          transition: background-color 280ms cubic-bezier(0.4, 0, 0.2, 1), border-color 280ms cubic-bezier(0.4, 0, 0.2, 1), opacity 280ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1);
+          box-shadow: var(--elevation-01);
+          transition: background-color 280ms cubic-bezier(0.4, 0, 0.2, 1), border-color 280ms cubic-bezier(0.4, 0, 0.2, 1), opacity 280ms cubic-bezier(0.4, 0, 0.2, 1), var(--elevation-transition);
         }
         :host([hover]) {
-          box-shadow: 0px 5px 5px -3px rgba(0, 0, 0, 0.2),0px 8px 10px 1px rgba(0, 0, 0, 0.14),0px 3px 14px 2px rgba(0, 0, 0, 0.12);
+          box-shadow: var(--elevation-06);
         }
         a.primary {
           text-decoration: none;
@@ -238,8 +239,6 @@ export class KMapCardText extends LitElement {
     return css`
         :host {
           font-family: Roboto, sans-serif;
-          text-decoration: inherit;
-          text-transform: inherit;
           padding-left: 16px;
           padding-right: 16px;
         }
@@ -247,13 +246,11 @@ export class KMapCardText extends LitElement {
           font-size: 1.0rem;
           line-height: 1.5rem;
           font-weight: 500;
-          letter-spacing: .0125em;
         }
         div[type=subheader], div[type=content] {
-          font-size: .875rem;
+          font-size: 0.875rem;
           line-height: 1.25rem;
           font-weight: 400;
-          letter-spacing: .0178571429em;
           color: var(--color-darkgray);
         }
       `;

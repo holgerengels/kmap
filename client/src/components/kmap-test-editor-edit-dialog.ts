@@ -18,7 +18,7 @@ import { KmapHtmlEditor } from "kmap-html-editor";
 import './kmap-knowledge-card-description';
 import './file-drop';
 import './validating-form';
-import {colorStyles, fontStyles, formStyles} from "./kmap-styles";
+import {resetStyles, colorStyles, fontStyles, formStyles, elevationStyles} from "./kmap-styles";
 
 import {Dialog} from "@material/mwc-dialog/mwc-dialog";
 import {TabBar} from "@material/mwc-tab-bar/mwc-tab-bar";
@@ -307,9 +307,11 @@ export class KMapTestEditorEditDialog extends Connected {
   static get styles() {
     // language=CSS
     return [
+      resetStyles,
       fontStyles,
       colorStyles,
       formStyles,
+      elevationStyles,
       css`
         mwc-dialog {
           --mdc-dialog-min-width: calc(100vw - 32px);
@@ -368,7 +370,7 @@ export class KMapTestEditorEditDialog extends Connected {
           box-sizing: border-box;
           background-color: var(--color-lightgray);
           border-radius: 3px;
-          box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
+          box-shadow: var(--elevation-01),
           0 1px 5px 0 rgba(0, 0, 0, 0.12),
           0 3px 1px -2px rgba(0, 0, 0, 0.2);
         }

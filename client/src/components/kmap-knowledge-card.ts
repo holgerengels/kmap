@@ -13,7 +13,7 @@ import './kmap-knowledge-card-progress';
 import './kmap-knowledge-card-description';
 import './kmap-knowledge-card-attachment';
 import './kmap-feedback';
-import {fontStyles, colorStyles} from "./kmap-styles";
+import {resetStyles, fontStyles, colorStyles} from "./kmap-styles";
 import {KMapFeedback} from "./kmap-feedback";
 import {Attachment, Card} from "../models/types";
 import {encodePath} from "../urls";
@@ -181,6 +181,7 @@ export class KMapKnowledgeCard extends Connected {
   static get styles() {
     // language=CSS
     return [
+      resetStyles,
       fontStyles,
       colorStyles,
       css`
@@ -191,12 +192,6 @@ export class KMapKnowledgeCard extends Connected {
         }
         :host([faded]) kmap-card {
           opacity: 0.0;
-        }
-        h2 {
-          font-size: 1.0rem;
-          line-height: 1.5rem;
-          font-weight: 500;
-          letter-spacing: .0125em;
         }
         .button {
           margin-left: 8px;

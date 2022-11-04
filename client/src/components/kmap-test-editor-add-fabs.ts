@@ -9,7 +9,7 @@ import '@material/mwc-fab';
 import '@material/mwc-textfield';
 import './validating-form';
 
-import {fontStyles, colorStyles} from "./kmap-styles";
+import {resetStyles, fontStyles, colorStyles} from "./kmap-styles";
 import {Test} from "../models/tests";
 import {Dialog} from "@material/mwc-dialog/mwc-dialog";
 import {ValidatingForm} from "./validating-form";
@@ -130,6 +130,7 @@ export class KMapTestEditorAddFabs extends Connected {
   static get styles() {
     // language=CSS
     return [
+      resetStyles,
       fontStyles,
       colorStyles,
       css`

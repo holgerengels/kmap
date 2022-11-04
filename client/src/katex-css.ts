@@ -3,8 +3,12 @@ import {css, CSSResult} from 'lit';
 // language=CSS
 export const katexStyles: CSSResult = css`
   .katex {
-    font: normal 1.21em KaTeX_Main, Times New Roman, serif;
-    line-height: 1.2;
+    font-weight: normal;
+    font-variant: normal;
+    font-style: normal;
+    font-family: KaTeX_Main, Times, New, Roman, serif;
+    font-size: 0.9375rem;
+    line-height: 1.2rem;
     text-indent: 0;
     text-rendering: auto;
   }

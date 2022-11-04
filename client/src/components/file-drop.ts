@@ -1,6 +1,7 @@
 import {LitElement, html, css} from 'lit';
 import {customElement, property, state} from 'lit/decorators.js';
 import '@material/mwc-icon';
+import {resetStyles} from "./kmap-styles";
 
 @customElement('file-drop')
 export class FileDrop extends LitElement {
@@ -81,6 +82,7 @@ export class FileDrop extends LitElement {
   static get styles() {
     // language=CSS
     return [
+      resetStyles,
       css`
         :host {
           display: inline-block;

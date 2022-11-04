@@ -11,7 +11,7 @@ import 'pwa-helper-components/pwa-update-available';
 import './datalist-textfield';
 import './validating-form';
 import {Dialog} from "@material/mwc-dialog/mwc-dialog";
-import {colorStyles, fontStyles} from "./kmap-styles";
+import {resetStyles, colorStyles, fontStyles} from "./kmap-styles";
 import {Instance} from "../models/instances";
 import {DatalistTextField} from "./datalist-textfield";
 
@@ -144,6 +144,7 @@ export class KMapLoginPopup extends Connected {
   static get styles() {
     // language=CSS
     return [
+      resetStyles,
       fontStyles,
       colorStyles,
       css`

@@ -8,7 +8,7 @@ import '@material/mwc-formfield';
 import '@material/mwc-radio';
 import '@material/mwc-textarea';
 import '@material/mwc-textfield';
-import {colorStyles, fontStyles} from "./kmap-styles";
+import {resetStyles, colorStyles, fontStyles} from "./kmap-styles";
 import {Dialog} from "@material/mwc-dialog/mwc-dialog";
 import {Radio} from "@material/mwc-radio/mwc-radio";
 
@@ -41,6 +41,7 @@ export class KMapFeedback extends LitElement {
   static get styles() {
     // language=CSS
     return [
+      resetStyles,
       fontStyles,
       colorStyles,
       css`

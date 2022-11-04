@@ -13,7 +13,7 @@ import '@material/mwc-slider';
 import '@material/mwc-top-app-bar';
 import '@material/mwc-top-app-bar';
 import '@material/menu-surface';
-import {colorStyles, elevationStyles, fontStyles} from "./kmap-styles";
+import {resetStyles, colorStyles, fontStyles} from "./kmap-styles";
 import {Subject} from "../models/subjects";
 
 @customElement('kmap-test-chooser')
@@ -88,9 +88,9 @@ export class KmapTestChooser extends Connected {
   static get styles() {
     // language=CSS
     return [
+      resetStyles,
       fontStyles,
       colorStyles,
-      elevationStyles,
       css`
         :host {
           display: contents;

@@ -1,9 +1,8 @@
-import {css, CSSResult, html, LitElement} from 'lit';
+import {css, html, LitElement} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 
-import {colorStyles, fontStyles} from "./kmap-styles";
+import {resetStyles, colorStyles, fontStyles} from "./kmap-styles";
 import '@material/mwc-icon';
-import {cardStyles} from "../mdc.card.css";
 
 @customElement('kmap-timeline-card')
 export class KMapTimelineCard extends LitElement {
@@ -16,18 +15,23 @@ export class KMapTimelineCard extends LitElement {
   static get styles() {
     // language=CSS
     return [
+      resetStyles,
       fontStyles,
       colorStyles,
-      cardStyles as CSSResult,
       css`
-        .mdc-card {
+        .card {
+          display: flex;
           margin: 6px 8px 6px 0px;
+          box-shadow: var(--elevation-02);
+          border-radius: 4px;
+          position: relative;
+          flex-direction: column;
         }
-        .mdc-card > * {
+        .card > * {
           display: block;
           margin: 12px
         }
-        .mdc-card *:not(:first-child) {
+        .card *:not(:first-child) {
           margin-top: 0px;
         }
         a.link {
@@ -56,7 +60,7 @@ export class KMapTimelineCard extends LitElement {
 
     // language=HTML
     return html`
-      <div class="mdc-card">
+      <div class="card">
         ${this.tops.map((top) => {
           switch (top[0]) {
             case 'card':

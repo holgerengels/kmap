@@ -3,7 +3,7 @@ import {customElement, property, state} from 'lit/decorators.js';
 import {State, store} from "../store";
 
 import '@material/mwc-button';
-import {colorStyles, fontStyles} from "./kmap-styles";
+import {resetStyles, colorStyles, fontStyles} from "./kmap-styles";
 import {Card} from "../models/types";
 import {Connected} from "./connected";
 
@@ -78,6 +78,7 @@ export class KMapBrowserChapterEditor extends Connected {
   static get styles() {
     // language=CSS
     return [
+      resetStyles,
       fontStyles,
       colorStyles,
       css`

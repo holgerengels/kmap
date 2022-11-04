@@ -23,7 +23,7 @@ import './components/kmap-exercise';
 import './components/kmap-timeline-selector';
 import './components/share-facebook';
 
-import {colorStyles, fontStyles} from "./components/kmap-styles";
+import {colorStyles, elevationStyles, fontStyles, resetStyles} from "./components/kmap-styles";
 import {Snackbar} from "@material/mwc-snackbar/mwc-snackbar";
 import {TopAppBar} from "@material/mwc-top-app-bar/mwc-top-app-bar";
 import {Meta} from "./models/shell";
@@ -273,8 +273,10 @@ export class KmapMain extends connect(store, LitElement) {
   static get styles() {
     // language=CSS
     return [
+      resetStyles,
       fontStyles,
       colorStyles,
+      elevationStyles,
       css`
       :host {
         display: contents;
@@ -313,6 +315,14 @@ export class KmapMain extends connect(store, LitElement) {
         flex-direction: row;
         align-items: center;
         justify-content: space-evenly;
+      }
+      .cc-fb > a {
+        line-height: 0;
+        box-shadow: var(--elevation-01);
+        transition: 200ms ease-in-out background-color, var(--elevation-transition);
+      }
+      .cc-fb > a:hover {
+        box-shadow: var(--elevation-03);
       }
       span[slot=subtitle] {
         display: flex;
@@ -482,10 +492,7 @@ export class KmapMain extends connect(store, LitElement) {
       <hr/>
       <!--googleon: all-->
       <div class="cc-fb">
-        <a class="license" rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/deed.de"><img width="88"
-                                                                                                           height="31"
-                                                                                                           src="/app/icons/cc-by-sa.png"
-                                                                                                           alt="CC BY-SA 4.0"></a>
+        <a class="license" rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/deed.de"><img width="88" height="31" src="/app/icons/cc-by-sa.png" alt="CC BY-SA 4.0"></a>
         <share-facebook></share-facebook>
       </div>
     `;

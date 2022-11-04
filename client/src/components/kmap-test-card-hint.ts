@@ -1,7 +1,7 @@
 import {LitElement, html, css} from 'lit';
 import {customElement, property, state} from 'lit/decorators.js';
 
-import {fontStyles, colorStyles, elevationStyles} from "./kmap-styles";
+import {resetStyles, fontStyles, colorStyles} from "./kmap-styles";
 import {unsafeHTML} from 'lit/directives/unsafe-html.js';
 import {math} from "../math";
 import {katexStyles} from "../katex-css";
@@ -43,21 +43,16 @@ export class KMapTestCardHint extends LitElement {
   static get styles() {
     // language=CSS
     return [
+      resetStyles,
       fontStyles,
       colorStyles,
       katexStyles,
-      elevationStyles,
       css`
         :host {
           display: contents;
         }
         #hint {
           padding: 8px 16px 0px 16px;
-          font-size: .875rem;
-          line-height: 1.25rem;
-          font-weight: 400;
-          letter-spacing: .0178571429em;
-          color: var(--color-darkgray);
         }
         slot {
           display: flex;

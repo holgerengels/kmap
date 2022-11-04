@@ -19,7 +19,7 @@ import { KmapHtmlEditor } from "kmap-html-editor";
 import './kmap-knowledge-card-description';
 import './file-drop';
 import './validating-form';
-import {colorStyles, fontStyles, formStyles} from "./kmap-styles";
+import {resetStyles, colorStyles, fontStyles, formStyles} from "./kmap-styles";
 
 import {Dialog} from "@material/mwc-dialog/mwc-dialog";
 import {TextArea} from "@material/mwc-textarea/mwc-textarea";
@@ -325,6 +325,7 @@ export class KMapEditorEditDialog extends Connected {
   static get styles() {
     // language=CSS
     return [
+      resetStyles,
       fontStyles,
       colorStyles,
       formStyles,

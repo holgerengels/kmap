@@ -1,7 +1,7 @@
 import {LitElement, html, css} from 'lit';
 import {customElement} from 'lit/decorators.js';
 import '@material/mwc-icon';
-import {fontStyles} from "./kmap-styles";
+import {resetStyles, fontStyles, elevationStyles} from "./kmap-styles";
 
 @customElement('share-facebook')
 export class ShareFacebook extends LitElement {
@@ -9,7 +9,9 @@ export class ShareFacebook extends LitElement {
   static get styles() {
     // language=CSS
     return [
+      resetStyles,
       fontStyles,
+      elevationStyles,
       css`
         :host {
           display: flex;
@@ -22,17 +24,20 @@ export class ShareFacebook extends LitElement {
           color: white;
           border-radius: 2px;
           cursor: pointer;
+          box-shadow: var(--elevation-01);
+          transition: 200ms ease-in-out background-color, var(--elevation-transition);
         }
         a:hover {
           background-color: #365899;
-          transition: 200ms ease-in-out background-color, 200ms ease-in-out box-shadow;
           text-decoration: none;
+          box-shadow: var(--elevation-03);
         }
         a:active {
           background-color: #29487d;
         }
         a:focus {
-          box-shadow: 0 0 1px 2px rgba(88, 144, 255, .75), 0 1px 1px rgba(0, 0, 0, .15);
+          box-shadow: var(--elevation-03);
+          outline: none;
         }
         a > * {
           margin: 2px 3px;

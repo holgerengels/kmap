@@ -1,11 +1,10 @@
-import {css, CSSResult, html, LitElement} from 'lit';
+import {css, html, LitElement} from 'lit';
 import {customElement, property, state} from 'lit/decorators.js';
 import {store} from "../store";
 
-import {colorStyles, fontStyles} from "./kmap-styles";
+import {resetStyles, colorStyles, fontStyles, elevationStyles} from "./kmap-styles";
 import '@material/mwc-icon-button';
 import './kmap-timeline-card';
-import {cardStyles} from "../mdc.card.css";
 import {iconPointInTime} from "./icons";
 import {Week} from "../models/courses";
 
@@ -79,9 +78,10 @@ export class KMapTimeline extends LitElement {
   static get styles() {
     // language=CSS
     return [
+      resetStyles,
       fontStyles,
       colorStyles,
-      cardStyles as CSSResult,
+      elevationStyles,
       css`
         :host {
           display: block;
@@ -121,11 +121,9 @@ export class KMapTimeline extends LitElement {
         }
         div.holidays {
           padding: 12px;
-          background-color: var(--color-lightgray);
-          box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 1px -1px, rgba(0, 0, 0, 0.14) 0px 1px 1px 0px, rgba(0, 0, 0, 0.12) 0px 1px 3px 0px;
-        }
-        div.holidays {
           margin: 8px 0px;
+          background-color: var(--color-lightgray);
+          box-shadow: var(--elevation-01);
         }
       `];
   }

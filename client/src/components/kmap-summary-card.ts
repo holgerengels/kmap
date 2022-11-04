@@ -10,7 +10,7 @@ import './kmap-summary-card-averages';
 import './kmap-summary-card-editor';
 import './kmap-summary-card-rating';
 import './kmap-summary-card-ratecolors';
-import {colorStyles, elevationStyles, fontStyles} from "./kmap-styles";
+import {resetStyles, colorStyles, elevationStyles, fontStyles} from "./kmap-styles";
 import {encodePath} from "../urls";
 import {Card} from "../models/types";
 
@@ -136,6 +136,7 @@ export class KMapSummaryCard extends Connected {
   static get styles() {
     // language=CSS
     return [
+      resetStyles,
       fontStyles,
       colorStyles,
       elevationStyles,
@@ -151,7 +152,7 @@ export class KMapSummaryCard extends Connected {
         kmap-card[selected] {
         }
         kmap-card[highlighted] {
-          box-shadow: 0px 3px 3px -2px rgba(0, 0, 0, 0.2),0px 3px 4px 0px rgba(0, 0, 0, 0.14),0px 1px 8px 0px rgba(0, 0, 0, 0.12);
+          box-shadow: var(--elevation-03);
         }
         kmap-card[grayedOut] {
           filter: grayscale(.5);

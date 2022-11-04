@@ -1,6 +1,6 @@
 import {LitElement, html, css, PropertyValues} from 'lit';
 import {customElement, property, state} from 'lit/decorators.js';
-import {colorStyles, elevationStyles, fontStyles} from "./kmap-styles";
+import {resetStyles, colorStyles, fontStyles} from "./kmap-styles";
 import {unsafeHTML} from 'lit/directives/unsafe-html.js';
 import {StyleInfo, styleMap} from 'lit/directives/style-map.js';
 import {katexStyles} from "../katex-css";
@@ -300,10 +300,10 @@ export class DndFillin extends LitElement implements TestInteraction {
   static get styles() {
     // language=CSS
     return [
+      resetStyles,
       fontStyles,
       colorStyles,
       katexStyles,
-      elevationStyles,
       css`
         :host {
           cursor: pointer;

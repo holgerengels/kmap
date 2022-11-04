@@ -7,7 +7,7 @@ import '@material/mwc-button';
 import '@material/mwc-icon';
 import '@material/mwc-icon-button';
 import './kmap-test-result-card';
-import {colorStyles, elevationStyles, fontStyles} from "./kmap-styles";
+import {resetStyles, colorStyles, fontStyles} from "./kmap-styles";
 import {TestResult} from "../models/tests";
 
 interface Summary {
@@ -112,9 +112,9 @@ export class KmapTestResults extends Connected {
   static get styles() {
     // language=CSS
     return [
+      resetStyles,
       fontStyles,
       colorStyles,
-      elevationStyles,
       css`
         :host {
           display: flex;

@@ -7,7 +7,7 @@ import {State} from "../store";
 import {StyleInfo, styleMap} from 'lit/directives/style-map.js';
 import '@material/mwc-icon';
 import './star-rating';
-import {colorStyles, fontStyles} from "./kmap-styles";
+import {resetStyles, colorStyles, fontStyles} from "./kmap-styles";
 import {TestResult} from "../models/tests";
 import {encodePath} from "../urls";
 
@@ -89,6 +89,7 @@ export class KMapTestResultCard extends Connected {
   static get styles() {
     // language=CSS
     return [
+      resetStyles,
       fontStyles,
       colorStyles,
       css`

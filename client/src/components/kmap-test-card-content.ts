@@ -2,10 +2,10 @@ import {LitElement, html, css, PropertyValues} from 'lit';
 import {customElement, property, query, state} from 'lit/decorators.js';
 
 import {urls} from '../urls';
-import {fontStyles, colorStyles} from "./kmap-styles";
+import {resetStyles, fontStyles, colorStyles} from "./kmap-styles";
+import {katexStyles} from "../katex-css";
 import {unsafeHTML} from 'lit/directives/unsafe-html.js';
 import {math} from "../math";
-import {katexStyles} from "../katex-css";
 
 import './dnd-assign';
 import './dnd-fillin';
@@ -188,40 +188,28 @@ export class KMapTestCardContent extends LitElement {
   static get styles() {
     // language=CSS
     return [
+      resetStyles,
       fontStyles,
       colorStyles,
       katexStyles,
       css`
-        .katex { font-size: 1.2em; }
         :host {
           padding: 8px 16px;
           transition: background-color .5s ease-in-out;
           display: flex;
           flex-direction: row;
           flex-wrap: wrap;
-          font-family: Roboto,sans-serif;
-          -webkit-font-smoothing: antialiased;
-          font-size: 0.95rem;
-          font-weight: 400;
+          gap: 16px;
         }
         img {
           max-width: calc(var(--content-width, 100vw) - 64px);
         }
-        #question {
-          margin-right: 16px;
-        }
-        #question, #answer {
-          font-size: .875rem;
-          line-height: 1.25rem;
-          font-weight: 400;
-          letter-spacing: .0178571429em;
-          color: var(--color-darkgray);
-        }
         input {
-          margin: 0.5em;
+          vertical-align: text-bottom;
           outline: 3px solid transparent;
           transition: outline-color .5s ease-in-out;
           height: 1.3em;
+          border: 1px solid var(--color-mediumgray);
         }
         kmap-solve-tree, kmap-jsxgraph {
           outline: 3px solid transparent;

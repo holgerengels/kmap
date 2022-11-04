@@ -3,7 +3,7 @@ import {customElement, state} from 'lit/decorators.js';
 import {Connected} from "./connected";
 import {State, store} from "../store";
 
-import {colorStyles, elevationStyles, fontStyles} from "./kmap-styles";
+import {resetStyles, colorStyles, fontStyles} from "./kmap-styles";
 
 import '@material/mwc-icon';
 import '@material/mwc-icon-button';
@@ -115,9 +115,9 @@ export class KMapContentManagerInstances extends Connected {
   static get styles() {
     // language=CSS
     return [
+      resetStyles,
       fontStyles,
       colorStyles,
-      elevationStyles,
       css`
         :host {
           display: contents;

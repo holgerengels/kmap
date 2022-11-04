@@ -6,7 +6,7 @@ import {State, store} from "../store";
 import './kmap-timeline';
 import {Timeline, Week} from "../models/courses";
 import {KMapTimeline} from "./kmap-timeline";
-import {elevationStyles} from "./kmap-styles";
+import {resetStyles, fontStyles, colorStyles} from "./kmap-styles";
 
 @customElement('kmap-timeline-aside')
 export class KMapTimelineAside extends Connected {
@@ -90,14 +90,18 @@ export class KMapTimelineAside extends Connected {
   static get styles() {
     // language=CSS
     return [
-      elevationStyles,
+      resetStyles,
+      fontStyles,
+      colorStyles,
       css`
         :host {
           display: flex;
           background-color: white;
+          box-shadow: var(--elevation-01);
         }
         aside {
           display: grid;
+          width: 100%;
         }
         label, kmap-timeline {
           transition: opacity .7s ease-in-out;

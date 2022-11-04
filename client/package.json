@@ -32,8 +32,8 @@
     "rollup-plugin-copy": "^3.4.0",
     "rollup-plugin-workbox": "^6.2.0",
     "source-map-explorer": "^2.5.2",
-    "tslib": "^2.4.0",
-    "typescript": "~4.7.4"
+    "tslib": "^2.4.1",
+    "typescript": "~4.8.4"
   },
   "browserslist": [
     "last 1 version",
@@ -78,21 +78,21 @@
     "@material/mwc-top-app-bar": "^0.26.1",
     "@material/mwc-top-app-bar-fixed": "^0.26.1",
     "asciimath2tex": "^1.4.0",
-    "firebase": "^9.8.4",
-    "jsxgraph": "^1.4.4",
+    "firebase": "^9.13.0",
+    "jsxgraph": "^1.4.6",
     "katex": "^0.16.0",
-    "kmap-ascii-math": "^0.9.13",
-    "kmap-html-editor": "^0.9.9",
-    "kmap-jsxgraph": "^0.9.8",
-    "kmap-solve-tree": "^0.9.13",
-    "kmap-term-tree": "^0.9.18",
-    "lit": "^2.2.7",
+    "kmap-ascii-math": "^0.9.15",
+    "kmap-html-editor": "^0.9.10",
+    "kmap-jsxgraph": "^0.9.10",
+    "kmap-solve-tree": "^0.9.15",
+    "kmap-term-tree": "^0.9.19",
+    "lit": "^2.4.0",
     "pwa-helper-components": "^0.2.10",
     "pwa-helpers": "^0.9.1",
     "reselect": "^4.1.6",
     "resize-observer-polyfill": "^1.5.1",
     "web-animations-js": "^2.3.2",
-    "workbox-broadcast-update": "^6.5.3",
-    "workbox-core": "^6.5.3"
+    "workbox-broadcast-update": "^6.5.4",
+    "workbox-core": "^6.5.4"
   }
 }

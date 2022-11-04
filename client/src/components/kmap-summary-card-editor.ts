@@ -4,7 +4,7 @@ import {Connected} from "./connected";
 import {State, store} from "../store";
 
 import '@material/mwc-button';
-import {colorStyles, fontStyles} from "./kmap-styles";
+import {resetStyles, colorStyles, fontStyles} from "./kmap-styles";
 import {Module} from "../models/contentMaps";
 import {Card} from "../models/types";
 
@@ -65,6 +65,7 @@ export class KMapSummaryCardEditor extends Connected {
   static get styles() {
     // language=CSS
     return [
+      resetStyles,
       fontStyles,
       colorStyles,
       css`

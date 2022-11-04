@@ -13,7 +13,7 @@ import './datalist-textfield';
 import {Dialog} from "@material/mwc-dialog/mwc-dialog";
 import {Instance} from "../models/instances";
 import {DatalistTextField} from "./datalist-textfield";
-import {colorStyles, fontStyles} from "./kmap-styles";
+import {resetStyles, colorStyles, fontStyles} from "./kmap-styles";
 
 @customElement('kmap-instance-popup')
 export class KMapInstancePopup extends Connected {
@@ -89,6 +89,7 @@ export class KMapInstancePopup extends Connected {
   static get styles() {
     // language=CSS
     return [
+      resetStyles,
       fontStyles,
       colorStyles,
       css`

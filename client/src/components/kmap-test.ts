@@ -9,7 +9,7 @@ import './kmap-test-chooser';
 import './kmap-test-exercise';
 import './kmap-test-results';
 import './kmap-test-editor-scroller';
-import {colorStyles, fontStyles} from "./kmap-styles";
+import {resetStyles, colorStyles, fontStyles} from "./kmap-styles";
 
 @customElement('kmap-test')
 export class KmapTest extends Connected {
@@ -66,6 +66,7 @@ export class KmapTest extends Connected {
   static get styles() {
     // language=CSS
     return [
+      resetStyles,
       fontStyles,
       colorStyles,
       css`

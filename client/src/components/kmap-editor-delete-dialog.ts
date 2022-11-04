@@ -5,7 +5,7 @@ import {State, store} from "../store";
 
 import '@material/mwc-button';
 import '@material/mwc-dialog';
-import {colorStyles, fontStyles} from "./kmap-styles";
+import {resetStyles, colorStyles, fontStyles} from "./kmap-styles";
 import {Dialog} from "@material/mwc-dialog/mwc-dialog";
 import {Card} from "../models/types";
 
@@ -56,6 +56,7 @@ export class KMapEditorDeleteDialog extends Connected {
   static get styles() {
     // language=CSS
     return [
+      resetStyles,
       fontStyles,
       colorStyles,
       css`

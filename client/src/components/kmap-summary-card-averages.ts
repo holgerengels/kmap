@@ -2,6 +2,7 @@ import {html, css} from 'lit';
 import {customElement, property, state} from 'lit/decorators.js';
 import {Connected} from "./connected";
 import {State} from "../store";
+import {colorStyles, fontStyles, resetStyles} from "./kmap-styles";
 
 @customElement('kmap-summary-card-averages')
 export class KMapSummaryCardAverages extends Connected {
@@ -62,6 +63,9 @@ export class KMapSummaryCardAverages extends Connected {
   static get styles() {
     // language=CSS
     return [
+      resetStyles,
+      fontStyles,
+      colorStyles,
       css`
         :host {
           display: block;

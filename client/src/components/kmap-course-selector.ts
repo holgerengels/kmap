@@ -6,7 +6,7 @@ import {State, store} from "../store";
 import '@material/mwc-icon';
 import '@material/mwc-list/mwc-list';
 import '@material/mwc-list/mwc-list-item';
-import {fontStyles, colorStyles} from "./kmap-styles";
+import {resetStyles, fontStyles, colorStyles} from "./kmap-styles";
 import {Course} from "../models/courses";
 
 @customElement('kmap-course-selector')
@@ -38,6 +38,7 @@ export class KMapCourseSelector extends Connected {
   static get styles() {
     // language=CSS
     return [
+      resetStyles,
       fontStyles,
       colorStyles,
       css`

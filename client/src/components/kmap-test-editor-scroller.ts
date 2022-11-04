@@ -3,7 +3,7 @@ import {customElement, state} from 'lit/decorators.js';
 import {Connected} from "./connected";
 import {State, store} from "../store";
 
-import {fontStyles, colorStyles, elevationStyles} from "./kmap-styles";
+import {resetStyles, fontStyles, colorStyles} from "./kmap-styles";
 import './kmap-test-card';
 import {Test} from "../models/tests";
 
@@ -51,9 +51,9 @@ export class KMapTestEditorScroller extends Connected {
   static get styles() {
     // language=CSS
     return [
+      resetStyles,
       fontStyles,
       colorStyles,
-      elevationStyles,
       css`
         .box {
           overflow: auto;

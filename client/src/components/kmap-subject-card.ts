@@ -4,6 +4,7 @@ import {customElement, property, state} from 'lit/decorators.js';
 import {Subject} from "../models/subjects";
 import './kmap-card';
 import {StyleInfo, styleMap} from 'lit/directives/style-map.js';
+import {resetStyles, colorStyles, fontStyles} from "./kmap-styles";
 
 @customElement('kmap-subject-card')
 export class KMapSubjectCard extends LitElement {
@@ -76,11 +77,15 @@ export class KMapSubjectCard extends LitElement {
 
   static get styles() {
     // language=CSS
-    return css`
+    return [
+      resetStyles,
+      fontStyles,
+      colorStyles,
+      css`
       kmap-card {
         width: 300px;
       }
-    `;
+    `];
   }
 
 

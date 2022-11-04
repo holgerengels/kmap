@@ -4,7 +4,7 @@ import {Connected} from "./connected";
 import {State} from "../store";
 
 import '@material/mwc-icon';
-import {fontStyles, colorStyles} from "./kmap-styles";
+import {resetStyles, fontStyles, colorStyles, elevationStyles} from "./kmap-styles";
 
 @customElement('kmap-login-button')
 export class KMapLoginButton extends Connected {
@@ -36,8 +36,10 @@ export class KMapLoginButton extends Connected {
   static get styles() {
     // language=CSS
     return [
+      resetStyles,
       fontStyles,
       colorStyles,
+      elevationStyles,
       css`
         :host {
           display: inline-block;
@@ -57,8 +59,11 @@ export class KMapLoginButton extends Connected {
           width: 36px;
           border-radius: 50%;
           color: black;
-          font-size: 0.95rem;
           background-color: var(--color-secondary);
+          box-shadow: var(--elevation-02);
+          transition: var(--elevation-transition);
+        }
+        .fab:hover {
           box-shadow: var(--elevation-06);
         }
         .fab > * {

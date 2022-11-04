@@ -10,7 +10,7 @@ import '@material/mwc-formfield';
 import '@material/mwc-slider';
 import '@material/mwc-top-app-bar';
 import './kmap-exercise-card';
-import {colorStyles, fontStyles} from "./kmap-styles";
+import {resetStyles, colorStyles, fontStyles} from "./kmap-styles";
 import {Test} from "../models/tests";
 import {encodePath} from "../urls";
 
@@ -34,6 +34,7 @@ export class KMapExercise extends Connected {
   static get styles() {
     // language=CSS
     return [
+      resetStyles,
       fontStyles,
       colorStyles,
       css`

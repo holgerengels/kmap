@@ -4,7 +4,7 @@ import {Connected, store} from "./connected";
 import {State} from "../store";
 
 import {encodePath} from '../urls';
-import {fontStyles, colorStyles} from "./kmap-styles";
+import {resetStyles, fontStyles, colorStyles} from "./kmap-styles";
 import '@material/mwc-icon';
 import '@material/mwc-button';
 import "./kmap-card";
@@ -108,6 +108,7 @@ export class KMapRandomTestCard extends Connected {
   static get styles() {
     // language=CSS
     return [
+      resetStyles,
       fontStyles,
       colorStyles,
       css`

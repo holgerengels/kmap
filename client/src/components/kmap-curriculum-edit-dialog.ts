@@ -1,4 +1,4 @@
-import {css, CSSResult, html} from 'lit';
+import {css, html} from 'lit';
 import {customElement, property, query, state} from 'lit/decorators.js';
 import {Connected} from "./connected";
 import {State} from "../store";
@@ -17,8 +17,7 @@ import '@material/mwc-tab-bar';
 import '@material/mwc-textarea';
 import '@material/mwc-textfield';
 import './validating-form';
-import {colorStyles, fontStyles, formStyles} from "./kmap-styles";
-import {cardStyles} from "../mdc.card.css";
+import {resetStyles, colorStyles, fontStyles, formStyles} from "./kmap-styles";
 
 import {Week} from "../models/courses";
 import {Dialog} from "@material/mwc-dialog/mwc-dialog";
@@ -294,10 +293,10 @@ export class KMapCurriculumEditDialog extends Connected {
 
   // language=CSS
   static styles = [
+    resetStyles,
     fontStyles,
     colorStyles,
     formStyles,
-    cardStyles as CSSResult,
     css`
       mwc-dialog {
         --mdc-dialog-min-width: 810px;
@@ -321,11 +320,22 @@ export class KMapCurriculumEditDialog extends Connected {
       .weeks {
         scroll-snap-type: y mandatory;
       }
-      .mdc-card {
+      .card {
         scroll-snap-align: start;
         display: grid;
         margin: 8px 0px;
         padding: 12px;
+        box-shadow: var(--elevation-02);
+        border-radius: 4px;
+        position: relative;
+        flex-direction: column;
+      }
+      .card > * {
+        display: block;
+        margin: 12px
+      }
+      .card *:not(:first-child) {
+        margin-top: 0px;
       }
       [hidden] {
         display: none;
@@ -391,7 +401,7 @@ export class KMapCurriculumEditDialog extends Connected {
     if (i === this._selectedIndex)
       return html`
         <validating-form id="topForm" @validity="${e => this._weekValid = e.target.valid}">
-          <div class="form mdc-card week_editor" type="${this._weekType}">
+          <div class="form card week_editor" type="${this._weekType}">
             <mwc-icon-button-toggle onIcon="school" offIcon="beach_access" ?on="${this._weekType === 'school'}" @icon-button-toggle-change="${e => this._weekType = e.detail.isOn ? 'school' : 'holidays'}" ?disabled="${this._weekType === 'preconds'}"></mwc-icon-button-toggle>
             <mwc-textfield id="cw" type="text" label="KW" .value="${this._weekCW}" @change="${e => this._weekCW = e.target.value}" ?disabled="${this._weekType === 'preconds'}"></mwc-textfield>
             <mwc-textfield id="sw" type="text" label="SW" ?hidden="${this._weekType === 'holidays'}" .value="${this._weekSW}" @change="${e => this._weekSW = e.target.value}"  ?disabled="${this._weekType === 'preconds'}"></mwc-textfield>
@@ -403,13 +413,13 @@ export class KMapCurriculumEditDialog extends Connected {
       `;
     if (week.sw === undefined)
       return html`
-        <div class="form mdc-card" style="grid-template-columns: 1fr" @click="${() => this._selectedIndex = this._selectedIndex === i ? -1 : i}">
+        <div class="form card" style="grid-template-columns: 1fr" @click="${() => this._selectedIndex = this._selectedIndex === i ? -1 : i}">
           <div>KW ${week.cw} ${week.holidays}</div>
         </div>
       `;
     else if (week.sw === 0)
       return html`
-        <div class="form mdc-card" style="grid-template-columns: 102px 1fr" @click="${() => this._selectedIndex = this._selectedIndex === i ? -1 : i}">
+        <div class="form card" style="grid-template-columns: 102px 1fr" @click="${() => this._selectedIndex = this._selectedIndex === i ? -1 : i}">
           <div>Check-in</div>
           <div>
             ${week.tops?.map(t => html`<b>${t[0]}:</b> ${t[1]}<br/>`)}
@@ -418,7 +428,7 @@ export class KMapCurriculumEditDialog extends Connected {
       `;
     else
       return html`
-        <div class="form mdc-card" style="grid-template-columns: 102px 1fr 40px" @click="${() => this._selectedIndex = this._selectedIndex === i ? -1 : i}">
+        <div class="form card" style="grid-template-columns: 102px 1fr 40px" @click="${() => this._selectedIndex = this._selectedIndex === i ? -1 : i}">
           <div>KW ${week.cw} SW ${week.sw}</div>
           <div>
             ${week.tops?.map(t => html`<b>${t[0]}:</b> ${t[1]}<br/>`)}

@@ -1,6 +1,6 @@
 import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
-import {colorStyles, fontStyles} from "./kmap-styles";
+import {resetStyles, colorStyles, fontStyles} from "./kmap-styles";
 
 @customElement('kmap-knowledge-card-summary')
 export class KMapKnowledgeCardSummary extends LitElement {
@@ -11,6 +11,7 @@ export class KMapKnowledgeCardSummary extends LitElement {
   static get styles() {
     // language=CSS
     return [
+      resetStyles,
       fontStyles,
       colorStyles,
       css`

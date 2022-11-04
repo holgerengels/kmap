@@ -7,7 +7,7 @@ import '@material/mwc-button';
 import '@material/mwc-dialog';
 import '@material/mwc-textfield';
 import './validating-form';
-import {colorStyles, fontStyles} from "./kmap-styles";
+import {resetStyles, colorStyles, fontStyles} from "./kmap-styles";
 import {Dialog} from "@material/mwc-dialog/mwc-dialog";
 import {Test} from "../models/tests";
 
@@ -73,6 +73,7 @@ export class KMapTestEditorRenameDialog extends Connected {
   static get styles() {
     // language=CSS
     return [
+      resetStyles,
       fontStyles,
       colorStyles,
       css`

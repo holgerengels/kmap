@@ -4,7 +4,7 @@ import {urls} from '../urls';
 
 import '@material/mwc-icon';
 import {Attachment} from "../models/types";
-import {fontStyles} from "./kmap-styles";
+import {resetStyles, fontStyles} from "./kmap-styles";
 import {unsafeHTML} from "lit/directives/unsafe-html.js";
 
 @customElement('kmap-knowledge-card-attachment')
@@ -72,6 +72,7 @@ export class KMapKnowledgeCardAttachment extends LitElement {
   static get styles() {
     // language=CSS
     return [
+      resetStyles,
       fontStyles,
       css`
         p {

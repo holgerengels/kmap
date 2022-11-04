@@ -5,7 +5,7 @@ import {State, store} from "../store";
 
 import '@material/mwc-list/mwc-list';
 import '@material/mwc-list/mwc-list-item';
-import {fontStyles, colorStyles} from "./kmap-styles";
+import {resetStyles, fontStyles, colorStyles} from "./kmap-styles";
 import {Module} from "../models/contentMaps";
 
 @customElement('kmap-module-selector')
@@ -36,6 +36,7 @@ export class KMapModuleSelector extends Connected {
   static get styles() {
     // language=CSS
     return [
+      resetStyles,
       fontStyles,
       colorStyles,
       css`

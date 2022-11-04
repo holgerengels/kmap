@@ -3,7 +3,7 @@ import {customElement, query, state} from 'lit/decorators.js';
 import {Connected} from "./connected";
 import {State, store} from "../store";
 
-import {colorStyles, fontStyles} from "./kmap-styles";
+import {resetStyles, colorStyles, fontStyles} from "./kmap-styles";
 
 import '@material/mwc-button';
 import '@material/mwc-dialog';
@@ -49,6 +49,7 @@ export class KMapTestEditorDeleteDialog extends Connected {
   static get styles() {
     // language=CSS
     return [
+      resetStyles,
       fontStyles,
       colorStyles,
       css`
