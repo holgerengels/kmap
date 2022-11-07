@@ -54,13 +54,17 @@ export class KMapTestCardsolution extends LitElement {
         #solution {
           padding: 8px 16px 0px 16px;
         }
+        slot {
+          display: flex;
+          justify-content: flex-end;
+        }
       `];
   }
 
   render() {
     return html`
       <div id="solution">
-        <div>${unsafeHTML(this._solution)}</div>
+        <p>${unsafeHTML(this._solution)}</p>
         <slot></slot>
       </div>
     `;

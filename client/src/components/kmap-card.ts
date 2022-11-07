@@ -272,6 +272,7 @@ export class KMapCardDivider extends LitElement {
   static get styles() {
     // language=CSS
     return [
+      resetStyles,
       css`
         hr {
           width: calc(100% - 32px);
@@ -297,12 +298,14 @@ export class KMapCardSpacer extends LitElement {
 
   static get styles() {
     // language=CSS
-    return css`
+    return [
+      resetStyles,
+      css`
         :host {
           display: block;
           height: 8px;
         }
-      `;
+      `];
   }
 
   render() {
@@ -325,7 +328,9 @@ export class KMapCardActions extends LitElement {
 
   static get styles() {
     // language=CSS
-    return css`
+    return [
+      resetStyles,
+      css`
         :host {
           display: flex;
           flex-direction: row;
@@ -347,7 +352,7 @@ export class KMapCardActions extends LitElement {
           align-items: center;
           justify-content: flex-end;
         }
-      `;
+      `];
   }
 
   render() {
