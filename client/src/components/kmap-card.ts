@@ -236,24 +236,26 @@ export class KMapCardText extends LitElement {
 
   static get styles() {
     // language=CSS
-    return css`
+    return [
+      resetStyles,
+      css`
         :host {
           font-family: Roboto, sans-serif;
           padding-left: 16px;
           padding-right: 16px;
         }
-        div[type=header] {
-          font-size: 1.0rem;
+        div[type=header], div[type=header]::slotted(*)  {
+          font-size: 0.9375rem;
           line-height: 1.5rem;
           font-weight: 500;
         }
-        div[type=subheader], div[type=content] {
+        div[type=subheader], div[type=subheader]::slotted(*), div[type=content], div[type=content]::slotted(*) {
           font-size: 0.875rem;
           line-height: 1.25rem;
           font-weight: 400;
           color: var(--color-darkgray);
         }
-      `;
+      `];
   }
 
   render() {

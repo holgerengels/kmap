@@ -8,7 +8,7 @@ export const resetStyles: CSSResult = css`
   :host {
     font-family: Roboto, sans-serif;
     -webkit-font-smoothing: antialiased;
-    font-size: 0.90rem;
+    font-size: 0.875rem;
   }
 `;
 
@@ -74,7 +74,7 @@ sup {
 figcaption {
   font-family: Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
-  font-size: 0.80rem;
+  font-size: 0.8125rem;
   font-weight: 400;
 }
 a {
@@ -99,7 +99,7 @@ optgroup,
 select,
 textarea {
   font-family: inherit;
-  font-size: 0.90rem;
+  font-size: 0.875rem;
   line-height: 1.2rem;
   margin: 0;
 }

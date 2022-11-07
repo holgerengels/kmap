@@ -382,13 +382,13 @@ export class KMapBrowser extends Connected {
               <a href="/app/browser/${encodePath(this._subject, backlink)}" title="Wissenslandkarte ${backlink}">${backlink}</a>&nbsp;
             `)}
           </kmap-card-text>
-          <kmap-card-spacer></kmap-card-spacer>
         ` : html`
           <kmap-card-text class="print-hide" type="header">
             <b>&#8598;&#xFE0E;</b> <a href="/app/" title="Startseite">Startseite</a>
           </kmap-card-text>
         ` }
         ${this._chapterCard.dependencies ? html`
+          <kmap-card-spacer></kmap-card-spacer>
           <kmap-card-text class="depends">
             <b>Voraussetzung für das Kapitel ${this._chapter}:</b> ${this._chapterCard.dependencies.map((depend) => html`
               <a href="/app/browser/${encodePath(this._subject, ...depend.split('/'))}" title="${(depend.includes('/') ? 'Wissenskarte ': 'Wissenslandkarte ') + depend}">${depend.replace(/\//, " → ")}</a>
@@ -400,7 +400,6 @@ export class KMapBrowser extends Connected {
           <kmap-card-text>
             ${this._chapterCard.summary}
           </kmap-card-text>
-          <kmap-card-spacer></kmap-card-spacer>
         ` : '' }
         ${this._layers.includes('editor') ? html`
           <kmap-card-text>
