@@ -1,8 +1,8 @@
-import {LitElement, html, css, PropertyValues} from 'lit';
+import {css, html, LitElement, PropertyValues} from 'lit';
 import {customElement, property, query, state} from 'lit/decorators.js';
 
 import {urls} from '../urls';
-import {resetStyles, fontStyles, colorStyles} from "./kmap-styles";
+import {colorStyles, fontStyles, resetStyles} from "./kmap-styles";
 import {katexStyles} from "../katex-css";
 import {unsafeHTML} from 'lit/directives/unsafe-html.js';
 import {math} from "../math";
@@ -94,6 +94,7 @@ export class KMapTestCardContent extends LitElement {
     for (var i = 0; i < inputs.length; i++) {
       var input: HTMLInputElement = inputs[i];
       input.removeAttribute("correctness");
+      input.setAttribute("empty", "")
       if (input.type === "checkbox")
         input.checked = false;
       else
@@ -185,6 +186,22 @@ export class KMapTestCardContent extends LitElement {
     return value;
   }
 
+  private _input(e) {
+    const input = e.path[0];
+    if (input.tagName === "INPUT") {
+      if (input.type === "text")
+        if (input.value === "")
+          input.setAttribute("empty", "")
+        else
+          input.removeAttribute("empty")
+      else if (input.type === "checkbox")
+        if (!input.checked)
+          input.setAttribute("empty", "")
+        else
+          input.removeAttribute("empty")
+      input.removeAttribute("correctness");
+    }
+  }
   static get styles() {
     // language=CSS
     return [
@@ -204,21 +221,28 @@ export class KMapTestCardContent extends LitElement {
         img {
           max-width: calc(var(--content-width, 100vw) - 64px);
         }
-        input {
-          vertical-align: text-bottom;
+        input[type=checkbox] {
+          vertical-align: middle;
           outline: 3px solid transparent;
           transition: outline-color .5s ease-in-out;
-          height: 1.3em;
-          border: 1px solid var(--color-mediumgray);
+        }
+        input[type=text] {
+          vertical-align: middle;
+          outline: 3px solid transparent;
+          transition: outline-color .5s ease-in-out;
+          height: 1.4em;
+          border: 1px solid var(--color-lightergray);
+          border-radius: 2px;
+          padding: 2px 4px;
         }
         kmap-solve-tree, kmap-jsxgraph {
           outline: 3px solid transparent;
         }
-        *[correctness=correct] {
-          outline-color: var(--color-green);
+        *[correctness=correct]:not([empty]) {
+          outline-color: rgba(var(--color-green-num), .7) !important;
         }
         *[correctness=incorrect] {
-          outline-color: var(--color-red);
+          outline-color: rgba(var(--color-red-num), .7) !important;
         }
       `];
   }
@@ -226,7 +250,7 @@ export class KMapTestCardContent extends LitElement {
   render() {
     return html`
       <div id="question" style="${this._questionFlex}">${unsafeHTML(this._question)}</div>
-      <div id="answer" style="${this._answerFlex}">${unsafeHTML(this._answer)}</div>
+      <div id="answer" style="${this._answerFlex}" @input="${this._input}">${unsafeHTML(this._answer)}</div>
     `;
   }
 }

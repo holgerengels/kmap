@@ -201,12 +201,11 @@ export class KMapTestCard extends Connected {
         }
 
         .blink {
-          animation: blinker .2s ease-in-out 2;
+          animation: blinker .25s ease-in-out 2;
         }
         @keyframes blinker {
-          70% {
-            text-shadow: 1px 1px 4px var(--color-darkgray);
-            transform: scale(1.1);
+          50% {
+            transform: scale(1.2);
             color: var(--color-secondary-dark)
           }
         }

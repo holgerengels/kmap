@@ -1,5 +1,5 @@
 import {html, css, PropertyValues} from 'lit';
-import {customElement, query, state} from 'lit/decorators.js';
+import {customElement, property, query, state} from 'lit/decorators.js';
 import {Connected} from "./connected";
 import {State, store} from "../store";
 
@@ -31,8 +31,13 @@ export class KmapTestExercise extends Connected {
   // @ts-ignore
   private _testCard: KMapTestCard;
 
+  @property({reflect: true, type: Boolean})
+  // @ts-ignore
+  private wide: boolean = false;
+
   mapState(state: State) {
     return {
+      wide: !state.shell.narrow,
       _order: state.tests.order,
       _allTests: state.tests.tests,
     };
@@ -114,7 +119,7 @@ export class KmapTestExercise extends Connected {
         :host {
           display: flex;
         }
-        kmap-test-card {
+        :host([wide]) kmap-test-card {
           margin: 16px;
         }
       `];
