@@ -107,10 +107,10 @@ export class KMapTestResultCard extends Connected {
           padding-right: 16px;
         }
         .correct {
-          color: var(--color-green);
+          color: rgba(var(--color-green-num), .7);
         }
         .wrong {
-          color: var(--color-red);
+          color: rgba(var(--color-red-num), .7);
         }
       `];
   }

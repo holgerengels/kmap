@@ -10,6 +10,7 @@ import './kmap-test-exercise';
 import './kmap-test-results';
 import './kmap-test-editor-scroller';
 import {resetStyles, colorStyles, fontStyles} from "./kmap-styles";
+import {encodePath} from "../urls";
 
 @customElement('kmap-test')
 export class KmapTest extends Connected {
@@ -21,6 +22,12 @@ export class KmapTest extends Connected {
   private _noRoute?: string = 'chooser';
   @state()
   private _results: string[] = [];
+  @state()
+  private _subject: string = '';
+  @state()
+  private _chapter: string = '';
+  @state()
+  private _topic: string = '';
 
   set route(val: RoutingState<string>) {
     if (val.page === "test") {
@@ -37,6 +44,9 @@ export class KmapTest extends Connected {
   mapState(state: State) {
     return {
       route: state.routing,
+      _subject: state.tests.subject,
+      _chapter: state.tests.chapter,
+      _topic: state.tests.topic,
       _layers: state.shell.layers,
       _results: state.tests.results,
     };
@@ -56,7 +66,7 @@ export class KmapTest extends Connected {
   }
 
   _goBack() {
-    store.dispatch.routing.back();
+    store.dispatch.routing.push('/app/browser/' + encodePath(this._subject, this._chapter));
   }
 
   _goResults() {
@@ -116,7 +126,7 @@ export class KmapTest extends Connected {
         `}
       </div>
       <div class="buttons">
-        <mwc-button ?hidden="${this._page !== 'exercise'}" @click="${this._goBack}">Zurück</mwc-button>
+        ${!this._topic ? html`<mwc-button ?hidden="${this._page !== 'exercise'}" @click="${this._goBack}">&#8598;&#xFE0E; ${this._chapter}</mwc-button>` : ''}
         <div style="flex: 1 0 auto"></div>
         <mwc-button ?hidden="${this._page === 'results' || this._results.length === 0}" @click="${this._goResults}">Auswertung</mwc-button>
       </div>

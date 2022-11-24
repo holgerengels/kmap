@@ -270,11 +270,11 @@ export class DndAssign extends LitElement implements TestInteraction{
         }
         [correct] {
           outline-style: solid;
-          outline-color: var(--color-green);
+          outline-color: rgba(var(--color-green-num), .7);
         }
         [incorrect] {
           outline-style: solid;
-          outline-color: var(--color-red);
+          outline-color: rgba(var(--color-red-num), .7);
         }
         slot {
           display: none;
