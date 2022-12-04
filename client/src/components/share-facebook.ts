@@ -19,7 +19,10 @@ export class ShareFacebook extends LitElement {
         }
         a {
           display: flex;
+          align-items: center;
           width: fit-content;
+          padding: 4px 8px;
+          gap: 8px;
           background-color: #4267b2;
           color: white;
           border-radius: 2px;
@@ -39,9 +42,6 @@ export class ShareFacebook extends LitElement {
           box-shadow: var(--elevation-03);
           outline: none;
         }
-        a > * {
-          margin: 2px 3px;
-        }
       `];
   }
 
@@ -52,7 +52,7 @@ export class ShareFacebook extends LitElement {
   render() {
     //language=HTML
     return html`
-      <a href="${this._href()}" title="Auf Facebook teilen"><img src="icons/facebook.svg" width="16" height="16" alt="f"/><h6>teilen</h6></a>
+      <a href="${this._href()}" title="Auf Facebook teilen"><img src="icons/facebook.svg" width="16" height="16" alt="f"/><label>teilen</label></a>
     `;
   }
 }
