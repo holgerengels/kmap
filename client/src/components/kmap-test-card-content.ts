@@ -187,7 +187,7 @@ export class KMapTestCardContent extends LitElement {
   }
 
   private _input(e) {
-    const input = e.path[0];
+    const input = e.target;
     if (input.tagName === "INPUT") {
       if (input.type === "text")
         if (input.value === "")
