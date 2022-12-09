@@ -21,7 +21,7 @@ export class ShareFacebook extends LitElement {
           display: flex;
           align-items: center;
           width: fit-content;
-          padding: 4px 8px;
+          padding: 4px 8px 4px 6px;
           gap: 8px;
           background-color: #4267b2;
           color: white;
