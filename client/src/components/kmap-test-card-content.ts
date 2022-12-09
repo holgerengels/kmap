@@ -190,18 +190,20 @@ export class KMapTestCardContent extends LitElement {
     const input = e.target;
     if (input.tagName === "INPUT") {
       if (input.type === "text")
-        if (input.value === "")
-          input.setAttribute("empty", "")
-        else
-          input.removeAttribute("empty")
+        this.booleanAttribute(input, "empty", input.value === "");
       else if (input.type === "checkbox")
-        if (!input.checked)
-          input.setAttribute("empty", "")
-        else
-          input.removeAttribute("empty")
+        this.booleanAttribute(input, "empty", !input.checked);
       input.removeAttribute("correctness");
     }
   }
+
+  private booleanAttribute(element, name, bool) {
+    if (bool)
+      element.setAttribute(name, "")
+    else
+      element.removeAttribute(name)
+  }
+
   static get styles() {
     // language=CSS
     return [

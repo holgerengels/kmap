@@ -77,10 +77,7 @@ export class DndFillin extends LitElement implements TestInteraction {
         this._dragElements.forEach((d, i) => {
           d.innerHTML = "";
           d.appendChild(this.createItemWrapper(this._drags[i]));
-          if (this._drags[i])
-            d.setAttribute("occupied", '');
-          else
-            d.removeAttribute("occupied");
+          this.booleanAttribute(d, "occupied", this._drags[i])
         });
       });
     }
@@ -89,10 +86,7 @@ export class DndFillin extends LitElement implements TestInteraction {
         this._dropElements.forEach((d, i) => {
           d.innerHTML = "";
           d.appendChild(this.createItemWrapper(this._drops[i]));
-          if (this._drops[i])
-            d.setAttribute("occupied", '');
-          else
-            d.removeAttribute("occupied");
+          this.booleanAttribute(d, "occupied", this._drops[i])
         });
       });
     }
@@ -104,20 +98,20 @@ export class DndFillin extends LitElement implements TestInteraction {
         valid = valid && currentValid;
 
         if (this._dropElements.length !== 0) {
-          if (currentValid && this._bark)
-            this._dropElements[i].setAttribute("correct", '');
-          else
-            this._dropElements[i].removeAttribute("correct");
-
-          if (!currentValid && this._bark)
-            this._dropElements[i].setAttribute("incorrect", '');
-          else
-            this._dropElements[i].removeAttribute("incorrect");
+          this.booleanAttribute(this._dropElements[i], "correct", currentValid && this._bark)
+          this.booleanAttribute(this._dropElements[i], "incorrect", !currentValid && this._bark)
         }
       }
       this.valid = valid;
       console.log(this.valid);
     }
+  }
+
+  private booleanAttribute(element, name, bool) {
+    if (bool)
+      element.setAttribute(name, "")
+    else
+      element.removeAttribute(name)
   }
 
   private _givenOrder() {
