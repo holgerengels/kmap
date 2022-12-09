@@ -1,7 +1,6 @@
 import {createModel} from '@captaincodeman/rdx'
 import { State, Store } from '../store'
 import { createSelector } from 'reselect'
-import { authLoader } from '../firebase'
 
 // @ts-ignore
 export type User = import('firebase').UserInfo
@@ -32,13 +31,14 @@ export default createModel({
     const dispatch = store.getDispatch();
     return {
       async signout() {
-        const auth = await authLoader
+        const module = await import('../firebase');
+        const auth = await module.authLoader;
         await auth.signOut()
       },
 
       async signinProvider(name: string) {
-        const auth = await authLoader;
-
+        const module = await import('../firebase');
+        const auth = await module.authLoader;
         const provider = providerFromName(name);
         auth.signInWithPopup(provider).catch(error => {
           dispatch.shell.showMessage(_errorCodes.get(error.code) || error.code);
@@ -48,13 +48,26 @@ export default createModel({
 
       async init() {
         const state = store.getState();
-        if (state.app.instance === "root")
-          initialize(store);
+        if (state.app.instance === "root" && state.app.userid) {
+          if (!window.firebase) {
+            initialize(store);
+          }
+        }
       },
+
+      async initialize() {
+        if (!window.firebase) {
+          initialize(store);
+        }
+      },
+
       'app/chooseInstance': async function () {
         const state = store.getState();
-        if (state.app.instance === "root")
-          initialize(store);
+        if (state.app.instance === "root" && state.app.userid) {
+          if (!window.firebase) {
+            initialize(store);
+          }
+        }
       },
     }
   }
@@ -62,7 +75,8 @@ export default createModel({
 
 async function initialize(store: Store) {
   const dispatch = store.getDispatch();
-  const auth = await authLoader
+  const module = await import('../firebase');
+  const auth = await module.authLoader;
 
   auth.onAuthStateChanged(async user => {
     console.log("onAuthStateChanged");
