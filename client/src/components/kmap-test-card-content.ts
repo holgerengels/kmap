@@ -251,7 +251,7 @@ export class KMapTestCardContent extends LitElement {
 
   render() {
     return html`
-      <div id="question" style="${this._questionFlex}">${unsafeHTML(this._question)}</div>
+      <div id="question" style="${this._questionFlex}" ?hidden="${this.balance === 0}">${unsafeHTML(this._question)}</div>
       <div id="answer" style="${this._answerFlex}" @input="${this._input}">${unsafeHTML(this._answer)}</div>
     `;
   }

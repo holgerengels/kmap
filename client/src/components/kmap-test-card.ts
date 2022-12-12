@@ -190,9 +190,11 @@ export class KMapTestCard extends Connected {
       colorStyles,
       css`
         :host {
+          width: 100%;
           display: flex;
         }
         kmap-card {
+          width: 100%;
           max-width: 800px;
           background-color: white;
         }
