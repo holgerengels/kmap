@@ -221,7 +221,12 @@ export class KMapTestCardContent extends LitElement {
           gap: 16px;
         }
         img {
-          max-width: calc(var(--content-width, 100vw) - 64px);
+          max-width: calc(var(--content-width, 100vw) - 32px);
+        }
+        @media (min-width: 600px) {
+          img {
+            max-width: calc(var(--content-width, 100vw) - 64px);
+          }
         }
         input[type=checkbox] {
           vertical-align: middle;

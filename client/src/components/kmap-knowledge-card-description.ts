@@ -150,7 +150,12 @@ export class KMapKnowledgeCardDescription extends LitElement {
           font-size: small;
         }
         img {
-          max-width: calc(var(--content-width, 100vw) - 64px);
+          max-width: calc(var(--content-width, 100vw) - 32px);
+        }
+        @media (min-width: 600px) {
+            img {
+                max-width: calc(var(--content-width, 100vw) - 64px);
+            }
         }
         figure { margin: 0px; }
 
