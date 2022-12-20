@@ -1,7 +1,7 @@
 import {createModel, RoutingState} from '@captaincodeman/rdx';
 import {Store} from '../store';
 import {endpoint, fetchjson} from "../endpoint";
-import {encodePath, urls} from "../urls";
+import {urls} from "../urls";
 import {Card} from "./types";
 
 export interface Line {
@@ -21,7 +21,6 @@ export interface MapState {
   loaded?: string,
   lines: Line[],
   chapterCard?: Card,
-  topicCard?: Card,
   loading: boolean,
   deleting: boolean,
   renaming: boolean,
@@ -39,6 +38,10 @@ export interface MapState {
 
 export default createModel({
   state: <MapState>{
+    subject: undefined,
+    chapter: undefined,
+    topic: undefined,
+    loaded: undefined,
     lines: [],
     loading: false,
     deleting: false,
@@ -75,7 +78,6 @@ export default createModel({
       return { ...state, loading: true,
         lines: [],
         chapterCard: undefined,
-        topicCard: undefined,
         error: "",
       };
     },
@@ -87,19 +89,13 @@ export default createModel({
         loading: false,
       };
     },
-    setTopicCard(state, topicCard: Card | undefined) {
-      return {
-        ...state,
-        topicCard: topicCard
-      };
-    },
     forget(state) {
       return { ...state,
         subject: undefined,
         chapter: undefined,
         topic: undefined,
-        lines: [],
         loaded: undefined,
+        lines: [],
         chapterCard: undefined,
         editAction: undefined,
       };
@@ -206,10 +202,13 @@ export default createModel({
       },
       async load() {
         const state = store.getState();
-        const load = "" + state.maps.subject + state.maps.chapter;
+
+        if (state.maps.topic)
+          return;
+        //const load = "" + state.maps.subject + state.maps.chapter;
         if (!state.maps.subject || !state.maps.chapter) return;
 
-        if (state.maps.loaded !== load) {
+        //if (state.maps.loaded !== load) {
           console.log("reloading map " + state.maps.subject + " " + state.maps.chapter);
           dispatch.maps.unselectCard();
           dispatch.maps.request();
@@ -217,16 +216,7 @@ export default createModel({
             dispatch.maps.loadedMap,
             dispatch.app.handleError,
             dispatch.maps.error);
-        }
-        else {
-          try {
-            dispatch.maps.setTopicCard(topicCard(state.maps));
-          }
-          catch (e) {
-            dispatch.maps.setTopicCard(undefined);
-            dispatch.shell.showMessage("Die Wissenskarte " + state.maps.subject + " → " + state.maps.chapter + " → " + state.maps.topic + " existiert nicht!");
-          }
-        }
+        //}
       },
       loadedMap(json) {
         const state = store.getState();
@@ -234,19 +224,6 @@ export default createModel({
         mapState.topic = state.maps.topic;
         complete(mapState);
         dispatch.maps.received(mapState);
-        if (mapState.lines.length === 0) {
-          dispatch.shell.showMessage("Die Wissenslandkarte " + mapState.subject + " → " + mapState.chapter + " existiert nicht!");
-          dispatch.maps.setTopicCard(undefined);
-        }
-        else {
-          try {
-            dispatch.maps.setTopicCard(topicCard(mapState));
-          }
-          catch (e) {
-            dispatch.maps.setTopicCard(undefined);
-            dispatch.shell.showMessage("Die Wissenskarte " + mapState.subject + " → " + mapState.chapter + " → " + mapState.topic + " existiert nicht!");
-          }
-        }
       },
       async loadLatest(subject: string) {
         const state = store.getState();
@@ -341,35 +318,10 @@ export default createModel({
             break;
         }
       },
-      'maps/setTopicCard': async function () {
+
+      'maps/received': async function () {
         const state = store.getState();
 
-        const card = state.maps.topicCard;
-        if (card) {
-          const subject = state.maps.subject || '';
-          const chapter = state.maps.chapter || '';
-          const topic = state.maps.topic || '';
-          dispatch.shell.updateMeta({
-            title: chapter,
-            detail: card.topic,
-            description: card.summary,
-            created: card.created,
-            modified: card.modified,
-            author: card.author,
-            image: card.thumb ?
-              `${urls.server}${encodePath("data", subject, chapter, topic, card.thumb)}?instance=${state.app.instance}`
-              : undefined,
-            keywords: [subject, chapter, topic, ...(card.keywords ? card.keywords.split(",").map(k => k.trim()) : [])],
-            breadcrumbs: ["browser", subject, chapter, topic],
-            about: [subject],
-            type: ["Text"],
-            thumb: `${urls.snappy}${encodePath(subject, chapter, topic)}.png`,
-            educationalLevel: card.educationalLevel?.split(",").map(l => l.trim()),
-            educationalContext: card.educationalContext?.split(",").map(l => l.trim()),
-            typicalAgeRange: card.typicalAgeRange,
-          });
-        }
-        else {
           var topics: string[] = [];
           for (let line of state.maps.lines) {
             for (let card of line.cards) {
@@ -387,8 +339,6 @@ export default createModel({
             about: [subject],
             type: ["Unterrichtsplanung"]
           });
-        }
-
       },
       'app/chooseInstance': async function () {
         const state = store.getState();
@@ -410,23 +360,6 @@ export default createModel({
     }
   }
 })
-
-function topicCard(state: MapState): Card | undefined
-{
-  if (!state.topic) {
-    return undefined;
-  } else if (state.topic === "_") {
-    return state.chapterCard;
-  } else {
-    for (let line of state.lines) {
-      for (let card of line.cards) {
-        if (card.topic === state.topic)
-          return card;
-      }
-    }
-    throw new Error("unknown topic " + state.topic);
-  }
-}
 
 function complete(state: MapState) {
   if (!state.subject)

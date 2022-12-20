@@ -4,6 +4,7 @@ export { default as shell } from './shell';
 export { default as instances } from './instances';
 export { default as subjects } from './subjects';
 export { default as maps } from './maps';
+export { default as cards } from './cards';
 export { default as rates } from './rates';
 export { default as averages } from './averages';
 export { default as courses } from './courses';

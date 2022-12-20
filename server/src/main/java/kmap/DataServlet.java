@@ -40,6 +40,8 @@ public class DataServlet
             String topics = req.getParameter("topics");
             String latest = req.getParameter("latest");
             String file = req.getPathInfo();
+            String chapter = req.getParameter("chapter");
+            String topic = req.getParameter("topic");
             if (subjects != null) {
                 log("subjects");
                 JsonArray result = couch.loadSubjects();
@@ -98,6 +100,12 @@ public class DataServlet
                 couch.loadAttachment(attachment -> {
                     sendAttachment(resp, attachment);
                 }, dirs);
+            }
+            else if (topic != null) {
+                log("load topic = " + topic);
+                JsonObject card = couch.loadTopic(subject, chapter, topic);
+                if (card != null)
+                    writeResponse(req, resp, card);
             }
         }
         catch (Exception e) {

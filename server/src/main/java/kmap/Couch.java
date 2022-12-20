@@ -343,6 +343,9 @@ public class Couch extends Server {
     }
 
     public synchronized JsonObject chapter(String subject, String name) {
+        return chapter(subject, name, false);
+    }
+    public synchronized JsonObject chapter(String subject, String name, boolean includeContent) {
         List<JsonObject> objects = loadChapterAsList(subject, name);
         Map<String, Node> nodes = new HashMap<>();
         Map<String, Connection> connections = new HashMap<>();
@@ -373,7 +376,8 @@ public class Couch extends Server {
                 chapterNode.setEducationalLevel(string(topic, "educationalLevel"));
                 chapterNode.setEducationalContext(string(topic, "educationalContext"));
                 chapterNode.setTypicalAgeRange(string(topic, "typicalAgeRange"));
-                chapterNode.setDescription(string(topic, "description"));
+                if (includeContent)
+                    chapterNode.setDescription(string(topic, "description"));
                 chapterNode.setSummary(string(topic, "summary"));
                 chapterNode.setAttachments(amendAttachments(topic.getAsJsonArray("attachments"), topic.getAsJsonObject("_attachments")));
                 iterator.remove();
@@ -389,7 +393,8 @@ public class Couch extends Server {
                 node.setEducationalLevel(string(topic, "educationalLevel"));
                 node.setEducationalContext(string(topic, "educationalContext"));
                 node.setTypicalAgeRange(string(topic, "typicalAgeRange"));
-                node.setDescription(string(topic, "description"));
+                if (includeContent)
+                    node.setDescription(string(topic, "description"));
                 node.setSummary(string(topic, "summary"));
                 node.setThumb(string(topic, "thumb"));
                 node.setPriority(integer(topic, "priority"));
@@ -473,7 +478,8 @@ public class Couch extends Server {
             JSON.addProperty(card, "educationalLevel", node.getEducationalLevel());
             JSON.addProperty(card, "educationalContext", node.getEducationalContext());
             JSON.addProperty(card, "typicalAgeRange", node.getTypicalAgeRange());
-            JSON.addProperty(card, "description", node.getDescription());
+            if (includeContent)
+                JSON.addProperty(card, "description", node.getDescription());
             JSON.addProperty(card, "summary", node.getSummary());
             JSON.addProperty(card, "thumb", node.getThumb());
             JSON.addProperty(card, "links", node.getLinks());
@@ -508,7 +514,8 @@ public class Couch extends Server {
             JSON.addProperty(card, "educationalLevel", chapterNode.getEducationalLevel());
             JSON.addProperty(card, "educationalContext", chapterNode.getEducationalContext());
             JSON.addProperty(card, "typicalAgeRange", chapterNode.getTypicalAgeRange());
-            JSON.addProperty(card, "description", chapterNode.getDescription());
+            if (includeContent)
+                JSON.addProperty(card, "description", chapterNode.getDescription());
             JSON.addProperty(card, "summary", chapterNode.getSummary());
             JSON.addProperty(card, "links", chapterNode.getLinks());
             add(card, "attachments", chapterNode.getAttachments());
@@ -684,7 +691,13 @@ public class Couch extends Server {
                 .reduce(false)
                 .includeDocs(true);
         List<JsonObject> objects = view.query(JsonObject.class);
-        return objects.size() == 1 ? objects.get(0) : null;
+        JsonObject o = objects.size() == 1 ? objects.get(0) : null;
+        JsonArray attachments = o.getAsJsonArray("attachments");
+        JsonObject _attachments = o.getAsJsonObject("_attachments");
+        o.add("attachments", amendAttachments(attachments, _attachments));
+        fixAttachments(attachments, dirs[0], string(o, "chapter"), string(o, "topic"));
+        //o.remove("_attachments");
+        return o;
     }
 
     public synchronized JsonArray search(String filter) {
@@ -858,7 +871,7 @@ public class Couch extends Server {
 
     public void walk(List<String> book, Map<String, String> links, String subject, String chapter) {
         book.add(chapter);
-        JsonObject chapterObject = chapter(subject, chapter);
+        JsonObject chapterObject = chapter(subject, chapter, true);
         for (JsonElement lineObject : chapterObject.getAsJsonArray("lines")) {
             for (JsonElement topicObject : ((JsonObject)lineObject).getAsJsonArray("cards")) {
                 book.add(chapter + "." + string((JsonObject)topicObject, "topic"));

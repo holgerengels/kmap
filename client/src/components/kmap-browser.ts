@@ -41,8 +41,6 @@ export class KMapBrowser extends Connected {
   // @ts-ignore
   private _topic: string = '';
   @state()
-  private _topicCard?: Card = undefined;
-  @state()
   private _lines: Line[] = [];
   @state()
   private _maxCols: number = 0;
@@ -107,7 +105,6 @@ export class KMapBrowser extends Connected {
       _page: state.maps.topic ? "topic" : "map",
       _lines: state.maps.lines,
       _chapterCard: state.maps.chapterCard,
-      _topicCard: state.maps.topicCard,
       _loading: state.maps.loading,
       _chapterCounts: state.tests.chapterCounts,
       _selected: state.maps.selected,
@@ -367,7 +364,7 @@ export class KMapBrowser extends Connected {
         `)}
       </div>
 
-      ${this._topicCard ? html`<kmap-knowledge-card @rated="${this._rated}" .card="${this._topicCard}"></kmap-knowledge-card>` : '' }
+      ${this._topic ? html`<kmap-knowledge-card @rated="${this._rated}"></kmap-knowledge-card>` : ''}
 
       <kmap-timeline-aside id="timeline" class="elevation-02" @open="${() => this.timelineState = 'open'}"></kmap-timeline-aside>
     `;

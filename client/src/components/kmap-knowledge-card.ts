@@ -70,6 +70,7 @@ export class KMapKnowledgeCard extends Connected {
     return {
       _instance: state.app.instance,
       _userid: state.app.userid,
+      card: state.cards.card,
       _topicCounts: state.tests.topicCounts,
       _rates: state.rates.rates,
       _compactCards: state.shell.compactCards,
