@@ -2,6 +2,7 @@ import {createModel, RoutingState} from '@captaincodeman/rdx';
 import {Store} from '../store';
 import {urls} from "../urls";
 import {KmapHtmlEditor} from "kmap-html-editor";
+import {endpoint, fetchjson} from "../endpoint";
 
 export interface Meta {
   title?: string,
@@ -91,6 +92,7 @@ export default createModel({
       },
       updateMeta(meta: Meta) {
         const title = meta.detail ? meta.title  + " - " + meta.detail : meta.title;
+        console.log("update meta " + title);
         const docTitle = title || "KMap";
         const description = meta.description || "KMap kartographiert Wissen mit Zusammenhang";
         document.title = docTitle ? docTitle + " - KMap" : "KMap";
@@ -143,6 +145,19 @@ export default createModel({
         window.setTimeout(() => dispatch.shell.removeMessage(payload), 2000 + state.shell.messages.length * payload.length * 50);
         dispatch.shell.addMessage(payload);
       },
+
+      sessionPing() {
+        const state = store.getState();
+        fetchjson(`${urls.server}state?ping=${state.app.userid}`, endpoint.get(state),
+          () => console.log("ping"),
+          dispatch.app.handleError,
+          dispatch.shell.sessionTimeout);
+      },
+      sessionTimeout() {
+        dispatch.shell.showMessage("Die Session ist abgelaufen.");
+        dispatch.app.logout();
+      },
+
       'routing/change': async function (routing: RoutingState<string>) {
         if (routing.page !== 'browser' && routing.page !== 'test')
           dispatch.shell.updateMeta({});

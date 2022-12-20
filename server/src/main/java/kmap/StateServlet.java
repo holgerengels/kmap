@@ -84,6 +84,7 @@ public class StateServlet
                 String courses = req.getParameter("courses");
                 String timelines = req.getParameter("timelines");
                 String course = req.getParameter("course");
+                String ping = req.getParameter("ping");
                 if (load != null) {
                     log("load state = " + load);
                     JsonObject state = course != null ? this.courses.courseStates(load, course, subject) : states.statesAndProgress(load, subject);
@@ -107,6 +108,10 @@ public class StateServlet
                     JsonObject object = this.courses.course(userid, course);
                     if (object != null)
                         writeResponse(req, resp, object);
+                }
+                else if (ping != null) {
+                    log("ping");
+                    writeResponse(req, resp, new JsonObject());
                 }
                 else
                     log("unknown request " + req.getParameterMap());

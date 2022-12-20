@@ -94,6 +94,7 @@ export class KmapMain extends connect(store, LitElement) {
   private _bar: TopAppBar;
   @query('#main')
   private _main: HTMLElement;
+  private _userActive: boolean = true;
 
   set route(routingState: RoutingState<string>) {
     if (routingState.page !== this._page) {
@@ -168,6 +169,19 @@ export class KmapMain extends connect(store, LitElement) {
     } catch (e) {}
     console.log("passive eventlisteners supported: " + supportsPassive);
     store.dispatch.shell.updatePassiveEventListeners(supportsPassive);
+
+    document.body.addEventListener('mousemove', () => {
+      this._userActive = true;
+    });
+    document.body.addEventListener('keypress', () => {
+      this._userActive = true;
+    });
+    setInterval(() => {
+      if (this._userActive && this._userid) {
+        store.dispatch.shell.sessionPing();
+        this._userActive = false;
+      }
+    }, 1000 * 60 * 10);
   }
 
   willUpdate(changedProps: PropertyValues) {
