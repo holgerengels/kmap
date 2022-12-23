@@ -150,6 +150,11 @@ export default createModel({
       };
     },
 
+    edit(state, card: Card) {
+      return {
+        ...state, editAction: { card: card, action: 'edit' },
+      }
+    },
     setEditAction(state, action: EditAction) {
       return {
         ...state, editAction: action,
@@ -162,6 +167,7 @@ export default createModel({
     error(state, message) {
       return { ...state,
         loading: false,
+        loadingCard: false,
         deleting: false,
         renaming: false,
         saving: false,
@@ -236,6 +242,15 @@ export default createModel({
             dispatch.app.handleError,
             dispatch.maps.error);
         }
+      },
+
+      async loadToEdit(card: Card) {
+        const state = store.getState();
+
+        fetchjson(`${urls.server}data?subject=${encodeURIComponent(card.subject)}&chapter=${encodeURIComponent(card.chapter)}&topic=${encodeURIComponent(card.topic)}`, endpoint.get(state),
+          dispatch.maps.edit,
+          dispatch.app.handleError,
+          dispatch.maps.error);
       },
 
       async deleteTopic(card: Card) {

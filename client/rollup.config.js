@@ -1,5 +1,6 @@
 import { createSpaConfig } from '@open-wc/building-rollup';
 import replace from '@rollup/plugin-replace'
+import sourcemaps from 'rollup-plugin-sourcemaps';
 import copy from 'rollup-plugin-copy';
 const { generateSW } = require('rollup-plugin-workbox');
 import merge from 'deepmerge';
@@ -31,6 +32,7 @@ export default merge(baseConfig, {
   input: './index.html',
   plugins: [
     commonjs(),
+    sourcemaps(),
     replace({
       'process.env.NODE_ENV': 'development',
     }),

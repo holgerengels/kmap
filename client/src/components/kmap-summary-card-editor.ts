@@ -39,7 +39,7 @@ export class KMapSummaryCardEditor extends Connected {
   _showEdit(e) {
     e.cancelBubble = true;
     if (this.card !== undefined)
-      store.dispatch.maps.setEditAction({ card: this.card, action: "edit" });
+      store.dispatch.maps.loadToEdit(this.card);
   }
 
   _showRename(e) {
