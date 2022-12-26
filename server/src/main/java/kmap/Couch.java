@@ -3,6 +3,7 @@ package kmap;
 import com.google.gson.*;
 import org.lightcouch.*;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -692,6 +693,8 @@ public class Couch extends Server {
                 .includeDocs(true);
         List<JsonObject> objects = view.query(JsonObject.class);
         JsonObject o = objects.size() == 1 ? objects.get(0) : null;
+        if (o == null)
+            return null;
         JsonArray attachments = o.getAsJsonArray("attachments");
         JsonObject _attachments = o.getAsJsonObject("_attachments");
         o.add("attachments", amendAttachments(attachments, _attachments));
