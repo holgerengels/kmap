@@ -11,6 +11,28 @@ import './dnd-assign';
 import './dnd-fillin';
 import {TestInteraction} from "./test-interaction";
 
+function lazyComponents(code: string) {
+  let result = code.match(/<((kmap-((term-tree)|(ascii-math)|(solve-tree)|(jsxgraph)))|(html-include)|(lazy-html))/g);
+  if (result !== null) {
+    result.forEach(async m => {
+      m = m.substring(1)
+      if (customElements.get(m))
+        return;
+
+      console.log("loading component: " + m + "");
+
+      switch (m) {
+        //case 'lazy-html': return (await import('./lazy-html')).LazyHtml;
+        //case 'html-include': return (await import('html-include-element')).HTMLIncludeElement;
+        case 'kmap-term-tree': return window.customElements.define('kmap-term-tree', (await import('kmap-term-tree')).KmapTermTree);
+        case 'kmap-solve-tree': return window.customElements.define('kmap-solve-tree', (await import('kmap-solve-tree')).KmapSolveTree);
+        case 'kmap-ascii-math': return window.customElements.define('kmap-ascii-math', (await import('kmap-ascii-math')).KmapAsciiMath);
+        case 'kmap-jsxgraph': return window.customElements.define('kmap-jsxgraph', (await import('kmap-jsxgraph')).KmapJsxGraph);
+      }
+    });
+  }
+}
+
 @customElement('kmap-test-card-content')
 export class KMapTestCardContent extends LitElement {
   @property({type: String})
@@ -82,6 +104,7 @@ export class KMapTestCardContent extends LitElement {
       code = code.replace(/<integer ([0-9]+)\/>/g, "<input type='text' inputmode='numeric' maxlength='$1' style='width: $1em'/>");
       code = code.replace(/<decimal\/>/g, "<input type='text' inputmode='decimal'/>");
       code = code.replace(/<decimal ([0-9]+)\/>/g, "<input type='text' inputmode='decimal' maxlength='$1' style='width: $1em'/>");
+      lazyComponents(code);
       math(code, setter);
     }
     else

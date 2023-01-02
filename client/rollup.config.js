@@ -51,9 +51,9 @@ export default merge(baseConfig, {
         urlPattern: /data/,
         handler: 'StaleWhileRevalidate',
         options: {
-          cacheName: 'maps',
+          cacheName: 'data',
           broadcastUpdate: {
-            channelName: 'maps',
+            channelName: 'data',
             options: {},
           }
         },

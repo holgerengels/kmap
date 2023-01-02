@@ -2,7 +2,6 @@ import {css, html, LitElement, PropertyValues} from 'lit';
 import {customElement, property, state, query} from 'lit/decorators.js';
 import {installMediaQueryWatcher} from 'pwa-helpers/media-query.js';
 import {installOfflineWatcher} from 'pwa-helpers/network.js';
-import "web-animations-js/web-animations.min";
 import {connect, RoutingState} from '@captaincodeman/rdx'
 import {State, store} from './store'
 
@@ -18,8 +17,6 @@ import 'pwa-helper-components/pwa-update-available';
 
 import './components/kmap-subjects';
 import './components/kmap-browser';
-import './components/kmap-test';
-import './components/kmap-exercise';
 import './components/kmap-timeline-selector';
 import './components/share-facebook';
 
@@ -29,15 +26,6 @@ import {TopAppBar} from "@material/mwc-top-app-bar/mwc-top-app-bar";
 import {Meta} from "./models/shell";
 import {Timeline} from "./models/courses";
 import {timelineClosed, timelineOpen} from "./components/icons";
-
-import {KmapTermTree} from "kmap-term-tree";
-window.customElements.define('kmap-term-tree', KmapTermTree);
-import {KmapAsciiMath} from "kmap-ascii-math";
-window.customElements.define('kmap-ascii-math', KmapAsciiMath);
-import {KmapSolveTree} from "kmap-solve-tree";
-window.customElements.define('kmap-solve-tree', KmapSolveTree);
-import {KmapJsxGraph} from "kmap-jsxgraph";
-window.customElements.define('kmap-jsxgraph', KmapJsxGraph);
 
 // @ts-ignore
 //const _standalone = (window.matchMedia('(display-mode: standalone)').matches) || (window.navigator.standalone) || document.referrer.includes('android-app://');

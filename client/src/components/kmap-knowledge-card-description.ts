@@ -6,6 +6,28 @@ import {resetStyles, colorStyles, fontStyles} from "./kmap-styles";
 import {katexStyles} from "../katex-css";
 import {math} from "../math";
 
+function lazyComponents(code: string) {
+  let result = code.match(/<((kmap-((term-tree)|(ascii-math)|(solve-tree)|(jsxgraph)))|(html-include)|(lazy-html))/g);
+  if (result !== null) {
+    result.forEach(async m => {
+      m = m.substring(1)
+      if (customElements.get(m))
+        return;
+
+      console.log("loading component: " + m + "");
+
+      switch (m) {
+        //case 'lazy-html': return (await import('./lazy-html')).LazyHtml;
+        //case 'html-include': return (await import('html-include-element')).HTMLIncludeElement;
+        case 'kmap-term-tree': return window.customElements.define('kmap-term-tree', (await import('kmap-term-tree')).KmapTermTree);
+        case 'kmap-solve-tree': return window.customElements.define('kmap-solve-tree', (await import('kmap-solve-tree')).KmapSolveTree);
+        case 'kmap-ascii-math': return window.customElements.define('kmap-ascii-math', (await import('kmap-ascii-math')).KmapAsciiMath);
+        case 'kmap-jsxgraph': return window.customElements.define('kmap-jsxgraph', (await import('kmap-jsxgraph')).KmapJsxGraph);
+      }
+    });
+  }
+}
+
 @customElement('kmap-knowledge-card-description')
 export class KMapKnowledgeCardDescription extends LitElement {
   @property({type: String})
@@ -79,6 +101,7 @@ export class KMapKnowledgeCardDescription extends LitElement {
           id = id.replaceAll(/[-_ ]/g, "-");
           return `<h3><a href="${urls.client}browser/${this.subject}/${this.chapter}/${this.topic}#${id}" id="${id}">${text}</a></h3>`;
         });
+        lazyComponents(code);
         math(code, setter);
       }
       else
