@@ -1,7 +1,6 @@
 import {createModel, RoutingState} from '@captaincodeman/rdx';
 import {Store} from '../store';
 import {urls} from "../urls";
-import {KmapHtmlEditor} from "kmap-html-editor";
 import {endpoint, fetchjson} from "../endpoint";
 
 export interface Meta {
@@ -162,22 +161,24 @@ export default createModel({
         if (routing.page !== 'browser' && routing.page !== 'test')
           dispatch.shell.updateMeta({});
 
-        if (routing.page === 'courses') {
-          console.log("loading courses")
+        if (routing.page === 'test' || routing.page === 'exercise') {
+          import('../components/kmap-test').then(() => console.log("loaded test"));
+          import('../components/kmap-exercise').then(() => console.log("loaded exercise"));
+        }
+        else if (routing.page === 'courses') {
           import('../components/kmap-courses').then(() => console.log("loaded courses"));
         }
         else if (routing.page === 'content-manager') {
-          console.log("loading content-manager")
           import('../components/kmap-content-manager').then(() => console.log("loaded content-manager"));
         }
       },
       'shell/addLayer': function () {
         const state = store.getState();
-        checkCustomElements(state.shell.layers, state.app.roles);
+        checkEditingElements(state.shell.layers, state.app.roles);
       },
       'app/receivedLogin': async function () {
         const state = store.getState();
-        checkCustomElements(state.shell.layers, state.app.roles);
+        checkEditingElements(state.shell.layers, state.app.roles);
       },
       'app/receivedLogout': async function () {
         dispatch.shell.removeLayer("averages");
@@ -262,8 +263,7 @@ function setMetaTag(attrName, attrValue, content) {
   element.setAttribute('content', content || '');
 }
 
-async function checkCustomElements(layers: string[], roles: string[]) {
-  console.log("loading components")
+async function checkEditingElements(layers: string[], roles: string[]) {
   if (roles.includes("teacher") || roles.includes("admin")) {
     if (layers.includes("editor")) {
       if (customElements.get("kmap-editor-add-fabs") === undefined) {
@@ -279,8 +279,7 @@ async function checkCustomElements(layers: string[], roles: string[]) {
         await import('../components/kmap-test-editor-edit-dialog');
       }
       if (customElements.get("kmap-html-editor") === undefined) {
-        await import('kmap-html-editor');
-        window.customElements.define('kmap-html-editor', KmapHtmlEditor);
+        window.customElements.define('kmap-html-editor', (await import('kmap-html-editor')).KmapHtmlEditor);
       }
     }
 
