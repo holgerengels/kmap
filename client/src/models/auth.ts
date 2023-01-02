@@ -1,11 +1,9 @@
 import {createModel} from '@captaincodeman/rdx'
-import { State, Store } from '../store'
-import { createSelector } from 'reselect'
+import {State, Store} from '../store'
+import {createSelector} from 'reselect'
 
 // @ts-ignore
 export type User = import('firebase').UserInfo
-// @ts-ignore
-export type Credential = import('firebase').OAuthCredential
 
 export interface AuthState {
   user: User | null,
@@ -31,16 +29,21 @@ export default createModel({
     const dispatch = store.getDispatch();
     return {
       async signout() {
+        initialize(store);
         const module = await import('../firebase');
-        const auth = await module.authLoader;
-        await auth.signOut()
+        await module.auth.signOut()
       },
 
       async signinProvider(name: string) {
+        initialize(store);
         const module = await import('../firebase');
-        const auth = await module.authLoader;
-        const provider = providerFromName(name);
-        auth.signInWithPopup(provider).catch(error => {
+        const provider = await providerFromName(name);
+        module.signIn(provider)
+          .then(async (result) => {
+            const user = result.user;
+            dispatch.auth.signedIn(user);
+          })
+          .catch(error => {
           dispatch.shell.showMessage(_errorCodes.get(error.code) || error.code);
           console.log(error);
         });
@@ -48,25 +51,8 @@ export default createModel({
 
       async init() {
         const state = store.getState();
-        if (state.app.instance === "root" && state.app.userid) {
-          if (!window.firebase) {
-            initialize(store);
-          }
-        }
-      },
-
-      async initialize() {
-        if (!window.firebase) {
+        if (state.app.instance === "root" && state.auth.user) {
           initialize(store);
-        }
-      },
-
-      'app/chooseInstance': async function () {
-        const state = store.getState();
-        if (state.app.instance === "root" && state.app.userid) {
-          if (!window.firebase) {
-            initialize(store);
-          }
         }
       },
     }
@@ -74,42 +60,22 @@ export default createModel({
 })
 
 async function initialize(store: Store) {
-  const dispatch = store.getDispatch();
   const module = await import('../firebase');
-  const auth = await module.authLoader;
-
-  auth.onAuthStateChanged(async user => {
-    console.log("onAuthStateChanged");
-    console.log(user);
-    if (user) {
-      console.log(user);
-      dispatch.auth.signedIn(user)
-    } else {
-      dispatch.auth.signedOut()
-    }
-  });
-  auth.onIdTokenChanged(async user => {
-    console.log("onIdTokenChanged");
-    console.log(user);
-    if (auth.currentUser !== null) {
-      const token = await auth.currentUser.getIdToken();
-      console.log(token);
-      dispatch.app.login({userid: user.uid, password: token});
-    } else {
-      dispatch.app.logout();
-    }
-  });
+  const dispatch = store.getDispatch();
+  module.initialize(dispatch.auth.signedIn, dispatch.auth.signedOut, dispatch.app.login, dispatch.app.logout);
 }
 
-function providerFromName(name: string) {
+async function providerFromName(name: string) {
+  const module = await import('../firebase');
   switch (name) {
     case 'google':
       // @ts-ignore
-      return new window.firebase.auth.GoogleAuthProvider();
+      return module.google;
     case 'facebook':
       // @ts-ignore
-      return new window.firebase.auth.FacebookAuthProvider();
-    default: throw `unknown provider ${name}`
+      return module.facebook;
+    default:
+      throw `unknown provider ${name}`
   }
 }
 

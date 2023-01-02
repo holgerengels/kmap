@@ -96,7 +96,7 @@ export default createModel({
         //if (state.cards.loaded !== load) {
           console.log("reloading card " + state.cards.subject + " " + state.cards.chapter + " "+ state.cards.topic);
           dispatch.cards.request();
-          fetchjson(`${urls.server}data?subject=${encodeURIComponent(state.cards.subject)}&chapter=${encodeURIComponent(state.cards.chapter)}&topic=${encodeURIComponent(state.cards.topic)}`, endpoint.get(state),
+          fetchjson(`${urls.server}data?topic=${encodeURIComponent(state.cards.topic)}&chapter=${encodeURIComponent(state.cards.chapter)}&subject=${encodeURIComponent(state.cards.subject)}`, endpoint.get(state),
             dispatch.cards.received,
             dispatch.app.handleError,
             dispatch.cards.error);

@@ -76,7 +76,6 @@ export class KMapLoginPopup extends Connected {
   }
 
   show() {
-    store.dispatch.auth.initialize();
     store.dispatch.app.clearLoginResponse();
     this._showInstanceChooser = false;
     this._loginDialog.show();

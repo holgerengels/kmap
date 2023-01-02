@@ -1,52 +1,45 @@
 import { config } from './config'
+import { initializeApp } from "firebase/app";
+import { getAuth } from 'firebase/auth';
+import { signInWithPopup, GoogleAuthProvider, FacebookAuthProvider, AuthProvider } from 'firebase/auth'
 
-export type Firebase = typeof import('firebase')
+export const firebaseApp = initializeApp(config);
 
-declare global {
-  interface Window {
-    firebase: Firebase
+export const auth = getAuth(firebaseApp);
+export const signIn = (provider: AuthProvider) => signInWithPopup(auth, provider);
+
+export const google = new GoogleAuthProvider();
+export const facebook = new FacebookAuthProvider();
+
+export const credentials = (result) => GoogleAuthProvider.credentialFromResult(result)
+
+let initialized = false;
+
+export function initialize(signedIn , signedOut, login, logout) {
+  if (!initialized) {
+    console.log("initializing auth");
+    auth.onAuthStateChanged(async user => {
+      console.log("onAuthStateChanged " + user?.uid);
+      if (user) {
+        signedIn(user);
+      } else {
+        signedOut();
+      }
+    });
+    auth.onIdTokenChanged(async user => {
+      console.log("onIdTokenChanged " + user?.uid);
+      if (auth.currentUser !== null) {
+        const token = await auth.currentUser.getIdToken();
+        console.log(token);
+        login({userid: user!.uid, password: token});
+      }
+      else {
+        logout();
+      }
+    });
+
+    initialized = true;
   }
 }
 
-const loadScript = (url: string) => new Promise((resolve, reject) => {
-  const script = document.createElement('script')
-  script.src = url
-  script.async = true
-  script.onload = resolve
-  script.onerror = reject
-  document.head.appendChild(script)
-})
-
-const loadModule = (module: string) => loadScript(`https://www.gstatic.com/firebasejs/7.14.0/firebase-${module}.js`)
-
-
-const loadAndInitialize = async () => {
-  await loadModule('app')
-
-  // @ts-ignore
-  window.firebase.initializeApp(config)
-
-  return window.firebase
-}
-
-export const loadFirebase = loadAndInitialize()
-
-export const app = loadFirebase.then(firebase => firebase.app())
-
-export const authLoader = app.then(app => loadModule('auth').then(() => app.auth()))
-
-// export const firestoreLoader = app.then(app => loadModule('firestore').then(() => {
-//   const fs = app.firestore()
-//   fs.enablePersistence({ synchronizeTabs: true })
-//   return fs
-// }))
-
-/*
-// TODO: use requestIdleCallback
-setTimeout(() => {
-  app.then(app => {
-    loadModule('analytics').then(() => app.analytics())
-    loadModule('performance').then(() => app.performance())
-  })
-}, 1000)
- */
+export const idToken = () => auth.currentUser?.getIdToken()

@@ -79,7 +79,7 @@
     "@material/mwc-top-app-bar": "^0.26.1",
     "@material/mwc-top-app-bar-fixed": "^0.26.1",
     "asciimath2tex": "^1.4.0",
-    "firebase": "^9.13.0",
+    "firebase": "^9.15.0",
     "jsxgraph": "^1.4.6",
     "katex": "^0.16.0",
     "kmap-ascii-math": "^0.9.15",
