@@ -11,25 +11,34 @@ import './dnd-assign';
 import './dnd-fillin';
 import {TestInteraction} from "./test-interaction";
 
-function lazyComponents(code: string) {
+async function lazyComponents(code: string) {
   let result = code.match(/<((kmap-((term-tree)|(ascii-math)|(solve-tree)|(jsxgraph)))|(html-include)|(lazy-html))/g);
   if (result !== null) {
-    result.forEach(async m => {
-      m = m.substring(1)
+    for (let i = 0; i < result.length; i++) {
+      const m = result[i].substring(1);
       if (customElements.get(m))
-        return;
+        continue;
 
-      console.log("loading component: " + m + "");
+      console.log("loading component: " + m);
 
       switch (m) {
-        //case 'lazy-html': return (await import('./lazy-html')).LazyHtml;
-        //case 'html-include': return (await import('html-include-element')).HTMLIncludeElement;
-        case 'kmap-term-tree': return window.customElements.define('kmap-term-tree', (await import('kmap-term-tree')).KmapTermTree);
-        case 'kmap-solve-tree': return window.customElements.define('kmap-solve-tree', (await import('kmap-solve-tree')).KmapSolveTree);
-        case 'kmap-ascii-math': return window.customElements.define('kmap-ascii-math', (await import('kmap-ascii-math')).KmapAsciiMath);
-        case 'kmap-jsxgraph': return window.customElements.define('kmap-jsxgraph', (await import('kmap-jsxgraph')).KmapJsxGraph);
+        //case 'lazy-html': return (await import('./lazy-html')).LazyHtml; break;
+        //case 'html-include': return (await import('html-include-element')).HTMLIncludeElement; break;
+        case 'kmap-term-tree':
+          customElements.define('kmap-term-tree', (await import('kmap-term-tree')).KmapTermTree);
+          break;
+        case 'kmap-solve-tree':
+          customElements.define('kmap-solve-tree', (await import('kmap-solve-tree')).KmapSolveTree);
+          break;
+        case 'kmap-ascii-math':
+          customElements.define('kmap-ascii-math', (await import('kmap-ascii-math')).KmapAsciiMath);
+          break;
+        case 'kmap-jsxgraph':
+          customElements.define('kmap-jsxgraph', (await import('kmap-jsxgraph')).KmapJsxGraph);
+          break;
       }
-    });
+      await customElements.whenDefined(m);
+    }
   }
 }
 
@@ -37,7 +46,6 @@ function lazyComponents(code: string) {
 export class KMapTestCardContent extends LitElement {
   @property({type: String})
   private instance: string = '';
-
   @property({type: String})
   private subject: string = '';
   @property({type: String})
@@ -94,7 +102,7 @@ export class KMapTestCardContent extends LitElement {
     this._answerFlex = "flex: " + (6 - balance);
   }
 
-  _math(code: string, setter) {
+  async _math(code: string, setter) {
     if (code) {
       code = code.replace(/inline:([^"]*)/g, urls.server + "tests/" + this.subject + "/" + this.set + "/" + this.key + "/$1?instance=" + this.instance);
       code = code.replace(/<check\/>/g, "<input type='checkbox'/>");
@@ -104,10 +112,9 @@ export class KMapTestCardContent extends LitElement {
       code = code.replace(/<integer ([0-9]+)\/>/g, "<input type='text' inputmode='numeric' maxlength='$1' style='width: $1em'/>");
       code = code.replace(/<decimal\/>/g, "<input type='text' inputmode='decimal'/>");
       code = code.replace(/<decimal ([0-9]+)\/>/g, "<input type='text' inputmode='decimal' maxlength='$1' style='width: $1em'/>");
-      lazyComponents(code);
+      await lazyComponents(code);
       math(code, setter);
-    }
-    else
+    } else
       setter("");
   }
 

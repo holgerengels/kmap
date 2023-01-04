@@ -6,25 +6,34 @@ import {resetStyles, colorStyles, fontStyles} from "./kmap-styles";
 import {katexStyles} from "../katex-css";
 import {math} from "../math";
 
-function lazyComponents(code: string) {
+async function lazyComponents(code: string) {
   let result = code.match(/<((kmap-((term-tree)|(ascii-math)|(solve-tree)|(jsxgraph)))|(html-include)|(lazy-html))/g);
   if (result !== null) {
-    result.forEach(async m => {
-      m = m.substring(1)
+    for (let i = 0; i < result.length; i++) {
+      const m = result[i].substring(1);
       if (customElements.get(m))
-        return;
+        continue;
 
-      console.log("loading component: " + m + "");
+      console.log("loading component: " + m);
 
       switch (m) {
-        //case 'lazy-html': return (await import('./lazy-html')).LazyHtml;
-        //case 'html-include': return (await import('html-include-element')).HTMLIncludeElement;
-        case 'kmap-term-tree': return window.customElements.define('kmap-term-tree', (await import('kmap-term-tree')).KmapTermTree);
-        case 'kmap-solve-tree': return window.customElements.define('kmap-solve-tree', (await import('kmap-solve-tree')).KmapSolveTree);
-        case 'kmap-ascii-math': return window.customElements.define('kmap-ascii-math', (await import('kmap-ascii-math')).KmapAsciiMath);
-        case 'kmap-jsxgraph': return window.customElements.define('kmap-jsxgraph', (await import('kmap-jsxgraph')).KmapJsxGraph);
+        //case 'lazy-html': return (await import('./lazy-html')).LazyHtml; break;
+        //case 'html-include': return (await import('html-include-element')).HTMLIncludeElement; break;
+        case 'kmap-term-tree':
+          customElements.define('kmap-term-tree', (await import('kmap-term-tree')).KmapTermTree);
+          break;
+        case 'kmap-solve-tree':
+          customElements.define('kmap-solve-tree', (await import('kmap-solve-tree')).KmapSolveTree);
+          break;
+        case 'kmap-ascii-math':
+          customElements.define('kmap-ascii-math', (await import('kmap-ascii-math')).KmapAsciiMath);
+          break;
+        case 'kmap-jsxgraph':
+          customElements.define('kmap-jsxgraph', (await import('kmap-jsxgraph')).KmapJsxGraph);
+          break;
       }
-    });
+      await customElements.whenDefined(m);
+    }
   }
 }
 
@@ -68,9 +77,11 @@ export class KMapKnowledgeCardDescription extends LitElement {
     }
   }
 
-  willUpdate(_changedProperties) {
+  async willUpdate(_changedProperties) {
     if (_changedProperties.has("description")) {
-      let setter = (value:string):void => { this._description = value };
+      let setter = (value: string): void => {
+        this._description = value
+      };
 
       if (this.description) {
         let code = this.description.replace(/inline:([^"]*)/g, urls.server + "data/" + this.subject + "/" + this.chapter + "/" + this.topic + "/$1?instance=" + this.instance);
@@ -82,14 +93,22 @@ export class KMapKnowledgeCardDescription extends LitElement {
           id = id.replaceAll(/["'`´§$%#|^°()<>{}\[\]]/g, "");
           id = id.replace(/[*~+-_ .,:;!?=&\/\\|äöüÄÖÜß]/g, (m) => {
             switch (m) {
-              case 'ä': return 'ae';
-              case 'ö': return 'oe';
-              case 'ü': return 'ue';
-              case 'Ä': return 'Ae';
-              case 'Ö': return 'Oe';
-              case 'Ü': return 'Ue';
-              case 'ß': return 'ss';
-              default: return '-';
+              case 'ä':
+                return 'ae';
+              case 'ö':
+                return 'oe';
+              case 'ü':
+                return 'ue';
+              case 'Ä':
+                return 'Ae';
+              case 'Ö':
+                return 'Oe';
+              case 'Ü':
+                return 'Ue';
+              case 'ß':
+                return 'ss';
+              default:
+                return '-';
             }
           });
           id = id.replaceAll(/ö/g, "oe");
@@ -101,10 +120,9 @@ export class KMapKnowledgeCardDescription extends LitElement {
           id = id.replaceAll(/[-_ ]/g, "-");
           return `<h3><a href="${urls.client}browser/${this.subject}/${this.chapter}/${this.topic}#${id}" id="${id}">${text}</a></h3>`;
         });
-        lazyComponents(code);
+        await lazyComponents(code);
         math(code, setter);
-      }
-      else
+      } else
         setter("");
     }
   }
