@@ -18,7 +18,6 @@ import 'pwa-helper-components/pwa-update-available';
 import './components/kmap-subjects';
 import './components/kmap-browser';
 import './components/kmap-timeline-selector';
-import './components/share-facebook';
 
 import {colorStyles, elevationStyles, fontStyles, resetStyles} from "./components/kmap-styles";
 import {Snackbar} from "@material/mwc-snackbar/mwc-snackbar";
@@ -311,20 +310,25 @@ export class KmapMain extends connect(store, LitElement) {
       .drawer-list > a[selected] {
         color: var(--app-drawer-selected-color);
       }
-      .cc-fb {
+      .cc-fb-inst {
         margin: 16px;
         display: flex;
         flex-direction: row;
         align-items: center;
         justify-content: space-evenly;
       }
-      .cc-fb > a {
+      .cc-fb-inst > a {
         line-height: 0;
+      }
+      .cc-fb-inst > a.license {
         box-shadow: var(--elevation-01);
         transition: 200ms ease-in-out background-color, var(--elevation-transition);
       }
-      .cc-fb > a:hover {
+      .cc-fb-inst > a.license:hover {
         box-shadow: var(--elevation-03);
+      }
+      .cc-fb-inst > a.social:hover {
+        filter: drop-shadow(2px 2px 2px rgba(0, 0, 0, 0.14));
       }
       span[slot=subtitle] {
         display: flex;
@@ -493,9 +497,10 @@ export class KmapMain extends connect(store, LitElement) {
       </nav>
       <hr/>
       <!--googleon: all-->
-      <div class="cc-fb">
+      <div class="cc-fb-inst">
         <a class="license" rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/deed.de"><img width="88" height="31" src="/app/icons/cc-by-sa.png" alt="CC BY-SA 4.0"></a>
-        <share-facebook></share-facebook>
+        <a class="social" href="https://www.facebook.com/kmap.eu/"><img height="24" src="icons/facebook-logo.svg"/></a>
+        <a class="social" href="https://www.instagram.com/kmap_eu/"><img height="24" src="icons/instagram-logo.svg"/></a>
       </div>
     `;
   }
