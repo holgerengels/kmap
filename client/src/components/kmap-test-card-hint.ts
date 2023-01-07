@@ -26,18 +26,18 @@ export class KMapTestCardHint extends LitElement {
 
   willUpdate(changedProperties) {
     if (changedProperties.has("hint")) {
-      let set = (value:string):void => { this._hint = value };
-      this._math(this.hint, set);
+      this._hint = this._math(this.hint);
     }
   }
 
-  _math(code: string, setter) {
+  _math(code: string) {
     if (code) {
       code = code.replace(/inline:([^"]*)/g, urls.server + "tests/" + this.subject + "/" + this.set + "/" + this.key + "/$1?instance=" + this.instance);
-      math(code, setter);
+      code = math(code);
+      return code;
     }
     else
-      setter("");
+      return '';
   }
 
   static get styles() {

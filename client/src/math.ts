@@ -4,7 +4,7 @@ import AsciiMathParser from 'asciimath2tex';
 const parser = new AsciiMathParser();
 
 // ″
-export function math(code: string, setter: (string) => void) {
+export function math(code: string): string {
   let segments = code.split('`');
   if (segments.length % 2 === 1)
     segments.push('');
@@ -43,5 +43,5 @@ export function math(code: string, setter: (string) => void) {
     buffer += `<span style='display: none'>${tex}</span>${math}`;
   }
 
-  setter(buffer);
+  return buffer;
 }

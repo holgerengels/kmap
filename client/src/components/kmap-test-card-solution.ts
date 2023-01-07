@@ -26,18 +26,18 @@ export class KMapTestCardsolution extends LitElement {
 
   willUpdate(changedProperties) {
     if (changedProperties.has("solution")) {
-      let set = (value:string):void => { this._solution = value };
-      this._math(this.solution, set);
+      this._solution = this._math(this.solution);
     }
   }
 
-  _math(code: string, setter) {
+  _math(code: string) {
     if (code) {
       code = code.replace(/inline:([^"]*)/g, urls.server + "tests/" + this.subject + "/" + this.set + "/" + this.key + "/$1?instance=" + this.instance);
-      math(code, setter);
+      code = math(code);
+      return code;
     }
     else
-      setter("");
+      return '';
   }
 
   static get styles() {

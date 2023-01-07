@@ -1,46 +1,15 @@
 import {css, html, LitElement, PropertyValues} from 'lit';
 import {customElement, property, query, state} from 'lit/decorators.js';
-
+import {unsafeHTML} from 'lit/directives/unsafe-html.js';
 import {urls} from '../urls';
 import {colorStyles, fontStyles, resetStyles} from "./kmap-styles";
 import {katexStyles} from "../katex-css";
-import {unsafeHTML} from 'lit/directives/unsafe-html.js';
 import {math} from "../math";
+import {lazyComponents} from "./lazy-components";
 
 import './dnd-assign';
 import './dnd-fillin';
 import {TestInteraction} from "./test-interaction";
-
-async function lazyComponents(code: string) {
-  let result = code.match(/<((kmap-((term-tree)|(ascii-math)|(solve-tree)|(jsxgraph)))|(html-include)|(lazy-html))/g);
-  if (result !== null) {
-    for (let i = 0; i < result.length; i++) {
-      const m = result[i].substring(1);
-      if (customElements.get(m))
-        continue;
-
-      console.log("loading component: " + m);
-
-      switch (m) {
-        //case 'lazy-html': return (await import('./lazy-html')).LazyHtml; break;
-        //case 'html-include': return (await import('html-include-element')).HTMLIncludeElement; break;
-        case 'kmap-term-tree':
-          customElements.define('kmap-term-tree', (await import('kmap-term-tree')).KmapTermTree);
-          break;
-        case 'kmap-solve-tree':
-          customElements.define('kmap-solve-tree', (await import('kmap-solve-tree')).KmapSolveTree);
-          break;
-        case 'kmap-ascii-math':
-          customElements.define('kmap-ascii-math', (await import('kmap-ascii-math')).KmapAsciiMath);
-          break;
-        case 'kmap-jsxgraph':
-          customElements.define('kmap-jsxgraph', (await import('kmap-jsxgraph')).KmapJsxGraph);
-          break;
-      }
-      await customElements.whenDefined(m);
-    }
-  }
-}
 
 @customElement('kmap-test-card-content')
 export class KMapTestCardContent extends LitElement {
@@ -77,22 +46,21 @@ export class KMapTestCardContent extends LitElement {
   @query('#answer')
   private _answerElement: HTMLElement;
 
-  willUpdate(changedProperties) {
-    if (changedProperties.has("question")) {
-      let set = (value:string):void => { this._question = value };
-      this._math(this.question, set);
-    }
-    if (changedProperties.has("answer")) {
-      let set = (value:string):void => { this._answer = value };
-      this._math(this.answer, set);
-    }
-    if (changedProperties.has("balance"))
+  protected willUpdate(_changedProperties) {
+    if (_changedProperties.has("balance"))
       this._flexes(this.balance);
   }
 
   protected async updated(_changedProperties: PropertyValues) {
-    if (_changedProperties.has("answer") && this.answer)
-      await new Promise<void>((resolve) => setTimeout(() => { this.init(); resolve() }));
+    if (_changedProperties.has("question")) {
+      await lazyComponents(this.question);
+      this._question = this._math(this.question);
+    }
+    if (_changedProperties.has("answer")) {
+      await lazyComponents(this.answer);
+      this._answer = this._math(this.answer);
+      setTimeout(() => this.init());
+    }
   }
 
   _flexes(balance) {
@@ -102,7 +70,7 @@ export class KMapTestCardContent extends LitElement {
     this._answerFlex = "flex: " + (6 - balance);
   }
 
-  async _math(code: string, setter) {
+  _math(code: string): string {
     if (code) {
       code = code.replace(/inline:([^"]*)/g, urls.server + "tests/" + this.subject + "/" + this.set + "/" + this.key + "/$1?instance=" + this.instance);
       code = code.replace(/<check\/>/g, "<input type='checkbox'/>");
@@ -112,10 +80,11 @@ export class KMapTestCardContent extends LitElement {
       code = code.replace(/<integer ([0-9]+)\/>/g, "<input type='text' inputmode='numeric' maxlength='$1' style='width: $1em'/>");
       code = code.replace(/<decimal\/>/g, "<input type='text' inputmode='decimal'/>");
       code = code.replace(/<decimal ([0-9]+)\/>/g, "<input type='text' inputmode='decimal' maxlength='$1' style='width: $1em'/>");
-      await lazyComponents(code);
-      math(code, setter);
-    } else
-      setter("");
+      code = math(code);
+      return code;
+    }
+    else
+      return '';
   }
 
   init() {

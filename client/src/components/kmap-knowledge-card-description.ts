@@ -1,41 +1,11 @@
 import {LitElement, html, css} from 'lit';
 import {customElement, property, state} from 'lit/decorators.js';
 import {unsafeHTML} from 'lit/directives/unsafe-html.js';
-import {urls} from "../urls";
-import {resetStyles, colorStyles, fontStyles} from "./kmap-styles";
+import {urls} from '../urls';
+import {colorStyles, fontStyles, resetStyles} from "./kmap-styles";
 import {katexStyles} from "../katex-css";
 import {math} from "../math";
-
-async function lazyComponents(code: string) {
-  let result = code.match(/<((kmap-((term-tree)|(ascii-math)|(solve-tree)|(jsxgraph)))|(html-include)|(lazy-html))/g);
-  if (result !== null) {
-    for (let i = 0; i < result.length; i++) {
-      const m = result[i].substring(1);
-      if (customElements.get(m))
-        continue;
-
-      console.log("loading component: " + m);
-
-      switch (m) {
-        //case 'lazy-html': return (await import('./lazy-html')).LazyHtml; break;
-        //case 'html-include': return (await import('html-include-element')).HTMLIncludeElement; break;
-        case 'kmap-term-tree':
-          customElements.define('kmap-term-tree', (await import('kmap-term-tree')).KmapTermTree);
-          break;
-        case 'kmap-solve-tree':
-          customElements.define('kmap-solve-tree', (await import('kmap-solve-tree')).KmapSolveTree);
-          break;
-        case 'kmap-ascii-math':
-          customElements.define('kmap-ascii-math', (await import('kmap-ascii-math')).KmapAsciiMath);
-          break;
-        case 'kmap-jsxgraph':
-          customElements.define('kmap-jsxgraph', (await import('kmap-jsxgraph')).KmapJsxGraph);
-          break;
-      }
-      await customElements.whenDefined(m);
-    }
-  }
-}
+import {lazyComponents} from "./lazy-components";
 
 @customElement('kmap-knowledge-card-description')
 export class KMapKnowledgeCardDescription extends LitElement {
@@ -77,12 +47,8 @@ export class KMapKnowledgeCardDescription extends LitElement {
     }
   }
 
-  async willUpdate(_changedProperties) {
+  willUpdate(_changedProperties) {
     if (_changedProperties.has("description")) {
-      let setter = (value: string): void => {
-        this._description = value
-      };
-
       if (this.description) {
         let code = this.description.replace(/inline:([^"]*)/g, urls.server + "data/" + this.subject + "/" + this.chapter + "/" + this.topic + "/$1?instance=" + this.instance);
         code = code.replace(/link:/g, urls.client + "browser/");
@@ -120,10 +86,11 @@ export class KMapKnowledgeCardDescription extends LitElement {
           id = id.replaceAll(/[-_ ]/g, "-");
           return `<h3><a href="${urls.client}browser/${this.subject}/${this.chapter}/${this.topic}#${id}" id="${id}">${text}</a></h3>`;
         });
-        await lazyComponents(code);
-        math(code, setter);
-      } else
-        setter("");
+        lazyComponents(code);
+        this._description = math(code);
+      }
+      else
+        this._description = '';
     }
   }
 
