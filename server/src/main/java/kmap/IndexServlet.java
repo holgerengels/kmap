@@ -16,6 +16,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 
 import static kmap.JSON.string;
+import static kmap.JsonLD.SERVER;
 import static kmap.Server.readProperties;
 import static kmap.URLs.encodePath;
 
@@ -39,8 +40,9 @@ public class IndexServlet extends JsonServlet {
 
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String title = "KMap";
+        String url = null;
         String description = "KMap kartographiert Wissen mit Zusammenhang";
-        String image = null;
+        String image = "https://kmap.eu/app/icons/KMap-Logo-cropped.png";
         String author = "KMap Team";
         String text = "";
         String created = null;
@@ -68,14 +70,18 @@ public class IndexServlet extends JsonServlet {
                             String topic = path[3];
                             title = subject + " - " + chapter + " - " + topic;
                             card = couch.loadTopic(subject, chapter, topic);
-                            image = JSON.string(card, "thumb") != null
+                            String thumb = JSON.string(card, "thumb");
+                            if ("".equals(thumb))
+                                thumb = null;
+                            image = thumb != null
                                     ? "https://kmap.eu/" + encodePath("server", "data", subject, chapter, topic, JSON.string(card, "thumb")) + "?instance=root"
                                     : "https://kmap.eu/" + encodePath("snappy", subject, chapter, topic + ".png");
+                            url = SERVER + encodePath("app", "browser", subject, chapter, topic);
                         }
                         else {
                             title = subject + " - " + chapter;
                             card = couch.loadTopic(subject, chapter, "_");
-                            image = "https://kmap.eu/app/icons/KMap-Logo-cropped.png";
+                            url = SERVER + encodePath("app", "browser", subject, chapter);
                         }
                         if (card != null) {
                             String cardSummary = string(card, "summary");
@@ -120,13 +126,22 @@ public class IndexServlet extends JsonServlet {
             Server.CLIENT.remove();
         }
 
+        boolean kcard = created != null || modified != null || section != null;
         String string = file;
         string = string.replace("<title>KMap</title>", "<title>" + title + "</title>");
-        string = string.replace("<meta ogtitle=\"\">", "<meta property=\"og:title\" content=\"" + title + "\">");
-        string = string.replace("<meta ogdescription=\"\">", "<meta property=\"og:description\" content=\"" + description + "\">");
-        string = string.replace("<meta ogimage=\"\">", "<meta property=\"og:image\" content=\"" + image + "\">");
-        string = string.replace("<meta author=\"\">", "<meta name=\"author\" content=\"" + author + "\">");
         StringBuilder builder = new StringBuilder();
+        builder.append("<meta name=\"description\" content=\"").append(description).append("\">");
+        if (author != null)
+            builder.append("<meta name=\"author\" content=\"").append(author).append("\">");
+        if (keywords != null)
+            builder.append("<meta name=\"keywords\" content=\"").append(keywords).append("\">");
+
+        builder.append(kcard ? "<meta name=\"og:type\" content=\"article\">" : "<meta name=\"og:type\" content=\"website\">");
+        builder.append("<meta property=\"og:url\" content=\"").append(url).append("\">");
+        builder.append("<meta property=\"og:title\" content=\"").append(title).append("\">");
+        builder.append("<meta property=\"og:description\" content=\"").append(description).append("\">");
+        builder.append("<meta property=\"og:image\" content=\"").append(image).append("\">");
+
         if (created != null)
             builder.append("<meta name=\"article:pulished_time\" content=\"").append(created).append("\">");
         if (modified != null)
@@ -135,13 +150,10 @@ public class IndexServlet extends JsonServlet {
             builder.append("<meta name=\"article:section\" content=\"").append(section).append("\">");
         if (keywords != null)
             builder.append("<meta name=\"article:tag\" content=\"").append(keywords).append("\">");
-        if (builder.length() > 0) {
+        if (author != null)
             builder.append("<meta name=\"article:author\" content=\"").append(author).append("\">");
-            string = string.replace("<meta type=\"\">", "<meta name=\"og:type\" content=\"article\">" + builder.toString());
-        }
-        else
-            string = string.replace("<meta type=\"\">", "<meta name=\"og:type\" content=\"website\">");
 
+        string = string.replace("<meta gen=\"\">", builder);
         string = string.replace("<meta jsonld=\"\">", jsonld != null
                 ? "<script id=\"ld\" type=\"application/ld+json\">" + jsonld + "</script><meta name=\"ld+generation\" content=\"server\">"
                 : "");
