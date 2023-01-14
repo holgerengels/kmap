@@ -1,4 +1,4 @@
-export interface TestInteraction {
+export interface TestInteraction extends HTMLElement {
   init(): void,
   bark(): void,
   showAnswer(): void,

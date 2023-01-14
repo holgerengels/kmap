@@ -87,6 +87,16 @@ export class KMapTestCardContent extends LitElement {
       return '';
   }
 
+  private forEachTestInteraction(fun: (testInteraction: TestInteraction) => void) {
+    var element = this._answerElement;
+    [
+      ...element.getElementsByTagName("dnd-assign"),
+      ...element.getElementsByTagName("dnd-fillin"),
+      ...element.getElementsByTagName("kmap-solve-tree"),
+      ...element.getElementsByTagName("kmap-jsxgraph"),
+    ].forEach(element => fun(element as unknown as TestInteraction));
+  }
+
   init() {
     var element = this._answerElement;
     var inputs = element.getElementsByTagName("input");
@@ -99,17 +109,11 @@ export class KMapTestCardContent extends LitElement {
       else
         input.value = '';
     }
-    var elements = [
-      ...element.getElementsByTagName("dnd-assign"),
-      ...element.getElementsByTagName("dnd-fillin"),
-      ...element.getElementsByTagName("kmap-solve-tree"),
-      ...element.getElementsByTagName("kmap-jsxgraph"),
-    ]
-    for (const element of elements) {
-      const testInteraction: TestInteraction = element as unknown as TestInteraction;
+
+    this.forEachTestInteraction((testInteraction: TestInteraction) => {
       testInteraction.init();
-      element.removeAttribute("correctness");
-    }
+      testInteraction.removeAttribute("correctness");
+    });
   }
 
   checkValues(): boolean {
@@ -133,18 +137,11 @@ export class KMapTestCardContent extends LitElement {
       input.setAttribute("correctness", correct ? "correct" : "incorrect");
     }
 
-    var elements = [
-      ...element.getElementsByTagName("dnd-assign"),
-      ...element.getElementsByTagName("dnd-fillin"),
-      ...element.getElementsByTagName("kmap-solve-tree"),
-      ...element.getElementsByTagName("kmap-jsxgraph"),
-    ]
-    for (const element of elements) {
-      const testInteraction: TestInteraction = element as unknown as TestInteraction;
+    this.forEachTestInteraction((testInteraction: TestInteraction) => {
       everythingCorrect = everythingCorrect && testInteraction.isValid();
-      element.setAttribute("correctness", testInteraction.isValid() ? "correct" : "incorrect");
+      testInteraction.setAttribute("correctness", testInteraction.isValid() ? "correct" : "incorrect");
       testInteraction.bark();
-    }
+    });
     return everythingCorrect;
   }
 
@@ -164,17 +161,10 @@ export class KMapTestCardContent extends LitElement {
       input.removeAttribute("correctness");
     }
 
-    var elements = [
-      ...element.getElementsByTagName("dnd-assign"),
-      ...element.getElementsByTagName("dnd-fillin"),
-      ...element.getElementsByTagName("kmap-solve-tree"),
-      ...element.getElementsByTagName("kmap-jsxgraph"),
-    ]
-    for (const element of elements) {
-      const testInteraction: TestInteraction = element as unknown as TestInteraction;
+    this.forEachTestInteraction((testInteraction: TestInteraction) => {
       testInteraction.showAnswer();
-      element.removeAttribute("correctness");
-    }
+      testInteraction.removeAttribute("correctness");
+    });
   }
 
   private canonicalize(value: string) {
