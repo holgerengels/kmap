@@ -144,9 +144,10 @@ export class KMapCard extends LitElement {
           flex-direction: column;
         }
         div.teaser {
-          position: absolute; top: 16px; right: 16px;
+          position: absolute; top: 0px; right: 0px;
+          border-top-right-radius: 4px;
+          padding: 16px;
           z-index: 2;
-          --foreground: rgba(0, 0, 0, 0.2);
           align-items: center;
         }
         .actions {
@@ -192,7 +193,7 @@ export class KMapCard extends LitElement {
   }
   _renderTeaser() {
     return this._teaserElements.length !== 0 ? html`
-      <div class="teaser"><slot name="teaser" @slotchange=${this._slotChange}></slot></div>
+      <div class="teaser" part="teaser"><slot name="teaser" @slotchange=${this._slotChange}></slot></div>
     ` : html`<slot name="teaser" @slotchange=${this._slotChange}></slot>`;
   }
   _renderPrimary() {
@@ -216,7 +217,6 @@ export class KMapCard extends LitElement {
       <div class="secondary" style="${styleMap(this._secondaryStyles)}">
         <slot @slotchange=${this._slotChange}></slot>
       </div>
-      ${this._secondaryElements.length === 7 ? html`<kmap-card-spacer></kmap-card-spacer>` : ''}
     `;
   }
   _renderActions() {
@@ -276,10 +276,9 @@ export class KMapCardDivider extends LitElement {
       css`
         hr {
           width: calc(100% - 32px);
-          margin-top: 16px;
-          margin-bottom: 16px;
+          margin: 16px;
           border: none;
-          background-color: lightgrey;
+          background-color: var(--color-lightgray);
           height: 1px;
         }
       `];

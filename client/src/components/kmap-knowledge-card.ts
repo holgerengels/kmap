@@ -3,7 +3,6 @@ import {customElement, property, query, state} from 'lit/decorators.js';
 import {Connected} from "./connected";
 import {State, store} from "../store";
 
-import {StyleInfo, styleMap} from 'lit/directives/style-map.js';
 import '@material/mwc-icon';
 import './star-rating';
 import './kmap-card'
@@ -46,7 +45,7 @@ export class KMapKnowledgeCard extends Connected {
   @state()
   private _exercises: Attachment[] = [];
   @state()
-  private _colorStyles: StyleInfo = { backgroundColor: "white" };
+  private _color: string = 'white';
   @state()
   private _testCount?: number;
   @state()
@@ -89,7 +88,7 @@ export class KMapKnowledgeCard extends Connected {
   }
 
   _colorize(rate) {
-    this._colorStyles = { backgroundColor: rate !== 0 ? "hsl(" + 120 * (rate-1)/4 + ", 100%, 90%)" : "white" };
+    this._color = rate !== 0 ? "hsl(" + 120 * (rate-1)/4 + ", 100%, 90%)" : "white";
   }
 
   _rated(e) {
@@ -209,6 +208,9 @@ export class KMapKnowledgeCard extends Connected {
         [hidden] {
           display: none;
         }
+        kmap-card::part(teaser) {
+          --foreground: rgba(0, 0, 0, 0.2);
+        }
       `];
   }
 
@@ -218,7 +220,12 @@ export class KMapKnowledgeCard extends Connected {
     else
       // language=HTML
       return html`
-      <kmap-card style=${styleMap(this._colorStyles)}>
+        <style>
+          kmap-card::part(teaser) {
+              background: linear-gradient(to right top, white 50%, ${this._color} );
+          }
+        </style>
+      <kmap-card>
         <kmap-card-text>
           ← <a href="/app/browser/${encodePath(this.card.subject, this.card.chapter)}" title="Wissenslandkarte ${this.card.chapter}">${this.card.chapter}</a>
         </kmap-card-text>
