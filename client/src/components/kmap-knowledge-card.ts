@@ -88,7 +88,7 @@ export class KMapKnowledgeCard extends Connected {
   }
 
   _colorize(rate) {
-    this._color = rate !== 0 ? "hsl(" + 120 * (rate-1)/4 + ", 100%, 90%)" : "white";
+    this._color = rate !== 0 ? "hsl(" + 120 * (rate-1)/4 + ", 100%, 80%)" : "white";
   }
 
   _rated(e) {
@@ -209,6 +209,7 @@ export class KMapKnowledgeCard extends Connected {
           display: none;
         }
         kmap-card::part(teaser) {
+          width: 100px;
           --foreground: rgba(0, 0, 0, 0.2);
         }
       `];

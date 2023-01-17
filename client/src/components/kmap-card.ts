@@ -148,7 +148,9 @@ export class KMapCard extends LitElement {
           border-top-right-radius: 4px;
           padding: 16px;
           z-index: 2;
-          align-items: center;
+          align-items: end;
+          display: flex;
+          flex-flow: column;
         }
         .actions {
           position: relative;
