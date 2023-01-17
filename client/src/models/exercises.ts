@@ -91,7 +91,7 @@ export default createModel({
           modified: state.exercises.test?.modified,
           author: state.exercises.test?.author,
           keywords: [subject, chapter, topic, key],
-          breadcrumbs: ["exercises", subject, chapter, topic, key],
+          breadcrumbs: ["exercise", subject, chapter, topic, key],
           about: [subject],
           type: ["Übung"]
         });
