@@ -204,7 +204,6 @@ const updateLd = (ld) => {
 };
 
 const breadCrumbsLd = function(path: string[]) {
-  console.log(path);
   const page = path.shift();
   const key = page === "exercise" ? path.pop() : undefined;
 
@@ -221,7 +220,6 @@ const breadCrumbsLd = function(path: string[]) {
         : a.slice(0, i+1).map(p => encodeURIComponent(p)).join("/"))
     }
   });
-  console.log(items)
   switch (page) {
     case "test":
       items.push({
@@ -240,7 +238,6 @@ const breadCrumbsLd = function(path: string[]) {
       });
       break;
   }
-  console.log(items)
 
   return {
     "@context": "https://schema.org",
