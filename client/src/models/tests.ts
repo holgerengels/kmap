@@ -429,11 +429,11 @@ export default createModel({
             if (subject && chapter) {
               if (topic) {
                 title = "Aufgaben zum Thema " + subject + " → " + chapter + " → " + topic;
-                breadcrumbs = ["tests", subject, chapter, topic];
+                breadcrumbs = ["test", subject, chapter, topic];
               }
               else {
                 title = "Aufgaben zum Thema " + subject + " → " + chapter;
-                breadcrumbs = ["tests", subject, chapter];
+                breadcrumbs = ["test", subject, chapter];
               }
               description = "Ermittle Deinen Wissensstand mit Hilfe von interaktiven Aufgaben!";
             }

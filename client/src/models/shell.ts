@@ -204,8 +204,12 @@ const updateLd = (ld) => {
 };
 
 const breadCrumbsLd = function(path: string[]) {
+  console.log(path);
   const page = path.shift();
-  const key = page === "exercises" ? path.pop() : undefined;
+  const key = page === "exercise" ? path.pop() : undefined;
+
+  if (path.length === 2 && path[0] === path[1])
+    path.pop();
 
   const items = path.map((v, i, a) => {
     return {
@@ -217,9 +221,9 @@ const breadCrumbsLd = function(path: string[]) {
         : a.slice(0, i+1).map(p => encodeURIComponent(p)).join("/"))
     }
   });
-
+  console.log(items)
   switch (page) {
-    case "tests":
+    case "test":
       items.push({
         "@type": "ListItem",
         "position": items.length + 1,
@@ -227,15 +231,16 @@ const breadCrumbsLd = function(path: string[]) {
         "item": "https://kmap.eu" + urls.client + "test/" + path.map(p => encodeURIComponent(p)).join("/")
       });
       break;
-    case "exercises":
+    case "exercise":
       items.push({
         "@type": "ListItem",
         "position": items.length + 1,
         "name": "Test",
-        "item": "https://kmap.eu" + urls.client + "exercises/" + path.map(p => encodeURIComponent(p)).join("/") + "/" + key,
+        "item": "https://kmap.eu" + urls.client + "exercise/" + path.map(p => encodeURIComponent(p)).join("/") + "/" + encodeURIComponent(key as string),
       });
       break;
   }
+  console.log(items)
 
   return {
     "@context": "https://schema.org",
