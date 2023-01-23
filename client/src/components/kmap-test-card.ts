@@ -211,6 +211,7 @@ export class KMapTestCard extends Connected {
             color: var(--color-secondary-dark)
           }
         }
+        a[slot=teaser] { text-decoration: none }
       `];
   }
 
@@ -249,7 +250,7 @@ export class KMapTestCard extends Connected {
            ?hidden="${!this.solutionVisible}">
         </kmap-test-card-solution>
 
-        <div slot="teaser" title="${ifDefined(this.author ? 'Autor: ' + this.author : undefined)}">${by}</div>
+        <a slot="teaser" rel="author" href="https://kmap.eu/app/browser/Hilfe/Autoren/${this.author}" title="${ifDefined(this.author ? 'CC BY-SA - ' + this.author : undefined)}">${by}<span style="font-size: 0">${this.author}</span></a>
         <mwc-button slot="button" ?hidden="${this.repetitions === 1}" @click="${this.init}">Neue Aufgabe</mwc-button>
         <mwc-button slot="button" @click="${this._showAnswer}">Antwort zeigen</mwc-button>
         <mwc-button slot="button" @click="${this._showHint}" ?hidden="${!this.hint}">Tipp</mwc-button>

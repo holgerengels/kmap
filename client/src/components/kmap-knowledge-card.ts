@@ -212,6 +212,7 @@ export class KMapKnowledgeCard extends Connected {
           width: 100px;
           --foreground: rgba(0, 0, 0, 0.2);
         }
+        a[slot=teaser] { text-decoration: none }
       `];
   }
 
@@ -223,7 +224,7 @@ export class KMapKnowledgeCard extends Connected {
       return html`
         <style>
           kmap-card::part(teaser) {
-              background: linear-gradient(to right top, white 50%, ${this._color} );
+            background: linear-gradient(to right top, rgba(255,255,255,0) 50%, ${this._color} );
           }
         </style>
       <kmap-card>
@@ -332,7 +333,7 @@ export class KMapKnowledgeCard extends Connected {
         </div>
         ` : '' }
 
-          <div slot="teaser" style="display: flex" title="${ifDefined(this.card.author ? 'CC BY-SA Autor: ' + this.card.author : undefined)}">${by}</div>
+          <a slot="teaser" rel="author" href="https://kmap.eu/app/browser/Hilfe/Autoren/${this.card.author}" title="${ifDefined(this.card.author ? 'CC BY-SA - ' + this.card.author : undefined)}">${by}<span style="font-size: 0">${this.card.author}</span></a>
           <span class="button" slot="button"><b>←</b> <a href="/app/browser/${encodePath(this.card.subject, this.card.chapter)}" title="Wissenslandkarte ${this.card.chapter}">${this.card.chapter}</a></span>
 
           ${!this.card.links && false ? html`
