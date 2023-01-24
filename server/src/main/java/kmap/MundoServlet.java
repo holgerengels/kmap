@@ -99,7 +99,7 @@ public class MundoServlet extends JsonServlet {
                     createNode(eventWriter, "itunes:keywords", keywords, null, false);
                     createNode(eventWriter, "itunes:image", null, Map.of("href", "https://kmap.eu/snappy/" + URLs.encode(subject) + "/" + URLs.encode(chapter) + "/" + URLs.encode(topic) + ".png"), false);
 
-                    createNode(eventWriter, "sdx:userGroups", "pupils");
+                    createNode(eventWriter, "sdx:userGroups", "learner");
                     createNode(eventWriter, "sdx:learnResourceType", "Unterrichtsbaustein");
                     createNode(eventWriter, "sdx:educationalLevel", string(card, "educationalContext"));
                     createNode(eventWriter, "sdx:classLevel", minmax(string(card, "educationalLevel")));
