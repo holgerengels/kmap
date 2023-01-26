@@ -218,7 +218,7 @@ export class KMapKnowledgeCard extends Connected {
 
   render() {
     if (this.card === undefined)
-      return html`card undefined`;
+      return '';
     else
       // language=HTML
       return html`
