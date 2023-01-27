@@ -1,9 +1,9 @@
 <!doctype html>
 <html lang="de">
 <head>
-  <title>KMap</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>KMap</title>
   <base href="/app/">
   <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#5eb8ff">
@@ -12,20 +12,13 @@
   <meta jsonld>
   <meta property="fb:app_id" content="3514005508685218">
 
-  <script>
-    if (typeof window.queueMicrotask !== "function") {
-      window.queueMicrotask = function (callback) {
-        Promise.resolve()
-          .then(callback)
-          .catch(e => setTimeout(() => { throw e; }));
-      };
-    }
-  </script>
-
   <link rel="stylesheet" href="./icon-fonts.css" as="style" media="print" onload="this.media='all'">
   <link rel="stylesheet" href="./roboto-fonts.css" as="style" media="print" onload="this.media='all'">
 
-  <link rel="preload" href="/app/fonts/KaTeX_Main-Bold.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/app/fonts/KaTeX_Main.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/app/fonts/KaTeX_Math.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/app/fonts/KaTeX_AMS.woff2" as="font" type="font/woff2" crossorigin>
+  <!--link rel="preload" href="/app/fonts/KaTeX_Main-Bold.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/app/fonts/KaTeX_Main-BoldItalic.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/app/fonts/KaTeX_Main-Italic.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/app/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin>
@@ -34,7 +27,7 @@
   <link rel="preload" href="/app/fonts/KaTeX_Size1-Regular.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/app/fonts/KaTeX_Size2-Regular.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/app/fonts/KaTeX_Size3-Regular.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="/app/fonts/KaTeX_Size4-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/app/fonts/KaTeX_Size4-Regular.woff2" as="font" type="font/woff2" crossorigin-->
   <link rel="stylesheet" href="./katex-fonts.css">
 
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
