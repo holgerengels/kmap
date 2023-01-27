@@ -51,6 +51,8 @@ public class IndexServlet extends JsonServlet {
         String keywords = null;
         String jsonld = null;
 
+        String embeddedTopic = null;
+
         try {
             Server.CLIENT.set(extractClient(req));
 
@@ -77,6 +79,7 @@ public class IndexServlet extends JsonServlet {
                                     ? "https://kmap.eu/" + encodePath("server", "data", subject, chapter, topic, JSON.string(card, "thumb")) + "?instance=root"
                                     : "https://kmap.eu/" + encodePath("snappy", subject, chapter, topic + ".png");
                             url = SERVER + encodePath("app", "browser", subject, chapter, topic);
+                            embeddedTopic = card.toString();
                         }
                         else {
                             title = subject + " - " + chapter;
@@ -152,6 +155,9 @@ public class IndexServlet extends JsonServlet {
             builder.append("<meta name=\"article:tag\" content=\"").append(keywords).append("\">");
         if (author != null)
             builder.append("<meta name=\"article:author\" content=\"").append(author).append("\">");
+
+        if (embeddedTopic != null)
+            builder.append("<script id=\"embedded-topic\" type=\"json\">").append(embeddedTopic).append("</script>");
 
         string = string.replace("<meta gen=\"\">", builder);
         string = string.replace("<meta jsonld=\"\">", jsonld != null

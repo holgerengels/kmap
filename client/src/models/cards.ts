@@ -10,6 +10,7 @@ export interface CardState {
   topic?: string,
   loaded?: string,
   card?: Card,
+  embedded?: Card,
   loading: boolean,
   error: string,
 }
@@ -21,6 +22,7 @@ export default createModel({
     topic: undefined,
     loaded: undefined,
     card: undefined,
+    embedded: undefined,
     loading: false,
     error: "",
   },
@@ -43,8 +45,14 @@ export default createModel({
     received(state, payload: Card) {
       return { ...state,
         card: payload,
+        embedded: undefined,
         loaded: "" + state.subject + state.chapter + state.topic,
         loading: false,
+      };
+    },
+    embedded(state, payload: Card) {
+      return { ...state,
+        embedded: payload,
       };
     },
     forget(state) {
@@ -70,6 +78,13 @@ export default createModel({
     return {
       async init() {
         navigator.serviceWorker.addEventListener('message', dispatch.cards.cacheUpdate);
+        let element = document.getElementById("embedded-topic");
+        if (element) {
+          const json = element.innerText;
+          element.remove();
+          console.log(json)
+          dispatch.cards.embedded(JSON.parse(json));
+        }
       },
       async cacheUpdate(event: MessageEvent) {
         console.log(event);
@@ -88,20 +103,24 @@ export default createModel({
       async load() {
         const state = store.getState();
 
-        if (!state.cards.topic)
-          return;
         //const load = "" + state.cards.subject + state.cards.chapter + state.cards.topic;
         if (!state.cards.subject || !state.cards.chapter || !state.cards.topic) return;
 
-        //if (state.cards.loaded !== load) {
-          console.log("reloading card " + state.cards.subject + " " + state.cards.chapter + " "+ state.cards.topic);
+        if (state.cards.embedded
+          && state.cards.embedded.subject === state.cards.subject
+          && state.cards.embedded.chapter === state.cards.chapter
+          && state.cards.embedded.topic === state.cards.topic) {
+          console.log("EMBEDDED CARD");
+          dispatch.cards.received(state.cards.embedded);
+        }
+        else {
+          console.log("reloading card " + state.cards.subject + " " + state.cards.chapter + " " + state.cards.topic);
           dispatch.cards.request();
           fetchjson(`${urls.server}data?topic=${encodeURIComponent(state.cards.topic)}&chapter=${encodeURIComponent(state.cards.chapter)}&subject=${encodeURIComponent(state.cards.subject)}`, endpoint.get(state),
             dispatch.cards.received,
             dispatch.app.handleError,
             dispatch.cards.error);
-          // dispatch.shell.showMessage("Die Wissenskarte " + state.maps.subject + " → " + state.maps.chapter + " → " + state.maps.topic + " existiert nicht!");
-        //}
+        }
       },
 
       'routing/change': async function (routing: RoutingState<string>) {
