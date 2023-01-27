@@ -80,10 +80,8 @@ export default createModel({
         navigator.serviceWorker.addEventListener('message', dispatch.cards.cacheUpdate);
         let element = document.getElementById("embedded-topic");
         if (element) {
-          const json = element.innerText;
+          dispatch.cards.embedded(JSON.parse(element.innerText));
           element.remove();
-          console.log(json)
-          dispatch.cards.embedded(JSON.parse(json));
         }
       },
       async cacheUpdate(event: MessageEvent) {
