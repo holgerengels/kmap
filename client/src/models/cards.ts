@@ -15,6 +15,12 @@ export interface CardState {
   error: string,
 }
 
+function same(card: Card, cards: CardState) {
+  return card.subject === cards.subject
+  && card.chapter === cards.chapter
+  && card.topic === cards.topic
+}
+
 export default createModel({
   state: <CardState>{
     subject: undefined,
@@ -104,10 +110,7 @@ export default createModel({
         //const load = "" + state.cards.subject + state.cards.chapter + state.cards.topic;
         if (!state.cards.subject || !state.cards.chapter || !state.cards.topic) return;
 
-        if (state.cards.embedded
-          && state.cards.embedded.subject === state.cards.subject
-          && state.cards.embedded.chapter === state.cards.chapter
-          && state.cards.embedded.topic === state.cards.topic) {
+        if (state.cards.embedded && same(state.cards.embedded, state.cards)) {
           console.log("EMBEDDED CARD");
           dispatch.cards.received(state.cards.embedded);
         }
@@ -139,7 +142,7 @@ export default createModel({
       'cards/received': async function() {
         const state = store.getState();
         const card = state.cards.card;
-        if (card) {
+        if (card && same(card, state.cards)) {
           const subject = state.maps.subject || '';
           const chapter = state.maps.chapter || '';
           const topic = state.maps.topic || '';
