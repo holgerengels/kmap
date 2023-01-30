@@ -5,6 +5,12 @@ import {installOfflineWatcher} from 'pwa-helpers/network.js';
 import {connect, RoutingState} from '@captaincodeman/rdx'
 import {State, store} from './store'
 
+import './components/kmap-subjects';
+import './components/kmap-browser';
+import './components/kmap-summary-card';
+import './components/kmap-knowledge-card';
+import './components/kmap-timeline-selector';
+
 import '@material/mwc-button';
 import '@material/mwc-button';
 import '@material/mwc-drawer';
@@ -14,10 +20,6 @@ import '@material/mwc-snackbar';
 import '@material/mwc-switch';
 import 'pwa-helper-components/pwa-install-button';
 import 'pwa-helper-components/pwa-update-available';
-
-import './components/kmap-subjects';
-import './components/kmap-browser';
-import './components/kmap-timeline-selector';
 
 import {colorStyles, elevationStyles, fontStyles, resetStyles} from "./components/kmap-styles";
 import {Snackbar} from "@material/mwc-snackbar/mwc-snackbar";
@@ -145,17 +147,6 @@ export class KmapMain extends connect(store, LitElement) {
     installMediaQueryWatcher(`(max-width: 500px)`, (matches) => store.dispatch.shell.updateNarrow(matches));
     installMediaQueryWatcher(`(min-width: 1600px)`, (matches) => store.dispatch.shell.updateWide(matches));
     this.installOnErrorHandler();
-
-    var supportsPassive = false;
-    try {
-      var opts = Object.defineProperty({}, 'passive', { get: function() { supportsPassive = true; } });
-      // @ts-ignore
-      window.addEventListener("testPassive", null, opts);
-      // @ts-ignore
-      window.removeEventListener("testPassive", null, opts);
-    } catch (e) {}
-    console.log("passive eventlisteners supported: " + supportsPassive);
-    store.dispatch.shell.updatePassiveEventListeners(supportsPassive);
 
     document.body.addEventListener('mousemove', () => {
       this._userActive = true;

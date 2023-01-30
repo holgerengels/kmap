@@ -25,7 +25,6 @@ export interface ShellState {
   narrow: boolean,
   wide: boolean,
   drawerOpen: boolean,
-  passiveEventListeners: boolean,
   messages: string[],
   layers: string[],
   compactCards: boolean,
@@ -37,7 +36,6 @@ export default createModel({
     narrow: false,
     wide: false,
     drawerOpen: false,
-    passiveEventListeners: false,
     messages: [],
     layers: ["ratings", "summaries"],
     compactCards: false,
@@ -63,9 +61,6 @@ export default createModel({
     },
     clearMessages(state) {
       return { ...state, messages: [] }
-    },
-    updatePassiveEventListeners(state, passiveEventListeners: boolean) {
-      return { ...state, passiveEventListeners: passiveEventListeners }
     },
     addLayer(state, layer: string) {
       return { ...state, layers: state.layers.includes(layer) ? state.layers : [...state.layers, layer].sort() }

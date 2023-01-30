@@ -81,9 +81,6 @@ export class KMapBrowser extends Connected {
   // @ts-ignore
   private wide: boolean = false;
 
-  @state()
-  private _passiveEventListeners: boolean = false;
-
   @query('#timeline', true)
   private _timelineElement: KMapTimelineAside;
 
@@ -98,7 +95,6 @@ export class KMapBrowser extends Connected {
       _layers: state.shell.layers,
       wide: !state.shell.narrow,
       drawerOpen: state.shell.drawerOpen && !state.shell.narrow,
-      _passiveEventListeners: state.shell.passiveEventListeners,
       _subject: state.maps.subject,
       _chapter: state.maps.chapter,
       _topic: state.maps.topic,
@@ -115,8 +111,8 @@ export class KMapBrowser extends Connected {
 
   protected firstUpdated() {
     this._sideBar(this.timelineState);
-    this._timelineElement.addEventListener('touchstart', this._swipeStart, this._passiveEventListeners ? { passive: true } : false);
-    this._timelineElement.addEventListener('touchmove', this._swipeMove, this._passiveEventListeners ? { passive: true } : false);
+    this._timelineElement.addEventListener('touchstart', this._swipeStart, { passive: true });
+    this._timelineElement.addEventListener('touchmove', this._swipeMove, { passive: true });
     this._timelineElement.addEventListener('touchend', this._swipeEnd);
   }
 
@@ -355,7 +351,7 @@ export class KMapBrowser extends Connected {
         <svg-connector id="connector"></svg-connector>
       ` : '' }
 
-      <div ?active="${this._page === 'map'}" @rated="${this._rated}" class="cards" style="${styleMap(gridStyles)}">
+      ${!this._topic ? html`<div ?active="${this._page === 'map'}" @rated="${this._rated}" class="cards" style="${styleMap(gridStyles)}">
         ${this._chapterCard ? this._renderChapterCard() : ''}
         ${this._lines.map((line) => html`
           ${line.cards.map((card, index) => html`
@@ -363,6 +359,7 @@ export class KMapBrowser extends Connected {
           `)}
         `)}
       </div>
+      ` : ''}
 
       ${this._topic ? html`<kmap-knowledge-card @rated="${this._rated}"></kmap-knowledge-card>` : ''}
 

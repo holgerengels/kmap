@@ -33,7 +33,7 @@ export default createModel({
     error: "",
   },
   reducers: {
-    'routing/change'(state, routing: RoutingState<string>) {
+    applyRoute(state, routing: RoutingState<string>) {
       return routing.page === 'browser' ? {
         ...state,
         subject: routing.params["subject"] ? decodeURIComponent(routing.params["subject"]) : undefined,
@@ -91,7 +91,6 @@ export default createModel({
         }
       },
       async cacheUpdate(event: MessageEvent) {
-        console.log(event);
         if (event.data.meta === 'workbox-broadcast-update') {
           const {cacheName, updatedURL}: { cacheName: string; updatedURL: string } = event.data.payload;
           const cache = await caches.open(cacheName);
@@ -108,14 +107,15 @@ export default createModel({
         const state = store.getState();
 
         //const load = "" + state.cards.subject + state.cards.chapter + state.cards.topic;
-        if (!state.cards.subject || !state.cards.chapter || !state.cards.topic) return;
+        if (!state.cards.subject || !state.cards.chapter || !state.cards.topic)
+          return;
 
         if (state.cards.embedded && same(state.cards.embedded, state.cards)) {
           console.log("EMBEDDED CARD");
           dispatch.cards.received(state.cards.embedded);
         }
         else {
-          console.log("reloading card " + state.cards.subject + " " + state.cards.chapter + " " + state.cards.topic);
+          console.log("LOADING CARD " + state.cards.subject + " " + state.cards.chapter + " " + state.cards.topic);
           dispatch.cards.request();
           fetchjson(`${urls.server}data?topic=${encodeURIComponent(state.cards.topic)}&chapter=${encodeURIComponent(state.cards.chapter)}&subject=${encodeURIComponent(state.cards.subject)}`, endpoint.get(state),
             dispatch.cards.received,
@@ -124,13 +124,6 @@ export default createModel({
         }
       },
 
-      'routing/change': async function (routing: RoutingState<string>) {
-        switch (routing.page) {
-          case 'browser':
-            await dispatch.cards.load();
-            break;
-        }
-      },
       'app/chooseInstance': async function () {
         const state = store.getState();
         const routing: RoutingState<string> = state.routing;
@@ -139,13 +132,23 @@ export default createModel({
           dispatch.cards.load();
       },
 
+      'routing/change': function (routing: RoutingState<string>) {
+        switch (routing.page) {
+          case 'browser':
+            dispatch.cards.applyRoute(routing);
+            dispatch.cards.load();
+            break;
+        }
+      },
+
       'cards/received': async function() {
         const state = store.getState();
+
         const card = state.cards.card;
         if (card && same(card, state.cards)) {
-          const subject = state.maps.subject || '';
-          const chapter = state.maps.chapter || '';
-          const topic = state.maps.topic || '';
+          const subject = state.cards.subject || '';
+          const chapter = state.cards.chapter || '';
+          const topic = state.cards.topic || '';
           dispatch.shell.updateMeta({
             title: chapter,
             detail: card.topic,

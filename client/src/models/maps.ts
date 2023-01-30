@@ -56,7 +56,7 @@ export default createModel({
     latestTimestamp: -1,
   },
   reducers: {
-    'routing/change'(state, routing: RoutingState<string>) {
+    applyRoute(state, routing: RoutingState<string>) {
       return routing.page === 'browser' ? {
         ...state,
         subject: routing.params["subject"] ? decodeURIComponent(routing.params["subject"]) : undefined,
@@ -84,8 +84,8 @@ export default createModel({
     received(state, payload: MapState) {
       return { ...state,
         lines: payload.lines,
-        loaded: "" + state.subject + state.chapter,
         chapterCard: payload.chapterCard,
+        loaded: "" + state.subject + state.chapter,
         loading: false,
       };
     },
@@ -183,7 +183,6 @@ export default createModel({
         navigator.serviceWorker.addEventListener('message', dispatch.maps.cacheUpdate);
       },
       async cacheUpdate(event: MessageEvent) {
-        console.log(event);
         if (event.data.meta === 'workbox-broadcast-update') {
           const {cacheName, updatedURL}: { cacheName: string; updatedURL: string } = event.data.payload;
           const cache = await caches.open(cacheName);
@@ -214,15 +213,13 @@ export default createModel({
         //const load = "" + state.maps.subject + state.maps.chapter;
         if (!state.maps.subject || !state.maps.chapter) return;
 
-        //if (state.maps.loaded !== load) {
-          console.log("reloading map " + state.maps.subject + " " + state.maps.chapter);
-          dispatch.maps.unselectCard();
-          dispatch.maps.request();
-          fetchjson(`${urls.server}data?load=${encodeURIComponent(state.maps.chapter)}&subject=${encodeURIComponent(state.maps.subject)}`, endpoint.get(state),
-            dispatch.maps.loadedMap,
-            dispatch.app.handleError,
-            dispatch.maps.error);
-        //}
+        console.log("LOADING MAP " + state.maps.subject + " " + state.maps.chapter);
+        dispatch.maps.unselectCard();
+        dispatch.maps.request();
+        fetchjson(`${urls.server}data?load=${encodeURIComponent(state.maps.chapter)}&subject=${encodeURIComponent(state.maps.subject)}`, endpoint.get(state),
+          dispatch.maps.loadedMap,
+          dispatch.app.handleError,
+          dispatch.maps.error);
       },
       loadedMap(json) {
         const state = store.getState();
@@ -323,10 +320,11 @@ export default createModel({
           dispatch.maps.error);
       },
 
-      'routing/change': async function (routing: RoutingState<string>) {
+      'routing/change': function (routing: RoutingState<string>) {
         switch (routing.page) {
           case 'browser':
-            await dispatch.maps.load();
+            dispatch.maps.applyRoute(routing);
+            dispatch.maps.load();
             break;
           case 'home':
             dispatch.maps.loadLatest("Mathematik");
