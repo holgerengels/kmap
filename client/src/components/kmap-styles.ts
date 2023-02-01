@@ -143,6 +143,22 @@ export const formStyles: CSSResult = css`
 `;
 
 // language=CSS
+export const calculationStyles: CSSResult = css`
+  calculation {
+    display: grid;
+    grid-gap: 16px;
+    grid-template-columns: max-content auto;
+  }
+  step {
+    grid-column: 1;
+  }
+  notes {
+    grid-column: 2;
+    font-size: small;
+  }
+`;
+
+// language=CSS
 export const elevationStyles: CSSResult = css`
 :host {
     --elevation-00: 0px 0px 0px 0px rgba(0, 0, 0, 0.2), 0px 0px 0px 0px rgba(0, 0, 0, 0.14), 0px 0px 0px 0px rgba(0, 0, 0, 0.12);

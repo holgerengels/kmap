@@ -2,7 +2,7 @@ import {LitElement, html, css} from 'lit';
 import {customElement, property, state} from 'lit/decorators.js';
 import {unsafeHTML} from 'lit/directives/unsafe-html.js';
 import {urls} from '../urls';
-import {colorStyles, fontStyles, resetStyles} from "./kmap-styles";
+import {calculationStyles, colorStyles, fontStyles, resetStyles} from "./kmap-styles";
 import {katexStyles} from "../katex-css";
 import {math} from "../math";
 import {lazyComponents} from "./lazy-components";
@@ -117,6 +117,7 @@ export class KMapKnowledgeCardDescription extends LitElement {
       fontStyles,
       colorStyles,
       katexStyles,
+      calculationStyles,
       css`
         :host {
           display: block;
@@ -144,18 +145,6 @@ export class KMapKnowledgeCardDescription extends LitElement {
             flex: 1 1 0px;
             margin: 8px;
           }
-        }
-        calculation {
-          display: grid;
-          grid-gap: 16px;
-          grid-template-columns: max-content auto;
-        }
-        step {
-          grid-column: 1;
-        }
-        notes {
-          grid-column: 2;
-          font-size: small;
         }
         img {
           max-width: calc(var(--content-width, 100vw) - 32px);

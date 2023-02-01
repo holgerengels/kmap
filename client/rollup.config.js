@@ -1,14 +1,13 @@
 import { createSpaConfig } from '@open-wc/building-rollup';
-import replace from '@rollup/plugin-replace'
-import sourcemaps from 'rollup-plugin-sourcemaps';
 import copy from 'rollup-plugin-copy';
 const { generateSW } = require('rollup-plugin-workbox');
 import merge from 'deepmerge';
+import { terser } from 'rollup-plugin-terser';
+import sourcemaps from 'rollup-plugin-sourcemaps';
 import commonjs from "@rollup/plugin-commonjs";
+import typescript from '@rollup/plugin-typescript';
 
 const baseConfig = createSpaConfig({
-
-  developmentMode: process.env.ROLLUP_WATCH === 'true',
   injectServiceWorker: true,
 
   babel: {
@@ -30,12 +29,12 @@ const baseConfig = createSpaConfig({
 
 export default merge(baseConfig, {
   input: './index.html',
+  output: { sourcemap: true },
   plugins: [
     commonjs(),
     sourcemaps(),
-    replace({
-      'process.env.NODE_ENV': 'development',
-    }),
+    terser(),
+    typescript(),
     generateSW({
       mode: 'development',
       swDest: './sw.js',
@@ -96,9 +95,3 @@ export default merge(baseConfig, {
     }),
   ],
 });
-
-
-// {
-//         urlPattern: /[^.]*/,
-//         handler: 'NetworkOnly',
-//       },

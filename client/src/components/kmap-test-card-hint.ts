@@ -1,7 +1,7 @@
 import {LitElement, html, css} from 'lit';
 import {customElement, property, state} from 'lit/decorators.js';
 
-import {resetStyles, fontStyles, colorStyles} from "./kmap-styles";
+import {resetStyles, fontStyles, colorStyles, calculationStyles} from "./kmap-styles";
 import {unsafeHTML} from 'lit/directives/unsafe-html.js';
 import {math} from "../math";
 import {katexStyles} from "../katex-css";
@@ -47,6 +47,7 @@ export class KMapTestCardHint extends LitElement {
       fontStyles,
       colorStyles,
       katexStyles,
+      calculationStyles,
       css`
         :host {
           display: contents;
