@@ -1,4 +1,5 @@
 export async function lazyComponents(code: string) {
+  if (!code) return;
   let result = code.match(/<((kmap-((term-tree)|(ascii-math)|(solve-tree)|(jsxgraph)))|(html-include)|(lazy-html))/g);
   if (result !== null) {
     for (let i = 0; i < result.length; i++) {
