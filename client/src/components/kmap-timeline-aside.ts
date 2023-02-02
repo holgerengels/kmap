@@ -67,8 +67,8 @@ export class KMapTimelineAside extends Connected {
         that._timeline.mark(sw, true);
       }.bind(undefined, this), 300);
 
-      console.log(cw);
-      console.log(sw)
+      //console.log(cw);
+      //console.log(sw)
     }
     if (changedProperties.has("_target")) {
       store.dispatch.maps.setTargeted(this._target);
