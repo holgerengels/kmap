@@ -80,7 +80,7 @@ export default createModel({
         updateMetadata({
           title: "KMap",
           description: "KMap kartographiert Wissen mit Zusammenhang",
-          image: window.location.origin + "/app/icons/KMap-Logo-cropped.png",
+          image: window.location.origin + "/app/icons/KMap.png",
           keywords: undefined
         });
       },
