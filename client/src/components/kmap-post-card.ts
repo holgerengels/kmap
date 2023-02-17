@@ -26,6 +26,7 @@ export class KMapPostCard extends LitElement {
       css`
         kmap-card {
           background-color: white;
+          max-width: 800px;
         }
         kmap-card-text {
           padding-left: 32px;
