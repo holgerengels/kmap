@@ -2,10 +2,7 @@ import { createSpaConfig } from '@open-wc/building-rollup';
 import copy from 'rollup-plugin-copy';
 const { generateSW } = require('rollup-plugin-workbox');
 import merge from 'deepmerge';
-import { terser } from 'rollup-plugin-terser';
 import sourcemaps from 'rollup-plugin-sourcemaps';
-import commonjs from "@rollup/plugin-commonjs";
-import typescript from '@rollup/plugin-typescript';
 
 const baseConfig = createSpaConfig({
   injectServiceWorker: true,
@@ -31,9 +28,7 @@ export default merge(baseConfig, {
   input: './index.html',
   output: { sourcemap: true },
   plugins: [
-    commonjs(),
     sourcemaps(),
-    typescript(),
     generateSW({
       mode: 'development',
       swDest: './sw.js',
@@ -79,7 +74,6 @@ export default merge(baseConfig, {
         '🐘', size,
       );
     }),
-    terser(),
     copy({
       targets: [
         {src: 'icons/*', dest: 'dist/icons'},

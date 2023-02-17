@@ -1,5 +1,5 @@
 import katex from 'katex';
-import AsciiMathParser from 'asciimath2tex';
+import AsciiMathParser from './asciimath2tex.js';
 
 const parser = new AsciiMathParser();
 
