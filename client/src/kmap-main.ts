@@ -212,6 +212,8 @@ export class KmapMain extends connect(store, LitElement) {
         return html`<kmap-exercise class="page"></kmap-exercise>`;
       case 'test':
         return html`<kmap-test class="page"></kmap-test>`;
+      case 'blog':
+        return html`<kmap-blog class="page"></kmap-blog>`;
       case 'courses':
         return html`<kmap-courses class="page"></kmap-courses>`;
       case 'content-manager':
@@ -427,7 +429,7 @@ export class KmapMain extends connect(store, LitElement) {
         <a ?selected="${this._page === 'content-manager'}" ?disabled="${!this._roles.includes("teacher")}"
            href="/app/content-manager">Content Manager</a>
         <a href="/app/browser/Hilfe/Hilfe">Hilfe</a>
-        <a href="/app/browser/Hilfe/Blog">Blog</a>
+        <a ?selected="${this._page === 'blog'}" href="/app/blog">Blog</a>
         <a href="/app/browser/Hilfe/Hilfe/Impressum">Impressum</a>
         <pwa-install-button>
           <mwc-button outlined style="--mdc-theme-primary: var(--color-secondary-dark);">App installieren</mwc-button>
@@ -504,7 +506,9 @@ export class KmapMain extends connect(store, LitElement) {
 const _title = new Map([
   ['home', "Start"],
   ['browser', "Browser"],
+  ['exercise', "Aufgabe"],
   ['test', "Test"],
+  ['blog', "Blog"],
   ['courses', "Kurse"],
   ['content-manager', "Content Manager"],
 ]);

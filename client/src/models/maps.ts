@@ -345,12 +345,13 @@ export default createModel({
           const subject = state.maps.subject || '';
           const chapter = state.maps.chapter || '';
           dispatch.shell.updateMeta({
+            type: "Article",
             title: chapter,
             description: state.maps.chapterCard !== undefined && state.maps.chapterCard.summary ? state.maps.chapterCard.summary : "Wissenslandkarte zum Kapitel " + chapter,
             keywords: [subject, chapter, ...topics],
             breadcrumbs: ["browser", subject, chapter],
             about: [subject],
-            type: ["Unterrichtsplanung"]
+            learningResourceType: ["Unterrichtsplanung"]
           });
       },
       'app/chooseInstance': async function () {

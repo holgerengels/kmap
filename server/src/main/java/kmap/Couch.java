@@ -129,7 +129,7 @@ public class Couch extends Server {
         });
         Map<String, Integer> map = modules.stream().collect(Collectors.groupingBy(s -> JSON.string(s, "subject"), Collectors.summingInt(c -> integer(c, "count"))));
         JsonArray array = new JsonArray();
-        map.entrySet().stream().filter(entry -> !"Hilfe".equals(entry.getKey())).sorted(Map.Entry.comparingByKey()).distinct().forEach(e -> {
+        map.entrySet().stream().filter(entry -> !"Hilfe".equals(entry.getKey()) && !"Blog".equals(entry.getKey())).sorted(Map.Entry.comparingByKey()).distinct().forEach(e -> {
             JsonObject subject = new JsonObject();
             subject.addProperty("name", e.getKey());
             subject.addProperty("count", e.getValue());
@@ -180,19 +180,20 @@ public class Couch extends Server {
                 else if (equals(element, subject, chapter, null)) {
                     boolean change = false;
                     JsonArray depends = element.getAsJsonArray("depends");
-                    JsonArray newDepends = new JsonArray(depends.size());
-                    for (int i = 0; i < depends.size(); i++) {
-                        if (depends.get(i).getAsString().equals(topic)) {
-                            if (!chapterChange)
-                                newDepends.add(new JsonPrimitive(newTopic));
-                            change = true;
+                    if (depends != null) {
+                        JsonArray newDepends = new JsonArray(depends.size());
+                        for (int i = 0; i < depends.size(); i++) {
+                            if (depends.get(i).getAsString().equals(topic)) {
+                                if (!chapterChange)
+                                    newDepends.add(new JsonPrimitive(newTopic));
+                                change = true;
+                            } else
+                                newDepends.add(depends.get(i));
                         }
-                        else
-                            newDepends.add(depends.get(i));
-                    }
-                    if (change) {
-                        element.add("depends", newDepends);
-                        client.update(element);
+                        if (change) {
+                            element.add("depends", newDepends);
+                            client.update(element);
+                        }
                     }
                 }
             }

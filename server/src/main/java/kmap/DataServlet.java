@@ -39,6 +39,7 @@ public class DataServlet
             String chapters = req.getParameter("chapters");
             String topics = req.getParameter("topics");
             String latest = req.getParameter("latest");
+            String number = req.getParameter("number");
             String file = req.getPathInfo();
             String chapter = req.getParameter("chapter");
             String topic = req.getParameter("topic");
@@ -85,8 +86,9 @@ public class DataServlet
                     writeResponse(req, resp, result);
             }
             else if (latest != null) {
-                log("latest = " + latest);
-                JsonArray result = couch.latest(latest, 3, false);
+                int n = number != null ? Integer.parseInt(number) : 3;
+                log("latest = " + latest + " " + n);
+                JsonArray result = couch.latest(latest, n, false);
                 if (result != null)
                     writeResponse(req, resp, result);
             }

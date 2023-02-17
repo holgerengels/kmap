@@ -4,6 +4,7 @@ import {urls} from "../urls";
 import {endpoint, fetchjson} from "../endpoint";
 
 export interface Meta {
+  type?: string,
   title?: string,
   detail?: string,
   description?: string,
@@ -14,7 +15,7 @@ export interface Meta {
   modified?: number,
   breadcrumbs?: string[],
   about?: string[],
-  type?: string[],
+  learningResourceType?: string[],
   thumb?: string,
   educationalLevel?: string[],
   educationalContext?: string[],
@@ -96,13 +97,13 @@ export default createModel({
           "@type": "WebPage",
           "breadcrumb": meta.breadcrumbs ? breadCrumbsLd(meta.breadcrumbs) : undefined,
           "mainEntity": {
-            "@type": "Article",
+            "@type": meta.type,
             "headline": title,
             "name": title,
             "description": description,
             "keywords": meta.keywords?.join(", "),
             "mainEntityOfPage": window.location.href,
-            "image": meta.image ? meta.image : "https://kmap.eu/app/icons/KMap-Logo-cropped.png",
+            "image": meta.image ? meta.image : "https://kmap.eu/app/icons/KMap.png",
             "datePublished": meta.created ? new Date(meta.created) : new Date(),
             "dateModified": meta.modified ? new Date(meta.modified) : undefined,
             "author": meta.author ? {
@@ -118,14 +119,14 @@ export default createModel({
               "email": "hengels@gmail.com",
               "logo": {
                 "@type": "ImageObject",
-                "url": "https://kmap.eu/app/icons/KMap-Logo-cropped.png"
+                "url": "https://kmap.eu/app/icons/KMap.png"
               }
             },
             "license": "https://creativecommons.org/licenses/by-sa/4.0/",
             "inLanguage": ["de"],
-            "audience": ["Lerner/in"],
+            "audience": meta.learningResourceType ? ["Lerner/in"] : undefined,
             "about": meta.about,
-            "learningResourceType": meta.type,
+            "learningResourceType": meta.learningResourceType,
             "thumbnailUrl": meta.thumb,
             "educationalLevel": meta.educationalLevel,
             "oeh:educationalContext": meta.educationalContext,
@@ -159,6 +160,9 @@ export default createModel({
         if (routing.page === 'test' || routing.page === 'exercise') {
           import('../components/kmap-test').then(() => console.log("loaded test"));
           import('../components/kmap-exercise').then(() => console.log("loaded exercise"));
+        }
+        else if (routing.page === 'blog') {
+          import('../components/kmap-blog').then(() => console.log("loaded blog"));
         }
         else if (routing.page === 'courses') {
           import('../components/kmap-courses').then(() => console.log("loaded courses"));
@@ -200,40 +204,60 @@ const updateLd = (ld) => {
 
 const breadCrumbsLd = function(path: string[]) {
   const page = path.shift();
-  const key = page === "exercise" ? path.pop() : undefined;
 
-  if (path.length === 2 && path[0] === path[1])
-    path.pop();
+  let items: { item: string; "@type": string; name: string; position: number }[];
 
-  const items = path.map((v, i, a) => {
-    return {
+  if (page === 'blog') {
+    items = [{
       "@type": "ListItem",
-      "position": i+1,
-      "name": v,
-      "item": "https://kmap.eu" + urls.client + "browser/" + (i === 0
-        ? a[0] + "/" + a[0]
-        : a.slice(0, i+1).map(p => encodeURIComponent(p)).join("/"))
+      "position": 1,
+      "name": "Blog",
+      "item": "https://kmap.eu" + urls.client + "blog"
+    }];
+    if (path.length === 1) {
+      items.push({
+        "@type": "ListItem",
+        "position": 2,
+        "name": path[0],
+        "item": "https://kmap.eu" + urls.client + "blog/" + encodeURIComponent(path[0])
+      });
     }
-  });
-  switch (page) {
-    case "test":
-      items.push({
-        "@type": "ListItem",
-        "position": items.length + 1,
-        "name": "Test",
-        "item": "https://kmap.eu" + urls.client + "test/" + path.map(p => encodeURIComponent(p)).join("/")
-      });
-      break;
-    case "exercise":
-      items.push({
-        "@type": "ListItem",
-        "position": items.length + 1,
-        "name": "Test",
-        "item": "https://kmap.eu" + urls.client + "exercise/" + path.map(p => encodeURIComponent(p)).join("/") + "/" + encodeURIComponent(key as string),
-      });
-      break;
   }
+  else {
+    const key = page === "exercise" ? path.pop() : undefined;
 
+    if (path.length === 2 && path[0] === path[1])
+      path.pop();
+
+    items = path.map((v, i, a) => {
+      return {
+        "@type": "ListItem",
+        "position": i + 1,
+        "name": v,
+        "item": "https://kmap.eu" + urls.client + "browser/" + (i === 0
+          ? a[0] + "/" + a[0]
+          : a.slice(0, i + 1).map(p => encodeURIComponent(p)).join("/"))
+      }
+    });
+    switch (page) {
+      case "test":
+        items.push({
+          "@type": "ListItem",
+          "position": items.length + 1,
+          "name": "Test",
+          "item": "https://kmap.eu" + urls.client + "test/" + path.map(p => encodeURIComponent(p)).join("/")
+        });
+        break;
+      case "exercise":
+        items.push({
+          "@type": "ListItem",
+          "position": items.length + 1,
+          "name": "Test",
+          "item": "https://kmap.eu" + urls.client + "exercise/" + path.map(p => encodeURIComponent(p)).join("/") + "/" + encodeURIComponent(key as string),
+        });
+        break;
+    }
+  }
   return {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",

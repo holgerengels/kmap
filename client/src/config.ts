@@ -10,6 +10,8 @@ const routes = {
   '/app/test':                                   'test',
   '/app/test/:results':                          'test',
   '/app/test/:subject/:chapter(/:topic)':        'test',
+  '/app/blog':                                   'blog',
+  '/app/blog/:post':                             'blog',
   '/app/courses':                                'courses',
   '/app/content-manager':                        'content-manager',
 };

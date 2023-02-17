@@ -3,7 +3,7 @@
   <defs>
     <bx:grid x="0" y="0" width="20" height="20"/>
   </defs>
-  <rect width="512" height="512" style="fill: rgb(214, 95, 16);"/>
+  <rect width="512" height="512" style="fill: rgb(217, 56, 20);"/>
   <polyline style="fill: rgb(35, 161, 246);" points="512 0 256 256 512 512"/>
   <g>
     <polyline style="stroke-linecap: square; fill: rgb(36, 168, 91); stroke: rgb(255, 255, 153); stroke-width: 50px;" points="25 0 25 454 478 0"/>

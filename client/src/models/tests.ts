@@ -443,7 +443,7 @@ export default createModel({
               keywords: subject != undefined ? [subject, chapter, topic] : undefined,
               breadcrumbs: breadcrumbs,
               about: subject !== undefined ? [subject] : undefined,
-              type: ["Lernkontrolle"]
+              learningResourceType: ["Lernkontrolle"]
             });
 
             if (Object.keys(routing.params).length === 0)

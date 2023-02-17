@@ -93,7 +93,7 @@ export default createModel({
           keywords: [subject, chapter, topic, key],
           breadcrumbs: ["exercise", subject, chapter, topic, key],
           about: [subject],
-          type: ["Übung"]
+          learningResourceType: ["Übung"]
         });
       },
       'routing/change': async function (routing: RoutingState<string>) {

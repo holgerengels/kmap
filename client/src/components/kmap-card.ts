@@ -234,7 +234,7 @@ export class KMapCard extends LitElement {
 @customElement('kmap-card-text')
 export class KMapCardText extends LitElement {
   @property({ type: String, reflect: true })
-  private type: "header" | "subheader" | "content" = "content";
+  private type: "title" | "header" | "subheader" | "content" = "content";
 
   static get styles() {
     // language=CSS
@@ -246,7 +246,13 @@ export class KMapCardText extends LitElement {
           padding-left: 16px;
           padding-right: 16px;
         }
-        div[type=header], div[type=header]::slotted(*)  {
+        div[type=title], div[type=title]::slotted(*) {
+          font-family: Roboto, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          font-size: 1.125rem;
+          font-weight: 500;
+        }
+        div[type=header], div[type=header]::slotted(*) {
           font-size: 0.9375rem;
           line-height: 1.5rem;
           font-weight: 500;

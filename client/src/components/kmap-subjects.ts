@@ -4,10 +4,6 @@ import {Connected} from "./connected";
 import {State} from "../store";
 
 import {resetStyles, colorStyles, fontStyles} from "./kmap-styles";
-import '@material/mwc-icon-button';
-import '@material/mwc-icon-button-toggle';
-import '@material/mwc-top-app-bar';
-import './kmap-login-button';
 import './kmap-subject-card';
 import './kmap-randomtest-card';
 import {Test} from "../models/tests";

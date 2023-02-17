@@ -150,6 +150,7 @@ export default createModel({
           const chapter = state.cards.chapter || '';
           const topic = state.cards.topic || '';
           dispatch.shell.updateMeta({
+            type: "Article",
             title: chapter,
             detail: card.topic,
             description: card.summary,
@@ -162,7 +163,7 @@ export default createModel({
             keywords: [subject, chapter, topic, ...(card.keywords ? card.keywords.split(",").map(k => k.trim()) : [])],
             breadcrumbs: ["browser", subject, chapter, topic],
             about: [subject],
-            type: ["Text"],
+            learningResourceType: ["Text"],
             thumb: `${urls.snappy}${encodePath(subject, chapter, topic)}.png`,
             educationalLevel: card.educationalLevel?.split(",").map(l => l.trim()),
             educationalContext: card.educationalContext?.split(",").map(l => l.trim()),
