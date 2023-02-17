@@ -77,7 +77,7 @@ export default createModel({
         const state = store.getState();
 
         dispatch.posts.request();
-        fetchjson(`${urls.server}data?latest=Blog&n=10000`, endpoint.get(state),
+        fetchjson(`${urls.server}data?latest=Blog&number=10000`, endpoint.get(state),
           dispatch.posts.received,
           dispatch.app.handleError,
           dispatch.posts.error);

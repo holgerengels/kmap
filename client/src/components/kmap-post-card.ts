@@ -58,7 +58,7 @@ export class KMapPostCard extends LitElement {
       return html`
         <kmap-card>
           <div slot="primary" ?expanded="${this.expanded}">
-            <img src="${thumb}" width="${this.expanded ? '120' : '100'}"/>
+            <img src="${thumb}" width="${this.expanded ? '120' : '100'}" alt="${this.card.topic}"/>
             <div></div>
             <kmap-card-text type="${this.expanded ? 'title' : 'header'}">${this.card.topic}</kmap-card-text>
             <kmap-card-text type="subheader"><b>${new Date(this.card.created!).toLocaleDateString()}</b>&nbsp; ${this.card.author}</kmap-card-text>
@@ -66,9 +66,9 @@ export class KMapPostCard extends LitElement {
           ${this.expanded ? html`
             <kmap-card-text>
               <kmap-knowledge-card-description
-                .instance="root"
-                .subject="Blog"
-                .chapter="Blog"
+                instance="root"
+                subject="Blog"
+                chapter="Blog"
                 .topic="${this.card.topic}"
                 .description="${this.card.description}">
               </kmap-knowledge-card-description>
