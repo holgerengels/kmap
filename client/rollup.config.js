@@ -33,7 +33,6 @@ export default merge(baseConfig, {
   plugins: [
     commonjs(),
     sourcemaps(),
-    terser(),
     typescript(),
     generateSW({
       mode: 'development',
@@ -80,6 +79,7 @@ export default merge(baseConfig, {
         '🐘', size,
       );
     }),
+    terser(),
     copy({
       targets: [
         {src: 'icons/*', dest: 'dist/icons'},
