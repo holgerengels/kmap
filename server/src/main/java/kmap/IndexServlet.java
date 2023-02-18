@@ -17,7 +17,6 @@ import java.util.Arrays;
 
 import static kmap.JSON.string;
 import static kmap.JsonLD.SERVER;
-import static kmap.Server.readProperties;
 import static kmap.URLs.encodePath;
 
 // http://jetty:8080/server/index/browser/Mathematik/Differentialrechnung/Differenzierbarkeit
@@ -61,59 +60,84 @@ public class IndexServlet extends JsonServlet {
             if (pathInfo != null) {
                 String[] path = pathInfo.substring(1).split("/");
                 System.out.println("path = " + Arrays.asList(path));
-                if (path.length == 3 || path.length == 4) {
-                    String page = path[0];
+                String page = path.length > 0 ? path[0] : null;
+
+                if ("browser".equals(page)) {
                     String subject = path[1];
                     String chapter = path[2];
 
-                    if ("browser".equals(page)) {
-                        JsonObject card;
-                        if (path.length == 4) {
-                            String topic = path[3];
-                            title = subject + " - " + chapter + " - " + topic;
-                            card = couch.loadTopic(subject, chapter, topic);
-                            String thumb = JSON.string(card, "thumb");
-                            if ("".equals(thumb))
-                                thumb = null;
-                            image = thumb != null
-                                    ? "https://kmap.eu/" + encodePath("server", "data", subject, chapter, topic, JSON.string(card, "thumb")) + "?instance=root"
-                                    : "https://kmap.eu/" + encodePath("snappy", subject, chapter, topic + ".png");
-                            url = SERVER + encodePath("app", "browser", subject, chapter, topic);
-                            embeddedTopic = card.toString();
-                        }
-                        else {
-                            title = subject + " - " + chapter;
-                            card = couch.loadTopic(subject, chapter, "_");
-                            url = SERVER + encodePath("app", "browser", subject, chapter);
-                        }
-                        if (card != null) {
-                            String cardSummary = string(card, "summary");
-                            String cardDescription = string(card, "description");
-                            description = cardSummary != null ? cardSummary : description;
-                            text = cardDescription != null ? cardDescription : cardSummary;
-                            author = string(card, "author");
-                            created = JSON.date(card, "created");
-                            modified = JSON.date(card, "modified");
-                            section = title;
-                            keywords = string(card, "keywords");
-                            try {
-                                jsonld = new JsonLD().jsonld(card);
-                            }
-                            catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        Server.CLIENT.remove();
+                    JsonObject card;
+                    if (path.length == 4) {
+                        String topic = path[3];
+                        title = subject + " - " + chapter + " - " + topic;
+                        card = couch.loadTopic(subject, chapter, topic);
+                        String thumb = JSON.string(card, "thumb");
+                        if ("".equals(thumb))
+                            thumb = null;
+                        image = thumb != null
+                                ? "https://kmap.eu/" + encodePath("server", "data", subject, chapter, topic, JSON.string(card, "thumb")) + "?instance=root"
+                                : "https://kmap.eu/" + encodePath("snappy", subject, chapter, topic + ".png");
+                        url = SERVER + encodePath("app", "browser", subject, chapter, topic);
+                        embeddedTopic = card.toString();
                     }
-                    else if ("test".equals(page)) {
-                        if (path.length == 4) {
-                            String topic = path[3];
-                            title = "Aufgaben zum Thema " + subject + " - " + chapter + " - " + topic;
+                    else {
+                        title = subject + " - " + chapter;
+                        card = couch.loadTopic(subject, chapter, "_");
+                        url = SERVER + encodePath("app", "browser", subject, chapter);
+                    }
+                    if (card != null) {
+                        String cardSummary = string(card, "summary");
+                        String cardDescription = string(card, "description");
+                        description = cardSummary != null ? cardSummary : description;
+                        text = cardDescription != null ? cardDescription : cardSummary;
+                        author = string(card, "author");
+                        created = JSON.date(card, "created");
+                        modified = JSON.date(card, "modified");
+                        section = title;
+                        keywords = string(card, "keywords");
+                        try {
+                            jsonld = new JsonLD().articleLD(card);
                         }
-                        else {
-                            title = "Aufgaben zum Thema " + subject + " - " + chapter;
+                        catch (Exception e) {
+                            e.printStackTrace();
                         }
-                        description = "Ermittle Deinen Wissensstand mit Hilfe von interaktiven Aufgaben!";
+                    }
+                    Server.CLIENT.remove();
+                }
+                else if ("test".equals(page)) {
+                    String subject = path[1];
+                    String chapter = path[2];
+                    if (path.length == 4) {
+                        String topic = path[3];
+                        title = "Aufgaben zum Thema " + subject + " - " + chapter + " - " + topic;
+                    } else {
+                        title = "Aufgaben zum Thema " + subject + " - " + chapter;
+                    }
+                    description = "Ermittle Deinen Wissensstand mit Hilfe von interaktiven Aufgaben!";
+                }
+                else if ("blog".equals(page)) {
+                    if (path.length == 2) {
+                        String topic = path[1];
+                        JsonObject card = couch.loadTopic("Blog", "Blog", topic);
+                        String cardSummary = string(card, "summary");
+                        String cardDescription = string(card, "description");
+                        description = cardSummary != null ? cardSummary : description;
+                        author = string(card, "author");
+                        created = JSON.date(card, "created");
+                        modified = JSON.date(card, "modified");
+                        section = title;
+                        keywords = string(card, "keywords");
+                        try {
+                            //jsonld = new JsonLD().postLD(card);
+                        }
+                        catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                    else {
+                        title = "KMap News Blog";
+                        description = "Was gibt es neues bei KMap";
                     }
                 }
             }

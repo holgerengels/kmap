@@ -5,7 +5,6 @@ import com.google.gson.JsonObject;
 import javax.json.Json;
 import javax.json.JsonArrayBuilder;
 import javax.json.JsonObjectBuilder;
-import javax.json.stream.JsonGenerator;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -21,8 +20,7 @@ import static kmap.Server.readProperties;
 public class JsonLD {
     static String SERVER = "https://kmap.eu/";
 
-    public String jsonld(JsonObject card) {
-
+    public String articleLD(JsonObject card) {
         String subject = JSON.string(card, "subject");
         String chapter = JSON.string(card, "chapter");
         String topic = JSON.string(card, "topic");
@@ -127,7 +125,7 @@ public class JsonLD {
         Couch couch = new Couch(readProperties(args[0]));
         Server.CLIENT.set("root");
         JsonObject card = couch.loadTopic("Mathematik", "Differentialrechnung", "Momentane Änderungsrate");
-        String jsonld = new JsonLD().jsonld(card);
+        String jsonld = new JsonLD().articleLD(card);
         System.out.println("jsonld = " + jsonld);
     }
 }

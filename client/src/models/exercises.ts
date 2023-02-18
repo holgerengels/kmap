@@ -85,6 +85,7 @@ export default createModel({
         const topic = state.exercises.topic || '';
         const key = state.exercises.key || '';
         dispatch.shell.updateMeta({
+          type: "Article",
           title: key,
           description: "Aufgabe zum Thema " + subject + " → " + chapter + " → " + topic,
           created: state.exercises.test?.created,

@@ -1,5 +1,5 @@
 import {createModel, RoutingState} from '@captaincodeman/rdx';
-import {State, Store} from '../store';
+import {Store} from '../store';
 import {endpoint, fetchjson} from "../endpoint";
 import {urls} from "../urls";
 import {Card} from "./types";
@@ -30,7 +30,6 @@ export default createModel({
     request(state) {
       return { ...state, loading: true,
         posts: [],
-        current: undefined,
         error: "",
       };
     },
@@ -82,26 +81,18 @@ export default createModel({
           dispatch.app.handleError,
           dispatch.posts.error);
       },
-      applyRoute(): any {
+      received(): any {
         const state = store.getState();
-        console.log(state.posts.current)
-        dispatch.shell.updateMeta(generateMeta(state));
+        if (!state.posts.posts) return;
+        dispatch.shell.updateMeta(generateMeta(state.posts.posts, state.posts.current));
       },
-
       'routing/change': function (routing: RoutingState<string>) {
         switch (routing.page) {
           case 'blog':
             dispatch.posts.applyRoute(routing);
-            if (!routing.params["post"])
-              dispatch.posts.load();
+            dispatch.posts.load();
             break;
         }
-      },
-
-      'posts/received': async function () {
-        const state = store.getState();
-        if (!state.posts.posts) return;
-        dispatch.shell.updateMeta(generateMeta(state));
       },
     }
   }
@@ -113,7 +104,7 @@ function textOnly(html: string) {
   return tempDivElement.textContent || "";
 }
 
-function generateMeta(state: State): Meta {
+function generateMeta(posts: Card[], current?: string): Meta {
   var keywords: string[] = [];
   var crumbs: string[] = [];
   var type: string = "Blog";
@@ -123,9 +114,10 @@ function generateMeta(state: State): Meta {
   var modified: number = created;
   var author: string = "KMap Team";
   var thumb: string = "/app/icons/KMap.svg";
-  if (state.posts.posts && state.posts.current) {
-    crumbs[0] = state.posts.current;
-    const card = state.posts.posts.find(c => c.topic === state.posts.current);
+
+  if (current) {
+    crumbs[0] = current;
+    const card = posts.find(c => c.topic === current);
     if (card) {
       type = "BlogPosting";
       title = card.topic;
@@ -138,14 +130,14 @@ function generateMeta(state: State): Meta {
         ? `${urls.server}data/Blog/Blog/${card.topic}/${card.thumb}?instance=root`
         : "/app/icons/KMap.svg";
     }
+    else
+      console.warn("current " + current + " not found in " + posts.join(", "));
   }
   else {
-    if (state.posts.posts)
-      for (let card of state.posts.posts) {
-        keywords.push(card.topic);
-      }
+    for (let card of posts) {
+      keywords.push(card.topic);
+    }
   }
-
   return {
     type: type,
     title: title,

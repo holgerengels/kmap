@@ -438,6 +438,7 @@ export default createModel({
               description = "Ermittle Deinen Wissensstand mit Hilfe von interaktiven Aufgaben!";
             }
             dispatch.shell.updateMeta({
+              type: "Article",
               title: title,
               description: description,
               keywords: subject != undefined ? [subject, chapter, topic] : undefined,

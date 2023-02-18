@@ -82,7 +82,7 @@ export default createModel({
           title: "KMap",
           description: "KMap kartographiert Wissen mit Zusammenhang",
           image: window.location.origin + "/app/icons/KMap.png",
-          keywords: undefined
+          keywords: ["Wissenslandkarten"]
         });
       },
       updateMeta(meta: Meta) {
