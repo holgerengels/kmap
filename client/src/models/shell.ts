@@ -108,7 +108,8 @@ export default createModel({
             "dateModified": meta.modified ? new Date(meta.modified) : undefined,
             "author": meta.author ? {
               "@type": "Person",
-              "name": meta.author
+              "name": meta.author,
+              "url": "https://kmap.eu/app/browser/Hilfe/Autoren/" + encodeURIComponent(meta.author)
             } : {
               "@type": "Organization",
               "name": "KMap Team"

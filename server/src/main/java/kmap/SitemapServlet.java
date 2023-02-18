@@ -71,7 +71,7 @@ public class SitemapServlet extends JsonServlet {
                     Long modified = loong(card, "modified");
                     if (modified == null)
                         modified = start;
-                    createNode(eventWriter, "loc", "https://kmap.eu/app/browser/" + URLs.encode(subject) + "/" + URLs.encode(chapter) + "/" + URLs.encode(topic));
+                    createNode(eventWriter, "loc", blogHack("https://kmap.eu/app/browser/" + URLs.encode(subject) + "/" + URLs.encode(chapter) + "/" + URLs.encode(topic)));
                     createNode(eventWriter, "lastmod", date_format.format(new Date(modified)));
 
                     eventWriter.add(end);
@@ -89,7 +89,7 @@ public class SitemapServlet extends JsonServlet {
                     eventWriter.add(eventFactory.createStartElement("", "", "url"));
                     eventWriter.add(end);
 
-                    createNode(eventWriter, "loc", "https://kmap.eu/app/browser/" + URLs.encode(subject) + "/" + URLs.encode(chapter));
+                    createNode(eventWriter, "loc", blogHack("https://kmap.eu/app/browser/" + URLs.encode(subject) + "/" + URLs.encode(chapter)));
                     createNode(eventWriter, "lastmod", date_format.format(new Date(modified)));
 
                     eventWriter.add(end);
@@ -129,6 +129,10 @@ public class SitemapServlet extends JsonServlet {
         } finally {
             Server.CLIENT.remove();
         }
+    }
+
+    private String blogHack(String url) {
+        return url.replace("/browser/Blog/Blog", "/blog");
     }
 
     private String extractSubject(HttpServletRequest req) {
