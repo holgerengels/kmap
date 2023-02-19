@@ -7,6 +7,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.collections.iterators.SingletonIterator;
+import org.apache.commons.collections4.IteratorUtils;
 
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventWriter;
@@ -68,7 +69,7 @@ public class SEOServlet extends JsonServlet {
                     Long created = loong(card, "created");
                     String thumb = string(card, "thumb");
                     String keywords = string(card, "keywords");
-                    boolean image = card.getAsJsonArray("attachments").asList().stream().anyMatch(a -> {
+                    boolean image = IteratorUtils.toList(card.getAsJsonArray("attachments").iterator()).stream().anyMatch(a -> {
                         String mime = string((JsonObject) a, "mime");
                         return mime != null && mime.startsWith("image/");
                     });
