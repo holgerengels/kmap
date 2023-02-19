@@ -66,6 +66,9 @@ public class SEOServlet extends JsonServlet {
                 JsonArray array = couch.latest(subject, 100000, false);
                 for (JsonElement element : array) {
                     JsonObject card = (JsonObject) element;
+                    String links = string(card, "links");
+                    if (links != null)
+                        continue;
                     Long created = loong(card, "created");
                     String thumb = string(card, "thumb");
                     String keywords = string(card, "keywords");
