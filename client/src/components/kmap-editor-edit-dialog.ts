@@ -61,6 +61,8 @@ export class KMapEditorEditDialog extends Connected {
   private _priority: string = '';
   @state()
   private _author: string = '';
+  @state()
+  private _created: string = '';
 
   @state()
   private _attachmentType: string = 'link';
@@ -158,6 +160,7 @@ export class KMapEditorEditDialog extends Connected {
       this._links = this._card.links || '';
       this._priority = this._card.priority !== undefined ? this._card.priority + '' : '';
       this._author      = this._card.author || store.state.app.username || '';
+      this._created     = new Date(this._card.created || new Date().getTime()).toLocaleDateString('de-DE', { year: 'numeric', month: 'numeric', day: 'numeric' });
       this._attachments = this._card.attachments;
 
       this._editDialog.show();
@@ -214,6 +217,7 @@ export class KMapEditorEditDialog extends Connected {
     card.priority = this._priority !== '' ? parseInt(this._priority) : undefined;
     card.attachments = this._attachments;
     card.author = this._author;
+    card.created = (this._created !== '' ? new Date(this._created.replace(/(\d{1,2})\.(\d{1,2})\.(\d{2,4})/, '$3-$2-$1')) : new Date()).getTime();
 
     console.log(card);
 
@@ -449,6 +453,7 @@ export class KMapEditorEditDialog extends Connected {
           <mwc-textfield s2 ?hidden="${this._card.topic === '_'}" id="educationalContext" label="Kontext" helper="Z.B. Primarstufe, Sekundarstufe I" dense .value=${this._educationalContext} @change="${e => this._educationalContext = e.target.value}" required></mwc-textfield>
           <mwc-textfield s2 ?hidden="${this._card.topic === '_'}" id="typicalAgeRange" label="Alter" disabled dense .value=${this._typicalAgeRange}></mwc-textfield>
           <mwc-textfield s2 ?hidden="${this._card.topic === '_'}" id="author" label="Autor" dense .value=${this._author} @change="${e => this._author = e.target.value}" required></mwc-textfield>
+          <mwc-textfield s2 ?hidden="${this._card.topic === '_'}" id="created" label="Erstellt" dense .value=${this._created} @change="${e => this._created = e.target.value}" pattern="^\\d{1,2}\\.\\d{1,2}\\.\\d{2,4}$" required></mwc-textfield>
         </div>
       </validating-form>
     ` : '';

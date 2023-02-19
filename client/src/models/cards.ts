@@ -159,7 +159,7 @@ export default createModel({
             author: card.author,
             image: card.thumb ?
               `${urls.server}${encodePath("data", subject, chapter, topic, card.thumb)}?instance=${state.app.instance}`
-              : undefined,
+              : `${urls.snappy}${encodePath(subject, chapter, topic)}.png`,
             keywords: [subject, chapter, topic, ...(card.keywords ? card.keywords.split(",").map(k => k.trim()) : [])],
             breadcrumbs: ["browser", subject, chapter, topic],
             about: [subject],

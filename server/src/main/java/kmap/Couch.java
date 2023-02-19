@@ -234,6 +234,7 @@ public class Couch extends Server {
                 if (existing != null) {
                     existing.addProperty("subject", subject);
                     existing.addProperty("modified", System.currentTimeMillis());
+                    existing.add("created", changed.get("created"));
                     existing.add("author", changed.get("author"));
                     existing.add("chapter", changed.get("chapter"));
                     existing.add("topic", changed.get("topic"));
@@ -264,9 +265,14 @@ public class Couch extends Server {
                 command = "add:";                                               // save
                 changed.remove("added");
                 changed.addProperty("subject", subject);
-                long millis = System.currentTimeMillis();
-                changed.addProperty("created", millis);
-                changed.addProperty("modified", millis);
+                Long created = JSON.loong(changed, "created");
+                if (created != null)
+                    changed.addProperty("modified", created);
+                else {
+                    long millis = System.currentTimeMillis();
+                    changed.addProperty("created", millis);
+                    changed.addProperty("modified", millis);
+                }
                 if (checks(changed)) {
                     Response response = client.save(changed);
                     JsonArray attachments = changed.getAsJsonArray("attachments");
