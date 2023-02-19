@@ -78,6 +78,11 @@
     </servlet>
 
     <servlet>
+        <servlet-name>seo</servlet-name>
+        <servlet-class>kmap.SEOServlet</servlet-class>
+    </servlet>
+
+    <servlet>
         <servlet-name>aiconnector</servlet-name>
         <servlet-class>kmap.AIConnectorServlet</servlet-class>
     </servlet>
@@ -145,6 +150,11 @@
     <servlet-mapping>
         <servlet-name>sitemap</servlet-name>
         <url-pattern>/sitemap/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>seo</servlet-name>
+        <url-pattern>/seo/*</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
