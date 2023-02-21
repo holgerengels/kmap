@@ -52,7 +52,7 @@ export class KMapBlog extends Connected {
     return html`
       ${this._posts ? html`
         ${this._selected ? html`
-          <kmap-post-card @click="${this._click}" .subject="Hilfe" .chapter="Blog" .card="${this._selected}" expanded></kmap-post-card>
+          <kmap-post-card .subject="Hilfe" .chapter="Blog" .card="${this._selected}" expanded></kmap-post-card>
         ` : html`
           ${this._posts.map((card) => html`
             <kmap-post-card @click="${this._click}" .subject="Hilfe" .chapter="Blog" .card="${card}"></kmap-post-card>
