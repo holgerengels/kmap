@@ -35,7 +35,7 @@ export default createModel({
     },
     received(state, payload: Card[]) {
       return { ...state,
-        posts: payload,
+        posts: payload.sort((a, b) => (b.created || b.modified || Date.now()) - (a.created || a.modified || Date.now())),
         loading: false,
       };
     },
