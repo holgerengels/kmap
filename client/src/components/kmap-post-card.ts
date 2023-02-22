@@ -34,16 +34,14 @@ export class KMapPostCard extends LitElement {
         }
         [slot=primary] {
           display: grid;
-          grid-template-columns: 100px 1fr;
-        }
-        [expanded] {
-          grid-template-columns: 120px 1fr;
+          grid-template-columns: 132px 1fr;
         }
         [slot=primary] img {
           grid-row: 1 / span 3;
           object-fit: cover;
-          border-top-left-radius: 4px;
-          border-bottom-right-radius: 4px;
+          border-radius: 4px;
+          margin-left: 32px;
+          margin-top: 24px;
         }
       `];
   }
@@ -59,9 +57,9 @@ export class KMapPostCard extends LitElement {
       return html`
         <kmap-card>
           <div slot="primary" ?expanded="${this.expanded}">
-            <img src="${thumb}" width="${this.expanded ? '120' : '100'}" alt="${this.card.topic}"/>
+            <img src="${thumb}" width="100" alt="${this.card.topic}"/>
             <div></div>
-            <kmap-card-text type="${this.expanded ? 'title' : 'header'}">${this.card.topic}</kmap-card-text>
+            <kmap-card-text type="title">${this.card.topic}</kmap-card-text>
             <kmap-card-text type="subheader"><b>${new Date(this.card.created!).toLocaleDateString('DE')}</b>&nbsp; ${this.card.author}</kmap-card-text>
           </div>
           ${this.expanded ? html`
