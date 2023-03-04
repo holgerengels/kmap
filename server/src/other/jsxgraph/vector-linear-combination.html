@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <title>Linearkombination</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <link rel='stylesheet' type='text/css' href='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraph.css'/>
+    <script src='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraphcore.js' type='text/javascript'></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js" crossorigin="anonymous"></script>
+
+    <style>
+        body {
+            margin: 0px;
+            padding: 0px;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr;
+            position: relative;
+        }
+        .jxgbox { border-radius: 0px; border: none}
+        .term { background-color: white }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id='board' class='jxgbox' style='width: 100%; aspect-ratio: 1'></div>
+</div>
+
+<script type='text/javascript'>
+    let ax = 3;
+    let ay = 1;
+    let bx = -2;
+    let by = 1;
+    var board = JXG.JSXGraph.initBoard('board', {boundingbox: [-3, 7, 8, -4], axis: true, showNavigation: false, showZoom: false, showCopyright: false, pan: { enabled: false}});
+    var r = board.create('slider', [[-2.5, -2], [5.5, -2], [-4, 1, 4]], {strokeColor: '#D55E00', snapWidth: .5, ticks: { drawLabels: true, label: {fontSize: 16, color: '#D55E00', offset: [-4, -16]} }, name: 'r', digits: 1, label: {fontSize: 16, color: '#D55E00', cssClass: 'term'}});
+    var s = board.create('slider', [[-2.5, -3], [5.5, -3], [-4, 1, 4]], {strokeColor: '#0072B2', snapWidth: .5, ticks: { drawLabels: true, label: {fontSize: 16, color: '#0072B2', offset: [-4, -16]} }, name: 's', digits: 1, label: {fontSize: 16, color: '#0072B2', cssClass: 'term'}});
+    var p0 = board.create('point', [0, 0], { visible: false });
+    var pa = board.create('point', [() => r.Value() * ax, () => r.Value() * ay], { visible: false, name: ''});
+    var pb = board.create('point', [() => r.Value() * ax + s.Value() * bx, () => r.Value() * ay + s.Value() * by], { visible: false });
+    var va = board.create('line', [p0, pa], { strokeColor: '#D55E00', straightFirst: false, straightLast: false, lastArrow: { type: 2, size: 6 } });
+    var vb = board.create('line', [pa, pb], { straightFirst: false, straightLast: false, lastArrow: { type: 2, size: 6 } });
+    var vc = board.create('line', [p0, pb], { strokeColor: 'darkgray', straightFirst: false, straightLast: false, lastArrow: { type: 2, size: 6 } });
+    var p = board.create('point', [-2, 6], { visible: true, name: 'P' });
+
+    //var ta = board.create('point', [() => pa.X() / 2, () => pa.Y() / 2 ], { visible: true, size: 0, label: { autoPosition: true, useKatex: true, cssClass: 'term' },
+    //    name: () => '\\textcolor{#D55E00}{\\begin{pmatrix} ' + pa.X() + ' \\\\ ' + pa.Y() + ' \\end{pmatrix}}' });
+    //var tb = board.create('point', [() => pa.X() + (pb.X() - pa.X()) / 2, () => pa.Y() + (pb.Y() - pa.Y()) / 2 ], { visible: true, size: 0, label: { autoPosition: true, useKatex: true, cssClass: 'term' },
+    //    name: () => '\\textcolor{#0072B2}{\\begin{pmatrix} ' + (pb.X() - pa.X()) + ' \\\\ ' + (pb.Y() - pa.Y()) + ' \\end{pmatrix}}' });
+    var tc = board.create('text', [1, 6, () => r.Value() + '\\cdot\\textcolor{#D55E00}{\\begin{pmatrix} ' + ax + ' \\\\ ' + ay + ' \\end{pmatrix}} + ' + s.Value() + '\\cdot\\textcolor{#0072B2}{\\begin{pmatrix} ' + bx + ' \\\\ ' + by + ' \\end{pmatrix}} = \\begin{pmatrix} ' + pb.X() + ' \\\\ ' + pb.Y() + ' \\end{pmatrix}'], { useKatex: true, cssClass: 'term' });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <link rel='stylesheet' type='text/css' href='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraph.css'/>
+    <script src='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraphcore.js' type='text/javascript'></script>
+
+    <style>
+        body {
+            margin: 0px;
+            padding: 0px;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr;
+            position: relative;
+        }
+        .jxgbox { border-radius: 0px; border: none}
+        .panel {
+            position: absolute;
+            display: flex;
+            flex-direction: row;
+            gap: 16px;
+            font-family: Roboto, sans-serif;
+            padding: 8px;
+        }
+        .panel2 {
+            position: absolute;
+            display: flex;
+            flex-direction: row;
+            gap: 16px;
+            font-family: Roboto, sans-serif;
+            padding: 8px;
+            top: 32px;
+        }
+        #term {
+            background-color: white;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id='board' class='jxgbox' style='width: 100%; aspect-ratio: 10/2'></div>
+    <div class="panel">
+        <button onclick="next()">Neue Aufgabe</button>
+        <div id="term"></div>
+    </div>
+    <div class="panel2">
+        Grenze links <select name="left" onchange="setLeft(this.value)">
+        <option value="-"></option>
+        <option value="[">[</option>
+        <option value="]">]</option>
+        </select>
+        rechts <select name="right" onchange="setRight(this.value)">
+        <option value="-"></option>
+        <option value="[">[</option>
+        <option value="]">]</option>
+        </select>
+    </div>
+</div>
+
+<script type='text/javascript'>
+    let left = '';
+    let right = '';
+    let a;
+    let ai;
+    let b;
+    let bi;
+
+    var board = JXG.JSXGraph.initBoard('board', {boundingbox: [-5, 1.5, 5, -.5], axis: false, showNavigation: false, showZoom: false, showCopyright: false, pan: { enabled: false}});
+    var xaxis = board.create('axis', [ [0,0],[1,0] ], { drawZero: true });
+    var p1 = board.create('point', [-5, 0], {visible: false});
+    var p2 = board.create('point', [5, 0], {visible: false});
+    var l = board.create('segment', [p1, p2], {visible: false});
+    var ga = board.create('glider', [-1, 0, l], {visible: false, name: '', color: 'white', label: {offset: [-3, 2], color: 'red', fontSize: '24'}, snapToGrid: true, snapSizeX: .5, snapSizeY: .5, size: 1});
+    var gb = board.create('glider', [1, 0, l], {visible: false, name: '', color: 'white', label: {offset: [-3, 2], color: 'red', fontSize: '24'}, snapToGrid: true, snapSizeX: .5, snapSizeY: .5, size: 1});
+    var i = board.create('line', [ga, gb], {stroke: 3, straightFirst: true, straightLast: true});
+
+    /*
+    var text = board.create('text', [2, -4.5, () => {
+        return x === p.X() && y === p.Y() ? "korrekt &#128077;" : "";
+    }], {fontSize: 1.3, fontUnit: 'em', color: '#D55E00'});
+     */
+
+    function next() {
+        ai = ['-', '[', ']'][Math.ceil(Math.random() * 3)];
+        bi = ['-', '[', ']'][Math.ceil(Math.random() * 3)];
+        a = Math.round(Math.random() * 9) -4.5;
+        b = Math.round(Math.random() * 9) -4.5;
+        document.getElementById("term").innerHTML = "{x | }";
+    }
+    next();
+
+    function setLeft(value) {
+        left = value;
+        i.setAttribute({straightFirst: left === '-'});
+        ga.setAttribute({name: left !== '-' ? left : '', visible: left !== '-'});
+    }
+    function setRight(value) {
+        right = value;
+        i.setAttribute({straightLast: right === '-'})
+        gb.setAttribute({name: right !== '-' ? right : '', visible: right !== '-'});
+    }
+</script>
+
+</body>
+</html>

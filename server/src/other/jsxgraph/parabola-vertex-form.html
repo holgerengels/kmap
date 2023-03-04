@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <title>Parabel - Scheitelpunktform</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <link rel='stylesheet' type='text/css' href='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraph.css'/>
+    <script src='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraphcore.js' type='text/javascript'></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js" crossorigin="anonymous"></script>
+
+    <style>
+        body {
+            margin: 0px;
+            padding: 0px;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr;
+            position: relative;
+        }
+        .jxgbox { border-radius: 0px; border: none}
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id='board' class='jxgbox' style='width: 100%; aspect-ratio: 1'></div>
+</div>
+
+<script>
+    var board = JXG.JSXGraph.initBoard('board', {boundingbox: [-5, 5, 5, -5], axis: true, showNavigation: false, showZoom: false, showCopyright: false, pan: { enabled: false}});
+    var p = board.create('point', [0, 0], {visible: true, name: 'P', snapToGrid: true, snapSizeX: .5, snapSizeY: .5});
+    var s = board.create('slider', [[-4.5, -4], [-2.5,-4], [-2, 1, 2]], {snapWidth: .5, ticks: { drawLabels: true, label: {fontSize: 16, strokeColor: '#D55E00', offset: [-4, -16]} }, name: 'a', digits: 1, label: {fontSize: 16, strokeColor: '#D55E00'}});
+    var g = board.create('functiongraph', [(x) => s.Value() * x**2], {strokeWidth: 1, dash: 2});
+    var f = board.create('functiongraph', [(x) => s.Value() * (x-p.X())**2 + p.Y()], {strokeWidth: 3});
+
+    var text = board.create('text', [.3, -4, () => {
+        const plusminus = val => val < 0 ? "- " + (-val) : "+ " + val;
+        return "y = " + s.Value()  + "\\cdot(x " + plusminus(-p.X()) + ")^2 " + plusminus(p.Y());
+    }], {useKatex: true});
+</script>
+
+</body>
+</html>

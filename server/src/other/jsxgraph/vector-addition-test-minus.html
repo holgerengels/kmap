@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Vektor Addition - Test</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <script type="module">
+        import {KmapJsxGraph} from 'https://cdn.jsdelivr.net/npm/kmap-jsxgraph/+esm';
+        window.customElements.define('kmap-jsxgraph', KmapJsxGraph);
+    </script>
+</head>
+<body>
+<kmap-jsxgraph id="graph" style="width: 330px; aspect-ratio: 1">
+    <style slot="styles">
+        .term {
+            background-color: white;
+        }
+    </style>
+    <script type="none" slot="attributes">
+      { boundingBox: [-6.5, 6.5, 6.5, -6.5], pan: { enabled: false} }
+    </script>
+    <script type="none" slot="script">//<![CDATA[
+      let ax = 0;
+      let ay = 0;
+      let bx = 0;
+      let by = 0;
+
+      var board = this.board;
+      board.options.point.snapToGrid = true;
+      board.options.point.showInfobox = false;
+      var o = board.create('point', [0, 0], { fixed: true, visible: false});
+      var a = board.create('point', [0, 0], { visible: false});
+      var b = board.create('point', [0, 0], { visible: false});
+      var va = board.create('line', [o, a], { straightFirst: false, straightLast: false, lastArrow: { type: 2, size: 6 }, color: JXG.palette.blue, fixed: true });
+      var vb = board.create('line', [o, b], { straightFirst: false, straightLast: false, lastArrow: { type: 2, size: 6 }, color: JXG.palette.blue, fixed: true });
+
+      var p = board.create('point', [2, 2], { visible: true, name: '', snapToGrid: true, snapSizeX: .5, snapSizeY: .5, face: 'cross', size: 3, witLabel: true, color: JXG.palette.vermillion });
+      board.create('arrow', [o, p], { strokeWidth: 2, color: JXG.palette.vermillion });
+
+      var al = board.create('point', [() => a.X() / 2, () => a.Y() / 2], { visible: () => a.X() != 0 || a.Y() != 0, size: 0, name: 'a', label: { autoPosition: true, offset: [10, 10], color: JXG.palette.blue, fontSize: 1.2, fontUnit: 'em' }});
+      var bl = board.create('point', [() => b.X() / 2, () => b.Y() / 2], { visible: () => b.X() != 0 || b.Y() != 0, size: 0, name: 'b', label: { autoPosition: true, offset: [10, 10], color: JXG.palette.blue, fontSize: 1.2, fontUnit: 'em' }});
+
+    this.isValid = function() {
+        let px = p.X();
+        let py = p.Y();
+        return ax - bx == px && ay - by == py;
+    }
+
+    this.init = function() {
+      do {
+      do { ax = Math.round(Math.random() * 6) -3; } while(Math.abs(ax) < 1);
+      do { ay = Math.round(Math.random() * 6) -3; } while(Math.abs(ay) < 1);
+      do { bx = Math.round(Math.random() * 6) -3; } while(Math.abs(bx) < 1);
+      do { by = Math.round(Math.random() * 6) -3; } while(Math.abs(by) < 1);
+      } while (ax == bx && ay == by);
+
+      a.moveTo([ax, ay], 300, { effect: '<>' });
+      b.moveTo([bx, by], 300, { effect: '<>' });
+    }
+
+    this.showAnswer = function() {
+      p.moveTo([ax - bx, ay - by], 300, { effect: '<>' });
+    }
+//]]></script>
+</kmap-jsxgraph>
+
+<button onclick="console.log(document.getElementById('graph').init())">init</button>
+<button onclick="console.log(document.getElementById('graph').isValid())">check</button>
+<button onclick="document.getElementById('graph').showAnswer()">answer</button>
+
+</body>
+</html>

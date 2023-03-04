@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <title>Gerade in Parameterform 3D</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <link rel='stylesheet' type='text/css' href='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraph.css'/>
+    <script src='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraphcore.js' type='text/javascript'></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js" crossorigin="anonymous"></script>
+
+    <style>
+        body {
+            margin: 0px;
+            padding: 0px;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr;
+        }
+        .jxgbox { border-radius: 0px; border: none}
+        .term { background-color: white }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id='board' class='jxgbox' style='width: 100%; aspect-ratio: 1'></div>
+</div>
+
+<script type='text/javascript'>
+    var animating = false;
+    var board = JXG.JSXGraph.initBoard('board', { boundingbox: [-8, 8, 8, -8], keepaspectratio: false, axis: false, showNavigation: false, showZoom: false, showCopyright: false, pan: { enabled: false} });
+    var t = board.create('slider', [[-3, -7], [5, -7], [-2, 0, 6]], {snapWidth: .1, ticks: { drawLabels: true, label: {fontSize: 16, offset: [-4, -16]} }, name: 't', digits: 1, label: { fontSize: 16, cssClass: 'term' }});
+    var toggle = board.create('button', [-7.5, -7, 'start/stop', function() {
+        if (!animating)
+            t.startAnimation(1, 100, 50);
+        else
+            t.stopAnimation();
+        animating = !animating;
+    }]);
+
+    let box = [-6, 6];
+    var view = board.create('view3d',
+        [
+            [-6, -3], [8, 8], // 2D box of view
+            [box, box, box]   // 3D bounding cube
+        ],
+        { xAxis: { visible: true }, yAxis: { visible: true }, zAxis: { visible: true },
+            xPlaneRear: {visible: false}, yPlaneRear: {visible: false}, zPlaneRear: {visible: false} });
+
+    var p0 = view.create('point3d', [0, 0, 0], { visible: false });
+    var pa = view.create('point3d', [3, -1, 2], { size: 3, name: '', visible: false });
+    var va = view.create('line3d', [p0, pa], { fixed: true, strokeColor: '#D55E00', strokeWidth: 3, lastArrow: { type: 2, size: 4 } });
+    var ta = view.create('point3d', [() => pa.X() / 2, () => pa.Y() / 2, () => pa.Z() / 2 ], { visible: true, size: 0, label: { color: '#D55E00', useKatex: true, autoPosition: true }, name: '\\vec a' });
+    var pb = view.create('point3d', [() => pa.X() - 1.5, () => pa.Y() + 3, () => pa.Z() + 1.5], { size: 3, name: '', visible: false });
+    var vb = view.create('line3d', [pa, pb], { fixed: true, strokeColor: 'blue', strokeWidth: 3, lastArrow: { type: 2, size: 4 } });
+    var tb = view.create('point3d', [() => pa.X() + (pb.X() - pa.X()) / 2, () => pa.Y() + (pb.Y() - pa.Y()) / 2, () => pa.Z() + (pb.Z() - pa.Z()) / 2 ], { visible: true, size: 0, label: { color: 'blue', useKatex: true, autoPosition: true }, name: '\\vec b' });
+    var pc = view.create('point3d', [() => pa.X() + t.Value() * (pb.X() - pa.X()), () => pa.Y() + t.Value() * (pb.Y() - pa.Y()), () => pa.Z() + t.Value() * (pb.Z() - pa.Z())], { size: 4, name: '', visible: true });
+    var vc = view.create('line3d', [pa, pc], { fixed: true, strokeColor: 'black', strokeWidth: 3, lastArrow: { type: 2, size: 4 } });
+    var vx = view.create('line3d', [p0, pc], { fixed: true, strokeColor: 'darkgray', strokeWidth: 3, dash: 2, lastArrow: { type: 2, size: 4 } });
+    var tx = view.create('point3d', [() => pc.X() / 2, () => pc.Y() / 2, () => pc.Z() / 2 ], { visible: true, size: 0, label: { color: 'black', useKatex: true }, name: '\\vec x' });
+
+    var p1 = view.create('point3d', [() => pa.X() + 10 * (pb.X() - pa.X()), () => pa.Y() + 10 * (pb.Y() - pa.Y()), () => pa.Z() + 10 * (pb.Z() - pa.Z())], { size: 3, name: '', visible: true });
+    var p2 = view.create('point3d', [() => pa.X() - 10 * (pb.X() - pa.X()), () => pa.Y() - 10 * (pb.Y() - pa.Y()), () => pa.Z() - 10 * (pb.Z() - pa.Z())], { size: 3, name: '', visible: true });
+    var g = view.create('line3d', [p1, p2], { fixed: true, strokeColor: 'darkgray', strokeWidth: 2, strokeOpacity: 0.8 });
+
+    var x1 = view.create('point3d', [20, 0, 0], { size: 3, name: '', visible: false });
+    var x2 = view.create('point3d', [-20, 0, 0], { size: 3, name: '', visible: false });
+    var gx = view.create('line3d', [x1, x2], { fixed: true, strokeColor: 'lightgray' });
+    var y1 = view.create('point3d', [0, 20, 0], { size: 3, name: '', visible: false });
+    var y2 = view.create('point3d', [0, -20, 0], { size: 3, name: '', visible: false });
+    var gy = view.create('line3d', [y1, y2], { fiyed: true, strokeColor: 'lightgray' });
+    var z1 = view.create('point3d', [0, 0, 20], { size: 3, name: '', visible: false });
+    var z2 = view.create('point3d', [0, 0, -20], { size: 3, name: '', visible: false });
+    var gz = view.create('line3d', [z1, z2], { fized: true, strokeColor: 'lightgray' });
+
+    var planex = view.create('plane3d', [[0, 0, 0], [0, 1, 0], [0, 0, 1]], { fillColor: JXG.palette.red, strokeColor: '#888888', strokeOpacity: 0.6, mesh3d: { visible: false } });
+    var planey = view.create('plane3d', [[0, 0, 0], [1, 0, 0], [0, 0, 1]], { fillColor: JXG.palette.green, strokeColor: '#888888', strokeOpacity: 0.6, mesh3d: { visible: false } });
+    var planez = view.create('plane3d', [[0, 0, 0], [0, 1, 0], [1, 0, 0]], { fillColor: JXG.palette.blue, strokeColor: '#888888', strokeOpacity: 0.6, mesh3d: { visible: false } });
+
+    //var s3 = view.create('point3d', [0, 5, 5], { size: 3, name: '', visible: true, color: JXG.palette.red });
+    //var s2 = view.create('point3d', [2.5, 0, 2.5], { size: 3, name: '', visible: true, color: JXG.palette.green });
+    //var s1 = view.create('point3d', [5, -5, 0], { size: 3, name: '', visible: true, color: JXG.palette.blue });
+    var sx = view.create('curve3d', [() => 0, (t) => 5 + .2*Math.sin(t), (t) => 5 + .2*Math.cos(t), [0, 2* Math.PI]], { strokeWidth: 2, visible: true, strokeColor: 'red' });
+    var sy = view.create('curve3d', [(t) => 2.5 + .2*Math.sin(t), () => 0, (t) => 2.5 + .2*Math.cos(t), [0, 2* Math.PI]], { strokeWidth: 2, visible: true, strokeColor: 'green' });
+    var sz = view.create('curve3d', [(t) => 5 + .2*Math.sin(t), (t) => -5 + .2*Math.cos(t), () => 0, [0, 2* Math.PI]], { strokeWidth: 2, visible: true, strokeColor: 'blue' });
+
+    var text = board.create('text', [7.5, 7.5, () => `g: \\vec x = \\textcolor{#D55E00}{\\begin{pmatrix} ${pa.X().toFixed(1)} \\\\ ${pa.Y().toFixed(1)} \\\\ ${pa.Z().toFixed(1)} \\end{pmatrix}} + t \\cdot \\textcolor{#0072B2}{\\begin{pmatrix} ${(pb.X() - pa.X()).toFixed(1)} \\\\ ${(pb.Y() - pa.Y()).toFixed(1)}  \\\\ ${(pb.Z() - pa.Z()).toFixed(1)} \\end{pmatrix}}`], { visible: true, size: 0, useKatex: true, cssClass: 'term', anchorX: 'right', anchorY: 'top' });
+</script>
+
+</body>
+</html>

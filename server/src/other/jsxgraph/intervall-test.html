@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <title>Intervall Test - Klammerschreibweise</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <script type="module">
+        import {KmapJsxGraph} from 'https://cdn.jsdelivr.net/npm/kmap-jsxgraph/+esm';
+        window.customElements.define('kmap-jsxgraph', KmapJsxGraph);
+    </script>
+</head>
+<body>
+<p>
+    Wähle für den linken und rechten Rand jeweils aus, ob es dort eine Grenze gibt
+    und ob diese zum Intervall dazugehört. Schiebe die Grenze(n) anschließend
+    jeweils an die richtige Stelle!
+</p>
+<style>
+    .container {
+        display: grid;
+        grid-template-columns: 1fr;
+        position: relative;
+    }
+    .panel {
+        position: absolute;
+        display: flex;
+        flex-direction: row;
+        gap: 8px;
+        font-family: Roboto, sans-serif;
+        font-size: 16px;
+        top: calc(25% - 8px);
+        right: 2.2%;
+    }
+</style>
+
+<div class="container">
+<kmap-jsxgraph id="graph" style="width: 100%; height: 112px">
+    <script type="none" slot="attributes">
+      { boundingbox: [-5, 1.5, 5, -.5], pan: { enabled: false}, axis: false }
+    </script>
+    <script type="none" slot="script">//<![CDATA[
+    let left = '-';
+    let right = '-';
+    let a;
+    let ai;
+    let b;
+    let bi;
+    let intervall = "";
+
+    const board = this.board;
+    var xaxis = board.create('axis', [ [0,0],[1,0] ], { ticks: { drawZero: true }});
+    var p1 = board.create('point', [-5, 0], {visible: false});
+    var p2 = board.create('point', [5, 0], {visible: false});
+    var l = board.create('segment', [p1, p2], {visible: false});
+    var ga = board.create('glider', [-1, 0, l], {visible: false, name: '', color: 'white', label: {offset: [-3, 2], color: 'red', fontSize: '24'}, snapToGrid: true, snapSizeX: .5, snapSizeY: .5, size: 1});
+    var gb = board.create('glider', [1, 0, l], {visible: false, name: '', color: 'white', label: {offset: [-3, 2], color: 'red', fontSize: '24'}, snapToGrid: true, snapSizeX: .5, snapSizeY: .5, size: 1});
+    var i = board.create('line', [ga, gb], {stroke: 3, straightFirst: true, straightLast: true});
+    var t = board.create('text', [-4.8, 1, () => intervall], {fontSize: 16, fontUnit: 'px', color: '#D55E00'});
+
+    ga.addChild(i);
+    gb.addChild(i);
+
+    this.setLeft = function(value) {
+        left = value;
+        i.setAttribute({straightFirst: left === '-'});
+        ga.setAttribute({name: left !== '-' ? left : '', visible: left !== '-'});
+    }
+    this.setRight = function(value) {
+        right = value;
+        i.setAttribute({straightLast: right === '-'})
+        gb.setAttribute({name: right !== '-' ? right : '', visible: right !== '-'});
+    }
+
+    this.isValid = function() {
+        return left === ai && right === bi && (ai === '-' || a === ga.X()) && (bi === '-' || b === gb.X());
+    }
+
+    this.init = function() {
+      do {
+        ai = ['-', '[', ']'][Math.round(Math.random() * 2)];
+        bi = ['-', '[', ']'][Math.round(Math.random() * 2)];
+      } while (ai === '-' && bi === '-');
+
+      a = Math.round(Math.random() * 4) - 4.5;
+      b = 1 + a + Math.round(Math.random() * (4.5 - a - 1));
+      intervall = "I = " + (ai === '-' ? ']oo' : ai + a) + "; " + (bi === '-' ? 'oo[' : b + bi);
+      board.fullUpdate();
+    }
+
+    this.showAnswer = function() {
+      left = ai;
+      this.getRootNode().getElementById('left').selectedIndex = ['-', '[', ']'].indexOf(ai);
+      ga.moveTo([ai === '-' ? -6 : a, 0], 300, { effect: '<>' });
+      ga.setAttribute({name: left !== '-' ? left : '', visible: left !== '-'});
+      i.setAttribute({straightFirst: left === '-'});
+
+      right = bi;
+      this.getRootNode().getElementById('right').selectedIndex = ['-', '[', ']'].indexOf(bi);
+      gb.moveTo([bi === '-' ? 6 : b, 0], 300, { effect: '<>' });
+      gb.setAttribute({name: right !== '-' ? right : '', visible: right !== '-'});
+      i.setAttribute({straightLast: right === '-'})
+
+      board.fullUpdate();
+    }
+//]]></script>
+</kmap-jsxgraph>
+    <div class="panel">
+        Grenze links <select id="left" name="left" onchange="this.getRootNode().getElementById('graph').setLeft(this.value)">
+        <option value="-"></option>
+        <option value="[">[</option>
+        <option value="]">]</option>
+    </select>
+        rechts <select id="right" name="right" onchange="this.getRootNode().getElementById('graph').setRight(this.value)">
+        <option value="-"></option>
+        <option value="[">[</option>
+        <option value="]">]</option>
+    </select>
+    </div>
+</div>
+
+<button onclick="document.getElementById('graph').init()">init</button>
+<button onclick="console.log(document.getElementById('graph').isValid())">check</button>
+<button onclick="document.getElementById('graph').showAnswer()">answer</button>
+
+</body>
+</html>

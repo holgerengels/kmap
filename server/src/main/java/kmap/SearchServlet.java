@@ -96,11 +96,41 @@ public class SearchServlet extends JsonServlet {
                     endNode(eventWriter, "a");
 
                     if (s)
-                        createNode(eventWriter, "summary", summary, null, true);
+                        emptyNode(eventWriter, "summary");
                     if (d)
-                        createNode(eventWriter, "description", description, null, true);
+                        emptyNode(eventWriter, "description");
                     if (k)
-                        createNode(eventWriter, "keywords", keywords, null, true);
+                        emptyNode(eventWriter, "keywords");
+
+                    endNode(eventWriter, "occurence");
+                }
+
+                JsonArray tarray = tests.latestThin(subject, 100000);
+                for (JsonElement element : tarray) {
+                    JsonObject card = (JsonObject) element;
+
+                    Pattern p = Pattern.compile(search);
+                    String question = string(card, "question");
+                    String answer = string(card, "answer");
+                    boolean q = question != null && p.matcher(question).find();
+                    boolean a = answer != null && p.matcher(answer).find();
+                    if (!q && !a)
+                        continue;
+
+                    startNode(eventWriter, "occurrence");
+
+                    String chapter = string(card, "chapter");
+                    String topic = string(card, "topic");
+                    String key = string(card, "key");
+                    String url = "https://kmap.eu/app/exercise/" + URLs.encode(subject) + "/" + URLs.encode(chapter) + "/" + URLs.encode(topic) + "/" + URLs.encode(key);
+
+                    eventWriter.add(eventFactory.createStartElement("", "", "a", new SingletonIterator(eventFactory.createAttribute("href", url)), null));
+                    endNode(eventWriter, "a");
+
+                    if (q)
+                        emptyNode(eventWriter, "question");
+                    if (a)
+                        emptyNode(eventWriter, "answer");
 
                     endNode(eventWriter, "occurence");
                 }

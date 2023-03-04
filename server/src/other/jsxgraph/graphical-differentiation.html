@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <title>Graphisches Ableiten</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <link rel='stylesheet' type='text/css' href='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraph.css'/>
+    <script src='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraphcore.js' type='text/javascript'></script>
+
+    <style>
+        body {
+            margin: 0px;
+            padding: 0px;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr;
+        }
+        .jxgbox { border-radius: 0px; border: none}
+        .term { background-color: white; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id=fboard class='jxgbox' style='width: 100%; aspect-ratio: 3'></div>
+    <div id="ffboard" class='jxgbox' style='width: 100%; aspect-ratio: 3'></div>
+</div>
+
+<script type='text/javascript'>
+    let f = (x) => 1/60 * x**5 -1/4 * x**4 + 5/4 * x**3 -9/4 * x**2 +2;
+    let ff = (x) => 5/60 * x*(x-3)**2*(x-6);
+
+    var fboard = JXG.JSXGraph.initBoard('fboard', {boundingbox: [-1.5, 2.5, 8, -3.5], axis: false, showNavigation: false, showZoom: false, showCopyright: false, pan: { enabled: false}});
+    var grid = fboard.create('grid', []);
+    fboard.create('axis', [[-1, 0], [1, 0]]);
+    var g = fboard.create('functiongraph', [f], {strokeWidth: 3});
+    var p1 = fboard.create('point', [-1.5, 0], {visible: false, name: ''});
+    var p2 = fboard.create('point', [8, 0], {visible: false, name: ''});
+    var l = fboard.create('segment', [p1, p2], {visible: false, name: ''});
+    var x1 = fboard.create('glider', [8, 0, l], {visible: true, name: 'x_0', label: {fontSize: 1, fontUnit: 'em', color: JXG.palette.vermillion}, showInfobox: false});
+
+    for (let pos = -1; pos < 8; pos+=.5) {
+        let x = pos;
+        let y = f(pos);
+        let m = ff(pos);
+        let atan = Math.atan(m);
+        let cos = Math.cos(atan);
+        let sin = Math.sin(atan);
+        console.log(m + " .. " + cos + " " + sin)
+        let a = fboard.create('point', [x-cos*.2, y-sin*.2], {visible: false, name: ''})
+        let b = fboard.create('point', [x+cos*.2, y+sin*.2], {visible: false, name: ''})
+        let s = fboard.create('segment', [a, b], {visible: () => x1.X() >= pos, name: '', strokeWidth: 4, strokeColor: JXG.palette.vermillion});
+    }
+
+    var ffboard = JXG.JSXGraph.initBoard('ffboard', {boundingbox: [-1.5, 3.5, 8, -3.5], axis: true, showNavigation: false, showZoom: false, showCopyright: false, pan: { enabled: false}});
+    fboard.addChild(ffboard);
+    var gff = ffboard.create('functiongraph', [ff], {strokeWidth: 3, visible: false});
+    var lalas = [];
+    for (let pos = -1; pos < 8; pos+=.5) {
+        let t = ffboard.create('text', [pos, ff(pos) === 0 ? 0 : ff(pos) > 0 ? .5 : -.5, ff(pos) === 0 ? '⊙' : ff(pos) > 0 ? '⊕' : '⊖'], {visible: () => x1.X() >= pos, fontSize: 1, fontUnit: 'em', color: JXG.palette.vermillion, anchorX: 'middle', anchorY: 'middle', cssClass: 'term'});
+        lalas.push({p: pos, t: t});
+    }
+    for (const pos of [0, .88, 3, 5.12, 6]) {
+        var lf = fboard.create('line', [[pos, -1], [pos, 1]], {visible: () => x1.X() >= pos, color: JXG.palette.vermillion, dash: 2});
+        var lff = ffboard.create('line', [[pos, -1], [pos, 1]], {visible: () => x1.X() >= pos, color: JXG.palette.vermillion, dash: 2});
+    }
+    var wp1 = ffboard.create('point', [.88, ff(.88)], {visible: false, name: '', size: 2, color: JXG.palette.vermillion});
+    var wp3 = ffboard.create('point', [5.12, ff(5.12)], {visible: false, name: '', size: 2, color: JXG.palette.vermillion});
+
+    var last = false;
+    x1.on('drag', () => {
+        const x = x1.X();
+        if (x >= 7 === last)
+            return;
+        last = x >= 7;
+        if (last) {
+            setTimeout(() => {
+                gff.setAttribute({ visible: true });
+                wp1.setAttribute({ visible: true });
+                wp3.setAttribute({ visible: true });
+            }, 300);
+            lalas.forEach(l => {
+                l.t.moveTo([l.p, ff(l.p)], 200);
+            });
+        }
+        else {
+            gff.setAttribute({ visible: false });
+            wp1.setAttribute({ visible: false });
+            wp3.setAttribute({ visible: false });
+            lalas.forEach(l => {
+                l.t.moveTo([l.p, ff(l.p) === 0 ? 0 : ff(l.p) > 0 ? .5 : -.5], 200);
+            })
+        }
+    });
+
+    x1.moveTo([-1, 0]);
+</script>
+
+</body>
+</html>
+

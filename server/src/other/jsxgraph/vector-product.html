@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <title>Vektorprodukt</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <link rel='stylesheet' type='text/css' href='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraph.css'/>
+    <script src='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraphcore.js' type='text/javascript'></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js" crossorigin="anonymous"></script>
+
+    <style>
+        body {
+            margin: 0px;
+            padding: 0px;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr;
+            position: relative;
+        }
+        .jxgbox { border-radius: 0px; border: none}
+        .term { background-color: white }
+        .lala {
+            color: #D55E00;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            font-size: 1.2em;
+            gap: 4px;
+            margin-bottom: 4px;
+        }
+        .lala span {
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id='board' class='jxgbox' style='width: 100%; aspect-ratio: 1'></div>
+</div>
+
+<script type='text/javascript'>
+    const minus = function (array1, array2, n) {
+        if (!n) {
+            n = Math.min(array1.length, array2.length);
+        }
+
+        let d = [];
+        for (let i = 0; i < n; i++) {
+            d[i] = array1[i] - array2[i];
+        }
+
+        return d;
+    }
+    const plus = function (array1, array2, n) {
+        if (!n) {
+            n = Math.min(array1.length, array2.length);
+        }
+
+        let d = [];
+        for (let i = 0; i < n; i++) {
+            d[i] = array1[i] + array2[i];
+        }
+
+        return d;
+    }
+
+    var board = JXG.JSXGraph.initBoard('board', { boundingbox: [-10, 8, 8, -8], keepaspectratio: false, showNavigation: false, showZoom: false, showCopyright: false, pan: { enabled: false} });
+    var b = board.create('text', [-9.5, -7.5, '<div class="lala" style="font-weight: bold">Aufgabenstellung:&ThinSpace;</div><div id="lala" class="lala"><span><input type="radio" name="b" value="n" checked/>&ThinSpace;Normalenvektor</span><span><input type="radio" name="b" value="p"/>&ThinSpace;Parallelogramm</span><span><input type="radio" name="b" value="d"/>&ThinSpace;Dreieck</span></div>'], { anchorY: 'bottom' });
+    b._value = 'n'; b.Value = () => b._value;
+    document.getElementById("lala").onchange = (e) => { b._value = e.target.value; console.log(e.target.value); board.update() };
+
+    let box = [-5, 5];
+    var view = board.create('view3d',
+        [
+            [-6, -3], [8, 8], // 2D box of view
+            [box, box, box]   // 3D bounding cube
+        ],
+        { xAxis: { visible: false }, yAxis: { visible: false }, zAxis: { visible: false },
+            xPlaneRear: {visible: true}, yPlaneRear: {visible: true}, zPlaneRear: {visible: true} });
+
+    var P = view.create('point3d', [1, -2, -4], { size: 3, name: '', visible: true, color: JXG.palette.vermillion });
+    var A = view.create('point3d', [0, 1, -4], { size: 3, name: '', visible: true, color: JXG.palette.vermillion });
+    var B = view.create('point3d', [-2, -1, -4], { size: 3, name: '', visible: true, color: JXG.palette.vermillion });
+    var C = view.create('point3d', [() => A.X() + B.X() - P.X(), () => A.Y() + B.Y() - P.Y(), () => A.Z() + B.Z() - P.Z()], { size: 3, name: 'C', visible: false });
+    var D = view.create('point3d', [
+        () => plus(JXG.Math.crossProduct(minus([A.X(), A.Y(), A.Z()], [P.X(), P.Y(), P.Z()]), minus([B.X(), B.Y(), B.Z()], [P.X(), P.Y(), P.Z()])), [P.X(), P.Y(), P.Z()])[0],
+        () => plus(JXG.Math.crossProduct(minus([A.X(), A.Y(), A.Z()], [P.X(), P.Y(), P.Z()]), minus([B.X(), B.Y(), B.Z()], [P.X(), P.Y(), P.Z()])), [P.X(), P.Y(), P.Z()])[1],
+        () => plus(JXG.Math.crossProduct(minus([A.X(), A.Y(), A.Z()], [P.X(), P.Y(), P.Z()]), minus([B.X(), B.Y(), B.Z()], [P.X(), P.Y(), P.Z()])), [P.X(), P.Y(), P.Z()])[2],
+        ], { size: 3, name: 'E', visible: false });
+    
+    var ta = view.create('point3d', [() => P.X() + (A.X() - P.X()) / 2, () => P.Y() + (A.Y() - P.Y()) / 2, () => P.Z() + (A.Z() - P.Z()) / 2 ], { visible: true, size: 0, label: { color: 'black', useKatex: true }, name: '\\vec a' });
+    var tb = view.create('point3d', [() => P.X() + (B.X() - P.X()) / 2, () => P.Y() + (B.Y() - P.Y()) / 2, () => P.Z() + (B.Z() - P.Z()) / 2 ], { visible: true, size: 0, label: { color: 'black', useKatex: true }, name: '\\vec b' });
+    var tn = view.create('point3d', [() => P.X() + (D.X() - P.X()) / 2, () => P.Y() + (D.Y() - P.Y()) / 2, () => P.Z() + (D.Z() - P.Z()) / 2 ], { visible: true, size: 0, label: { color: 'black', useKatex: true },
+        name: () => { switch (b.Value()) {
+            case 'n': return `\\vec n = \\begin{pmatrix} ${(D.X() - P.X()).toFixed(1)} \\\\ ${(D.Y() - P.Y()).toFixed(1)} \\\\ ${(D.Z() - P.Z()).toFixed(1)} \\end{pmatrix}`;
+            case 'p': return `A_P = \\left|\\begin{pmatrix} ${(D.X() - P.X()).toFixed(1)} \\\\ ${(D.Y() - P.Y()).toFixed(1)} \\\\ ${(D.Z() - P.Z()).toFixed(1)} \\end{pmatrix}\\right| \\approx ${JXG.Math.Geometry.affineDistance([D.X(), D.Y(), D.Z()], [P.X(), P.Y(), P.Z()]).toFixed(1)}`;
+            case 'd': return `A_D = \\frac{1}{2}\\left|\\begin{pmatrix} ${(D.X() - P.X()).toFixed(1)} \\\\ ${(D.Y() - P.Y()).toFixed(1)} \\\\ ${(D.Z() - P.Z()).toFixed(1)} \\end{pmatrix}\\right| \\approx ${(JXG.Math.Geometry.affineDistance([D.X(), D.Y(), D.Z()], [P.X(), P.Y(), P.Z()])/2).toFixed(1)} `;
+        }}});
+
+    //var E = view.create('point3d', [0, 0, 0], { size: 3, name: 'E' });
+    /*
+    const calc = () => {
+        let a = minus([B.X(), B.Y(), B.Z()], [A.X(), A.Y(), A.Z()]);
+        let b = minus([D.X(), D.Y(), D.Z()], [A.X(), A.Y(), A.Z()]);
+        let c = JXG.Math.crossProduct(a, b);
+        console.log(plus([A.X(), A.Y(), A.Z()], c));
+        //E.coords = plus([A.X(), A.Y(), A.Z()], c);
+        //E.setPosition(JXG.COORDS_BY_USER, plus([A.X(), A.Y(), A.Z()], c));
+        //E.updateCoords()
+        //view.fullUpdate()
+    }
+    B.on('drag', calc);
+    D.on('drag', calc);
+    calc();
+    */
+
+    view.create('segment', [P.element2D, A.element2D], { lastArrow: true });
+    view.create('segment', [P.element2D, B.element2D], { lastArrow: true });
+    view.create('segment', [P.element2D, D.element2D], { lastArrow: true });
+    view.create('polygon', [P.element2D, A.element2D, C.element2D, B.element2D], {
+        visible: () => b.Value() === 'p',
+        highlight: false,
+        gradient: 'linear',
+        gradientSecondColor: 'white',
+        fillColor: 'blue',
+        borders: { strokecolor: 'blue', strokeWidth: 1 }
+    });
+    view.create('polygon', [P.element2D, A.element2D, B.element2D], {
+        visible: () => b.Value() === 'd',
+        highlight: false,
+        gradient: 'linear',
+        gradientSecondColor: 'white',
+        fillColor: 'blue',
+        borders: { strokecolor: 'blue', strokeWidth: 1 }
+    });
+    var plane = view.create('plane3d', [[() => P.X(), () => P.Y(), () => P.Z()], [() => P.X() - A.X(), () => P.Y() - A.Y(), () => P.Z() - A.Z()], [() => P.X() - B.X(), () => P.Y() - B.Y(), () => P.Z() - B.Z()], [-10, 10], [-10, 10]], {
+        visible: () => b.Value() === 'n',
+        fillColor: JXG.palette.blue, strokeWidth: 1, strokeColor: '#888888', strokeOpacity: 0.6, mesh3d: { visible: false }
+    });
+
+    const azimuth = (v) => {
+        var s = view.az_slide._smin,
+            e = view.az_slide._smax,
+            sdiff = e - s;
+        view.az_slide.position = ((v - s) / sdiff);
+        view.board.update();
+    }
+    //azimuth(5);
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Gerade Test</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <script type="module">
+        import {KmapJsxGraph} from 'https://cdn.jsdelivr.net/npm/kmap-jsxgraph/+esm';
+        window.customElements.define('kmap-jsxgraph', KmapJsxGraph);
+    </script>
+</head>
+<body>
+<kmap-jsxgraph style="width: 300px; aspect-ratio: 1">
+    <script type="none" slot="attributes">
+      { boundingBox: [-5, 5, 5, -5], pan: { enabled: false} }
+    </script>
+    <script type="none" slot="script">//<![CDATA[
+    let m;
+    let t;
+    let term = "";
+
+    var board = this.board;
+    var a = board.create('point', [-1, -1], {visible: true, name: 'A', snapToGrid: true, snapSizeX: .5, snapSizeY: .5});
+    var b = board.create('point', [1, 1], {visible: true, name: 'B', snapToGrid: true, snapSizeX: .5, snapSizeY: .5});
+    var g = board.create('line', [a, b], { fixed: true });
+    var p1 = board.create('point', [0, -5], {visible: false,});
+    var p2 = board.create('point', [0, 5], {visible: false});
+    var l = board.create('line', [p1, p2], {visible: false});
+    var i = board.create('intersection', [g, l], {visible: false});
+    var tt = board.create('text', [-4.5, 4.5, () => term], {fontSize: 1.3, fontUnit: 'em', color: '#D55E00'});
+
+    this.isValid = function() {
+        let dx = b.X() - a.X();
+        let dy = b.Y() - a.Y();
+        let gm = dy/dx;
+        let gt = (- dy * b.X() + b.Y() * dx) / dx;
+        return m == gm && t == gt;
+    }
+
+    this.init = function() {
+      ms = Math.random() > .5 ? "+" : "-";
+      mx = Math.round(Math.random() * 3) + 1;
+      my = Math.round(Math.random() * 3) + 1;
+      m = ms === "+" ? my/mx : -my/mx;
+      t = Math.round(Math.random() * 8) - 4;
+      let frac = reduceFraction(my, mx);
+      term = "y = " + (ms === "-" ? "-" : "") + frac + "x " + (t >= 0 ? "+ " + t : "- " + (-t));
+      board.fullUpdate();
+    }
+
+    this.showAnswer = function() {
+      a.moveTo([0, t], 300, { effect: '<>' });
+      b.moveTo([mx, t + (ms === '+' ? my : -my)], 300, { effect: '<>' });
+      board.fullUpdate();
+    }
+
+    let reduceFraction = function(numOne, numTwo) {
+      var result = '';
+      for (var i = Math.max(numOne, numTwo); i > 1; i--) {
+        if ((numOne % i == 0) && (numTwo % i == 0)) {
+          numOne /= i;
+          numTwo /= i;
+        }
+      }
+      if (numTwo === 1) {
+        result = numOne.toString()
+      } else {
+        result = numOne.toString() + '/' + numTwo.toString()
+      }
+      return result
+    }
+//]]></script>
+</kmap-jsxgraph>
+
+</body>
+</html>

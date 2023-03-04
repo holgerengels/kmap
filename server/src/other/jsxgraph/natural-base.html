@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <title>Natürliche Basis</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <link rel='stylesheet' type='text/css' href='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraph.css'/>
+    <script src='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraphcore.js' type='text/javascript'></script>
+
+    <style>
+        body {
+            margin: 0px;
+            padding: 0px;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr;
+            position: relative;
+        }
+        .jxgbox { border-radius: 0px; border: none }
+        .term { background-color: white; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id='board' class='jxgbox' style='width: 100%; aspect-ratio: 1'></div>
+</div>
+
+<script>
+    var board = JXG.JSXGraph.initBoard('board', {boundingbox: [-3, 5.5, 3, -.5], axis: true, showNavigation: false, showZoom: false, showCopyright: false, pan: { enabled: false}});
+    let  f = (x) => Math.E ** x;
+
+    var g = board.create('functiongraph', [f], {strokeWidth: 3});
+    var p1 = board.create('point', [-2, 0], {visible: false, name: ''});
+    var p2 = board.create('point', [1, 0], {visible: false, name: ''});
+    var l = board.create('segment', [p1, p2], { visible: false, name: '' });
+    var x1 = board.create('glider', [-1, 0, l], { visible: true, name: 'x_0', label: {fontSize: 1, fontUnit: 'em', color: '#D55E00', offset: [7, -15], cssClass: 'term' }, showInfobox: false});
+    var y1 = board.create('glider', [() => x1.X(), () => f(x1.X()), g], { size: 2, color: '#0072B2', size: 3, name: () => 'y = ' + f(x1.X()).toFixed(1), color: '#0072B2', label: { offset: [10, -10], cssClass: 'term' } });
+    var t = board.create('tangent', [y1], { label: { digits: 1} });
+    var sl = board.create('slopetriangle', [t], { label: { digits: 1, cssClass: 'term' }, name: () => 'y = ' + f(x1.X()).toFixed(1) });
+    sl.label._setText(function () {
+        return 'm = ' + f(x1.X()).toFixed(1);
+    });
+    var y2 = board.create('point', [0, () => f(x1.X())], { size: 2, name: '', color: '#0072B2' });
+    var l1 = board.create('segment', [x1, y1], {visible: true, dash: 2});
+    var l2 = board.create('segment', [y1, y2], {visible: true, dash: 2});
+
+    /*
+    var text = board.create('text', [.3, -4, () => {
+        const plusminus = val => val < 0 ? "- " + (-val) : "+ " + val;
+        return "f(x) = " + s.Value()  + "\\cdot(x " + plusminus(-p.X()) + ")^2 " + plusminus(p.Y());
+    }], {useKatex: true});
+     */
+</script>
+
+</body>
+</html>

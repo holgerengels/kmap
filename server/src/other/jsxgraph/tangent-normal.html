@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <title>Tangente und Normale</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <link rel='stylesheet' type='text/css' href='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraph.css'/>
+    <script src='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraphcore.js' type='text/javascript'></script>
+
+    <style>
+        body {
+            margin: 0px;
+            padding: 0px;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr;
+        }
+        .jxgbox { border-radius: 0px; border: none}
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id=fboard class='jxgbox' style='width: 100%; aspect-ratio: 2'></div>
+</div>
+
+<script type='text/javascript'>
+    let f = (x) => 1/15 * x**3 - 1/2 * x**2 + 2;
+    let df = (x) => 1/5 * (x - 5)*x;
+    var fboard = JXG.JSXGraph.initBoard('fboard', {boundingbox: [-1.5, 3, 8, -3], axis: true, keepAspectRatio: true, showNavigation: false, showZoom: false, showCopyright: false, pan: { enabled: false}});
+    var g = fboard.create('functiongraph', [f], {strokeWidth: 3});
+    var p1 = fboard.create('point', [-3, 0], {visible: false, name: ''});
+    var p2 = fboard.create('point', [9, 0], {visible: false, name: ''});
+    var l = fboard.create('segment', [p1, p2], {visible: false, name: ''});
+    var x1 = fboard.create('glider', [-1, 0, l], {visible: true, name: 'x_0', label: {fontSize: 1.3, fontUnit: 'em', color: '#D55E00'}});
+    var y1 = fboard.create('point', [() => x1.X(), () => f(x1.X())], {visible: true, name: '', color: '#0072B2'});
+    var s1 = fboard.create('line', [x1, y1], {visible: true, name: '', dash: 2});
+    var y3 = fboard.create('point', [() => x1.X() + 1, () => df(x1.X()) + y1.Y()], {visible: false});
+    var t = fboard.create('line', [y1, y3], {name: 'Tangente', color: 'red'});
+    var y4 = fboard.create('point', [() => x1.X() + 1, () => - 1/df(x1.X()) + y1.Y()], {visible: false});
+    var n = fboard.create('line', [y1, y4], {name: 'Normale', color: 'green'});
+    var a1 = fboard.create('angle', [y4, y1, y3], {orthoType: 'sectordot', visible: () => x1.X() < 0 || x1.X() > 5, color: '#0072B2'})
+    var a2 = fboard.create('angle', [y3, y1, y4], {orthoType: 'sectordot', visible: () => x1.X() > 0 && x1.X() < 5, color: '#0072B2'})
+
+    function plusMinus(val) {
+        return val > 0 ? " + " + JXG.toFixed(val, 1) : " - " + JXG.toFixed(-val, 1);
+    }
+
+    var textt = fboard.create('text', [2, 2, () => {
+        return "<span style=\"color: red\">f_t(x) = " + (JXG.toFixed(df(x1.X()), 1) + "(x " + plusMinus(-x1.X()) + ") " + plusMinus(y1.Y())) + "</span><br/>"
+            + "<span style=\"color: green\">" + (df(x1.X()) !== 0 ? ("f_n(x) = " + JXG.toFixed(-1/df(x1.X()), 1) + "(x " + plusMinus(-x1.X()) + ") " + plusMinus(y1.Y())) : "f_n ist nicht definiert") + "</span>";
+    }], {fontSize: 1.1, fontUnit: 'em'});
+
+    //x1.startAnimation(1, 200, 30);
+</script>
+
+</body>
+</html>

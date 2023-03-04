@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <title>Zeltvolumen maximieren</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <link rel='stylesheet' type='text/css' href='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraph.css'/>
+    <script src='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraphcore.js' type='text/javascript'></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js" crossorigin="anonymous"></script>
+
+    <style>
+        body {
+            margin: 0px;
+            padding: 0px;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr;
+        }
+        .jxgbox { border-radius: 0px; border: none}
+        .term { background-color: white }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id='board' class='jxgbox' style='width: 100%; min-width: 350px; max-width: 450px; aspect-ratio: 1'></div>
+    <div id='model' class='jxgbox' style='width: 100%; min-width: 350px; max-width: 450px; aspect-ratio: 1'></div>
+</div>
+
+<script type='text/javascript'>
+    let v = (x) => 1/3 * x**2 * Math.sqrt(6.25 - 1/2 * x**2);
+    let d = (x) => Math.sqrt(2) * x;
+    let h = (x) => Math.sqrt(2.5**2 - 1/4 * d(x)**2);
+
+    var board = JXG.JSXGraph.initBoard('board', {boundingbox: [-.5, 5, 4, -.5], axis: true, showNavigation: false, showZoom: false, showCopyright: false, pan: { enabled: false}});
+    var fv = board.create('functiongraph', [v, 0, 4], {strokeWidth: 3});
+    var fh = board.create('functiongraph', [h, 0, 4], {strokeWidth: 3, strokeColor: 'green'});
+    var p1 = board.create('point', [0, 0], {visible: false, name: ''});
+    var p2 = board.create('point', [Math.sqrt(12.5), 0], {visible: false, name: ''});
+    var l = board.create('segment', [p1, p2], {visible: false, name: ''});
+    var x1 = board.create('glider', [2, 0, l], {visible: true, name: 'a', showInfobox: false, label: {fontSize: 1.3, fontUnit: 'em', color: '#D55E00'}});
+    var y1 = board.create('point', [() => x1.X(), () => v(x1.X())], {visible: true, name: '', color: '#0072B2'});
+    var y2 = board.create('point', [() => x1.X(), () => h(x1.X())], {visible: true, name: '', color: 'green'});
+    var s1 = board.create('line', [x1, y1], {visible: true, name: '', dash: 2, strokeColor: 'darkgray'});
+    var a = board.create('segment', [p1, x1], {visible: true, name: '', strokeColor: '#D55E00'});
+
+    var model = JXG.JSXGraph.initBoard('model', { boundingbox: [-10, 8, 8, -8], keepaspectratio: false, axis: false, showNavigation: false, showZoom: false, showCopyright: false, pan: { enabled: false} });
+    board.addChild(model);
+
+    let box = [-2, 2];
+    var view = model.create('view3d',
+        [
+            [-6, -3], [8, 8], // 2D box of view
+            [box, box, box]   // 3D bounding cube
+        ],
+        { xAxis: { visible: false }, yAxis: { visible: false }, zAxis: { visible: false },
+            xPlaneRear: {visible: false}, yPlaneRear: {visible: false}, zPlaneRear: {visible: true} });
+
+    var A = view.create('point3d', [() => -x1.X() / 2, () => -x1.X() / 2, -2], { size: 3, name: '', visible: true });
+    var B = view.create('point3d', [() => x1.X() / 2, () => -x1.X() / 2, -2], { size: 3, name: '', visible: true });
+    var C = view.create('point3d', [() => x1.X() / 2, () => x1.X() / 2, -2], { size: 3, name: '', visible: true });
+    var D = view.create('point3d', [() => -x1.X() / 2, () => x1.X() / 2, -2], { size: 3, name: '', visible: true });
+    var E = view.create('point3d', [0, 0, () => (isNaN(y2.Y()) ? 0 : y2.Y()) -2], { size: 3, name: '', visible: true });
+    var O = view.create('point3d', [0, 0, -2], { size: 3, name: '', visible: true });
+    view.create('line3d', [O, E], { strokeColor: 'green' });
+
+    view.create('polygon', [A.element2D, B.element2D, E.element2D], { highlight: false, gradient: 'linear', gradientSecondColor: 'white', fillColor: 'blue', borders: { strokecolor: 'blue', strokeWidth: 1 }});
+    view.create('polygon', [B.element2D, C.element2D, E.element2D], { highlight: false, gradient: 'linear', gradientSecondColor: 'white', fillColor: 'blue', borders: { strokecolor: 'blue', strokeWidth: 1 }});
+    view.create('polygon', [C.element2D, D.element2D, E.element2D], { highlight: false, gradient: 'linear', gradientSecondColor: 'white', fillColor: 'blue', borders: { strokecolor: 'blue', strokeWidth: 0 }});
+    view.create('polygon', [D.element2D, A.element2D, E.element2D], { highlight: false, gradient: 'linear', gradientSecondColor: 'white', fillColor: 'blue', borders: { strokecolor: 'blue', strokeWidth: 1 }});
+    view.create('polygon', [A.element2D, B.element2D, C.element2D, D.element2D], { highlight: false, gradient: 'linear', gradientSecondColor: 'white', fillColor: 'blue', borders: { strokecolor: 'blue', strokeWidth: 0 }});
+    view.create('line3d', [C, D], { strokeColor: '#D55E00', strokeWidth: 2 });
+    view.create('line3d', [B, O], { strokeColor: 'darkgray', strokeWidth: 1 });
+
+    var text1 = model.create('text', [-6, 4, () => '\\textcolor{#D55E00}{a = ' + x1.X().toFixed(1) + '} \\implies'], { fontSize: 1, fontUnit: 'em', color: '#D55E00', cssClass: 'term', useKatex: true });
+    var text2 = model.create('text', [0, 4, () => '\\textcolor{#0072B2}{V \\approx ' + y1.Y().toFixed(1) + '}\\newline' +
+        '\\textcolor{green}{h \\approx ' + y2.Y().toFixed(1) + '}'], { fontSize: 1, fontUnit: 'em', color: '#D55E00', cssClass: 'term', useKatex: true });
+
+</script>
+
+</body>
+</html>

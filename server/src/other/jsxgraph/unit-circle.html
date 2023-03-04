@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <title>Bogenmaß</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <link rel='stylesheet' type='text/css' href='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraph.css'/>
+    <script src='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraphcore.js' type='text/javascript'></script>
+
+    <style>
+        body {
+            margin: 0px;
+            padding: 0px;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr;
+        }
+        .jxgbox { border-radius: 0px; border: none}
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id='circle' class='jxgbox' style='width: 100%; aspect-ratio: 1'></div>
+</div>
+
+<script type='text/javascript'>
+    const piFracts = ["", "1/6&pi;", "2/6&pi;", "3/6&pi;", "4/6&pi;", "5/6&pi;", "&pi;", "7/6&pi;", "8/6&pi;", "9/6&pi;", "10/6&pi;", "11/6&pi;", "2&pi;"];
+
+    var circle = JXG.JSXGraph.initBoard('circle', {boundingbox: [-1.25, 1.25, 1.25, -1.25], axis: true, showNavigation: false, showZoom: false, showCopyright: false, pan: { enabled: false}});
+
+    var p0 = circle.create('point', [0, 0], {fixed: true, visible: false});
+    var p1 = circle.create('point', [1, 0], {name: '', visible: false, fixed: true});
+    var c = circle.create('circle', [p0, p1], {dash: 2, strokeWidth: 1, strokeOpacity: 0.6});
+
+    var pc = circle.create('glider', [Math.cos(1/6 * Math.PI), Math.sin(1/6 * Math.PI), c], {visible: true, name: ''});
+    var pc2 = circle.create('point', [() => pc.X(), () => pc.Y()], {visible: true, withLabel: true, layer: 0, name: function() {
+            let angle = JXG.Math.Geometry.rad(p1, p0, pc);
+            if (angle < 0)
+                angle = 2 * Math.PI + angle;
+            let pth = angle * 6 / Math.PI;
+            let int = (Math.round(angle * 6 / Math.PI));
+            return Math.abs(pth - int) < .1 ? piFracts[int] : angle.toFixed(1);
+        }});
+    var pcx = circle.create('point', [function () {return pc.X();}, 0.0 ], {visible: false, name: '', withLabel: false});
+    var arc = circle.create('arc', [p0, p1, pc], {strokeWidth: 3, strokeColor: 'green'});
+    var ang = circle.create('angle', [p1, p0, pc], {orthoSensitivity: false, radius: 0.25, strokeColor: 'green', fillColor: 'green', name: function() {
+            return JXG.Math.Geometry.trueAngle(p1, p0, pc).toFixed(0) + "&deg;";
+    }});
+    circle.create('line', [pc, p0], {straightFirst: false, straightLast: false, dash: 2});
+
+    circle.create('text', [.5, 1, () => JXG.Math.Geometry.trueAngle(p1, p0, pc).toFixed(0) + "&deg; &wedgeq; " + JXG.Math.Geometry.rad(p1, p0, pc).toFixed(2)], {fontSize: 1, fontUnit: 'rem'});
+</script>
+
+</body>
+</html>

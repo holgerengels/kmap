@@ -1,0 +1,96 @@
+<html>
+<head>
+    <title>Sinusfunktion</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <link rel='stylesheet' type='text/css' href='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraph.css'/>
+    <script src='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraphcore.js' type='text/javascript'></script>
+
+    <style>
+        body {
+            margin: 0px;
+            padding: 0px;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+        }
+        .jxgbox { border-radius: 0px; border: none}
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id='circle' class='jxgbox' style='width: 100%; aspect-ratio: 1'></div>
+    <div id='sine' class='jxgbox' style='width: 100%; aspect-ratio: 2'></div>
+</div>
+
+<script type='text/javascript'>
+    const piFracts = ["", "1/6&pi;", "2/6&pi;", "3/6&pi;", "4/6&pi;", "5/6&pi;", "&pi;", "7/6&pi;", "8/6&pi;", "9/6&pi;", "10/6&pi;", "11/6&pi;", "2&pi;"];
+
+    var circle = JXG.JSXGraph.initBoard('circle', {boundingbox: [-1.25, 1.25, 1.25, -1.25], axis: true, showNavigation: false, showZoom: false, showCopyright: false, pan: { enabled: false}});
+
+    var p0 = circle.create('point', [0, 0], {fixed: true, visible: false});
+    var p1 = circle.create('point', [1, 0], {name: '', visible: false, fixed: true});
+    var c = circle.create('circle', [p0, p1], {dash: 2, strokeWidth: 1, strokeOpacity: 0.6});
+
+    var pc = circle.create('glider', [Math.cos(1/6 * Math.PI), Math.sin(1/6 * Math.PI), c], {visible: true, name: ''});
+    var pc2 = circle.create('point', [() => pc.X(), () => pc.Y()], {visible: true, withLabel: true, layer: 0, name: function() {
+            let angle = JXG.Math.Geometry.rad(p1, p0, pc);
+            if (angle < 0)
+                angle = 2 * Math.PI + angle;
+            let pth = angle * 6 / Math.PI;
+            let int = (Math.round(angle * 6 / Math.PI));
+            return Math.abs(pth - int) < .1 ? piFracts[int] : angle.toFixed(1);
+        }});
+    var pcx = circle.create('point', [function () {return pc.X();}, 0.0 ], {visible: false, name: '', withLabel: false});
+    var pcy = circle.create('point', [1.5, function () {return pc.Y();}], {visible: false, name: '', withLabel: false});
+    var pcl = circle.create('point', [function () {return pc.X();}, function () {return pc.Y() / 2;}], {visible: true, opacity: 0, name: 'sin(&alpha;)', withLabel: true, highlight: false});
+    var arc = circle.create('arc', [p0, p1, pc], {strokeWidth: 3, strokeColor: 'green'});
+    var ang = circle.create('angle', [p1, p0, pc], {orthoSensitivity: false, radius: 0.25, strokeColor: 'green', fillColor: 'green', name: function() {
+            return JXG.Math.Geometry.trueAngle(p1, p0, pc).toFixed(0) + "&deg;";
+    }});
+    circle.create('line', [pc, pcx], {straightFirst: false, straightLast: false, strokeColor: 'red'});
+    circle.create('line', [pc, pcy], {straightFirst: false, straightLast: false, dash: 2});
+    circle.create('line', [pc, p0], {straightFirst: false, straightLast: false, dash: 2});
+
+    var sine = JXG.JSXGraph.initBoard('sine', {boundingbox: [-.25, 1.25, 6.5, -1.25], axis: false, showNavigation: false, showZoom: false, showCopyright: false, pan: { enabled: false}});
+    var xaxis = sine.create('axis', [ [0,0],[1,0] ], { drawZero: false });
+    xaxis.removeAllTicks();
+    var yaxis = sine.create('axis', [ [0,0],[0,1] ]);
+
+    circle.addChild(sine);
+
+    var p2  = sine.create('point', [0, 0], {fixed: true, visible: false});
+    var p3  = sine.create('point', [1/6*Math.PI, 0], {fixed: true, visible: true, color: 'green', face: 'plus', name: piFracts[1], label: {offset: [-10, -15]}});
+    var p4  = sine.create('point', [2/6*Math.PI, 0], {fixed: true, visible: true, color: 'green', face: 'plus', name: piFracts[2], label: {offset: [-10, -15]}});
+    var p5  = sine.create('point', [3/6*Math.PI, 0], {fixed: true, visible: true, color: 'green', face: 'plus', name: piFracts[3], label: {offset: [-10, -15]}});
+    var p6  = sine.create('point', [4/6*Math.PI, 0], {fixed: true, visible: true, color: 'green', face: 'plus', name: piFracts[4], label: {offset: [-10, -15]}});
+    var p7  = sine.create('point', [5/6*Math.PI, 0], {fixed: true, visible: true, color: 'green', face: 'plus', name: piFracts[5], label: {offset: [-10, -15]}});
+    var p8  = sine.create('point', [6/6*Math.PI, 0], {fixed: true, visible: true, color: 'green', face: 'plus', name: piFracts[6], label: {offset: [-10, -15]}});
+    var p9  = sine.create('point', [7/6*Math.PI, 0], {fixed: true, visible: true, color: 'green', face: 'plus', name: piFracts[7], label: {offset: [-10, -15]}});
+    var p10 = sine.create('point', [8/6*Math.PI, 0], {fixed: true, visible: true, color: 'green', face: 'plus', name: piFracts[8], label: {offset: [-10, -15]}});
+    var p11 = sine.create('point', [9/6*Math.PI, 0], {fixed: true, visible: true, color: 'green', face: 'plus', name: piFracts[9], label: {offset: [-10, -15]}});
+    var p12 = sine.create('point', [10/6*Math.PI, 0], {fixed: true, visible: true, color: 'green', face: 'plus', name: piFracts[10], label: {offset: [-10, -15]}});
+    var p13 = sine.create('point', [11/6*Math.PI, 0], {fixed: true, visible: true, color: 'green', face: 'plus', name: piFracts[11], label: {offset: [-10, -15]}});
+    var p14 = sine.create('point', [12/6*Math.PI, 0], {fixed: true, visible: true, color: 'green', face: 'plus', name: piFracts[12], label: {offset: [-10, -15]}});
+    var psx = sine.create('point', [ function () {return ang.Value();}, 0], {visible: false, name: '', withLabel: false});
+    var psy = sine.create('point', [-.25, function () {return pc.Y();}], {visible: false, name: '', withLabel: false});
+    var ps = sine.create('point', [function () {return ang.Value();}, function () {return pc.Y();}], {visible: true, name: '', withLabel: false, color: '#0072B2'});
+    var psl = sine.create('point', [function () {return ang.Value();}, function () {return pc.Y() / 2;}], {visible: true, opacity: 0, name: 'sin(x)', withLabel: true, highlight: false});
+
+
+    sine.create('line', [ps, psx], {straightFirst: false, straightLast: false, strokeColor: 'red'});
+    sine.create('line', [ps, psy], {straightFirst: false, straightLast: false, dash: 2});
+    sine.create('line', [p2, psx], {straightFirst: false, straightLast: false, strokeWidth: 3, strokeColor: 'green'});
+
+    var f = sine.create('functiongraph', [function (x) { return Math.sin(x); }], {dash: 2});
+    var fp = sine.create('functiongraph', [function (x) { return Math.sin(x); }, 0, () => ang.Value()], {strokeWidth: 3});
+
+    var sine = sine.create('text', [4, .75, () => "sin(" + JXG.Math.Geometry.rad(p1, p0, pc).toFixed(1) + ") = " + Math.sin(JXG.Math.Geometry.rad(p1, p0, pc)).toFixed(1)], {fontSize: 1, fontUnit: 'rem'});
+</script>
+
+</body>
+</html>

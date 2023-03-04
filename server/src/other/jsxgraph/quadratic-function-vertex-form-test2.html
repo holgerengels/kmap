@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Quadratische Funktion - Scheitelpunktform Test - Zweiter Punkt</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <script type="module">
+        import {KmapJsxGraph} from 'https://cdn.jsdelivr.net/npm/kmap-jsxgraph/+esm';
+        window.customElements.define('kmap-jsxgraph', KmapJsxGraph);
+    </script>
+</head>
+<body onload="document.getElementById('graph').init()">
+<p>
+    Verschiebe den Scheitelpunkt und den weiteren Punkt, sodass das Schaubild zum angegebenen
+    Funktionsterm passt. Von dieser Aufgabe gibt es 2 Wiederholungen mit zufällig generierten Gleichungen.
+</p>
+<kmap-jsxgraph id="graph" style="width: 300px; aspect-ratio: 1">
+    <style slot="styles">
+        .term {
+            background-color: white;
+        }
+    </style>
+    <script type="none" slot="attributes">
+      { boundingBox: [-5, 5, 5, -5], pan: { enabled: false} }
+    </script>
+    <script type="none" slot="script">//<![CDATA[
+    let x;
+    let y;
+    let a;
+    let term = "";
+
+    var board = this.board;
+    var ps = board.create('point', [0, -1], {visible: true, name: 'S', snapToGrid: true, snapSizeX: .5, snapSizeY: .5});
+    var pp = board.create('point', [1, 0], {visible: true, name: 'P', snapToGrid: true, snapSizeX: .5, snapSizeY: .5});
+    //var s = board.create('slider', [[-4.5, -4], [-2.5,-4], [-2, 1, 2]], {snapWidth: .5, ticks: { drawLabels: true, label: {fontSize: 16, strokeColor: '#D55E00', offset: [-4, -16]} }, name: 'a', digits: 1, label: {fontSize: 16, strokeColor: '#D55E00'}});
+    var f = board.create('functiongraph', [(x) => {
+        let a = (pp.Y() - ps.Y()) / (pp.X()-ps.X())**2;
+        return a * (x-ps.X())**2 + ps.Y();
+    }], {strokeWidth: 3});
+    var tt = board.create('text', [-4.5, 4.5, () => term], {fontSize: 1.1, fontUnit: 'em', color: '#D55E00', cssClass: 'term'});
+
+    this.isValid = function() {
+        let px = ps.X();
+        let py = ps.Y();
+        let sa = (pp.Y() - ps.Y()) / (pp.X()-ps.X())**2;
+        return x == px && y == py && a == sa;
+    }
+
+    this.init = function() {
+      x = Math.round(Math.random() * 4) -2;
+      y = Math.round(Math.random() * 4) -2;
+      a = [.25, .5, 1, 1.5, 2, 4][Math.round(Math.random()*5)];
+      if (y > 0)
+        a = -a;
+      const plusminus = val => val < 0 ? "- " + (-val) : "+ " + val;
+      term = "f(x) = " + (a != 1 ? a + "·" : "") + "(x " + plusminus(-x) + ")^2" + plusminus(y);
+      board.fullUpdate();
+    }
+
+    this.showAnswer = function() {
+      ps.moveTo([x, y], 300, { effect: '<>' });
+      if (a === .25 || a === -.25)
+        pp.moveTo([x+2, y+4*a], 300, { effect: '<>' });
+      else
+        pp.moveTo([x+1, y+a], 300, { effect: '<>' });
+    }
+
+    this.init();
+//]]></script>
+</kmap-jsxgraph>
+
+<button onclick="document.getElementById('graph').init()">init</button>
+<button onclick="console.log(document.getElementById('graph').isValid())">check</button>
+<button onclick="document.getElementById('graph').showAnswer()">answer</button>
+
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <title>Riemannsumme</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <link rel='stylesheet' type='text/css' href='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraph.css'/>
+    <script src='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraphcore.js' type='text/javascript'></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css" integrity="sha384-KiWOvVjnN8qwAZbuQyWDIbfCLFhLXNETzBQjA/92pIowpC0d2O3nppDGQVgwd2nB" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js" integrity="sha384-0fdwu/T/EQMsQlrHCCHoH10pkPLlKA1jL5dFyUOvB3lfeT2540/2g6YgSi2BL14p" crossorigin="anonymous"></script>
+
+    <style>
+        body {
+            margin: 0px;
+            padding: 0px;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr;
+            position: relative;
+        }
+        .jxgbox { border-radius: 0px; border: none}
+        .panel {
+            position: absolute;
+            display: flex;
+            flex-direction: row;
+            gap: 16px;
+            font-family: Roboto, sans-serif;
+            padding: 8px
+        }
+        select {
+            font-size: 1.1em;
+        }
+        .term {
+            background-color: white;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id='board' class='jxgbox' style='width: 100%; aspect-ratio: 2'></div>
+    <div class="panel">
+        <select name="left" onchange="setType(this.value)">
+            <option value="upper">Obersumme</option>
+            <option value="lower">Untersumme</option>
+            <option value="left">Linkssumme</option>
+            <option value="right">Rechtssumme</option>
+            <option value="trapezoidal">Trapezsumme</option>
+        </select>
+    </div>
+</div>
+
+<script type='text/javascript'>
+    let f = (x) => 1/8*(x+3)*x*((x-3))+3;
+    let type = 'upper';
+
+    var board = JXG.JSXGraph.initBoard('board', {boundingbox: [-4, 7, 5, -2], axis: true, showNavigation: false, showZoom: false, showCopyright: false, pan: { enabled: false}});
+    var fg = board.create('functiongraph', [f], {strokeWidth: 3});
+    var p1 = board.create('point', [-4, 0], {visible: false, name: ''});
+    var p2 = board.create('point', [5, 0], {visible: false, name: ''});
+    var l = board.create('line', [p1, p2], {visible: false, name: ''});
+    var x1 = board.create('glider', [-2, 0, l], {visible: true, snapToGrid: true, snapSizeX: .25, name: 'x_1', showInfobox: false, label: {fontSize: 1, fontUnit: 'em', color: '#D55E00'}});
+    var x2 = board.create('glider', [3, 0, l], {visible: true, snapToGrid: true, snapSizeX: .25, name: 'x_2', showInfobox: false, label: {fontSize: 1, fontUnit: 'em', color: '#D55E00'}});
+    var n = board.create('slider', [[.5, -1], [3.5,-1], [0, 4, 90]], { snapWidth: 1, size: 4, ticks: { drawLabels: true, label: {fontSize: 1, fontUnit: 'em', strokeColor: '#D55E00', offset: [-4, -16]} }, name: 'n', digits: 0, label: {fontSize: 1, fontUnit: 'em', strokeColor: '#D55E00'}});
+
+    var upper = board.create('riemannsum', [f, () => n.Value(), 'upper', () => x1.X(), () => x2.X()], { strokeWidth: 3, visible: true });
+    var lower = board.create('riemannsum', [f, () => n.Value(), 'lower', () => x1.X(), () => x2.X()], { strokeWidth: 3, visible: false });
+    var left = board.create('riemannsum', [f, () => n.Value(), 'left', () => x1.X(), () => x2.X()], { strokeWidth: 3, visible: false });
+    var right = board.create('riemannsum', [f, () => n.Value(), 'right', () => x1.X(), () => x2.X()], { strokeWidth: 3, visible: false });
+    var trapezoidal = board.create('riemannsum', [f, () => n.Value(), 'trapezoidal', () => x1.X(), () => x2.X()], { strokeWidth: 3, visible: false });
+
+    var text = board.create('text', [.5, 5.5, () => {
+        let a;
+        let _;
+        switch (type) {
+            case 'upper': a = upper.Value(); _ = "O"; break;
+            case 'lower': a = lower.Value(); _ = "U"; break;
+            case 'left': a = left.Value();  _ = "L"; break;
+            case 'right': a = right.Value(); _ = "R"; break;
+            case 'trapezoidal': a = trapezoidal.Value(); _ = "T"; break;
+        }
+        return "A_" + _ + " = " + JXG.toFixed(a, 1) + " &approx; A = " + JXG.toFixed(JXG.Math.Numerics.I([x1.X(), x2.X()], f), 1);
+    }], {fontSize: 1.1, fontUnit: 'em', cssClass: 'term'});
+
+    function setType(value) {
+        type = value;
+        upper.setAttribute({visible: type === 'upper'});
+        lower.setAttribute({visible: type === 'lower'});
+        left.setAttribute({visible: type === 'left'});
+        right.setAttribute({visible: type === 'right'});
+        trapezoidal.setAttribute({visible: type === 'trapezoidal'});
+    }
+</script>
+
+</body>
+</html>

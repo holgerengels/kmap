@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <title>Quadratische Funktion - Scheitelpunktform</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <link rel='stylesheet' type='text/css' href='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraph.css'/>
+    <script src='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraphcore.js' type='text/javascript'></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js" crossorigin="anonymous"></script>
+
+    <style>
+        body {
+            margin: 0px;
+            padding: 0px;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr;
+            position: relative;
+        }
+        .jxgbox { border-radius: 0px; border: none}
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id='board' class='jxgbox' style='width: 100%; aspect-ratio: 2'></div>
+</div>
+
+<script>
+    var f = (x) => Math.abs(Math.E**(x-1)-1)+.5;
+    var board = JXG.JSXGraph.initBoard('board', {boundingbox: [-1.5, 2.5, 2.5, -.5], axis: true, showNavigation: false, showZoom: false, showCopyright: false, pan: { enabled: false}});
+    var fg = board.create('functiongraph', [f], {strokeWidth: 3, strokeColor: '#888'});
+
+    var p1 = board.create('point', [-1, 0], {visible: false});
+    var p2 = board.create('point', [1, 0], {visible: false});
+    var l = board.create('segment', [p1, p2], {visible: false});
+    var gl = board.create('glider', [-1, 0, l], { visible: true, name: 'x_l', label: {fontSize: 1, fontUnit: 'em', color: '#D55E00', offset: [7, -15], cssClass: 'term' }, showInfobox: false});
+    var yl = board.create('glider', [() => gl.X(), () => f(gl.X()), fg], { visible: true, color: JXG.palette.blue, size: 2, name: '' });
+    var tl = board.create('tangent', [yl], {visible: () => gl.X() < 1});
+
+    var p3 = board.create('point', [1, 0], {visible: false});
+    var p4 = board.create('point', [2, 0], {visible: false});
+    var r = board.create('segment', [p3, p4], {visible: false});
+    var gr = board.create('glider', [2, 0, r], { visible: true, name: 'x_r', label: {fontSize: 1, fontUnit: 'em', color: '#D55E00', offset: [7, -15], cssClass: 'term' }, showInfobox: false});
+    var yr = board.create('glider', [() => gr.X(), () => f(gr.X()), fg], { visible: true, color: JXG.palette.blue, size: 2, name: '' });
+    var tr = board.create('tangent', [yr], {visible: () => gr.X() > 1});
+
+    /*
+    var text = board.create('text', [.3, -4, () => {
+        const plusminus = val => val < 0 ? "- " + (-val) : "+ " + val;
+        return "f(x) = " + s.Value()  + "\\cdot(x " + plusminus(-p.X()) + ")^2 " + plusminus(p.Y());
+    }], {useKatex: true});
+     */
+</script>
+
+</body>
+</html>
