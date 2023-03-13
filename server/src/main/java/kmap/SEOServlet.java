@@ -64,7 +64,9 @@ public class SEOServlet extends JsonServlet {
 
             if (subject != null) {
                 JsonArray array = couch.latest(subject, 100000, false);
-                for (JsonElement element : array) {
+                List<JsonElement> list = array.asList();
+                list.sort(Comparator.comparing((o) -> string((JsonObject)o, "chapter")).thenComparing((o) -> string((JsonObject)o, "topic")));
+                for (JsonElement element : list) {
                     JsonObject card = (JsonObject) element;
                     String links = string(card, "links");
                     if (links != null)
