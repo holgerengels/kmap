@@ -7,10 +7,7 @@ import com.google.gson.JsonPrimitive;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.stream.StreamSupport;
 
 public class JSON {
@@ -71,6 +68,12 @@ public class JSON {
         JsonArray array = new JsonArray();
         objects.stream().sorted(Comparator.comparing(o -> o.getAsJsonPrimitive(member).getAsString())).forEach(array::add);
         return array;
+    }
+
+    static List<JsonElement> toList(JsonArray array) {
+        List<JsonElement> list = new ArrayList<>(array.size());
+        array.iterator().forEachRemaining(list::add);
+        return list;
     }
 
     static boolean removeEmptyStrings(JsonObject o) {
