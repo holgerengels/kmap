@@ -17,36 +17,42 @@ export const fontStyles: CSSResult = css`
 h1 {
   font-family: Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   font-size: 1.125rem;
   font-weight: 500;
 }
 h2 {
   font-family: Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   font-size: 1.0625rem;
   font-weight: 500;
 }
 h3 {
   font-family: Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   font-size: 1.00rem;
   font-weight: 500;
 }
 h4, label {
   font-family: Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   font-size: 0.9375rem;
   font-weight: 500;
 }
 h5, th, dt, b, label[secondary] {
   font-family: Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   font-size: 0.875rem;
   font-weight: 500;
 }
 p, .font-body, td, dd, .secondary {
   font-family: Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   font-size: 0.875rem;
   font-weight: 400;
 }
