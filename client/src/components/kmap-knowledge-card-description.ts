@@ -52,41 +52,7 @@ export class KMapKnowledgeCardDescription extends LitElement {
       if (this.description) {
         let code = this.description.replace(/inline:([^"]*)/g, urls.server + "data/" + this.subject + "/" + this.chapter + "/" + this.topic + "/$1?instance=" + this.instance);
         code = code.replace(/link:/g, urls.client + "browser/");
-        code = code.replace(/(<h3>(.*)<\/h3>)/g, (m) => {
-          let text = m.substring(4, m.length - 5)
-          let id = text;
-          id = id.toLowerCase();
-          id = id.replaceAll(/["'`´§$%#|^°()<>{}\[\]]/g, "");
-          id = id.replace(/[*~+-_ .,:;!?=&\/\\|äöüÄÖÜß]/g, (m) => {
-            switch (m) {
-              case 'ä':
-                return 'ae';
-              case 'ö':
-                return 'oe';
-              case 'ü':
-                return 'ue';
-              case 'Ä':
-                return 'Ae';
-              case 'Ö':
-                return 'Oe';
-              case 'Ü':
-                return 'Ue';
-              case 'ß':
-                return 'ss';
-              default:
-                return '-';
-            }
-          });
-          id = id.replaceAll(/ö/g, "oe");
-          id = id.replaceAll(/ü/g, "ue");
-          id = id.replaceAll(/Ä/g, "Ae");
-          id = id.replaceAll(/Ö/g, "Oe");
-          id = id.replaceAll(/Ü/g, "Ue");
-          id = id.replaceAll(/ß/g, "ss");
-          id = id.replaceAll(/[-_ ]/g, "-");
-          return `<h3><a href="${urls.client}browser/${this.subject}/${this.chapter}/${this.topic}#${id}" id="${id}">${text}</a></h3>`;
-        });
-        lazyComponents(code);
+        code = this.anchors(code);
         this._description = math(code);
       }
       else
@@ -94,9 +60,47 @@ export class KMapKnowledgeCardDescription extends LitElement {
     }
   }
 
-  protected updated(_changedProperties) {
+  private anchors(code: string) {
+    return code.replace(/(<h3>(.*)<\/h3>)/g, (m) => {
+      let text = m.substring(4, m.length - 5)
+      let id = text;
+      id = id.toLowerCase();
+      id = id.replaceAll(/["'`´§$%#|^°()<>{}\[\]]/g, "");
+      id = id.replace(/[*~+-_ .,:;!?=&\/\\|äöüÄÖÜß]/g, (m) => {
+        switch (m) {
+          case 'ä':
+            return 'ae';
+          case 'ö':
+            return 'oe';
+          case 'ü':
+            return 'ue';
+          case 'Ä':
+            return 'Ae';
+          case 'Ö':
+            return 'Oe';
+          case 'Ü':
+            return 'Ue';
+          case 'ß':
+            return 'ss';
+          default:
+            return '-';
+        }
+      });
+      id = id.replaceAll(/ö/g, "oe");
+      id = id.replaceAll(/ü/g, "ue");
+      id = id.replaceAll(/Ä/g, "Ae");
+      id = id.replaceAll(/Ö/g, "Oe");
+      id = id.replaceAll(/Ü/g, "Ue");
+      id = id.replaceAll(/ß/g, "ss");
+      id = id.replaceAll(/[-_ ]/g, "-");
+      return `<h3><a href="${urls.client}browser/${this.subject}/${this.chapter}/${this.topic}#${id}" id="${id}">${text}</a></h3>`;
+    });
+  }
+
+  protected async updated(_changedProperties) {
     if (_changedProperties.has("_description")) {
-      const { hash } = window.location;
+      await lazyComponents(this._description);
+      const {hash} = window.location;
 
       if (hash) {
         const element = this.shadowRoot!.querySelector(`[id="${hash.substring(1)}"]`);
