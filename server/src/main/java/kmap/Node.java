@@ -28,6 +28,7 @@ public class Node {
     private String summary;
     private String thumb;
     private JsonArray attachments;
+    private JsonArray skills;
     private List<String> annotations = new ArrayList<>();
 
     public Node(String topic) {
@@ -188,6 +189,14 @@ public class Node {
 
     public void setAttachments(JsonArray attachments) {
         this.attachments = attachments;
+    }
+
+    public JsonArray getSkills() {
+        return skills;
+    }
+
+    public void setSkills(JsonArray skills) {
+        this.skills = skills;
     }
 
     public List<String> getAnnotations() {

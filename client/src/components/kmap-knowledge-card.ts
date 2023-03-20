@@ -11,6 +11,7 @@ import './kmap-knowledge-card-depends';
 import './kmap-knowledge-card-progress';
 import './kmap-knowledge-card-description';
 import './kmap-knowledge-card-attachment';
+import './kmap-knowledge-card-skills';
 import './kmap-feedback';
 import {resetStyles, fontStyles, colorStyles} from "./kmap-styles";
 import {KMapFeedback} from "./kmap-feedback";
@@ -278,6 +279,15 @@ export class KMapKnowledgeCard extends Connected {
               .progressOf="${this.progressOf}">
           </kmap-knowledge-card-description>
         </kmap-card-text>
+
+        ${this.card.skills && this.card.skills.length !== 0 ? html`
+          <kmap-card-text>
+            <kmap-card-spacer></kmap-card-spacer>
+            <kmap-knowledge-card-skills .skills="${this.card.skills}"></kmap-knowledge-card-skills>
+            <kmap-card-spacer></kmap-card-spacer>
+          </kmap-card-text>
+        ` : '' }
+
         ${this.card.attachments.length !== 0 ? html`
         <div class="attachments font-body">
             ${this._explanations && this._explanations.length > 0

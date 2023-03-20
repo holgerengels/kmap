@@ -250,6 +250,7 @@ public class Couch extends Server {
                     existing.add("thumb", changed.get("thumb"));
                     existing.add("summary", changed.get("summary"));
                     existing.add("attachments", changed.get("attachments"));
+                    existing.add("skills", changed.get("skills"));
                     if (checks(changed)) {
                         Response response = client.update(existing);
                         JsonArray attachments = changed.getAsJsonArray("attachments");
@@ -388,6 +389,7 @@ public class Couch extends Server {
                     chapterNode.setDescription(string(topic, "description"));
                 chapterNode.setSummary(string(topic, "summary"));
                 chapterNode.setAttachments(amendAttachments(topic.getAsJsonArray("attachments"), topic.getAsJsonObject("_attachments")));
+                chapterNode.setSkills(topic.getAsJsonArray("skills"));
                 iterator.remove();
             }
             else {
@@ -408,6 +410,7 @@ public class Couch extends Server {
                 node.setPriority(integer(topic, "priority"));
                 node.setLinks(string(topic, "links"));
                 node.setAttachments(amendAttachments(topic.getAsJsonArray("attachments"), topic.getAsJsonObject("_attachments")));
+                node.setSkills(topic.getAsJsonArray("skills"));
                 nodes.put(topicName, node);
             }
         }
@@ -492,6 +495,7 @@ public class Couch extends Server {
             JSON.addProperty(card, "thumb", node.getThumb());
             JSON.addProperty(card, "links", node.getLinks());
             add(card, "attachments", node.getAttachments());
+            add(card, "skills", node.getSkills());
             JsonArray depends = new JsonArray();
             JsonArray dependencies = new JsonArray();
             for (String dependName : node.getDepends()) {
@@ -527,6 +531,7 @@ public class Couch extends Server {
             JSON.addProperty(card, "summary", chapterNode.getSummary());
             JSON.addProperty(card, "links", chapterNode.getLinks());
             add(card, "attachments", chapterNode.getAttachments());
+            add(card, "skills", chapterNode.getSkills());
             board.add("chapterCard", card);
         }
         return board;

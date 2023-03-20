@@ -85,14 +85,15 @@ export class KMapEditorEditDialog extends Connected {
   private _pendingUploads: boolean = false;
 
   @state()
+  private _skills: string = '';
+
+  @state()
   private _navigateAfterSave?: string = '';
 
   @state()
   private _wide: boolean = false;
   @state()
   private _tab: string = 'editor';
-  @state()
-  private _innerTab: string = 'meta';
   @state()
   private _metaVisible: boolean = false;
   @state()
@@ -162,6 +163,7 @@ export class KMapEditorEditDialog extends Connected {
       this._author      = this._card.author || store.state.app.username || '';
       this._created     = new Date(this._card.created || new Date().getTime()).toLocaleDateString('de-DE', { year: 'numeric', month: 'numeric', day: 'numeric' });
       this._attachments = this._card.attachments;
+      this._skills = this._card.skills ? this._card.skills.map(s => s.tag + ": " + s.text).join("\n") : "";
 
       this._editDialog.show();
 
@@ -184,17 +186,12 @@ export class KMapEditorEditDialog extends Connected {
       this._pendingUploads = this._uploads.some(u => u.uploading);
     }
 
-    if (changedProperties.has("_tab") || changedProperties.has("_innerTab") || changedProperties.has("_wide")) {
-      if (this._wide) {
-        this._metaVisible = this._innerTab === 'meta';
-        this._contentVisible = this._innerTab === 'content';
-        this._previewVisible = true;
-      }
-      else {
-        this._metaVisible = this._tab === 'meta';
-        this._contentVisible = this._tab === 'content';
-        this._previewVisible = this._tab === 'preview';
-      }
+    if (changedProperties.has("_tab") || changedProperties.has("_wide")) {
+      this._metaVisible = this._tab === 'meta';
+      this._contentVisible = this._tab === 'content';
+      this._previewVisible = this._wide || this._tab === 'preview';
+      if (this._tab === 'preview' && this._wide)
+        this._tabBar.activeIndex = 1;
     }
   }
 
@@ -216,6 +213,13 @@ export class KMapEditorEditDialog extends Connected {
     card.links = this._links;
     card.priority = this._priority !== '' ? parseInt(this._priority) : undefined;
     card.attachments = this._attachments;
+    card.skills = this._skills ? this._skills.split("\n").map(l => {
+      const pos = l.indexOf(':');
+      switch (pos) {
+        case 1: return { tag: '', text: l.trim() }
+        default: return { tag: l.substring(0, pos).toUpperCase().trim(), text: l.substring(pos + 1).trim() };
+      }
+    }).filter(l => l.text !== '') : [];
     card.author = this._author;
     card.created = (this._created !== '' ? new Date(this._created.replace(/(\d{1,2})\.(\d{1,2})\.(\d{2,4})/, '$3-$2-$1')) : new Date()).getTime();
 
@@ -307,15 +311,7 @@ export class KMapEditorEditDialog extends Connected {
 
   _switchTab(e) {
     if (e.type === "MDCTabBar:activated")
-      this._tab = !this._wide ? ['meta', 'content', 'preview'][e.detail.index] : ['editor', 'preview'][e.detail.index];
-
-    if (this._contentVisible)
-      this._descriptionEditor.focus();
-  }
-
-  _switchInnerTab(e) {
-    if (e.type === "MDCTabBar:activated")
-      this._innerTab = e.detail.index === 0 ? 'meta' : 'content';
+      this._tab = !this._wide ? ['meta', 'content', 'preview'][e.detail.index] : ['meta', 'content'][e.detail.index];
 
     if (this._contentVisible)
       this._descriptionEditor.focus();
@@ -343,20 +339,55 @@ export class KMapEditorEditDialog extends Connected {
         .dialog {
           height: calc(100vh - 166px);
         }
-        .tab {
-          display: grid;
-          grid-template-rows: min-content 1fr;
-        }
         .wide {
           display: grid;
           grid-template-columns: 1fr 1fr;
+          grid-template-rows: min-content 3fr 1fr;
+          grid-template-areas:
+            "tab preview"
+            "content preview"
+            "attachments preview"
+          ;
           column-gap: 32px;
           justify-items: stretch;
           height: inherit;
         }
+        .narrow {
+          display: grid;
+          grid-template-columns: 1fr;
+          grid-template-rows: min-content 3fr 1fr;
+          justify-items: stretch;
+          height: inherit;
+        }
+        .narrow[tab=meta] {
+          grid-template-areas:
+            "tab"
+            "meta"
+            "attachments"
+          ;
+        }
+        .narrow[tab=content] {
+          grid-template-areas:
+            "tab"
+            "content"
+            "attachments"
+          ;
+        }
+        .narrow[tab=preview] {
+          grid-template-areas:
+            "tab"
+            "preview"
+            "preview"
+          ;
+        }
+        .tab { grid-area: tab; }
+        .content { grid-area: content; }
+        .meta { grid-area: meta; }
+        .attachments { grid-area: attachments; }
+        .preview { grid-area: preview; }
         .content {
           display: grid;
-          grid-template-rows: min-content 3fr 1fr min-content;
+          grid-template-rows: min-content 3fr;
         }
         .preview {
           overflow-y: auto;
@@ -407,29 +438,18 @@ export class KMapEditorEditDialog extends Connected {
     // language=HTML
     return this._card ? html`
       <mwc-dialog id="editDialog" heading="Editor" @keydown="${this._captureKeys}">
-        <div class="dialog tab">
-          ${!this._wide ? html`
+        <div class="dialog">
+          <div class="${this._wide ? 'wide' : 'narrow'}" tab="${this._tab}">
             <mwc-tab-bar id="tabBar" @MDCTabBar:activated="${this._switchTab}">
-              <mwc-tab label="Metadaten" ?hidden="${this._wide}"></mwc-tab>
-              <mwc-tab label="${this._wide ? 'Editor' : 'Inhalt'}"></mwc-tab>
-              <mwc-tab label="Preview"></mwc-tab>
+              <mwc-tab label="Metadaten"></mwc-tab>
+              <mwc-tab label="Inhalt"></mwc-tab>
+              <mwc-tab label="Preview" ?hidden="${this._wide}"></mwc-tab>
             </mwc-tab-bar>
             ${this.renderMeta()}
             ${this.renderContent()}
+            ${this.renderAttachments()}
             ${this.renderPreview()}
-          ` : html`
-            <div class="wide">
-              <div class="tab">
-                <mwc-tab-bar id="innerTabBar" @MDCTabBar:activated="${this._switchInnerTab}" ?hidden="${!this._wide}">
-                  <mwc-tab label="Metadaten"></mwc-tab>
-                  <mwc-tab label="Inhalt"></mwc-tab>
-                </mwc-tab-bar>
-                ${this.renderMeta()}
-                ${this.renderContent()}
-              </div>
-              ${this.renderPreview()}
-            </div>
-          `}
+          </div>
         </div>
 
         <mwc-button slot="secondaryAction" @click=${this._cancel}>Abbrechen</mwc-button>
@@ -440,7 +460,7 @@ export class KMapEditorEditDialog extends Connected {
   renderMeta() {
     // language=HTML
     return this._card ? html`
-      <validating-form @keydown="${this._captureKeys}" @validity="${e => this._metaValid = e.target.valid}" ?hidden="${!this._metaVisible}">
+      <validating-form class="meta" @keydown="${this._captureKeys}" @validity="${e => this._metaValid = e.target.valid}" ?hidden="${!this._metaVisible}">
         <div class="form">
           <mwc-textfield s3 id="topic" name="topic" disabled label="Thema" dense type="text" .value="${this._card.topic !== '_' ? this._card.topic : "Allgemeines zu " + this._card.chapter}"></mwc-textfield>
           <mwc-textfield s2 ?hidden="${this._card.topic === '_'}" id="links" name="links" label="Verweist auf ..." dense type="text" .value="${this._links}" @change="${e => this._links = e.target.value}" pattern="^([^/.]*)$"></mwc-textfield>
@@ -454,6 +474,7 @@ export class KMapEditorEditDialog extends Connected {
           <mwc-textfield s2 ?hidden="${this._card.topic === '_'}" id="typicalAgeRange" label="Alter" disabled dense .value=${this._typicalAgeRange}></mwc-textfield>
           <mwc-textfield s2 ?hidden="${this._card.topic === '_'}" id="author" label="Autor" dense .value=${this._author} @change="${e => this._author = e.target.value}" required></mwc-textfield>
           <mwc-textfield s2 ?hidden="${this._card.topic === '_'}" id="created" label="Erstellt" dense .value=${this._created} @change="${e => this._created = e.target.value}" pattern="^\\d{1,2}\\.\\d{1,2}\\.\\d{2,4}$" required></mwc-textfield>
+          <mwc-textarea s5 ?hidden="${this._card.topic === '_'}" id="skills" label="Kompetenzen" rows="3" dense .value=${this._skills} @change="${e => this._skills = e.target.value}"></mwc-textarea>
         </div>
       </validating-form>
     ` : '';
@@ -471,8 +492,6 @@ export class KMapEditorEditDialog extends Connected {
             <kmap-html-editor id="description" placeholder="Inhalt" .value=${this._card.description} @change="${e => this._description = e.detail.value}"></kmap-html-editor>
           </div>
         </validating-form>
-
-        ${this.renderAttachments()}
       </div>
     ` : '';
   }
@@ -480,7 +499,7 @@ export class KMapEditorEditDialog extends Connected {
   renderAttachments() {
     // language=HTML
     return html`
-        <div class="scrollcontainer attachmentscontainer" ?hidden="${!this._contentVisible}">
+        <div class="scrollcontainer" ?hidden="${!this._contentVisible && !this._metaVisible}">
           <div class="attachments">
             <label for="attachments">Materialien</label><br/>
             ${this._attachments.map((attachment) => html`
@@ -499,7 +518,7 @@ export class KMapEditorEditDialog extends Connected {
           </div>
         </div>
         <validating-form id="attachmentForm" @validity="${e => this._attachmentValid = e.target.valid}"
-                         ?hidden="${!this._contentVisible}">
+                         ?hidden="${!this._contentVisible && !this._metaVisible}">
           <div class="form" style="${styleMap(this._attachmentFormStyles(this._attachmentType))}"
                @dragover="${() => this._attachmentType = 'file'}">
             <mwc-select id="tag" label="Tag" .value="${this._attachmentTag}"
@@ -512,7 +531,7 @@ export class KMapEditorEditDialog extends Connected {
             <mwc-textfield id="name" type="text" label="Name" .value="${this._attachmentName}"
                            @change="${e => this._attachmentName = e.target.value}"></mwc-textfield>
             <mwc-icon-button-toggle ?on="${this._attachmentType === 'file'}" onIcon="attachment" offIcon="link"
-                                    @MDCIconButtonToggle:change="${e => this._attachmentType = e.detail.isOn ? 'file' : 'link'}"></mwc-icon-button-toggle>
+                                    @icon-button-toggle-change="${e => this._attachmentType = e.detail.isOn ? 'file' : 'link'}"></mwc-icon-button-toggle>
             <mwc-textfield ?hidden="${this._attachmentType === "file"}" id="href" type="url" label="Link"
                            .value="${this._attachmentHref}"
                            @change="${e => this._attachmentHref = e.target.value}"></mwc-textfield>
