@@ -163,7 +163,7 @@ export class KMapEditorEditDialog extends Connected {
       this._author      = this._card.author || store.state.app.username || '';
       this._created     = new Date(this._card.created || new Date().getTime()).toLocaleDateString('de-DE', { year: 'numeric', month: 'numeric', day: 'numeric' });
       this._attachments = this._card.attachments;
-      this._skills = this._card.skills ? this._card.skills.map(s => s.tag + ": " + s.text).join("\n") : "";
+      this._skills = this._card.skills ? this._card.skills.join("\n") : "";
 
       this._editDialog.show();
 
@@ -213,13 +213,7 @@ export class KMapEditorEditDialog extends Connected {
     card.links = this._links;
     card.priority = this._priority !== '' ? parseInt(this._priority) : undefined;
     card.attachments = this._attachments;
-    card.skills = this._skills ? this._skills.split("\n").map(l => {
-      const pos = l.indexOf(':');
-      switch (pos) {
-        case 1: return { tag: '', text: l.trim() }
-        default: return { tag: l.substring(0, pos).toUpperCase().trim(), text: l.substring(pos + 1).trim() };
-      }
-    }).filter(l => l.text !== '') : [];
+    card.skills = this._skills ? this._skills.split("\n").filter(l => l.trim() !== '') : [];
     card.author = this._author;
     card.created = (this._created !== '' ? new Date(this._created.replace(/(\d{1,2})\.(\d{1,2})\.(\d{2,4})/, '$3-$2-$1')) : new Date()).getTime();
 

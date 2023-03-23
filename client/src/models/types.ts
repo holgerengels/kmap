@@ -18,11 +18,6 @@ export interface Attachment {
   mime?: string,
 }
 
-export interface Skill {
-  tag: string, // k1 .. k6
-  text: string,
-}
-
 export interface Card {
   subject: string,
   module: string,
@@ -43,7 +38,7 @@ export interface Card {
   dependencies?: string[];
   priority?: number,
   attachments: Attachment[];
-  skills: Skill[];
+  skills: string[];
   annotations?: string,
   created?: number,
   modified?: number,

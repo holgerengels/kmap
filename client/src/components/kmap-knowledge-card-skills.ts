@@ -1,12 +1,12 @@
 import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import {resetStyles, colorStyles, fontStyles} from "./kmap-styles";
-import {Skill} from "../models/types";
+import {unsafeHTML} from "lit/directives/unsafe-html.js";
 
 @customElement('kmap-knowledge-card-skills')
 export class KMapKnowledgeCardSkills extends LitElement {
   @property({type: Object})
-  private skills: Skill[] = [];
+  private skills: string[] = [];
 
   static get styles() {
     // language=CSS
@@ -36,7 +36,7 @@ export class KMapKnowledgeCardSkills extends LitElement {
       ? html`
         <b>Kompetenzcheck</b><br/>
         ${this.skills.map((skill) => html`
-          <abbr>${skill.tag || '??'}</abbr><span>${skill.text}</span><br/>
+          <span>${unsafeHTML(skill.replace(/\[([^\]]*)]/g, '<abbr>$1</abbr>'))}</span><br/>
         `)}
       ` : ''
     ;

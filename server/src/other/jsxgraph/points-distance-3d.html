@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <title>Abstand zweier Punkte</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <link rel='stylesheet' type='text/css' href='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraph.css'/>
+    <script src='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraphcore.js' type='text/javascript'></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js" crossorigin="anonymous"></script>
+
+    <style>
+        body {
+            margin: 0px;
+            padding: 0px;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr;
+        }
+        .jxgbox { border-radius: 0px; border: none}
+        .term { background-color: white }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id='board' class='jxgbox' style='width: 100%; aspect-ratio: 1'></div>
+</div>
+
+<script type='text/javascript'>
+    var board = JXG.JSXGraph.initBoard('board', { boundingbox: [-8, 8, 8, -8], keepaspectratio: false, axis: false, showNavigation: false, showZoom: false, showCopyright: false, pan: { enabled: false} });
+    let box = [-5, 5];
+    var view = board.create('view3d',
+        [
+            [-6, -3], [8, 8], // 2D box of view
+            [box, box, box]   // 3D bounding cube
+        ],
+        {});
+
+    var pa = view.create('point3d', [-2, -2, -2], { visible: true, name: '', snapSizeX: .5, snapSizeY: .5, size: 5, color: '#D55E00' });
+    var pb = view.create('point3d', [2, 1, 1], { visible: true, name: '', snapSizeX: .5, snapSizeY: .5, size: 5, color: '#D55E00' });
+    var vd = view.create('line3d', [pb, pa], { straightFirst: false, straightLast: false, color: JXG.palette.blue, strokeWidth: 2 });
+
+    const xmin = () => Math.min(pa.X(), pb.X()); const xmax = () => Math.max(pa.X(), pb.X());
+    const ymin = () => Math.min(pa.Y(), pb.Y()); const ymax = () => Math.max(pa.Y(), pb.Y());
+    const zmin = () => Math.min(pa.Z(), pb.Z()); const zmax = () => Math.max(pa.Z(), pb.Z());
+
+    var piii = view.create('point3d', [xmin, ymin, zmin], { visible: false, name: '', size: 3 });
+    var paii = view.create('point3d', [xmax, ymin, zmin], { visible: false, name: '', size: 3 });
+    var piai = view.create('point3d', [xmin, ymax, zmin], { visible: false, name: '', size: 3 });
+    var piia = view.create('point3d', [xmin, ymin, zmax], { visible: false, name: '', size: 3 });
+    var paai = view.create('point3d', [xmax, ymax, zmin], { visible: false, name: '', size: 3 });
+    var piaa = view.create('point3d', [xmin, ymax, zmax], { visible: false, name: '', size: 3 });
+    var paia = view.create('point3d', [xmax, ymin, zmax], { visible: false, name: '', size: 3 });
+    var paaa = view.create('point3d', [xmax, ymax, zmax], { visible: false, name: '', size: 3 });
+    view.create('line3d', [piii, paii], { straightFirst: false, straightLast: false, dash: 2 });
+    view.create('line3d', [piii, piai], { straightFirst: false, straightLast: false, dash: 2 });
+    view.create('line3d', [piii, piia], { straightFirst: false, straightLast: false, dash: 2 });
+    view.create('line3d', [paaa, piaa], { straightFirst: false, straightLast: false, dash: 2 });
+    view.create('line3d', [paaa, paia], { straightFirst: false, straightLast: false, dash: 2 });
+    view.create('line3d', [paaa, paai], { straightFirst: false, straightLast: false, dash: 2 });
+    view.create('line3d', [piia, piaa], { straightFirst: false, straightLast: false, dash: 2 });
+    view.create('line3d', [piia, paia], { straightFirst: false, straightLast: false, dash: 2 });
+    view.create('line3d', [paai, paii], { straightFirst: false, straightLast: false, dash: 2 });
+    view.create('line3d', [paai, piai], { straightFirst: false, straightLast: false, dash: 2 });
+    view.create('line3d', [piaa, piai], { straightFirst: false, straightLast: false, dash: 2 });
+    view.create('line3d', [paia, paii], { straightFirst: false, straightLast: false, dash: 2 });
+
+    var text = board.create('text', [7.5, 7.5, () => {
+        const dx = pb.X()-pa.X(); const dxf = dx.toFixed(1);
+        const dy = pb.Y()-pa.Y(); const dyf = dy.toFixed(1);
+        const dz = pb.Z()-pa.Z(); const dzf = dz.toFixed(1);
+        return `\\Bigg|\\begin{pmatrix} ${dxf} \\\\ ${dyf} \\\\ ${dzf} \\end{pmatrix}\\Bigg| = \\sqrt{${dx >= 0 ? dxf : '(' + dxf + ')'}^2 + ${dy >= 0 ? dyf : '(' + dyf + ')'}^2 + ${+(dz >= 0 ? dzf : '(' + dzf + ')')}^2 } \\approx ${Math.sqrt(dx ** 2 + dy ** 2 + dz ** 2).toFixed(1)}`
+    }], { fontSize: .8, fontUnit: 'em', color: '#D55E00', useKatex: true, cssClass: 'term', anchorX: 'right', anchorY: 'top' });
+</script>
+
+</body>
+</html>
