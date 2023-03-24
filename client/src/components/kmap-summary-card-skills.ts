@@ -23,7 +23,7 @@ export class KMapSummaryCardSkills extends LitElement {
         }
         abbr {
           padding: 1px 8px 0px 8px;
-          margin: 0px 8px 3px 0px;
+          margin: 0px 0px 3px 0px;
           border-radius: 4px;
           background-color: var(--color-primary);
           color: white;
@@ -38,7 +38,7 @@ export class KMapSummaryCardSkills extends LitElement {
     return this.card && this.card.skills && this.card.skills.length > 0
       ? html`<span>
         ${this.card.skills.map((skill) => html`
-          <span>${unsafeHTML(skill.replace(/\[([^\]]*)]/g, '<abbr>$1</abbr>'))}</span>&nbsp;
+          <span>${unsafeHTML(skill.replace(/\[([^\]]*)] */g, '<abbr>$1</abbr> '))}</span>&nbsp;
         `)}
       </span>` : ''
     ;
