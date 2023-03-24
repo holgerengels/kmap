@@ -458,6 +458,10 @@ export class KmapMain extends connect(store, LitElement) {
           <mwc-switch ?selected="${this._layers.includes('summaries')}"
                       @click="${e => this._switchLayer('summaries', e.target.selected)}"></mwc-switch>
         </mwc-formfield>
+        <mwc-formfield label="Kompetenzen">
+          <mwc-switch ?selected="${this._layers.includes('skills')}"
+                      @click="${e => this._switchLayer('skills', e.target.selected)}"></mwc-switch>
+        </mwc-formfield>
         <mwc-formfield label="Selbsteinschätzungen">
           <mwc-switch ?selected="${this._layers.includes('ratings')}"
                       @click="${e => this._switchLayer('ratings', e.target.selected)}"></mwc-switch>

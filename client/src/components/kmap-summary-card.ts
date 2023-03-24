@@ -7,6 +7,7 @@ import {StyleInfo, styleMap} from 'lit/directives/style-map.js';
 import '@material/mwc-icon';
 import './kmap-card';
 import './kmap-summary-card-averages';
+import './kmap-summary-card-skills';
 import './kmap-summary-card-editor';
 import './kmap-summary-card-rating';
 import './kmap-summary-card-ratecolors';
@@ -180,9 +181,14 @@ export class KMapSummaryCard extends Connected {
               <kmap-summary-card-averages id="averages" .key="${this._key}" @statecolor="${this._colorizeEvent}"></kmap-summary-card-averages>
             </kmap-card-element>
           ` : '' }
+          ${this._layers.includes('skills') ? html`
+            <kmap-card-element>
+              <kmap-summary-card-skills id="skills" .card="${this.card}" @statecolor="${this._colorizeEvent}"></kmap-summary-card-skills>
+            </kmap-card-element>
+          ` : '' }
           ${this._layers.includes('editor') ? html`
             <kmap-card-element>
-              <kmap-summary-card-editor id="editor" .key="${this._key}" .card="${this.card}" @statecolor="${this._colorizeEvent}"></kmap-summary-card-editor>
+              <kmap-summary-card-editor id="editor" .card="${this.card}" @statecolor="${this._colorizeEvent}"></kmap-summary-card-editor>
             </kmap-card-element>
           ` : '' }
           ${!this._layers.includes('averages') ? html`

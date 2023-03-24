@@ -2,12 +2,13 @@ import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import {unsafeHTML} from "lit/directives/unsafe-html.js";
 import {resetStyles, colorStyles, fontStyles} from "./kmap-styles";
+import {Card} from "../models/types";
 
-@customElement('kmap-knowledge-card-skills')
-export class KMapKnowledgeCardSkills extends LitElement {
+@customElement('kmap-summary-card-skills')
+export class KMapSummaryCardSkills extends LitElement {
 
-  @property({type: Object})
-  private skills: string[] = [];
+  @property()
+  private card?: Card = undefined;
 
   static get styles() {
     // language=CSS
@@ -18,6 +19,7 @@ export class KMapKnowledgeCardSkills extends LitElement {
       css`
         :host {
           display: block;
+          padding: 16px;
         }
         abbr {
           padding: 1px 8px 0px 8px;
@@ -33,13 +35,12 @@ export class KMapKnowledgeCardSkills extends LitElement {
   }
 
   render() {
-    return this.skills && this.skills.length > 0
-      ? html`
-        <b>Kompetenzcheck</b><br/>
-        ${this.skills.map((skill) => html`
-          <span>${unsafeHTML(skill.replace(/\[([^\]]*)]/g, '<abbr>$1</abbr>'))}</span><br/>
+    return this.card && this.card.skills && this.card.skills.length > 0
+      ? html`<span>
+        ${this.card.skills.map((skill) => html`
+          <span>${unsafeHTML(skill.replace(/\[([^\]]*)]/g, '<abbr>$1</abbr>'))}</span>&nbsp;
         `)}
-      ` : ''
+      </span>` : ''
     ;
   }
 }
