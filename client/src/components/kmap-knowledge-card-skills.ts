@@ -20,13 +20,13 @@ export class KMapKnowledgeCardSkills extends LitElement {
           display: block;
         }
         abbr {
-          padding: 1px 8px 0px 8px;
+          padding: 0px 8px 0px 8px;
           margin: 0px 0px 3px 0px;
           border-radius: 4px;
           background-color: var(--color-primary);
           color: white;
           font-size: 80%;
-          font-weight: 600;
+          font-weight: 500;
         }
       `
     ];
