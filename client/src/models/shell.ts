@@ -171,6 +171,20 @@ export default createModel({
         else if (routing.page === 'content-manager') {
           import('../components/kmap-content-manager').then(() => console.log("loaded content-manager"));
         }
+
+        if (routing.queries && routing.queries['layers']) {
+          const activated = routing.queries['layers'];
+
+          for (const available of ['summaries', 'skills', 'ratings', 'dependencies', 'timeline', 'averages', 'editor']) {
+            if (activated.includes(available))
+              dispatch.shell.addLayer(available);
+            else
+              dispatch.shell.removeLayer(available);
+          }
+          let loc = window.location.toString();
+          loc = loc.substring(0, loc.indexOf('?'));
+          window.location.replace(loc);
+        }
       },
       'shell/addLayer': function () {
         const state = store.getState();
