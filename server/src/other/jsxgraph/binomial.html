@@ -63,7 +63,12 @@
         }
         return arr;
     }
-    var chart = board.create('chart', [dataX(), dataY()], { chartStyle: 'bar', width: 1, color: '#66bb6a'});
+
+    var chart = board.create('chart', [dataX(), dataY()], { chartStyle: 'bar', width: 1, color: '#66bb6a' });
+    for (i = 0; i < chart[0].length; i++) {
+        element = chart[0][i];
+        element.rendNode.style = "strokeWidth: 1px; stroke: green";
+    }
     var points = board.create('chart', [dataX(), dataY()], { chartStyle: 'point', color: 'green', size: .2 });
 
     var e1   = board.create('point', [() => expectation(ns.Value(), ps.Value()), 0], { visible: false });
@@ -87,7 +92,11 @@
             board.removeObject(points[0][i]);
         }
         board.setBoundingBox([-1 * n/20, 1.2, n + 1, -.1])
-        chart = board.create('chart', [dataX(), dataY()], { chartStyle: 'bar', width: 1, color: '#66bb6a'});
+        chart = board.create('chart', [dataX(), dataY()], { chartStyle: 'bar', width: 1, color: '#66bb6a' });
+        for (i = 0; i < chart[0].length; i++) {
+            element = chart[0][i];
+            element.rendNode.style = "strokeWidth: 1px; stroke: green";
+        }
         points = board.create('chart', [dataX(), dataY()], { chartStyle: 'point', color: 'green', size: .2 });
         board.unsuspendUpdate();
 

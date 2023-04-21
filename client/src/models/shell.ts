@@ -20,6 +20,8 @@ export interface Meta {
   educationalLevel?: string[],
   educationalContext?: string[],
   typicalAgeRange?: string,
+  courseList?: object,
+  course?: object,
 }
 export interface ShellState {
   meta: Meta,
@@ -94,9 +96,11 @@ export default createModel({
         updateMetadata({ title: title, description: description, image: meta.image, keywords: meta.keywords });
         updateLd({
           "@context": "https://schema.org",
-          "@type": "WebPage",
+          "@type": document.location.pathname === "/app/" ? "WebSite" : "WebPage",
+          "name": document.location.pathname === "/app/" ? "KMap" : undefined,
+          "url": document.location.pathname === "/app/" ? "https://kmap.eu/app/" : undefined,
           "breadcrumb": meta.breadcrumbs ? breadCrumbsLd(meta.breadcrumbs) : undefined,
-          "mainEntity": {
+          "mainEntity": document.location.pathname !== "/app/" ? {
             "@type": meta.type,
             "headline": title,
             "name": title,
@@ -132,7 +136,9 @@ export default createModel({
             "educationalLevel": meta.educationalLevel,
             "oeh:educationalContext": meta.educationalContext,
             "typicalAgeRange": meta.typicalAgeRange,
-          }
+            "courseList": meta.courseList,
+            "course": meta.course,
+          } : undefined
         });
       },
       showMessage(payload: string) {
