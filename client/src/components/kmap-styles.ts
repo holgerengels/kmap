@@ -84,7 +84,7 @@ figcaption {
   font-weight: 400;
 }
 a {
-  color: var(--color-mediumgray);
+  color: var(--color-primary-dark);
   text-decoration: none;
   font-size: inherit;
   font-weight: 500;

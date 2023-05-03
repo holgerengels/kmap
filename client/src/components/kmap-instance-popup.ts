@@ -118,7 +118,7 @@ export class KMapInstancePopup extends Connected {
     <div>
         <h3>Instanzen</h3>
         <p>Wenn Deine Schule eine eigene KMap Instanz eingerichtet hat, stehen Dir für die Zusammenarbeit in Deiner
-         Klasse und mit Deinen Lehrern erweiterte Funktionen zur Verfügung.</p>
+         Klasse und mit Deinen Lehrer*innen erweiterte Funktionen zur Verfügung.</p>
     <mwc-formfield label="Meine Schule hat keine eigene Instanz"><mwc-radio name="group" value="root" ?checked="${this._radio === 'root'}" @change="${() => this._radio = 'root'}"></mwc-radio></mwc-formfield>
     <mwc-formfield label="Ich möchte die Instanz meiner Schule nutzen ..."><mwc-radio name="group" value="dedicated" ?checked="${this._radio === 'dedicated'}" @change="${() => this._radio = 'dedicated'}" dialogitialFocus></mwc-radio></mwc-formfield>
     </div>

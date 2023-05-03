@@ -1,7 +1,7 @@
 import {LitElement, html, css} from 'lit';
 import {customElement, property, state} from 'lit/decorators.js';
 import {unsafeHTML} from 'lit/directives/unsafe-html.js';
-import {urls} from '../urls';
+import {encodePath, urls} from '../urls';
 import {calculationStyles, colorStyles, fontStyles, resetStyles} from "./kmap-styles";
 import {katexStyles} from "../katex-css";
 import {math} from "../math";
@@ -51,7 +51,8 @@ export class KMapKnowledgeCardDescription extends LitElement {
     if (_changedProperties.has("description")) {
       if (this.description) {
         let code = this.description.replace(/inline:([^"]*)/g, urls.server + "data/" + this.subject + "/" + this.chapter + "/" + this.topic + "/$1?instance=" + this.instance);
-        code = code.replace(/link:/g, urls.client + "browser/");
+        //code = code.replace(/link:/g, urls.client + "browser/");
+        code = this.linkss(code);
         code = this.anchors(code);
         this._description = math(code);
       }
@@ -93,7 +94,13 @@ export class KMapKnowledgeCardDescription extends LitElement {
       id = id.replaceAll(/Ü/g, "Ue");
       id = id.replaceAll(/ß/g, "ss");
       id = id.replaceAll(/[-_ ]/g, "-");
-      return `<h3><a href="${urls.client}browser/${this.subject}/${this.chapter}/${this.topic}#${id}" id="${id}">${text}</a></h3>`;
+      return `<h3><a href="${urls.client}browser/${encodePath(this.subject, this.chapter, this.topic)}#${id}" id="${id}">${text}</a></h3>`;
+    });
+  }
+  private linkss(code: string) {
+    return code.replace(/"link:([^"]*)"/g, (m) => {
+      let path = m.substring(6, m.length - 1);
+      return `${urls.client}browser/${encodePath(...path.split("/"))}`;
     });
   }
 

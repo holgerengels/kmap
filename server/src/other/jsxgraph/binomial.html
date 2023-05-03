@@ -71,16 +71,6 @@
     }
     var points = board.create('chart', [dataX(), dataY()], { chartStyle: 'point', color: 'green', size: .2 });
 
-    var e1   = board.create('point', [() => expectation(ns.Value(), ps.Value()), 0], { visible: false });
-    var e2   = board.create('point', [() => expectation(ns.Value(), ps.Value()), .9], { visible: true, size: 0, name: '&mu;', label: { cssClass: 'term', color: '#c41c00', offset: [6, 6], fontSize: 14 } });
-    var ems1 = board.create('point', [() => expectation(ns.Value(), ps.Value()) - deviation(ns.Value(), ps.Value()), 0], { visible: false });
-    var ems2 = board.create('point', [() => expectation(ns.Value(), ps.Value()) - deviation(ns.Value(), ps.Value()), .7], { visible: () => { let p = ps.Value(); return p !== 0 && p !== 1}, size: 0, name: '&mu; - &sigma;', label: { cssClass: 'term', color: '#c41c00', offset: [6, 6], fontSize: 14 }});
-    var eps1 = board.create('point', [() => expectation(ns.Value(), ps.Value()) + deviation(ns.Value(), ps.Value()), 0], { visible: false });
-    var eps2 = board.create('point', [() => expectation(ns.Value(), ps.Value()) + deviation(ns.Value(), ps.Value()), .7], { visible: () => { let p = ps.Value(); return p !== 0 && p !== 1}, size: 0, name: '&mu; + &sigma;', label: { cssClass: 'term', color: '#c41c00', offset: [6, 6], fontSize: 14 } });
-    var el =   board.create('line', [e1, e2], { color: '#c41c00', dash: 2 });
-    var emsl =   board.create('line', [ems1, ems2], { color: '#c41c00', dash: 2 });
-    var epsl =   board.create('line', [eps1, eps2], { color: '#c41c00', dash: 2 });
-
     ns.on('drag', () => {
         const n = ns.Value();
         if (n === oldn)
