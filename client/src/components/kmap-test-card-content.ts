@@ -132,7 +132,9 @@ export class KMapTestCardContent extends LitElement {
       if (expected) {
         expected = this.canonicalize(expected);
       }
-      var correct = value == expected;
+      var correct = value == expected
+        || (input.inputMode === 'numeric' && value == Number.parseInt(expected).toLocaleString('de-DE'))
+        || (input.inputMode === 'decimal' && value == Number.parseFloat(expected).toLocaleString('de-DE'));
       everythingCorrect = everythingCorrect && correct;
       input.setAttribute("correctness", correct ? "correct" : "incorrect");
     }
