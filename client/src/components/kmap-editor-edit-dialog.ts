@@ -335,7 +335,7 @@ export class KMapEditorEditDialog extends Connected {
         }
         .wide {
           display: grid;
-          grid-template-columns: 1fr 1fr;
+          grid-template-columns: 1fr fit-content(40%);
           grid-template-rows: min-content 3fr 1fr;
           grid-template-areas:
             "tab preview"
@@ -385,6 +385,7 @@ export class KMapEditorEditDialog extends Connected {
         }
         .preview {
           overflow-y: auto;
+          max-width: 800px;
         }
         .form {
           align-self: start;
