@@ -97,6 +97,7 @@ public class SitemapServlet extends JsonServlet {
                     eventWriter.add(end);
                 }
 
+                /*
                 array = tests.latestThin(subject, 100000);
                 for (JsonElement element : array) {
                     JsonObject test = (JsonObject)element;
@@ -116,6 +117,7 @@ public class SitemapServlet extends JsonServlet {
                     eventWriter.add(eventFactory.createEndElement("", "", "url"));
                     eventWriter.add(end);
                 }
+                 */
             }
 
             eventWriter.add(end);
