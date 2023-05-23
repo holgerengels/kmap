@@ -41,7 +41,7 @@ public class IndexServlet extends JsonServlet {
         String title = "KMap";
         String url = null;
         String description = "KMap kartographiert Wissen mit Zusammenhang";
-        String image = "https://kmap.eu/app/icons/KMap-Logo-cropped.png";
+        String image = "https://kmap.eu/app/icons/KMap.svg";
         String author = "KMap Team";
         String text = "";
         String created = null;

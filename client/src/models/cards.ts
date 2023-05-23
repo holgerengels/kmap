@@ -160,7 +160,7 @@ export default createModel({
             image: card.thumb ?
               `${urls.server}${encodePath("data", subject, chapter, topic, card.thumb)}?instance=${state.app.instance}`
               : `${urls.snappy}${encodePath(subject, chapter, topic)}.png`,
-            keywords: [subject, chapter, topic, ...(card.keywords ? card.keywords.split(",").map(k => k.trim()) : [])],
+            keywords: [subject, chapter, topic, ...(card.keywords ? card.keywords.split(",").map(k => k.trim()) : []), ...(card.skills ? ["Kompetenzcheck"] : [])],
             breadcrumbs: ["browser", subject, chapter, topic],
             about: [subject],
             learningResourceType: ["Text"],
