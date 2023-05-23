@@ -20,6 +20,10 @@ export class KMapSummaryCardSkills extends LitElement {
         :host {
           display: block;
           padding: 0px 16px;
+          font-size: 0.875rem;
+          line-height: 1.25rem;
+          font-weight: 400;
+          color: var(--color-darkgray);
         }
         abbr {
           padding: 0px 6px 0px 6px;
@@ -27,8 +31,9 @@ export class KMapSummaryCardSkills extends LitElement {
           border-radius: 4px;
           background-color: var(--color-primary);
           color: white;
-          font-size: 80%;
           font-weight: 500;
+          font-size: .8rem;
+          line-height: .8rem;
         }
       `
     ];
