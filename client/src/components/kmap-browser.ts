@@ -129,6 +129,10 @@ export class KMapBrowser extends Connected {
 
   updated(changedProperties) {
     if (changedProperties.has("_page") && this._page === 'topic' && this._animFrom !== undefined) {
+      if (this._connector) {
+        this._connector.clear();
+        this._connector.setAttribute("faded", "true");
+      }
       let that = this;
       setTimeout(function () {
         // @ts-ignore

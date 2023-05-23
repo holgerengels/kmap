@@ -19,7 +19,7 @@ export class KMapSummaryCardSkills extends LitElement {
       css`
         :host {
           display: block;
-          padding: 16px;
+          padding: 0px 16px;
         }
         abbr {
           padding: 0px 6px 0px 6px;
