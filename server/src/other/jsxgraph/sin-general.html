@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <title>Sinusfunktion aufstellen</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <link rel='stylesheet' type='text/css' href='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraph.css'/>
+    <script src='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraphcore.js' type='text/javascript'></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js" crossorigin="anonymous"></script>
+
+    <style>
+        body {
+            margin: 0px;
+            padding: 0px;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr;
+            position: relative;
+        }
+        .jxgbox { border-radius: 0px; border: none }
+        .term { background-color: white; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id='board' class='jxgbox' style='width: 100%; aspect-ratio: 7/3'></div>
+</div>
+
+<script>
+    const board = JXG.JSXGraph.initBoard('board', {
+        boundingbox: [-4, 3, 10, -3], axis: true,
+        defaultAxes: {
+            x: {
+                ticks: {
+                    scale: Math.PI,
+                    scaleSymbol: '\u03c0',
+                    ticksDistance: 1,
+                    insertTicks: false,
+                    minorTicks: 5,
+                }
+            }
+        },
+        showNavigation: false, showZoom: false, showCopyright: false, pan: { enabled: false}
+    });
+
+    var p0 = board.create('point', [0, 0], {visible: true, name: 'P', snapToGrid: true, snapSizeX: Math.PI/6, snapSizeY: .1});
+    var pa = board.create('point', [0, 1], {visible: true, name: '', snapToGrid: true, snapSizeX: Math.PI/6, snapSizeY: .1});
+    var pp = board.create('point', [2*Math.PI, 0], {visible: true, name: '', snapToGrid: true, snapSizeX: Math.PI/6, snapSizeY: .1});
+    var ld = board.create('line', [[-1, () => p0.Y()], [7, () => p0.Y()]], {visible: true, name: 'd', dash: 2});
+    var la = board.create('line', [[-1, () => pa.Y()], [7, () => pa.Y()]], {visible: true, name: '', dash: 2});
+    var lc = board.create('line', [[() => p0.X(), 3], [() => p0.X(), -3]], {visible: true, name: 'c', dash: 2});
+    var lp = board.create('line', [[() => pp.X(), 3], [() => pp.X(), -3]], {visible: true, name: '', dash: 2});
+    var sa = board.create('segment', [p0, pa], {visible: true, name: 'a', fixed: true});
+    var sp = board.create('segment', [p0, pp], {visible: true, name: 'p', fixed: true});
+    let a = 1;
+    let p = 2 * Math.PI;
+    let  f = (x) => a * Math.sin(2 * Math.PI / p * (x - p0.X())) + p0.Y();
+    var g = board.create('functiongraph', [f], {strokeWidth: 3});
+    pa.on('drag', () => {
+        pa.moveTo([p0.X(), pa.Y()])
+        a = pa.Y() - p0.Y();
+    });
+    pp.on('drag', () => {
+        pp.moveTo([pp.X(), p0.Y()])
+        p = pp.X() - p0.X();
+    });
+    p0.on('drag', () => {
+        pa.moveTo([p0.X(), p0.Y() + a], 0);
+        pp.moveTo([p0.X() + p, p0.Y()], 0)
+    });
+
+    var text = board.create('text', [3 * Math.PI, -2.7, () => {
+        const plusminus = val => val < 0 ? "- " + (-val) : "+ " + val;
+        const bminus = Math.round(p/Math.PI*6) < 0 ? "-" : "";
+        const c = Math.round(p0.X()/Math.PI*6)
+        const cminus = c > 0 ? "-" : "+";
+        console.log(c)
+        return "f(x) = " + a.toFixed(1)  + "\\cdot sin(" + bminus + " \\frac{12}{" + Math.abs(Math.round(p/Math.PI*6)) + "}(x " + cminus + "\\frac{" + Math.abs(c) + "}{6}\\pi)) " + plusminus(p0.Y().toFixed(1));
+    }], {useKatex: true, fontSize: .9, fontUnit: 'em', anchorX: 'right', anchorY: 'bottom', cssClass: 'term'});
+
+</script>
+
+</body>
+</html>

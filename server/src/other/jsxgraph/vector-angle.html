@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <title>Winkel zwischen Vektoren</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <link rel='stylesheet' type='text/css' href='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraph.css'/>
+    <script src='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraphcore.js' type='text/javascript'></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js" crossorigin="anonymous"></script>
+
+    <style>
+        body {
+            margin: 0px;
+            padding: 0px;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr;
+        }
+        .jxgbox { border-radius: 0px; border: none}
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id='circle' class='jxgbox' style='width: 100%; aspect-ratio: 8/5'></div>
+</div>
+
+<script type='text/javascript'>
+    const piFracts = ["", "1/6&pi;", "2/6&pi;", "3/6&pi;", "4/6&pi;", "5/6&pi;", "&pi;", "7/6&pi;", "8/6&pi;", "9/6&pi;", "10/6&pi;", "11/6&pi;", "2&pi;"];
+
+    var circle = JXG.JSXGraph.initBoard('circle', {boundingbox: [-1.25, 1.25, 2.75, -1.25], axis: true, showNavigation: false, showZoom: false, showCopyright: false, pan: { enabled: false}});
+
+    var p0 = circle.create('point', [0, 0], {fixed: true, visible: false});
+    var p1 = circle.create('point', [1, 0], {name: '', visible: false, fixed: true});
+    var c = circle.create('circle', [p0, p1], {dash: 2, strokeWidth: 1, strokeOpacity: 0.7, strokeColor: 'black'});
+
+    var pc1 = circle.create('glider', [1, 0, c], {visible: true, name: ''});
+    var pc2 = circle.create('glider', [Math.cos(1/6 * Math.PI), Math.sin(1/6 * Math.PI), c], {visible: true, name: ''});
+    var ang = circle.create('angle', [pc1, p0, pc2], {orthoSensitivity: false, radius: 0.25, strokeColor: 'green', fillColor: 'green', label: {color: 'green'}, name: function() {
+            let angle = JXG.Math.Geometry.rad(pc1, p0, pc2);
+            if (angle < 0)
+                angle = 2 * Math.PI + angle;
+            let pth = angle * 6 / Math.PI;
+            let int = (Math.round(angle * 6 / Math.PI));
+            return Math.abs(pth - int) < .1 ? piFracts[int] : angle.toFixed(2);
+    }});
+    circle.create('line', [p0, pc1], {straightFirst: false, straightLast: false, lastArrow: true, color: JXG.palette.skyblue});
+    circle.create('line', [p0, pc2], {straightFirst: false, straightLast: false, lastArrow: true, color: JXG.palette.orange});
+
+    var text = circle.create('text', [2.6, -1.2, () => '\\displaystyle \\begin{aligned}'
+        + '\\color{#009E73}{cos(\\alpha) \\approx ' + Math.cos(JXG.Math.Geometry.rad(pc1, p0, pc2)).toFixed(2) + '}'
+        + '\\\\'
+        + '\\color{#56B4E9}{\\begin{pmatrix} ' + pc1.X().toFixed(1) + ' \\\\ ' + pc1.Y().toFixed(1) + ' \\end{pmatrix}}'
+        + '\\color{#000}{\\cdot} \\color{#E69F00}{\\begin{pmatrix} ' + pc2.X().toFixed(1) + ' \\\\ ' + pc2.Y().toFixed(1) + ' \\end{pmatrix}}'
+        + '\\color{#000}{\\approx ' + (pc1.X() * pc2.X() + pc1.Y() * pc2.Y()).toFixed(2) + '}'
+        + '\\end{aligned}'
+    ], { fontSize: .9, fontUnit: 'em', color: '#D55E00', useKatex: true, cssClass: 'term', anchorX: 'right', anchorY: 'bottom', dragArea: 'none' });
+</script>
+
+</body>
+</html>
