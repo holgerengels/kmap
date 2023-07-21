@@ -233,7 +233,8 @@ public class Couch extends Server {
                 JsonObject existing = loadTopic(client, new String[] { subject, chapter, topic });
                 if (existing != null) {
                     existing.addProperty("subject", subject);
-                    existing.addProperty("modified", System.currentTimeMillis());
+                    if (!JSON.bool(changed, "minorEdit"))
+                        existing.addProperty("modified", System.currentTimeMillis());
                     existing.add("created", changed.get("created"));
                     existing.add("author", changed.get("author"));
                     existing.add("chapter", changed.get("chapter"));

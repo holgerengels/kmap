@@ -19,6 +19,7 @@ export interface Attachment {
 }
 
 export interface Card {
+  minorEdit?: boolean;
   subject: string,
   module: string,
   chapter: string,

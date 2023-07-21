@@ -4,6 +4,7 @@ import {Connected} from "./connected";
 import {State, store} from "../store";
 
 import '@material/mwc-button';
+import '@material/mwc-checkbox';
 import '@material/mwc-dialog';
 import '@material/mwc-formfield';
 import '@material/mwc-icon-button';
@@ -86,6 +87,9 @@ export class KMapEditorEditDialog extends Connected {
 
   @state()
   private _skills: string = '';
+
+  @state()
+  private _minor: boolean = false;
 
   @state()
   private _navigateAfterSave?: string = '';
@@ -216,6 +220,7 @@ export class KMapEditorEditDialog extends Connected {
     card.skills = this._skills ? this._skills.split("\n").filter(l => l.trim() !== '') : [];
     card.author = this._author;
     card.created = (this._created !== '' ? new Date(this._created.replace(/(\d{1,2})\.(\d{1,2})\.(\d{2,4})/, '$3-$2-$1')) : new Date()).getTime();
+    card.minorEdit = this._minor;
 
     console.log(card);
 
@@ -447,6 +452,7 @@ export class KMapEditorEditDialog extends Connected {
           </div>
         </div>
 
+        <mwc-formfield label="Geringfügige Änderung" slot="secondaryAction" style="vertical-align: middle"><mwc-checkbox @change="${e => this._minor = e.target.checked}"></mwc-checkbox></mwc-formfield>
         <mwc-button slot="secondaryAction" @click=${this._cancel}>Abbrechen</mwc-button>
         <mwc-button ?disabled="${this._pendingUploads || !this._metaValid || !this._contentValid}" slot="primaryAction" @click=${this._save}>Speichern</mwc-button>
       </mwc-dialog>` : '';

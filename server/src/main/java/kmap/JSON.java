@@ -52,6 +52,11 @@ public class JSON {
         return primitive != null && primitive.getAsString().length() != 0 ? primitive.getAsLong() : defaultValue;
     }
 
+    public static Boolean bool(JsonObject topic, String name) {
+        JsonPrimitive primitive = topic.getAsJsonPrimitive(name);
+        return primitive != null && primitive.getAsBoolean();
+    }
+
     static JsonArray sort(JsonArray array) {
         JsonArray newArray = new JsonArray();
         StreamSupport.stream(array.spliterator(), false).sorted(Comparator.comparing(JsonElement::getAsString)).forEach(newArray::add);
