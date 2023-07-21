@@ -60,7 +60,12 @@ export class KMapPostCard extends LitElement {
             <img src="${thumb}" width="100" alt="${this.card.topic}"/>
             <div></div>
             <kmap-card-text type="title">${this.card.topic}</kmap-card-text>
-            <kmap-card-text type="subheader"><b>${new Date(this.card.created!).toLocaleDateString('DE')}</b>&nbsp; ${this.card.author}</kmap-card-text>
+            <kmap-card-text type="subheader"><b>${new Date(this.card.created!).toLocaleDateString('DE')}</b>&nbsp;
+              ${this.expanded
+                ? html`<a rel="author" href="https://kmap.eu/app/browser/Hilfe/Autoren/${this.card.author}" title="Autor">${this.card.author}</a>`
+                : html`${this.card.author}`
+              }
+            </kmap-card-text>
           </div>
           ${this.expanded ? html`
             <kmap-card-text>
