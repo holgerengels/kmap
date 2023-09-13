@@ -1,11 +1,11 @@
-function(doc) {
-    if ('_' === doc.topic) return;
-    index("chapter", doc.chapter, {'store': true});
-    index("topic", doc.topic, {'store': true, 'boost': 2});
-    if (doc.summary)
-        index("summary", doc.summary, {'store': true, 'boost': 2});
-    if (doc.description)
-        index("description", doc.description, {'store': true});
-    if (doc.thumb)
-        index("thumb", doc.thumb, {'store': true, 'index': false});
+function convert(docel) {
+    if ('_' === docel.topic) return;
+    index("chapter", docel.chapter, {'store': true});
+    index("topic", docel.topic, {'store': true, 'boost': 2});
+    if (docel.summary)
+        index("summary", docel.summary, {'store': true, 'boost': 2});
+    if (docel.description)
+        index("description", docel.description, {'store': true});
+    if (docel.thumb)
+        index("thumb", docel.thumb, {'store': true, 'index': false});
 }

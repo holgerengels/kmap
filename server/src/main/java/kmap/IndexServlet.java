@@ -181,7 +181,7 @@ public class IndexServlet extends JsonServlet {
             builder.append("<meta name=\"article:author\" content=\"").append(author).append("\">");
 
         if (embeddedTopic != null)
-            builder.append("<script id=\"embedded-topic\" type=\"json\">").append(embeddedTopic).append("</script>");
+            builder.append("<script id=\"embedded-topic\" type=\"json\"><!--//--><![CDATA[//><!--").append(embeddedTopic).append("//--><!]]></script>");
 
         string = string.replace("<meta gen=\"\">", builder);
         string = string.replace("<meta jsonld=\"\">", jsonld != null

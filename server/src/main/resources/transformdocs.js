@@ -1,6 +1,7 @@
 var fs = require("fs");
-console.log("\n *START transformation* \n");
-var content = fs.readFileSync("test.json");
+var name = process.argv[2];
+console.log("\n *START transformation of " + name + " * \n");
+var content = fs.readFileSync(name);
 var json = JSON.parse(content);
 var docs = json.rows;
 var newDocs = new Array();
@@ -12,7 +13,7 @@ docs.forEach(function(doc) {
 var newJson = new Object();
 newJson.docs = newDocs;
 var newContent = JSON.stringify(newJson)
-fs.writeFile('test.json', newContent, 'utf8', function(err) {
+fs.writeFile(name, newContent, 'utf8', function(err) {
     if (err) throw err;
     console.log('complete');
 });

@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <title>Normalverteilung</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <link rel='stylesheet' type='text/css' href='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraph.css'/>
+    <script src='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraphcore.js' type='text/javascript'></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js" crossorigin="anonymous"></script>
+
+    <style>
+        body {
+            margin: 0px;
+            padding: 0px;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr;
+        }
+        .jxgbox { border-radius: 0px; border: none}
+        .term {
+            background-color: white;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id='sliders' class='jxgbox' style='width: 100%; aspect-ratio: 6'></div>
+    <div id='board' class='jxgbox' style='width: 100%; aspect-ratio: 3'></div>
+</div>
+
+<script>
+    var sliders = JXG.JSXGraph.initBoard('sliders', { boundingbox: [0, 2, 13, 0], showNavigation: false, showZoom: false, showCopyright: false, pan: { enabled: false }});
+    var ms = sliders.create('slider', [[.5, 1.6], [10.5, 1.6], [-5, 0, 5]], {snapWidth: .5, ticks: { drawLabels: true, label: {fontSize: 13, strokeColor: '#D55E00'} }, name: 'µ', digits: 0, label: {fontSize: 14, strokeColor: '#D55E00'}});
+    var ss = sliders.create('slider', [[.5, 0.7], [10.5, 0.7], [0, .5, 2]], {snapWidth: .1, ticks: { drawLabels: true, label: {fontSize: 13, strokeColor: '#D55E00'} }, name: 'σ', digits: 1, label: {fontSize: 14, strokeColor: '#D55E00'}});
+
+    var board = JXG.JSXGraph.initBoard('board', { boundingbox: [-7, 2, 8, -.5], axis: true, showNavigation: false, showZoom: false, showCopyright: false, pan: { enabled: false }});
+    sliders.addChild(board);
+
+    const normal = x => 1/Math.sqrt(2 * Math.PI * ss.Value()**2) * Math.exp(-1/2 * ((x-ms.Value())/ss.Value())**2);
+
+    var f = board.create('functiongraph', [normal], {strokeWidth: 2});
+
+    var check = board.create('checkbox', [7, 1.9, '<b style="color: #D55E00">Standardabweichung</b>'], { anchorX: 'right', anchorY: 'top'});
+    var i = board.create('integral', [[() => ms.Value() - ss.Value(), () => ms.Value() + ss.Value()], f], { visible: () => check.Value(), color: '#0072B2', curveLeft: { visible: false }, curveRight: { visible: false }, label: { visible: () => check.Value(), cssClass: 'term', fontSize: 1, fontUnit: 'em'}});
+    //var t = board.create('text', [10, .5, "" + i.Value()], { });
+
+</script>
+
+</body>
+</html>
