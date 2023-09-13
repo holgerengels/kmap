@@ -249,7 +249,7 @@ export class KMapBrowser extends Connected {
     }
     else {
       console.log("cannot save " + detail.key + " := " + detail.rate);
-      store.dispatch.shell.showMessage("Achtung! Deine Eingaben können nur gespeichert werden, wenn Du angemeldet bist!");
+      store.dispatch.shell.showMessage("Achtung! Deine Eingaben können nur gespeichert werden, wenn du angemeldet bist!");
     }
   }
 

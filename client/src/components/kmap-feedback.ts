@@ -75,7 +75,7 @@ export class KMapFeedback extends LitElement {
       return;
     this._dialog.close();
     store.dispatch.feedback.submit({subject: this.subject, chapter: this.chapter, topic: this.topic, test: this.test, type: this._type, title: this._title, text: this._text});
-    store.dispatch.shell.showMessage("Vielen Dank für Dein Feedback!")
+    store.dispatch.shell.showMessage("Vielen Dank für dein Feedback!")
   }
 
   render() {

@@ -105,7 +105,7 @@ export class KmapTestResults extends Connected {
     }
     else {
       console.log("cannot save " + detail.key + " := " + detail.rate);
-      store.dispatch.shell.showMessage("Achtung! Deine Eingaben können nur gespeichert werden, wenn Du angemeldet bist!");
+      store.dispatch.shell.showMessage("Achtung! Deine Eingaben können nur gespeichert werden, wenn du angemeldet bist!");
     }
   }
 
@@ -145,8 +145,8 @@ export class KmapTestResults extends Connected {
       <label>Ergebnis</label>
       <label class="secondary">${this._summary.achievedPoints} von ${this._summary.achievablePoints} Punkten</label>
               <br/>
-      <label ?hidden="${this._results.length > 0 && this._summary.hasCards}">Top! Das hast Du drauf!</label>
-      <label ?hidden="${!this._summary.hasCards}">Folgende Themen solltest Du dir nochmal anschauen!</label>
+      <label ?hidden="${this._results.length > 0 && this._summary.hasCards}">Top! Das hast du drauf!</label>
+      <label ?hidden="${!this._summary.hasCards}">Folgende Themen solltest du dir nochmal anschauen!</label>
         <br/>
       <div class="result-cards" ?hidden="${!this._summary.hasCards}" @rated="${this._rated}">
         ${this._summary.cards.map((card) => html`
@@ -156,11 +156,11 @@ export class KmapTestResults extends Connected {
         `)}
       </div>
         <br/>
-      <label class="secondary" ?hidden="${!this._summary.hasCards}">Wenn Du auf die
+      <label class="secondary" ?hidden="${!this._summary.hasCards}">Wenn du auf die
         <svg viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet" focusable="false" style="pointer-events: none; display: inline; width: 16px; height: 16px;"><g><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"></path></g></svg>
         klickst, wird die jeweilige Bewertung entsprechend als Selbsteinschätzung übernommen.
       </label>
-      <label class="secondary" ?hidden="${!this._summary.hasCards}">Wenn Du auf den Titel der Ergebniskarte klickst, kommst Du zur Themenkarte.
+      <label class="secondary" ?hidden="${!this._summary.hasCards}">Wenn du auf den Titel der Ergebniskarte klickst, kommst Du zur Wissenskarte.
       </label>
       <br/><br/>`
       : ''}

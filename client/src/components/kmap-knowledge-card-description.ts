@@ -9,6 +9,8 @@ import {lazyComponents} from "./lazy-components";
 
 @customElement('kmap-knowledge-card-description')
 export class KMapKnowledgeCardDescription extends LitElement {
+  declare shadowRoot: ShadowRoot;
+
   @property({type: String})
   private instance: string = '';
   @property({type: String})
@@ -109,10 +111,14 @@ export class KMapKnowledgeCardDescription extends LitElement {
       await lazyComponents(this._description);
       const {hash} = window.location;
 
+      var scripts = [...Array.from(this.shadowRoot.querySelectorAll("script"))];
+      for (var script of scripts) {
+        new Function(script.innerText).call(this);
+      }
+
       if (hash) {
         const element = this.shadowRoot!.querySelector(`[id="${hash.substring(1)}"]`);
         if (element) {
-          console.log("scroll to " + element)
           window.setTimeout(() => {
             window.requestAnimationFrame(() => element.scrollIntoView({block: 'start', behavior: 'smooth'}));
           }, 200);

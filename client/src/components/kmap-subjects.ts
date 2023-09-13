@@ -81,8 +81,8 @@ export class KMapSubjects extends Connected {
         <div class="title font-body">
           <p style="color: var(--color-mediumgray)">
             KMap kartografiert Wissen auf übersichtlichen Wissenslandkarten. Du erkennst sofort, wie alles
-            zusammenhängt und wo welches Wissen vorausgesetzt wird. Durch Einfärben der Wissenskarten kannst Du Deinen
-            Lernfortschritt sichtbar machen. So weißt Du immer, wo Du stehst.
+            zusammenhängt und wo welches Wissen vorausgesetzt wird. Durch Einfärben der Wissenskarten kannst du Deinen
+            Lernfortschritt sichtbar machen. So weißt du immer, wo Du stehst.
           </p>
         </div>
         <div class="title">
@@ -109,7 +109,7 @@ export class KMapSubjects extends Connected {
 
         ${this._currentTest ? html`
           <div class="title">
-            <label style="line-height: 200%">Teste Dein Wissen!</label><br/>
+            <label style="line-height: 200%">Teste dein Wissen!</label><br/>
             <label secondary>.. anhand dreier zufällig ausgewählter Aufgaben ..</label>
           </div>
 

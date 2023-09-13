@@ -448,7 +448,7 @@ export class KMapTestEditorEditDialog extends Connected {
         <mwc-select s3 required label="Thema" @change="${e => this._topic = e.target.value}">
           ${this._topics.map((topic) => html`<mwc-list-item value="${topic}" ?selected="${topic === this._topic}">${topic}</mwc-list-item>`)}
         </mwc-select>
-        <mwc-textfield s5 id="key" name="key" label="Titel" dense type="text" required disabled .value="${this._key}" @change="${e => this._key = e.target.value}" pattern="^([^./]*)$"></mwc-textfield>
+        <mwc-textfield s5 id="key" name="key" label="Titel" dense type="text" required disabled .value="${this._key}" @change="${e => this._key = e.target.value}" pattern="[^.\\/]*"></mwc-textfield>
         <mwc-textfield s1 id="level" name="level" label="Level" dense type="number" inputmode="numeric" min="1" max="3" step="1" .value="${this._level}" @change="${e => this._level = e.target.value}"></mwc-textfield>
         <mwc-textfield s2 id="author" name="author" label="Autor" dense type="text" required .value="${this._author}" @change="${e => this._author = e.target.value}"></mwc-textfield>
         <mwc-formfield s3 style="padding-left: 16px" alignEnd nowrap label="Layout Frage : Antwort =&nbsp;${this._balance}&nbsp;:&nbsp;${6 - this._balance}">
