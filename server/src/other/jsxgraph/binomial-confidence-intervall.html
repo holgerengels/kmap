@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <title>Konfidenzintervall</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <link rel='stylesheet' type='text/css' href='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraph.css'/>
+    <script src='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraphcore.js' type='text/javascript'></script>
+
+    <style>
+        body {
+            margin: 0px;
+            padding: 0px;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr;
+            position: relative;
+        }
+        .jxgbox { border-radius: 0px; border: none}
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id='board' class='jxgbox' style='width: 100%; aspect-ratio: 3'></div>
+</div>
+
+<script type='text/javascript'>
+    var board = JXG.JSXGraph.initBoard('board', {boundingbox: [-.2, 2.5, 1.2, -.5], axis: false, showNavigation: false, showZoom: false, showCopyright: false, pan: { enabled: false}});
+    var xaxis = board.create('axis', [ [0,0],[1,0] ], { ticks: { drawZero: true }});
+    var ns = board.create('slider', [[-.12, 2], [.88, 2], [0, 500, 1000]], {snapWidth: 1, ticks: { drawLabels: true, label: {fontSize: 13, strokeColor: JXG.palette.vermillion} }, name: 'n', digits: 0, label: {fontSize: 14, strokeColor: JXG.palette.vermillion}});
+    var bs = board.create('slider', [[-.12, 1], [.88, 1], [90, 95, 100]], {snapWidth: 1, ticks: { drawLabels: true, label: {fontSize: 13, strokeColor: JXG.palette.vermillion} }, name: 'β', digits: 0, label: {fontSize: 14, strokeColor: JXG.palette.vermillion}, postLabel: '&thinsp;%'});
+
+    const dist = () => JXG.Math.ProbFuncs.ndtri((bs.Value()/100+1)/2)*Math.sqrt(h.X()*(1-h.X())/ns.Value());
+    const nonNaN = (v, d) => isNaN(v) ? d : v;
+    var h = board.create('glider', [.5, 0, xaxis], {visible: true, name: 'h', label: { offset: [0, 12] }, snapToGrid: true, snapSizeX: .01, snapSizeY: 0, size: 2});
+    var p1 = board.create('point', [() => Math.max(nonNaN(h.X() - dist(), 0), 0), 0], {visible: true, face: 'divide', color: JXG.palette.darkblue, name: ''});
+    var p2 = board.create('point', [() => Math.min(nonNaN(h.X() + dist(), 1), 1), 0], {visible: true, face: 'divide', color: JXG.palette.darkblue, name: ''});
+    var ci = board.create('segment', [p1, p2], {visible: true});
+</script>
+
+</body>
+</html>

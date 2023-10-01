@@ -1,0 +1,16 @@
+{
+  "name": "cortex",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/compare.js",
+  "scripts": {
+    "start": "node src/cortex.js"
+  },
+  "keywords": [],
+  "author": "",
+  "dependencies": {
+    "@cortex-js/compute-engine": "^0.12.3",
+    "asciimath2tex": "^1.4.0",
+    "http-server": "^0.12.3"
+  }
+}

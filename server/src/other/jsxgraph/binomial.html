@@ -59,7 +59,7 @@
         const n = ns.Value();
         const arr = [];
         for (let i = 0; i <= n; i++) {
-            arr.push(() => binomial(n, i, ps.Value()).toFixed(2));
+            arr.push(() => bernoulli(n, i, ps.Value()).toFixed(2));
         }
         return arr;
     }
@@ -93,7 +93,7 @@
         oldn = n;
     });
 
-    function binomial(n, k, p) {
+    function bernoulli(n, k, p) {
         var coeff = 1;
 
         for (var x = n - k + 1; x < n+1; x++) {

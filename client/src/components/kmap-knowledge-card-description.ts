@@ -113,7 +113,7 @@ export class KMapKnowledgeCardDescription extends LitElement {
 
       var scripts = [...Array.from(this.shadowRoot.querySelectorAll("script"))];
       for (var script of scripts) {
-        new Function(script.innerText).call(this);
+        new Function("shadowRoot", script.innerText).call(this, this.shadowRoot);
       }
 
       if (hash) {

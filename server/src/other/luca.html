@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <meta charset="utf-8">
+    <title>Luca</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+
+<script>
+    function factorial(a) {
+        if (a === 0) {
+            return 1;
+        } else {
+            for (let n = a - 1; n >= 1; n--) {
+                a *= n;
+            }
+            return a;
+        }
+    }
+    function pascal(n, k) {
+        return factorial(n) / factorial(k) / factorial(n - k);
+    }
+    function bernoulli(n, p, k) {
+        return pascal(n, k) * p ** k * (1 - p) ** (n - k);
+    }
+    function cumulated(n, p, k) {
+        var sum = 0.0;
+
+        for (var i=0; i <= k; i++) {
+            sum += bernoulli(n, p, i);
+        }
+
+        return sum;
+    }
+
+    function rounded(num) {
+        return FORMAT.format(Math.round(num*10000)/10000);
+    }
+
+    const FORMAT = new Intl.NumberFormat('de-DE', {minimumFractionDigits: 3, maximumFractionDigits: 3});
+
+    function calc() {
+        if (!document.getElementById('k'))
+            return;
+        document.getElementById('l').innerText = "" + (document.getElementById('k').valueAsNumber - 1);
+        document.getElementById('res').value = rounded(cumulated(100, 0.75, document.getElementById('k').valueAsNumber));
+    }
+
+    calc();
+</script>
+
+<label for="k"><i>k</i> = </label><input id="k" type="number" step="1" min="0" max="100" value="10" lang="de-DE" inputmode="numeric" oninput="calc()"/>
+⇒
+<label for="res"><i>P(X ≤ <span id="l">9</span>)</i> &thickapprox; </label><input id="res" type="text" readonly style="width: 6em">
+
+</body>
+</html>

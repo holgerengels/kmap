@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <meta charset="utf-8">
+    <title>Sasha</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+
+<script>
+    function factorial(a) {
+        if (a === 0) {
+            return 1;
+        } else {
+            for (let n = a - 1; n >= 1; n--) {
+                a *= n;
+            }
+            return a;
+        }
+    }
+    function pascal(n, k) {
+        return factorial(n) / factorial(k) / factorial(n - k);
+    }
+    function bernoulli(n, p, k) {
+        return pascal(n, k) * p ** k * (1 - p) ** (n - k);
+    }
+    function cumulated(n, p, k) {
+        var sum = 0.0;
+
+        for (var i=0; i <= k; i++) {
+            sum += bernoulli(n, p, i);
+        }
+
+        return sum;
+    }
+
+    function rounded(num) {
+        return FORMAT.format(Math.round(num*10000)/10000);
+    }
+
+    const FORMAT = new Intl.NumberFormat('de-DE', {minimumFractionDigits: 3, maximumFractionDigits: 3});
+
+    function calc() {
+        if (!document.getElementById('p'))
+            return;
+        document.getElementById('res').value = rounded(cumulated(100, document.getElementById('p').valueAsNumber, 84));
+    }
+
+    calc();
+</script>
+
+<label for="p"><i>p</i> = </label><input id="p" type="number" step="0.001" min="0" max="1" value="0.8" lang="de-DE" inputmode="decimal" oninput="calc()"/>
+⇒
+<label for="res"><i>P(X ≤ 84)</i> &thickapprox; </label><input id="res" type="text" readonly style="width: 6em">
+
+</body>
+</html>

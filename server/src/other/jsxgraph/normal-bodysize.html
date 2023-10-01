@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <title>Quadratische Funktion - Scheitelpunktform</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <link rel='stylesheet' type='text/css' href='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraph.css'/>
+    <script src='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraphcore.js' type='text/javascript'></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js" crossorigin="anonymous"></script>
+
+    <style>
+        body {
+            margin: 0px;
+            padding: 0px;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr;
+            position: relative;
+        }
+        .jxgbox { border-radius: 0px; border: none}
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id='board' class='jxgbox' style='width: 100%; aspect-ratio: 4'></div>
+</div>
+
+<script>
+    var n = 200;
+    var mean = 160;
+    var stdDev = 10;
+    var x = Array.from({length: n}, () => JXG.Math.Statistics.generateGaussian(mean, stdDev)).sort();
+    var y = Array.from({length: n}, () => 0);
+    var board = JXG.JSXGraph.initBoard('board', {boundingbox: [125, .06, 195, -.02], axis: true, showNavigation: false, showZoom: false, showCopyright: false, pan: { enabled: false }});
+    var points = board.create('chart', [x, y], { chartStyle: 'point', color: 'green', opacity: .3 });
+    for (let i = 0; i < n; i++) {
+        points[0][i].setAttribute({ face: '|', size: 4, strokeWidth: '3px' });
+    }
+    var button = board.create('button', [127, .04, 'random', function() {
+        var lala = Array.from({length: n}, () => JXG.Math.Statistics.generateGaussian(mean, stdDev)).sort();
+        for (let i = 0; i < n; i++) {
+            points[0][i].moveTo([lala[i], y[i]], 100, {});
+        }
+    }]);
+    button.rendNodeButton.style.border = "1px solid " + JXG.palette.vermillion;
+
+    var checkbox = board.create('checkbox', [190, .04, 'Dichte'], { color: JXG.palette.vermillion,  fontSize: 1, fontUnit: 'em', anchorX: 'right'});
+    JXG.addEvent(checkbox.rendNodeCheckbox, 'change', function() {
+        if (this.Value()) {
+            axis.show()
+        } else {
+            axis.hide();
+        }
+    }, checkbox);
+    const normal = x => 1/Math.sqrt(2 * Math.PI * stdDev**2) * Math.exp(-1/2 * ((x-mean)/stdDev)**2) +.01;
+    const axis = board.create('axis', [[120, .01], [180, .01]], { drawLabels: false, ticks: {drawLabels: false, visible: false}, visible: false });
+    var f = board.create('functiongraph', [normal], {strokeWidth: 2, dash: 2, visible: () => checkbox.Value()});
+
+    /*
+    var d = 5;
+    var h = Array.from({length: 200/d}, () => 0);
+    var p = Array.from({length: 200/d}, () => 0);
+    x.forEach(p => h[Math.floor(p/d)] = h[Math.floor(p/d)]+1);
+    for (let i = 0; i < p.length; i++) {
+        h[i] = h[i]/n;
+        p[i] = d/2+i*d;
+    }
+    console.log(x)
+    console.log(v)
+
+    var start = Math.ceil(x[0]);
+    var end = Math.floor(x[x.length-1]);
+
+    var dist = [];
+    for (let j = 0; j < 200; j++) {
+        if (j < start || j > end) {
+            dist[j] = .01;
+            continue;
+        }
+        var x2 = x.findIndex((e) => e > j);
+        var x1 = x2 > 0 ? x2 - 1 : 0;
+        dist[j] = 1/(x[x2]-x[x1])/n +.01;
+    }
+    console.log(dist)
+    let i=0
+    var v = Array.from({length: dist.length}, () => i++);
+
+    dist = dist.map((v, i) => {
+        return .3 * v + .75 * normal(i);
+    })
+    var pointss = board.create('chart', [v, dist], { chartStyle: 'point', color: 'red', size: .2 });
+
+    var pp = dist.map((p, i) => board.create('point',[v[i], dist[i]]));
+    board.create('curve', JXG.Math.Numerics.CatmullRomSpline(pp, "centripetal"), {strokeWidth:3});
+*/
+</script>
+
+</body>
+</html>

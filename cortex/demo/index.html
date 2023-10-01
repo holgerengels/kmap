@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+<input id="e1"><input id="e2">
+<button id="submit">Vergleichen</button>
+
+<script type="module">
+    document.getElementById('submit').addEventListener('click', async () => {
+        const e1 = document.getElementById('e1').value;
+        const e2 = document.getElementById('e2').value;
+        const response = await fetch(`http://localhost:8002/?expression1=${encodeURIComponent(e1)}&expression2=${encodeURIComponent(e2  )}`, {
+            method: "GET",
+            mode: "cors",
+            cache: "no-cache",
+            headers: new Headers({
+                "Content-Type": "application/json; charset=utf-8",
+                "Origin": "http://localhost",
+                "Access-Control-Request-Method": "GET",
+                "Access-Control-Request-Headers": "Content-Type",
+
+            })
+        });
+        const movies = await response.json();
+        console.log(movies);
+    });
+</script>
+</body>
+</html>

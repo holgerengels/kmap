@@ -89,7 +89,7 @@ export class KMapTestEditorScroller extends Connected {
           ${this._tests.map((test, i) => html`
             <div class="item font-body" ?activated="${this._selectedIndex === i}" @click="${() => this._select(i)}">${test.key}
                 <span class="secondary">${test.chapter} - ${test.topic}</span>
-                <a href="${urls.client}/exercise/${encodePath(test.subject, test.chapter, test.topic, test.key)}" target="_blank" rel="noopener noreferrer"><mwc-icon>open_in_new</mwc-icon></a>
+                <a href="${urls.client}exercise/${encodePath(test.subject, test.chapter, test.topic, test.key)}" target="_blank" rel="noopener noreferrer"><mwc-icon>open_in_new</mwc-icon></a>
                 <mwc-icon @click="${e => { e.stopPropagation(); this._deleteTest(test)}}">delete</mwc-icon>
                 <mwc-icon @click="${e => { e.stopPropagation(); this._renameTest(test)}}">label</mwc-icon>
                 <mwc-icon @click="${e => { e.stopPropagation(); this._editTest(test)}}">edit</mwc-icon>

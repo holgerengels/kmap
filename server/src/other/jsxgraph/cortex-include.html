@@ -3,12 +3,57 @@
 <head>
   <meta charset="UTF-8">
   <title>MathLive</title>
-  <script src="https://unpkg.com/mathlive"></script>
+  <script defer src="https://unpkg.com/mathlive"></script>
   <style>
     body { margin: 0px; }
+    math-field {
+      display: block;
+    }
+    math-field::part(virtual-keyboard-toggle) {
+      display: none;
+    }
+    input {
+      display: block;
+      box-sizing: border-box;
+      width: 100%;
+      margin-top: 10px;
+      border: 1px solid rgb(172, 172, 172);
+      border-radius: 2px;
+      padding: 10px 6px;
+      font-family: sans-serif;
+    }
+    #message {
+      padding: 10px;
+      text-align: right;
+      font-family: sans-serif;
+      color: #ffffff;
+      transition: color 100ms ease-in-out;
+    }
+    #message[show] {
+      color: #6a6a6a;
+    }
   </style>
 </head>
 <body>
-  <math-field>x = </math-field>
+  <math-field id="math"></math-field>
+  <div style="position: relative">
+    <input id="latex" type="text" readonly>
+    <svg id="copy" style="position: absolute; right: 10px; top: calc(50% - 12px)" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0z" fill="none"/><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+  </div>
+  <div id="message">kopiert</div>
+<script type="module">
+  await customElements.whenDefined('math-field');
+  MathfieldElement.decimalSeparator = ",";
+  document.getElementById("math").addEventListener("input", () => document.getElementById("latex").value = document.getElementById("math").value);
+  document.getElementById("copy").addEventListener("click", () => {
+    navigator.permissions.query({ name: "clipboard-write" }).then((result) => {
+      if (result.state === "granted" || result.state === "prompt") {
+        navigator.clipboard.writeText(document.getElementById("latex").value);
+        document.getElementById("message").setAttribute("show", "");
+        setTimeout(() => document.getElementById("message").removeAttribute("show"), 1000)
+      }
+    });
+  });
+</script>
 </body>
 </html>

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <title>Binomialverteilung - p gesucht</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <script type="module">
+        import {KmapJsxGraph} from 'https://cdn.jsdelivr.net/npm/kmap-jsxgraph/+esm';
+        window.customElements.define('kmap-jsxgraph', KmapJsxGraph);
+    </script>
+</head>
+<body>
+<p>
+    Stelle den Wert für <i>p</i> auf 3 Nachkommastellen genau so ein, dass <i>P(X ≤ 84)</i> gerade kleiner <i>0,2</i> ist!
+</p>
+<style>
+    .container {
+        display: grid;
+        grid-template-columns: 1fr;
+        position: relative;
+    }
+    .panel {
+        position: absolute;
+        display: flex;
+        flex-direction: row;
+        gap: 8px;
+        font-family: Roboto, sans-serif;
+        font-size: 16px;
+        top: calc(25% - 8px);
+        right: 2.2%;
+    }
+</style>
+
+<div class="container">
+<kmap-jsxgraph id="graph" style="width: 100%; aspect-ratio: 8">
+    <script type="none" slot="attributes">
+      { boundingbox: [-8, .3, 110, -.1], pan: { enabled: false} }
+    </script>
+    <script type="none" slot="script">//<![CDATA[
+    let n = 100;
+    let k = 84;
+    var oldp = .85;
+
+    this.bernoulli = function(n, p, k) {
+        var coeff = 1;
+
+        for (var x = n - k + 1; x < n+1; x++) {
+            coeff *= x;
+        }
+        for (x = 1; x < k+1; x++) {
+            coeff /= x;
+        }
+
+        var p1=1;
+        var p2=1;
+
+        for (x=0; x < k; x++) {
+            p1=p1*p;
+        }
+        for (x=0; x < n-k; x++) {
+            p2=p2*(1-p);
+        }
+
+        return coeff*p1*p2;
+    }
+    this.cumulated = function(n, p, k) {
+        var sum = 0.0;
+
+        for (var i=0; i <= k; i++) {
+            sum += this.bernoulli(n, p, i);
+        }
+
+        return sum;
+    }
+    this.data = function(p, a, b) {
+        const arrx = [];
+        const arry = [];
+        for (let i = a; i <= b; i++) {
+            const v = this.bernoulli(n, p, i).toFixed(2);
+            arrx.push(i);
+            arry.push(v);
+        }
+        return [arrx, arry];
+    }
+    this.colors = function(a, b) {
+        const arr = [];
+        for (let i = a; i <= b; i++) {
+            arr.push((i <= k) ? '#66bb6a' : '#9E9E9E');
+        }
+        return arr;
+    }
+    this.rounded = function(num) {
+        return FORMAT.format(Math.round(num*10000)/10000);
+    }
+    const FORMAT = new Intl.NumberFormat('de-DE', {minimumFractionDigits: 3, maximumFractionDigits: 3});
+
+    const board = this.board;
+    var ps = board.create('input', [5, 0.25, 0.85, 'p = '], {});
+    ps.rendNodeInput.setAttribute('type', 'number');
+    ps.rendNodeInput.setAttribute('step', 0.001);
+    ps.rendNodeInput.setAttribute('min', 0);
+    ps.rendNodeInput.setAttribute('max', 1);
+
+    const p = ps.Value();
+    const m = n*p;
+    const s = Math.sqrt(n*p*(1-p));
+    const a = Math.floor(m - 3*s);
+    const b = Math.ceil(m + 3*s);
+    var d = this.data(p, a, b);
+    var cs = this.colors(a, b);
+    this.chart = board.create('chart', d, { chartStyle: 'bar', width: 1, colors: cs });
+    var res = board.create('text', [5, 0.15, () => 'P(X ≤ 84) ≈ ' + this.rounded(this.cumulated(n, ps.Value(), k))]);
+
+    JXG.addEvent(ps.rendNodeInput, 'input', throttle(() => {
+        const p = ps.Value();
+        if (p === oldp)
+            return;
+
+        const m = n*p;
+        const s = Math.sqrt(n*p*(1-p));
+        const a = Math.floor(m - 3*s);
+        const b = Math.ceil(m + 3*s);
+        const d = data(p, a, b);
+        const cs = colors(a, b);
+        board.suspendUpdate();
+        for (let i = 0; i <= this.chart[0].length; i++) {
+            board.removeObject(this.chart[0][i]);
+        }
+        this.chart = board.create('chart', d, { chartStyle: 'bar', width: 1, colors: cs });
+        board.unsuspendUpdate();
+
+        oldp = p;
+    }, 40, this), ps);
+
+    function throttle(fn, threshold, scope) {
+        threshold || (threshold = 250);
+        var last, deferTimer;
+
+        return function() {
+            // @ts-ignore
+            var context = scope || this;
+            var now = +new Date, args = arguments;
+
+            if (last && now < last + threshold) {
+                // Hold on to it
+                clearTimeout(deferTimer);
+                deferTimer = setTimeout(function() {
+                    last = now;
+                    fn.apply(context, args);
+                }, threshold);
+            } else {
+                last = now;
+                fn.apply(context, args);
+            }
+        };
+    }
+
+    this.isValid = function() {
+        return true;
+    }
+
+    this.init = function() {
+        board.fullUpdate();
+    }
+
+    this.showAnswer = function() {
+        board.fullUpdate();
+    }
+//]]></script>
+</kmap-jsxgraph>
+</div>
+
+<button onclick="document.getElementById('graph').init()">init</button>
+<button onclick="console.log(document.getElementById('graph').isValid())">check</button>
+<button onclick="document.getElementById('graph').showAnswer()">answer</button>
+
+</body>
+</html>

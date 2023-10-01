@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <meta charset="utf-8">
+    <title>Anouk</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+
+<script>
+    function factorial(a) {
+        if (a === 0) {
+            return 1;
+        } else {
+            for (let n = a - 1; n >= 1; n--) {
+                a *= n;
+            }
+            return a;
+        }
+    }
+    function pascal(n, k) {
+        return factorial(n) / factorial(k) / factorial(n - k);
+    }
+    function bernoulli(n, p, k) {
+        return pascal(n, k) * p ** k * (1 - p) ** (n - k);
+    }
+    function cumulated(n, p, k) {
+        var sum = 0.0;
+
+        for (var i=0; i <= k; i++) {
+            sum += bernoulli(n, p, i);
+        }
+
+        return sum;
+    }
+
+    function rounded(num) {
+        return FORMAT.format(Math.round(num*10000)/10000);
+    }
+
+    const FORMAT = new Intl.NumberFormat('de-DE', {minimumFractionDigits: 3, maximumFractionDigits: 3});
+
+    function calc() {
+        if (!document.getElementById('n'))
+            return;
+        document.getElementById('res').value = rounded(cumulated(document.getElementById('n').valueAsNumber, 0.7, 9));
+    }
+
+    calc();
+</script>
+
+<label for="n"><i>n</i> = </label><input id="n" type="number" step="1" min="9" max="100" value="10" lang="de-DE" inputmode="numeric" oninput="calc()"/>
+⇒
+<label for="res"><i>P(X ≤ 9)</i> &thickapprox; </label><input id="res" type="text" readonly style="width: 6em">
+
+</body>
+</html>
