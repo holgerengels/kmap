@@ -113,7 +113,17 @@ export class KMapKnowledgeCardDescription extends LitElement {
 
       var scripts = [...Array.from(this.shadowRoot.querySelectorAll("script"))];
       for (var script of scripts) {
-        new Function("shadowRoot", script.innerText).call(this, this.shadowRoot);
+        if (script.src) {
+          const mode = 'cors';
+          const response = await fetch(script.src, {mode});
+          if (!response.ok) {
+            throw new Error(`html-include fetch failed: ${response.statusText}`);
+          }
+          const text = await response.text();
+          new Function(text).call(this);
+        }
+        else
+          new Function("shadowRoot", script.innerText).call(this, this.shadowRoot);
       }
 
       if (hash) {
