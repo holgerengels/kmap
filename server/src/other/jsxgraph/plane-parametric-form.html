@@ -45,7 +45,7 @@
     rs.on('drag', () => { r._value = rs.Value() });
     ss.on('drag', () => { s._value = ss.Value() });
 
-    var atext = board.create('text', [-7.5, -6.6, 'Animation'], { visible: true, size: 0, cssClass: 'term', fontSize: .9, fontUnit: 'em', anchorX: 'left', anchorY: 'bottom' });
+    var atext = board.create('text', [-7.5, -6.6, 'Animation'], { visible: true, size: 0, cssClass: 'term', fontSize: .9, fontUnit: 'em', anchorX: 'left', anchorY: 'bottom', fixed: true });
     var toggle = board.create('button', [-7.5, -7.9, 'start / stop', function() {
         if (!animating) {
             animating = setInterval(() => {

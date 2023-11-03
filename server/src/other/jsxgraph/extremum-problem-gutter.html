@@ -69,15 +69,15 @@
     }
     azimuth(3);
 
-    var A = view.create('point3d', [0, -2, -1], { size: 3, name: '', visible: true });
-    var B = view.create('point3d', [1, -2, -1], { size: 3, name: '', visible: true });
-    var C = view.create('point3d', [() => 1 + x1.X(), -2, () => -1 + y2.Y()], { size: 3, name: '', visible: true });
-    var D = view.create('point3d', [() => 0 - x1.X(), -2, () => -1 + y2.Y()], { size: 3, name: '', visible: true });
-    var A2 = view.create('point3d', [0, 2, -1], { size: 3, name: '', visible: true });
-    var B2 = view.create('point3d', [1, 2, -1], { size: 3, name: '', visible: true });
-    var C2 = view.create('point3d', [() => 1 + x1.X(), 2, () => -1 + y2.Y()], { size: 3, name: '', visible: true });
-    var D2 = view.create('point3d', [() => 0 - x1.X(), 2, () => -1 + y2.Y()], { size: 3, name: '', visible: true });
-    var S = view.create('point3d', [0, -2, () => -1 + y2.Y()], { size: 3, name: '', visible: true });
+    var A = view.create('point3d', [0, -2, -1], { size: 3, name: '', visible: true, fixed: true });
+    var B = view.create('point3d', [1, -2, -1], { size: 3, name: '', visible: true, fixed: true });
+    var C = view.create('point3d', [() => 1 + x1.X(), -2, () => -1 + y2.Y()], { size: 3, name: '', visible: true, fixed: true });
+    var D = view.create('point3d', [() => 0 - x1.X(), -2, () => -1 + y2.Y()], { size: 3, name: '', visible: true, fixed: true });
+    var A2 = view.create('point3d', [0, 2, -1], { size: 3, name: '', visible: true, fixed: true });
+    var B2 = view.create('point3d', [1, 2, -1], { size: 3, name: '', visible: true, fixed: true });
+    var C2 = view.create('point3d', [() => 1 + x1.X(), 2, () => -1 + y2.Y()], { size: 3, name: '', visible: true, fixed: true });
+    var D2 = view.create('point3d', [() => 0 - x1.X(), 2, () => -1 + y2.Y()], { size: 3, name: '', visible: true, fixed: true });
+    var S = view.create('point3d', [0, -2, () => -1 + y2.Y()], { size: 3, name: '', visible: true, fixed: true });
 
     view.create('polygon', [A.element2D, B.element2D, C.element2D, D.element2D], { highlight: false, gradient: 'linear', gradientSecondColor: 'white', fillColor: 'blue', borders: { strokecolor: 'blue', strokeWidth: 2 }});
     view.create('polygon', [A2.element2D, B2.element2D, C2.element2D, D2.element2D], { highlight: false, gradient: 'linear', gradientSecondColor: 'white', fillColor: 'darkgray', borders: { strokecolor: 'blue', strokeWidth: 1 }});
@@ -87,9 +87,9 @@
     view.create('segment', [D.element2D, S.element2D], { strokeColor: '#D55E00', strokeWidth: 3 });
     view.create('segment', [A.element2D, S.element2D], { strokeColor: 'green', strokeWidth: 3 });
 
-    var text1 = model.create('text', [-6, 4, () => '\\textcolor{#D55E00}{s = ' + x1.X().toFixed(1) + '} \\implies'], { fontSize: 1, fontUnit: 'em', color: '#D55E00', cssClass: 'term', useKatex: true });
+    var text1 = model.create('text', [-6, 4, () => '\\textcolor{#D55E00}{s = ' + x1.X().toFixed(1) + '} \\implies'], { fontSize: 1, fontUnit: 'em', color: '#D55E00', cssClass: 'term', useKatex: true, fixed: true });
     var text2 = model.create('text', [0, 4, () => '\\textcolor{#0072B2}{A \\approx ' + y1.Y().toFixed(1) + '}\\newline' +
-        '\\textcolor{green}{h \\approx ' + y2.Y().toFixed(1) + '}'], { fontSize: 1, fontUnit: 'em', color: '#D55E00', cssClass: 'term', useKatex: true });
+        '\\textcolor{green}{h \\approx ' + y2.Y().toFixed(1) + '}'], { fontSize: 1, fontUnit: 'em', color: '#D55E00', cssClass: 'term', useKatex: true, fixed: true });
 
 </script>
 

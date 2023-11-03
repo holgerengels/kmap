@@ -42,6 +42,8 @@ export class KMapTestCard extends Connected {
   private of: number = 0;
   @property({type: Number})
   private repetitions: number = 1;
+  @property({type: Boolean})
+  private extern: boolean = false;
   @property({type: Number})
   private level: number = 0;
   @property({type: String})
@@ -125,6 +127,18 @@ export class KMapTestCard extends Connected {
     this.correct = true;
     this.sent = true;
     this.attempts = -1;
+
+    if (this.solution) {
+      this.solutionVisible = true;
+      this.hintVisible = false;
+    }
+  }
+
+  _compareAnswer() {
+    this._content.showAnswer();
+    this.correct = true;
+    this.sent = true;
+    this.attempts = 0;
 
     if (this.solution) {
       this.solutionVisible = true;
@@ -255,9 +269,10 @@ export class KMapTestCard extends Connected {
         ` : ''}
 
         <mwc-button slot="button" ?hidden="${this.repetitions === 1}" @click="${this.init}">Neue Aufgabe</mwc-button>
-        <mwc-button slot="button" @click="${this._showAnswer}">Antwort zeigen</mwc-button>
+        <mwc-button slot="button" @click="${this._showAnswer}" ?hidden="${this.extern}">Antwort zeigen</mwc-button>
+        <mwc-button slot="button" @click="${this._compareAnswer}" ?hidden="${!this.extern}">Antwort vergleichen</mwc-button>
         <mwc-button slot="button" @click="${this._showHint}" ?hidden="${!this.hint}">Tipp</mwc-button>
-        <mwc-button slot="button" @click="${this._sendAnswer}" ?hidden="${this.sent}">Antwort abschicken</mwc-button>
+        <mwc-button slot="button" @click="${this._sendAnswer}" ?hidden="${this.sent || this.extern}">Antwort abschicken</mwc-button>
         <mwc-button slot="button" @click="${this._next}" ?hidden="${!this.correct}">Weiter</mwc-button>
         <mwc-icon-button slot="icon" icon="info" title="Wissenskarte" @click="${this._card}" id="blinky"></mwc-icon-button>
         <mwc-icon-button slot="icon" icon="feedback" title="Feedback" aria-haspopup="dialog" @click="${this._feedback}"></mwc-icon-button>

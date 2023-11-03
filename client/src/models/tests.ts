@@ -28,6 +28,7 @@ export interface Test {
   hint: string,
   solution: string,
   repetitions: number,
+  extern?: boolean,
   attachments: Attachment[];
   created?: number,
   modified?: number,

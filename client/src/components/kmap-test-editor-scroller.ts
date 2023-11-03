@@ -105,6 +105,7 @@ export class KMapTestEditorScroller extends Connected {
                       .topic="${this._selected?.topic}"
                       .author="${this._selected?.author}"
                       .repetitions="${this._selected?.repetitions}"
+                      .extern"${this._selected?.extern}"
                       .level="${this._selected?.level}"
                       .balance="${this._selected?.balance}"
                       .question="${this._selected?.question}"

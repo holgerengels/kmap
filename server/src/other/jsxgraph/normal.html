@@ -45,7 +45,7 @@
 
     var f = board.create('functiongraph', [normal], {strokeWidth: 2});
 
-    var check = board.create('checkbox', [7, 1.9, '<b style="color: #D55E00">Standardabweichung</b>'], { anchorX: 'right', anchorY: 'top'});
+    var check = board.create('checkbox', [7, 1.9, '<b style="color: #D55E00">Standardabweichung</b>'], { anchorX: 'right', anchorY: 'top', fixed: true});
     var i = board.create('integral', [[() => ms.Value() - ss.Value(), () => ms.Value() + ss.Value()], f], { visible: () => check.Value(), color: '#0072B2', curveLeft: { visible: false }, curveRight: { visible: false }, label: { visible: () => check.Value(), cssClass: 'term', fontSize: 1, fontUnit: 'em'}});
     //var t = board.create('text', [10, .5, "" + i.Value()], { });
 

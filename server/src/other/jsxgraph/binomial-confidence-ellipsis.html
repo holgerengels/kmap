@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <title>Konfidenzellipse</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <link rel='stylesheet' type='text/css' href='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraph.css'/>
+    <script src='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraphcore.js' type='text/javascript'></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js" crossorigin="anonymous"></script>
+
+    <style>
+        body {
+            margin: 0px;
+            padding: 0px;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr;
+            position: relative;
+        }
+        .jxgbox { border-radius: 0px; border: none}
+        .term {
+            background-color: white;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id='sliders' class='jxgbox' style='width: 100%; aspect-ratio: 4'></div>
+    <div id='board' class='jxgbox' style='width: 100%; aspect-ratio: 1'></div>
+</div>
+
+<script type='text/javascript'>
+    var sliders = JXG.JSXGraph.initBoard('sliders', { boundingbox: [-.2, .6, 1.15, 0], showNavigation: false, showZoom: false, showCopyright: false, pan: { enabled: false }});
+    //var xaxis = board.create('axis', [ [0,0],[1,0] ], { ticks: { drawZero: true }});
+    var ns = sliders.create('slider', [[-.17, .25], [.83, .25], [0, 100, 1000]], {snapWidth: 1, ticks: { drawLabels: true, label: {fontSize: 13, strokeColor: JXG.palette.vermillion} }, name: 'n', digits: 0, label: {fontSize: 14, strokeColor: JXG.palette.vermillion}});
+    var bs = sliders.create('slider', [[-.17, .5], [.83, .5], [90, 95, 100]], {snapWidth: 1, ticks: { drawLabels: true, label: {fontSize: 13, strokeColor: JXG.palette.vermillion} }, name: 'β', digits: 0, label: {fontSize: 14, strokeColor: JXG.palette.vermillion}, postLabel: '&thinsp;%'});
+    var checkp = sliders.create('checkbox', [-.1, .05, 'Prognose'], { fixed: true });
+    var checkk = sliders.create('checkbox', [.5, .05, 'Konfidenz'], { fixed: true });
+
+    var board = JXG.JSXGraph.initBoard('board', {boundingbox: [-.1, 1.1, 1.1, -.1], axis: true, showNavigation: false, showZoom: false, showCopyright: false, pan: { enabled: false},
+        defaultAxes: {
+            x: {
+                name: 'p', withLabel: true,
+                label: { position: 'rt', offset: [0, -15], anchcorX: 'right' }
+            },
+            y: {
+                name: 'h', withLabel: true,
+                label: { position: 'rt', offset: [-20, 0], anchorcY: 'top', fontWeight: 'bold' }
+            }
+        }
+    });
+    sliders.addChild(board);
+
+    const c = () => JXG.Math.ProbFuncs.ndtri((bs.Value()/100+1)/2);
+    const nonNaN = (v, d) => isNaN(v) ? d : v;
+
+    const hu = (x) => x-c()*Math.sqrt(x*(1-x)/ns.Value())
+    const ho = (x) => x+c()*Math.sqrt(x*(1-x)/ns.Value())
+    var f1 = board.create('functiongraph', [hu], {strokeWidth: 2, strokeColor: JXG.palette.darkblue});
+    var f2 = board.create('functiongraph', [ho], {strokeWidth: 2, strokeColor: JXG.palette.green});
+
+    var sx = board.create('segment', [[0,0],[1,0]], {visible: false});
+    var sy = board.create('segment', [[0,0],[0,1]], {visible: false});
+
+    var p = board.create('glider', [.5, 0, sx], {visible: () => checkp.Value(), name: 'p', label: { offset: [4, 12] }, snapToGrid: true, snapSizeX: .01, snapSizeY: 0, size: 3});
+    var p1 = board.create('point', [() => p.X(), () => hu(p.X())], {visible: () => checkp.Value(), color: JXG.palette.darkblue, name: ''});
+    var p2 = board.create('point', [() => p.X(), () => ho(p.X())], {visible: () => checkp.Value(), color: JXG.palette.darkblue, name: ''});
+    var y1 = board.create('point', [0, () => hu(p.X())], {visible: () => checkp.Value(), color: JXG.palette.darkblue, name: 'h_1'});
+    var y2 = board.create('point', [0, () => ho(p.X())], {visible: () => checkp.Value(), color: JXG.palette.darkblue, name: 'h_2'});
+    var lp = board.create('line', [p1, p2], {visible: () => checkp.Value(), color: JXG.palette.vermillion, dash: 2});
+    var sp1 = board.create('segment', [p1, y1], {visible: () => checkp.Value(), dash: 2});
+    var sp2 = board.create('segment', [p2, y2], {visible: () => checkp.Value(), dash: 2});
+    var sp3 = board.create('segment', [y1, y2], {visible: () => checkp.Value(), strokeWidth: 3});
+    var hi = board.create('text', [.1, 1.08, () => `h \\in [${p1.Y().toFixed(2)}; ${p2.Y().toFixed(2)}]`], {visible: () => checkp.Value(), useKatex: true, cssClass: 'term', anchorY: 'top'});
+
+    const pu = (x) => (c()**2*x - c()**2*x**2)/(x - ns.Value())**2
+    const po = (x) => (c()**2*x**2 - c()**2*x)/(x - ns.Value())**2
+    var h = board.create('glider', [0, .5, sy], {visible: () => checkk.Value(), name: 'h', label: { offset: [4, 12] }, snapToGrid: true, snapSizeY: .01, snapSizeX: 0, size: 3});
+    var lh = board.create('line', [() => [0, h.Y()], () => [1, h.Y()]], {visible: () => checkk.Value(), color: JXG.palette.vermillion, dash: 2});
+    var h1 = board.create('intersection', [lh, f1], {visible: () => checkk.Value(), color: JXG.palette.darkblue, name: ''});
+    var h2 = board.create('intersection', [lh, f2], {visible: () => checkk.Value(), color: JXG.palette.darkblue, name: ''});
+    var x1 = board.create('point', [() => h1.X(), 0], {visible: () => checkk.Value(), color: JXG.palette.darkblue, name: 'p_2'});
+    var x2 = board.create('point', [() => h2.X(), 0], {visible: () => checkk.Value(), color: JXG.palette.darkblue, name: 'p_1'});
+    var sh1 = board.create('segment', [h1, x1], {visible: () => checkk.Value(), dash: 2});
+    var sh2 = board.create('segment', [h2, x2], {visible: () => checkk.Value(), dash: 2});
+    var sh3 = board.create('segment', [x1, x2], {visible: () => checkk.Value(), strokeWidth: 3});
+    var pi = board.create('text', [1.08, .08, () => `p \\in [${h2.X().toFixed(2)}; ${h1.X().toFixed(2)}]`], {visible: () => checkk.Value(), useKatex: true, cssClass: 'term', anchorX: 'right'});
+
+</script>
+
+</body>
+</html>

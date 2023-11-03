@@ -40,7 +40,7 @@
     var x1 = fboard.create('glider', [8, 0, l], {visible: true, name: 'x_0', label: {fontSize: 1, fontUnit: 'em', color: JXG.palette.vermillion}, showInfobox: false});
 
     for (let pos = -1; pos < 8; pos+=.5) {
-        fboard.create('text', [pos, () => f(pos), f(pos) === 0 ? '⊙' : f(pos) > 0 ? '⊕' : '⊖'], {visible: () => x1.X() >= pos, fontSize: 1, fontUnit: 'em', color: JXG.palette.vermillion, anchorX: 'middle', anchorY: 'middle', cssClass: 'term'});
+        fboard.create('text', [pos, () => f(pos), f(pos) === 0 ? '⊙' : f(pos) > 0 ? '⊕' : '⊖'], {visible: () => x1.X() >= pos, fontSize: 1, fontUnit: 'em', color: JXG.palette.vermillion, anchorX: 'middle', anchorY: 'middle', cssClass: 'term', fixed: true});
     }
 
     var ffboard = JXG.JSXGraph.initBoard('ffboard', {boundingbox: [-1.5, 4, 8, -4], axis: false, showNavigation: false, showZoom: false, showCopyright: false, pan: { enabled: false}});
@@ -51,16 +51,16 @@
     for (let pos = -1; pos < 8; pos+=.5) {
         let a = ffboard.create('point', [pos-.1, -f(pos)/10], {visible: false, name: ''})
         let b = ffboard.create('point', [pos+.1, f(pos)/10], {visible: false, name: ''})
-        let s = ffboard.create('segment', [a, b], {visible: () => x1.X() >= pos, name: '', strokeColor: JXG.palette.vermillion});
+        let s = ffboard.create('segment', [a, b], {visible: () => x1.X() >= pos, name: '', strokeColor: JXG.palette.vermillion, fixed: true});
         lalas.push({p: pos, a: a, b: b, s: s});
     }
-    var ht = ffboard.create('text', [0, -.1, 'SP'], {visible: () => x1.X() >= 0, fontSize: 1, fontUnit: 'em', color: JXG.palette.vermillion, anchorX: 'middle', anchorY: 'top', cssClass: 'term'});
-    var wt = ffboard.create('text', [4, -.1, 'WP'], {visible: () => x1.X() >= 4, fontSize: 1, fontUnit: 'em', color: JXG.palette.vermillion, anchorX: 'middle', anchorY: 'top', cssClass: 'term'});
-    var tt = ffboard.create('text', [6, .1, 'TP'], {visible: () => x1.X() >= 6, fontSize: 1, fontUnit: 'em', color: JXG.palette.vermillion, anchorX: 'middle', anchorY: 'bottom', cssClass: 'term'});
+    var ht = ffboard.create('text', [0, -.1, 'SP'], {visible: () => x1.X() >= 0, fontSize: 1, fontUnit: 'em', color: JXG.palette.vermillion, anchorX: 'middle', anchorY: 'top', cssClass: 'term', fixed: true});
+    var wt = ffboard.create('text', [4, -.1, 'WP'], {visible: () => x1.X() >= 4, fontSize: 1, fontUnit: 'em', color: JXG.palette.vermillion, anchorX: 'middle', anchorY: 'top', cssClass: 'term', fixed: true});
+    var tt = ffboard.create('text', [6, .1, 'TP'], {visible: () => x1.X() >= 6, fontSize: 1, fontUnit: 'em', color: JXG.palette.vermillion, anchorX: 'middle', anchorY: 'bottom', cssClass: 'term', fixed: true});
 
     for (const pos of [0, 4, 6]) {
-        var lf = fboard.create('line', [[pos, -1], [pos, 1]], {visible: () => x1.X() >= pos, color: JXG.palette.vermillion, dash: 2});
-        var lff = ffboard.create('line', [[pos, -1], [pos, 1]], {visible: () => x1.X() >= pos, color: JXG.palette.vermillion, dash: 2});
+        var lf = fboard.create('line', [[pos, -1], [pos, 1]], {visible: () => x1.X() >= pos, color: JXG.palette.vermillion, dash: 2, fixed: true});
+        var lff = ffboard.create('line', [[pos, -1], [pos, 1]], {visible: () => x1.X() >= pos, color: JXG.palette.vermillion, dash: 2, fixed: true});
     }
 
     var last = false;

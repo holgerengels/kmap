@@ -49,15 +49,15 @@
     let g = (x) => Math.exp(-Math.log(2)*x);
     var fboard = JXG.JSXGraph.initBoard('fboard', {boundingbox: [-2, 3, 7, -3], axis: true, showNavigation: false, showZoom: false, showCopyright: false, pan: { enabled: false}});
     var fg = fboard.create('functiongraph', [f], {strokeWidth: 3});
-    var ft = fboard.create('text', [6.5, 2.5, 'f(x)'], { anchorX: 'right', anchorY: 'top', strokeColor: JXG.palette.blue});
+    var ft = fboard.create('text', [6.5, 2.5, 'f(x)'], { anchorX: 'right', anchorY: 'top', strokeColor: JXG.palette.blue, fixed: true });
 
     var gboard = JXG.JSXGraph.initBoard('gboard', {boundingbox: [-2, 4, 7, -2], axis: true, showNavigation: false, showZoom: false, showCopyright: false, pan: { enabled: false}});
     var gg = gboard.create('functiongraph', [g], {strokeWidth: 3});
-    var gt = gboard.create('text', [6.5, 3.5, 'g(x)'], { anchorX: 'right', anchorY: 'top', strokeColor: JXG.palette.blue });
+    var gt = gboard.create('text', [6.5, 3.5, 'g(x)'], { anchorX: 'right', anchorY: 'top', strokeColor: JXG.palette.blue, fixed: true });
 
 
     var hboard = JXG.JSXGraph.initBoard('hboard', {boundingbox: [-2, 10, 7, -2], axis: true, showNavigation: false, showZoom: false, showCopyright: false, pan: { enabled: false}});
-    var o = hboard.create('text', [6.5, 8, '<div class="lala" style="font-weight: bold">Verknüpfung:&ThinSpace;</div><div id="lala" class="lala"><span><input type="radio" name="o" value="plus"/>&ThinSpace;Addition</span><span><input type="radio" name="o" value="mal"/>&ThinSpace;Multiplikation</span><span><input type="radio" name="o" value="kette"/>&ThinSpace;Verkettung</span></div>'], { anchorX: 'right', anchorY: 'top' });
+    var o = hboard.create('text', [6.5, 8, '<div class="lala" style="font-weight: bold">Verknüpfung:&ThinSpace;</div><div id="lala" class="lala"><span><input type="radio" name="o" value="plus"/>&ThinSpace;Addition</span><span><input type="radio" name="o" value="mal"/>&ThinSpace;Multiplikation</span><span><input type="radio" name="o" value="kette"/>&ThinSpace;Verkettung</span></div>'], { anchorX: 'right', anchorY: 'top', fixed: true });
     o._value = undefined; o.Value = () => o._value;
     document.getElementById("lala").onchange = (e) => { o._value = e.target.value; hboard.update(); };
     var ht = hboard.create('text', [6.5, 3.5, () => terms[o.Value()]], { anchorX: 'right', anchorY: 'top', strokeColor: JXG.palette.blue });

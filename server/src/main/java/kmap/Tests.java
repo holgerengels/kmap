@@ -326,6 +326,7 @@ public class Tests {
                     existing.add("balance", changed.get("balance"));
                     existing.add("attachments", changed.get("attachments"));
                     existing.addProperty("repetitions", JSON.integer(changed, "repetitions", 1));
+                    existing.add("extern", changed.get("extern"));
                     if (checks(existing)) {
                         Response response = client.update(existing);
                         JsonArray attachments = changed.getAsJsonArray("attachments");

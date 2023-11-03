@@ -95,7 +95,7 @@
     }
     const FORMAT = new Intl.NumberFormat('de-DE', { minimumFractionDigits: 3, maximumFractionDigits: 3 });
 
-    var ps = board.create('input', [5, 0.2, 0.85, 'p = '], { cssClass: 'term', cssStyle: 'width: 5em', color: '#D55E00', maxlength: 2 });
+    var ps = board.create('input', [5, 0.2, 0.85, 'p = '], { cssClass: 'term', cssStyle: 'width: 5em', color: '#D55E00', maxlength: 2, fixed: true });
     ps.rendNodeInput.setAttribute('type', 'number');
     ps.rendNodeInput.setAttribute('step', 0.001);
     ps.rendNodeInput.setAttribute('min', 0);
@@ -109,7 +109,7 @@
     var d = data(p, a, b);
     var cs = colors(a, b);
     var chart = board.create('chart', d, { chartStyle: 'bar', width: 1, colors: cs });
-    var res = board.create('text', [5, 0.1, () => 'P(X ≤ 84) ≈ ' + rounded(cumulated(n, ps.Value(), k))], { cssClass: 'term' });
+    var res = board.create('text', [5, 0.1, () => 'P(X ≤ 84) ≈ ' + rounded(cumulated(n, ps.Value(), k))], { cssClass: 'term', fixed: true });
 
     JXG.addEvent(ps.rendNodeInput, 'input', throttle(() => {
         const p = ps.Value();

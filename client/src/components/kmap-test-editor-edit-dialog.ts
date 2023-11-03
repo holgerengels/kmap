@@ -63,6 +63,8 @@ export class KMapTestEditorEditDialog extends Connected {
   @state()
   private _repetitions: string = "1";
   @state()
+  private _extern: boolean = false;
+  @state()
   private _balance: number = 3;
 
   @state()
@@ -154,6 +156,7 @@ export class KMapTestEditorEditDialog extends Connected {
       this._key      = this._test.key || '';
       this._author      = this._test.author || store.state.app.username || '';
       this._repetitions    = "" + (this._test.repetitions || 1);
+      this._extern    = this._test.extern || false;
       this._level    = "" + (this._test.level || 1);
       // @ts-ignore
       this._balance  = this._test.balance === "" || this._test.balance === undefined ? 3 : this._test.balance;
@@ -219,6 +222,7 @@ export class KMapTestEditorEditDialog extends Connected {
     test.key = this._key;
     test.author = this._author;
     test.repetitions = this._repetitions ? parseInt(this._repetitions, 10) : 1;
+    test.extern = this._extern;
     test.level = this._level ? parseInt(this._level, 10) : undefined;
     test.balance = this._balance;
     test.question = this._question;
@@ -448,8 +452,9 @@ export class KMapTestEditorEditDialog extends Connected {
         <mwc-select s3 required label="Thema" @change="${e => this._topic = e.target.value}">
           ${this._topics.map((topic) => html`<mwc-list-item value="${topic}" ?selected="${topic === this._topic}">${topic}</mwc-list-item>`)}
         </mwc-select>
-        <mwc-textfield s5 id="key" name="key" label="Titel" dense type="text" required disabled .value="${this._key}" @change="${e => this._key = e.target.value}" pattern="[^.\\/]*"></mwc-textfield>
+        <mwc-textfield s4 id="key" name="key" label="Titel" dense type="text" required disabled .value="${this._key}" @change="${e => this._key = e.target.value}" pattern="[^.\\/]*"></mwc-textfield>
         <mwc-textfield s1 id="level" name="level" label="Level" dense type="number" inputmode="numeric" min="1" max="3" step="1" .value="${this._level}" @change="${e => this._level = e.target.value}"></mwc-textfield>
+        <mwc-formfield label="Extern"><mwc-checkbox s1 id="extern" name="extern" .checked="${this._extern}" @change="${e => this._extern = e.target.checked}"></mwc-checkbox></mwc-formfield>
         <mwc-textfield s2 id="author" name="author" label="Autor" dense type="text" required .value="${this._author}" @change="${e => this._author = e.target.value}"></mwc-textfield>
         <mwc-formfield s3 style="padding-left: 16px" alignEnd nowrap label="Layout Frage : Antwort =&nbsp;${this._balance}&nbsp;:&nbsp;${6 - this._balance}">
           <mwc-slider id="balance" style="vertical-align:middle; width: min(50%, 200px)" .value="${this._balance}" withTickMarks discrete step="1" min="0" max="5" @input=${e => this._balance = e.target.value}></mwc-slider>
@@ -536,6 +541,7 @@ export class KMapTestEditorEditDialog extends Connected {
           .topic="${this._topic}"
           .key="${this._key}"
           .repetitions="${this._repetitions}"
+          .extern="${this._extern}"
           .level="${this._level}"
           .balance="${this._balance}"
           .question="${this._question}"

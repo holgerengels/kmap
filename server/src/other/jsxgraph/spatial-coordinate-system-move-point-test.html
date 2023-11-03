@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Quadratische Funktion - Scheitelpunktform Test - Streckung</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <script type="module">
+        import {KmapJsxGraph} from 'https://cdn.jsdelivr.net/npm/kmap-jsxgraph/+esm';
+        window.customElements.define('kmap-jsxgraph', KmapJsxGraph);
+    </script>
+</head>
+<body>
+<kmap-jsxgraph lazy:KmapJsxGraph:kmap-jsxgraph id="graph" style="width: 300px; aspect-ratio: 1">
+    <style slot="styles">
+        .term { background-color: white; }
+    </style>
+    <script type="none" slot="attributes">
+        { boundingBox: [-5.1, 5.1, 5.1, -5.1], pan: { enabled: false}, defaultAxes: {
+            x: {
+                withLabel: true,
+                name: 'x_2',
+                label: { position: 'rt', offset: [-5, -15] }
+            },
+            y: {
+                withLabel: true,
+                name: 'x_3',
+                label: { position: 'rt', offset: [-20, -0] }
+            }
+        } }
+    </script>
+    <script tfype="none" slot="script">//<![CDATA[
+    let x;
+    let y;
+    let z;
+
+    var board = this.board;
+    var axis = board.create('segment', [[4, 4], [-4, -4]], { lastArrow: true, strokeWidth: 1.5, fixed: true });
+    var ticks = board.create('ticks', [axis], { drawZero: false, scale: Math.sqrt(2)/2, ticksDistance: 2, drawLabels: true, anchor: 'middle', minorTicks: 0, majorHeight: 10,
+     label: { anchorX: 'middle', anchorY: 'top', offset: [10, 0] }});
+    var at = board.create('text', [-3.5, -4, 'x_1'], { anchorX: 'left', anchorY: 'middle', cssClass: 'term', fixed: true });
+    var p = board.create('point', [0, 0], {visible: true, name: 'P', snapToGrid: true, snapSizeX: .5, snapSizeY: .5});
+    var t = board.create('text', [-5, 5, () => 'P(' + x + '|' + y + '|' + z + ')'], {visible: true, fontSize: 1, fontUnit: 'em', color: JXG.palette.vermillion, anchorX: 'left', anchorY: 'top', cssClass: 'term', fixed: true});
+
+    this.isValid = function() {
+        let px = p.X();
+        let py = p.Y();
+        return y - x/2 === px && z - x/2 === py;
+    }
+
+    this.init = function() {
+      do {
+        x = Math.round(Math.random() * 8) - 4;
+        y = Math.round(Math.random() * 8) - 4;
+        z = Math.round(Math.random() * 8) - 4;
+      }
+      while (x === 0 || y === 0 || z === 0 || y - x/2 < -5 || y - x/2 > 5 || z - x/2 < -5 || z - x/2 > 5)
+        board.fullUpdate();
+    }
+
+    this.showAnswer = function() {
+      p.moveTo([y - x/2, z - x/2], 300, { effect: '<>' });
+      board.fullUpdate();
+    }
+
+    this.init();
+//]]></script>
+</kmap-jsxgraph>
+
+<button onclick="console.log(document.getElementById('graph').isValid())">check</button>
+<button onclick="document.getElementById('graph').showAnswer()">answer</button>
+
+</body>
+</html>

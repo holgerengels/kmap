@@ -61,12 +61,12 @@
         { xAxis: { visible: false }, yAxis: { visible: false }, zAxis: { visible: false },
             xPlaneRear: {visible: false}, yPlaneRear: {visible: false}, zPlaneRear: {visible: true} });
 
-    var A = view.create('point3d', [() => -x1.X() / 2, () => -x1.X() / 2, -2], { size: 3, name: '', visible: true });
-    var B = view.create('point3d', [() => x1.X() / 2, () => -x1.X() / 2, -2], { size: 3, name: '', visible: true });
-    var C = view.create('point3d', [() => x1.X() / 2, () => x1.X() / 2, -2], { size: 3, name: '', visible: true });
-    var D = view.create('point3d', [() => -x1.X() / 2, () => x1.X() / 2, -2], { size: 3, name: '', visible: true });
-    var E = view.create('point3d', [0, 0, () => (isNaN(y2.Y()) ? 0 : y2.Y()) -2], { size: 3, name: '', visible: true });
-    var O = view.create('point3d', [0, 0, -2], { size: 3, name: '', visible: true });
+    var A = view.create('point3d', [() => -x1.X() / 2, () => -x1.X() / 2, -2], { size: 3, name: '', visible: true, fixed: true });
+    var B = view.create('point3d', [() => x1.X() / 2, () => -x1.X() / 2, -2], { size: 3, name: '', visible: true, fixed: true });
+    var C = view.create('point3d', [() => x1.X() / 2, () => x1.X() / 2, -2], { size: 3, name: '', visible: true, fixed: true });
+    var D = view.create('point3d', [() => -x1.X() / 2, () => x1.X() / 2, -2], { size: 3, name: '', visible: true, fixed: true });
+    var E = view.create('point3d', [0, 0, () => (isNaN(y2.Y()) ? 0 : y2.Y()) -2], { size: 3, name: '', visible: true, fixed: true });
+    var O = view.create('point3d', [0, 0, -2], { size: 3, name: '', visible: true, fixed: true });
     view.create('line3d', [O, E], { strokeColor: 'green' });
 
     view.create('polygon', [A.element2D, B.element2D, E.element2D], { highlight: false, gradient: 'linear', gradientSecondColor: 'white', fillColor: 'blue', borders: { strokecolor: 'blue', strokeWidth: 1 }});
@@ -77,9 +77,9 @@
     view.create('line3d', [C, D], { strokeColor: '#D55E00', strokeWidth: 2 });
     view.create('line3d', [B, O], { strokeColor: 'darkgray', strokeWidth: 1 });
 
-    var text1 = model.create('text', [-6, 4, () => '\\textcolor{#D55E00}{a = ' + x1.X().toFixed(1) + '} \\implies'], { fontSize: 1, fontUnit: 'em', color: '#D55E00', cssClass: 'term', useKatex: true });
+    var text1 = model.create('text', [-6, 4, () => '\\textcolor{#D55E00}{a = ' + x1.X().toFixed(1) + '} \\implies'], { fontSize: 1, fontUnit: 'em', color: '#D55E00', cssClass: 'term', useKatex: true, fixed: true });
     var text2 = model.create('text', [0, 4, () => '\\textcolor{#0072B2}{V \\approx ' + y1.Y().toFixed(1) + '}\\newline' +
-        '\\textcolor{green}{h \\approx ' + y2.Y().toFixed(1) + '}'], { fontSize: 1, fontUnit: 'em', color: '#D55E00', cssClass: 'term', useKatex: true });
+        '\\textcolor{green}{h \\approx ' + y2.Y().toFixed(1) + '}'], { fontSize: 1, fontUnit: 'em', color: '#D55E00', cssClass: 'term', useKatex: true, fixed: true });
 
 </script>
 

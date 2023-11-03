@@ -52,7 +52,7 @@
     var textt = fboard.create('text', [2, 2, () => {
         return "<span style=\"color: red\">f_t(x) = " + (JXG.toFixed(df(x1.X()), 1) + "(x " + plusMinus(-x1.X()) + ") " + plusMinus(y1.Y())) + "</span><br/>"
             + "<span style=\"color: green\">" + (df(x1.X()) !== 0 ? ("f_n(x) = " + JXG.toFixed(-1/df(x1.X()), 1) + "(x " + plusMinus(-x1.X()) + ") " + plusMinus(y1.Y())) : "f_n ist nicht definiert") + "</span>";
-    }], {fontSize: 1.1, fontUnit: 'em'});
+    }], { fontSize: 1.1, fontUnit: 'em', fixed: true });
 
     //x1.startAnimation(1, 200, 30);
 </script>

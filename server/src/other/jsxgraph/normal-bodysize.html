@@ -50,7 +50,7 @@
     }]);
     button.rendNodeButton.style.border = "1px solid " + JXG.palette.vermillion;
 
-    var checkbox = board.create('checkbox', [190, .04, 'Dichte'], { color: JXG.palette.vermillion,  fontSize: 1, fontUnit: 'em', anchorX: 'right'});
+    var checkbox = board.create('checkbox', [190, .04, 'Dichte'], { color: JXG.palette.vermillion,  fontSize: 1, fontUnit: 'em', anchorX: 'right', fixed: true});
     JXG.addEvent(checkbox.rendNodeCheckbox, 'change', function() {
         if (this.Value()) {
             axis.show()

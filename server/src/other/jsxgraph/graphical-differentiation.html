@@ -49,10 +49,9 @@
         let atan = Math.atan(m);
         let cos = Math.cos(atan);
         let sin = Math.sin(atan);
-        console.log(m + " .. " + cos + " " + sin)
         let a = fboard.create('point', [x-cos*.2, y-sin*.2], {visible: false, name: ''})
         let b = fboard.create('point', [x+cos*.2, y+sin*.2], {visible: false, name: ''})
-        let s = fboard.create('segment', [a, b], {visible: () => x1.X() >= pos, name: '', strokeWidth: 4, strokeColor: JXG.palette.vermillion});
+        let s = fboard.create('segment', [a, b], {visible: () => x1.X() >= pos, name: '', strokeWidth: 4, strokeColor: JXG.palette.vermillion, fixed: true});
     }
 
     var ffboard = JXG.JSXGraph.initBoard('ffboard', {boundingbox: [-1.5, 3.5, 8, -3.5], axis: true, showNavigation: false, showZoom: false, showCopyright: false, pan: { enabled: false}});
@@ -60,12 +59,12 @@
     var gff = ffboard.create('functiongraph', [ff], {strokeWidth: 3, visible: false});
     var lalas = [];
     for (let pos = -1; pos < 8; pos+=.5) {
-        let t = ffboard.create('text', [pos, ff(pos) === 0 ? 0 : ff(pos) > 0 ? .5 : -.5, ff(pos) === 0 ? '⊙' : ff(pos) > 0 ? '⊕' : '⊖'], {visible: () => x1.X() >= pos, fontSize: 1, fontUnit: 'em', color: JXG.palette.vermillion, anchorX: 'middle', anchorY: 'middle', cssClass: 'term'});
+        let t = ffboard.create('text', [pos, ff(pos) === 0 ? 0 : ff(pos) > 0 ? .5 : -.5, ff(pos) === 0 ? '⊙' : ff(pos) > 0 ? '⊕' : '⊖'], {visible: () => x1.X() >= pos, fontSize: 1, fontUnit: 'em', color: JXG.palette.vermillion, anchorX: 'middle', anchorY: 'middle', cssClass: 'term', fixed: true});
         lalas.push({p: pos, t: t});
     }
     for (const pos of [0, .88, 3, 5.12, 6]) {
-        var lf = fboard.create('line', [[pos, -1], [pos, 1]], {visible: () => x1.X() >= pos, color: JXG.palette.vermillion, dash: 2});
-        var lff = ffboard.create('line', [[pos, -1], [pos, 1]], {visible: () => x1.X() >= pos, color: JXG.palette.vermillion, dash: 2});
+        var lf = fboard.create('line', [[pos, -1], [pos, 1]], {visible: () => x1.X() >= pos, color: JXG.palette.vermillion, dash: 2, fixed: true});
+        var lff = ffboard.create('line', [[pos, -1], [pos, 1]], {visible: () => x1.X() >= pos, color: JXG.palette.vermillion, dash: 2, fixed: true});
     }
     var wp1 = ffboard.create('point', [.88, ff(.88)], {visible: false, name: '', size: 2, color: JXG.palette.vermillion});
     var wp3 = ffboard.create('point', [5.12, ff(5.12)], {visible: false, name: '', size: 2, color: JXG.palette.vermillion});

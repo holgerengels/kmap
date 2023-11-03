@@ -34,6 +34,8 @@ export class KMapRandomTestCard extends Connected {
   private topic: string = '';
   @property({type: Number})
   private repetitions: number = 1;
+  @property({type: Boolean})
+  private extern: boolean = false;
   @property({type: Number})
   private level: number = 0;
   @property({type: String})
@@ -151,7 +153,7 @@ export class KMapRandomTestCard extends Connected {
         </kmap-test-card-content>
 
         <mwc-button slot="button" ?hidden="${this.repetitions === 1}" @click="${this.init}">Neue Aufgabe</mwc-button>
-        <mwc-button slot="button" @click="${this._showAnswer}">Antwort zeigen</mwc-button>
+        <mwc-button slot="button" @click="${this._showAnswer}">${this.extern ? 'Antwort vergleichen' : 'Antwort zeigen'}</mwc-button>
         <mwc-button slot="button" @click="${this._sendAnswer}">Antwort Abschicken</mwc-button>
 
         <mwc-icon-button slot="icon" icon="info" title="Wissenskarte" @click="${this._card}" id="blinky"></mwc-icon-button>

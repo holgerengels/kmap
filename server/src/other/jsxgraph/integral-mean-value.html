@@ -43,7 +43,7 @@
     var d = (x) => k.Value() * f(x) + (1 - k.Value()) * m;
     var dg = board.create('functiongraph', [d, 0, 5], {strokeWidth: 1, strokeColor: '#888'});
     var hg = board.create('functiongraph', [m], {strokeWidth: 3, dash: 2, strokeColor: '#888'});
-    var b = board.create('line', [[5,0], [5,1]], { dash: 2, color: 'gray'})
+    var b = board.create('line', [[5,0], [5,1]], { dash: 2, color: 'gray', fixed: true})
 
     var s1 = board.create('intersection', [fg, hg, 0], { visible: false });
     var s2 = board.create('intersection', [fg, hg, 1], { visible: false });

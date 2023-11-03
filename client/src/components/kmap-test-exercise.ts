@@ -137,6 +137,7 @@ export class KmapTestExercise extends Connected {
         .key="${this._currentTest.key}"
         .num="${this._currentIndex}" of="${this._tests ? this._tests.length : 0}"
         .repetitions="${this._currentTest.repetitions}"
+        .extern="${this._currentTest.extern}"
         .level="${this._currentTest.level}"
         .question="${this._currentTest.question}"
         .answer="${this._currentTest.answer}"
