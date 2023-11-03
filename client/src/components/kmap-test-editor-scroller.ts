@@ -24,7 +24,10 @@ export class KMapTestEditorScroller extends Connected {
     };
   }
 
-  _select(index) {
+  _select(e: Event) {
+    if (!e.target)
+      return;
+    let index = parseInt((e.target as HTMLElement).getAttribute("i") || "");
     if (this._selectedIndex === index)
       this._selectedIndex = -1;
     else
@@ -87,7 +90,7 @@ export class KMapTestEditorScroller extends Connected {
   <div class="box elevation-01">
     ${this._tests ? html`<div class="scroller">
           ${this._tests.map((test, i) => html`
-            <div class="item font-body" ?activated="${this._selectedIndex === i}" @click="${() => this._select(i)}">${test.key}
+            <div class="item font-body" ?activated="${this._selectedIndex === i}" @click="${this._select}" i="${i}">${test.key}
                 <span class="secondary">${test.chapter} - ${test.topic}</span>
                 <a href="${urls.client}exercise/${encodePath(test.subject, test.chapter, test.topic, test.key)}" target="_blank" rel="noopener noreferrer"><mwc-icon>open_in_new</mwc-icon></a>
                 <mwc-icon @click="${e => { e.stopPropagation(); this._deleteTest(test)}}">delete</mwc-icon>

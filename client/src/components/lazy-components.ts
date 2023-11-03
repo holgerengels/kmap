@@ -16,7 +16,6 @@ export async function lazyComponents(code: string) {
   }
    */
   const lazies = [...code.matchAll(/<([a-z0-9-]+) lazy:([^:]+):([^ >]+)/g)];
-  console.log(lazies)
   for (let i = 0; i < lazies.length; i++) {
     const lazy = lazies[i];
     const tag = lazy[1];
