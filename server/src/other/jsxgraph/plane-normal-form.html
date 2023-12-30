@@ -34,13 +34,13 @@
 <script type='text/javascript'>
     var animating = undefined;
     let r = {};
-    r._value = 1; r.Value = () => r._value;
+    r._value = .5; r.Value = () => r._value;
     let s = {};
-    s._value = 1; s.Value = () => s._value;
+    s._value = -1; s.Value = () => s._value;
 
     var board = JXG.JSXGraph.initBoard('board', { boundingbox: [-8, 8, 8, -8], keepaspectratio: false, axis: false, showNavigation: false, showZoom: false, showCopyright: false, pan: { enabled: false} });
-    var ss = board.create('slider', [[-3, -7.1], [5, -7.1], [-2, 1, 2]], { visible: () => !animating, snapWidth: .1, ticks: { drawLabels: true, label: {fontSize: .9, fontUnit: 'em', offset: [-4, -16]} }, name: 's', digits: 1, label: { fontSize: .9, fontUnit: 'em', cssClass: 'term' }});
-    var rs = board.create('slider', [[-3, -6.1], [5, -6.1], [-2, 1, 2]], { visible: () => !animating, snapWidth: .1, ticks: { drawLabels: true, label: {fontSize: .9, fontUnit: 'em', offset: [-4, -16]} }, name: 'r', digits: 1, label: { fontSize: .9, fontUnit: 'em', cssClass: 'term' }});
+    var rs = board.create('slider', [[-3, -6.1], [5, -6.1], [-1, .5, 1]], { visible: () => !animating, snapWidth: .1, ticks: { drawLabels: true, label: {fontSize: .9, fontUnit: 'em', offset: [-4, -16]} }, name: 'r', digits: 1, label: { fontSize: .9, fontUnit: 'em', cssClass: 'term' }});
+    var ss = board.create('slider', [[-3, -7.1], [5, -7.1], [-2, -1, 2]], { visible: () => !animating, snapWidth: .1, ticks: { drawLabels: true, label: {fontSize: .9, fontUnit: 'em', offset: [-4, -16]} }, name: 's', digits: 1, label: { fontSize: .9, fontUnit: 'em', cssClass: 'term' }});
 
     rs.on('drag', () => { r._value = rs.Value() });
     ss.on('drag', () => { s._value = ss.Value() });
@@ -51,7 +51,7 @@
             animating = setInterval(() => {
                 var millis = +new Date();
                 millis = millis % 10000;
-                r._value = (2 * Math.sin(2 * Math.PI * millis / 10000));
+                r._value = (1 * Math.sin(2 * Math.PI * millis / 10000));
                 s._value = (2 * Math.sin(8 * Math.PI * millis / 10000));
                 board.update();
             }, 50);
@@ -73,14 +73,8 @@
         { xAxis: { visible: true }, yAxis: { visible: true }, zAxis: { visible: true },
             xPlaneRear: {visible: false}, yPlaneRear: {visible: false}, zPlaneRear: {visible: false} });
 
-    const azimuth = (v) => {
-        var s = view.az_slide._smin,
-            e = view.az_slide._smax,
-            sdiff = e - s;
-        view.az_slide.position = ((v - s) / sdiff);
-        view.board.update();
-    }
-    //azimuth(2.8);
+    const scalarProduct = (a, b) => a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
+    const vectorProduct = (a, b) => [a[1]*b[2] - a[2]*b[1], a[2]*b[0] - a[0]*b[2], a[0]*b[1] - a[1]*b[0]];
 
     var x1 = view.create('point3d', [20, 0, 0], { size: 3, name: '', visible: false });
     var x2 = view.create('point3d', [-20, 0, 0], { size: 3, name: '', visible: false });
@@ -98,45 +92,47 @@
 
     let a = [.5, 2, .5];
     let b = [-2, -2, 1];
-    let c = [1, 3, -1];
+    let c = [1, 4, -1];
     var p0 = view.create('point3d', [0, 0, 0], { visible: false });
     var pa = view.create('point3d', a, { size: 3, name: '', visible: false });
     var va = view.create('line3d', [p0, pa], { fixed: true, strokeColor: '#D55E00', strokeWidth: 3, lastArrow: { type: 2, size: 4 } });
     var ta = view.create('point3d', [() => pa.X() / 2, () => pa.Y() / 2, () => pa.Z() / 2 ], { visible: true, size: 0, label: { color: '#D55E00', useKatex: true, autoPosition: false }, name: '\\vec p' });
     var pb = view.create('point3d', [() => pa.X() + b[0], () => pa.Y() + b[1], () => pa.Z() + b[2]], { size: 3, name: '', visible: false });
-    var vb = view.create('line3d', [pa, pb], { fixed: true, strokeColor: JXG.palette.orange, strokeWidth: 3, lastArrow: { type: 2, size: 4 } });
-    var tb = view.create('point3d', [() => pa.X() + (pb.X() - pa.X()) / 2, () => pa.Y() + (pb.Y() - pa.Y()) / 2, () => pa.Z() + (pb.Z() - pa.Z()) / 2 ], { visible: true, size: 0, label: { color: 'red', useKatex: true, autoPosition: false }, name: '\\vec u' });
     var pc = view.create('point3d', [() => pa.X() + c[0], () => pa.Y() + c[1], () => pa.Z() + c[2]], { size: 3, name: '', visible: false });
-    var vc = view.create('line3d', [pa, pc], { fixed: true, strokeColor: JXG.palette.orange, strokeWidth: 3, lastArrow: { type: 2, size: 4 } });
-    var tc = view.create('point3d', [() => pa.X() + (pc.X() - pa.X()) / 2, () => pa.Y() + (pc.Y() - pa.Y()) / 2, () => pa.Z() + (pc.Z() - pa.Z()) / 2 ], { visible: true, size: 0, label: { color: 'red', useKatex: true, autoPosition: false }, name: '\\vec v' });
-    var px = view.create('point3d', [() => pa.X() + r.Value() * (pb.X() - pa.X()) + s.Value() * (pc.X() - pa.X()), () => pa.Y() + r.Value() * (pb.Y() - pa.Y()) + s.Value() * (pc.Y() - pa.Y()), () => pa.Z() + r.Value() * (pb.Z() - pa.Z()) + s.Value() * (pc.Z() - pa.Z())], { size: 4, name: '', visible: true });
+    var px = view.create('point3d', [() => pa.X() + r.Value() * (-3) + s.Value() * (-3), () => pa.Y() + r.Value() * (6) + s.Value() * (0), () => pa.Z() + r.Value() * (0) + s.Value() * (1)], { size: 4, name: '', visible: true });
     var vx = view.create('line3d', [p0, px], { fixed: true, strokeColor: 'darkgray', strokeWidth: 3, dash: 2, lastArrow: { type: 2, size: 4 } });
     var tx = view.create('point3d', [() => px.X() / 2, () => px.Y() / 2, () => px.Z() / 2 ], { visible: true, size: 0, label: { color: 'black', useKatex: true }, name: '\\vec x' });
+    var vax = view.create('line3d', [pa, px], { fixed: true, strokeColor: JXG.palette.orange, strokeWidth: 3, lastArrow: { type: 2, size: 4 } });
 
-    var p1 = view.create('point3d', [() => pa.X() + 10 * (pb.X() - pa.X()), () => pa.Y() + 10 * (pb.Y() - pa.Y()), () => pa.Z() + 10 * (pb.Z() - pa.Z())], { size: 3, name: '', visible: true });
-    var p2 = view.create('point3d', [() => pa.X() - 10 * (pb.X() - pa.X()), () => pa.Y() - 10 * (pb.Y() - pa.Y()), () => pa.Z() - 10 * (pb.Z() - pa.Z())], { size: 3, name: '', visible: true });
-
-    var plane = view.create('plane3d', [[() => pa.X(), () => pa.Y(), () => pa.Z()], [() => pb.X() - pa.X(), () => pb.Y() - pa.Y(), () => pb.Z() - pa.Z()], [() => pc.X() - pa.X(), () => pc.Y() - pa.Y(), () => pc.Z() - pa.Z()], [-10, 10], [-10, 10]], {
+    var plane = view.create('plane3d', [[() => pa.X(), () => pa.Y(), () => pa.Z()], [-3, 6, 0], [-3, 0, 1], [-10, 10], [-10, 10]], {
         fillColor: JXG.palette.yellow, strokeWidth: 1, strokeColor: '#888888', strokeOpacity: 0.5, mesh3d: { visible: false }
     });
+    var pn = view.create('point3d', [() => pa.X() + 2*plane.normal[0], () => pa.Y() + 2*plane.normal[1], () => pa.Z() + 2*plane.normal[2]], { size: 3, name: '', visible: false });
+    var tn = view.create('point3d', [() => pa.X() + (pn.X() - pa.X()) / 2, () => pa.Y() + (pn.Y() - pa.Y()) / 2, () => pa.Z() + (pn.Z() - pa.Z()) / 2 ], { visible: true, size: 0, label: { color: 'red', useKatex: true, autoPosition: false }, name: '\\vec n' });
 
-    let bn = JXG.Math.norm(b);
-    let cn = JXG.Math.norm(c);
+    var psx = view.create('point3d', [() => scalarProduct([pa.X(), pa.Y(), pa.Z()], [pn.X() - pa.X(), pn.Y() - pa.Y(), pn.Z() - pa.Z()]) / (pn.X() - pa.X()), 0, 0], { size: 3, name: '', visible: false });
+    var psy = view.create('point3d', [0, () => scalarProduct([pa.X(), pa.Y(), pa.Z()], [pn.X() - pa.X(), pn.Y() - pa.Y(), pn.Z() - pa.Z()]) / (pn.Y() - pa.Y()), 0], { size: 3, name: '', visible: false });
+    var psz = view.create('point3d', [0, 0, () => scalarProduct([pa.X(), pa.Y(), pa.Z()], [pn.X() - pa.X(), pn.Y() - pa.Y(), pn.Z() - pa.Z()]) / (pn.Z() - pa.Z())], { size: 3, name: '', visible: false });
+
+    var lxy = view.create('line3d', [psx, psy], { fixed: true, strokeColor: JXG.palette.orange, strokeWidth: 3, strokeOpacity: .5 });
+    var lyz = view.create('line3d', [psy, psz], { fixed: true, strokeColor: JXG.palette.orange, strokeWidth: 3, strokeOpacity: .5 });
+    var lzx = view.create('line3d', [psz, psx], { fixed: true, strokeColor: JXG.palette.orange, strokeWidth: 3, strokeOpacity: .5 });
+
+    var vn = view.create('line3d', [pa, pn], { fixed: true, strokeColor: JXG.palette.darkblue, strokeWidth: 3, lastArrow: { type: 2, size: 4 } });
+
+    let n12 = JXG.Math.norm([-3, 6, 0]);
+    let n13 = JXG.Math.norm([-3,0,1]);
     var cx = view.create('curve3d', [
-        (t) => px.X() + .7 * Math.cos(t) * b[0]/bn + .7 * Math.sin(t) * c[0]/cn,
-        (t) => px.Y() + .7 * Math.cos(t) * b[1]/bn + .7 * Math.sin(t) * c[1]/cn,
-        (t) => px.Z() + .7 * Math.cos(t) * b[2]/bn + .7 * Math.sin(t) * c[2]/cn,
+        (t) => px.X() + .7 * Math.cos(t) * -3/n12 + .7 * Math.sin(t) * -3/n13,
+        (t) => px.Y() + .7 * Math.cos(t) * 6/n12 + .7 * Math.sin(t) * 0/n13,
+        (t) => px.Z() + .7 * Math.cos(t) * 0/n12 + .7 * Math.sin(t) * 1/n13,
         [0, 2* Math.PI]], { strokeWidth: 3, visible: true, strokeColor: JXG.palette.orange });
 
-    var px1 = view.create('point3d', [() => view.intersectionPlanePlane(plane, planex)[0]], { visible: false });
-    var px2 = view.create('point3d', [() => view.intersectionPlanePlane(plane, planex)[1]], { visible: false });
-    var lx = view.create('line3d', [px1, px2], { strokeColor: JXG.palette.red, strokeWidth: 2, strokeOpacity: 0.5, straightFirst: true, straightLast: true });
-    var py1 = view.create('point3d', [() => view.intersectionPlanePlane(plane, planey)[0]], { visible: false });
-    var py2 = view.create('point3d', [() => view.intersectionPlanePlane(plane, planey)[1]], { visible: false });
-    var ly = view.create('line3d', [py1, py2], { strokeColor: JXG.palette.green, strokeWidth: 2, strokeOpacity: 0.5, straightFirst: true, straightLast: true });
-    var pz1 = view.create('point3d', [() => view.intersectionPlanePlane(plane, planez)[0]], { visible: false });
-    var pz2 = view.create('point3d', [() => view.intersectionPlanePlane(plane, planez)[1]], { visible: false });
-    var lz = view.create('line3d', [pz1, pz2], { strokeColor: JXG.palette.blue, strokeWidth: 2, strokeOpacity: 0.5, straightFirst: true, straightLast: true });
+    var angle = view.create('curve3d', [
+        (t) => pa.X() + .7 * Math.cos(t) * (px.X() - pa.X())/JXG.Math.norm([px.X() - pa.X(), px.Y() - pa.Y(), px.Z() - pa.Z()]) + .7 * Math.sin(t) * plane.normal[0],
+        (t) => pa.Y() + .7 * Math.cos(t) * (px.Y() - pa.Y())/JXG.Math.norm([px.X() - pa.X(), px.Y() - pa.Y(), px.Z() - pa.Z()]) + .7 * Math.sin(t) * plane.normal[1],
+        (t) => pa.Z() + .7 * Math.cos(t) * (px.Z() - pa.Z())/JXG.Math.norm([px.X() - pa.X(), px.Y() - pa.Y(), px.Z() - pa.Z()]) + .7 * Math.sin(t) * plane.normal[2],
+        [0, 1/2*Math.PI]], { strokeWidth: 3, visible: true, strokeColor: JXG.palette.darkblue });
 
     //var text = board.create('text', [7.5, 7.5, () => `E: \\vec x = \\textcolor{#D55E00}{\\begin{pmatrix} ${a[0]} \\\\ ${a[1]} \\\\ ${a[2]} \\end{pmatrix}} + r \\cdot \\textcolor{#0072B2}{\\begin{pmatrix} ${b[0]} \\\\ ${b[1]}  \\\\ ${b[2]} \\end{pmatrix}} + s \\cdot \\textcolor{#0072B2}{\\begin{pmatrix} ${c[0]} \\\\ ${c[1]}  \\\\ ${c[2]} \\end{pmatrix}}`], { visible: true, size: 0, useKatex: true, cssClass: 'term', anchorX: 'right', anchorY: 'top' });
 </script>

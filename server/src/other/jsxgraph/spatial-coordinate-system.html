@@ -33,13 +33,16 @@
 
 <script type='text/javascript'>
     var board = JXG.JSXGraph.initBoard('board', { boundingbox: [-8, 8, 8, -8], keepaspectratio: false, axis: false, showNavigation: false, showZoom: false, showCopyright: false, pan: { enabled: false} });
-    let box = [-4, 6];
+    let box = [-5, 5];
     var view = board.create('view3d',
         [
             [-6, -3], [8, 8], // 2D box of view
             [box, box, box]   // 3D bounding cube
-        ],
-        {});
+        ], {});
+
+    var px = view.create('point3d', [5, 0, 0], { visible: true, size: 0, name: 'x₁', label: { cssClass: 'term' } });
+    var py = view.create('point3d', [0, 5, 0], { visible: true, size: 0, name: 'x₂', label: { cssClass: 'term' } });
+    var pz = view.create('point3d', [0, 0, 5], { visible: true, size: 0, name: 'x₃', label: { cssClass: 'term' } });
 
     var pa = view.create('point3d', [2, 2, 2], { visible: true, name: '', snapSizeX: .5, snapSizeY: .5, size: 5, color: '#D55E00' });
 </script>

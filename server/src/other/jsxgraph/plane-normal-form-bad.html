@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <title>Ebene in Parameterform 3D</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <link rel='stylesheet' type='text/css' href='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraph.css'/>
+    <script src='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraphcore.js' type='text/javascript'></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js" crossorigin="anonymous"></script>
+
+    <style>
+        body {
+            margin: 0px;
+            padding: 0px;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr;
+        }
+        .jxgbox { border-radius: 0px; border: none}
+        .term { background-color: white }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id='board' class='jxgbox' style='width: 100%; aspect-ratio: 1'></div>
+</div>
+
+<script type='text/javascript'>
+    var animating = undefined;
+    let r = {};
+    r._value = 1; r.Value = () => r._value;
+    let s = {};
+    s._value = 1; s.Value = () => s._value;
+
+    var board = JXG.JSXGraph.initBoard('board', { boundingbox: [-8, 8, 8, -8], keepaspectratio: false, axis: false, showNavigation: false, showZoom: false, showCopyright: false, pan: { enabled: false} });
+
+    let box = [-6, 6];
+    var view = board.create('view3d',
+        [
+            [-6, -3], [8, 8], // 2D box of view
+            [box, box, box]   // 3D bounding cube
+        ],
+        { xAxis: { visible: true }, yAxis: { visible: true }, zAxis: { visible: true },
+            xPlaneRear: {visible: false}, yPlaneRear: {visible: false}, zPlaneRear: {visible: false} });
+
+    const scalarProduct = (a, b) => a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
+    const vectorProduct = (a, b) => [a[1]*b[2] - a[2]*b[1], a[2]*b[0] - a[0]*b[2], a[0]*b[1] - a[1]*b[0]];
+
+    var x1 = view.create('point3d', [20, 0, 0], { size: 3, name: '', visible: false });
+    var x2 = view.create('point3d', [-20, 0, 0], { size: 3, name: '', visible: false });
+    var gx = view.create('line3d', [x1, x2], { fixed: true, strokeColor: 'lightgray' });
+    var y1 = view.create('point3d', [0, 20, 0], { size: 3, name: '', visible: false });
+    var y2 = view.create('point3d', [0, -20, 0], { size: 3, name: '', visible: false });
+    var gy = view.create('line3d', [y1, y2], { fiyed: true, strokeColor: 'lightgray' });
+    var z1 = view.create('point3d', [0, 0, 20], { size: 3, name: '', visible: false });
+    var z2 = view.create('point3d', [0, 0, -20], { size: 3, name: '', visible: false });
+    var gz = view.create('line3d', [z1, z2], { fized: true, strokeColor: 'lightgray' });
+
+    var planex = view.create('plane3d', [[0, 0, 0], [0, 1, 0], [0, 0, 1]], { fillColor: JXG.palette.red, strokeColor: '#888888', strokeOpacity: 0.5, mesh3d: { visible: false } });
+    var planey = view.create('plane3d', [[0, 0, 0], [1, 0, 0], [0, 0, 1]], { fillColor: JXG.palette.green, strokeColor: '#888888', strokeOpacity: 0.5, mesh3d: { visible: false } });
+    var planez = view.create('plane3d', [[0, 0, 0], [0, 1, 0], [1, 0, 0]], { fillColor: JXG.palette.blue, strokeColor: '#888888', strokeOpacity: 0.5, mesh3d: { visible: false } });
+
+    let a = [1, 2, 1];
+    let b = [4, 6, 4];
+    var p0 = view.create('point3d', [0, 0, 0], { visible: false });
+    var pa = view.create('point3d', a, { size: 3, name: '', visible: true });
+    var va = view.create('line3d', [p0, pa], { fixed: true, strokeColor: '#D55E00', strokeWidth: 3, lastArrow: { type: 2, size: 4 } });
+    var ta = view.create('point3d', [() => pa.X() / 2, () => pa.Y() / 2, () => pa.Z() / 2 ], { visible: true, size: 0, label: { color: '#D55E00', useKatex: true, autoPosition: false }, name: '\\vec p' });
+    var pb = view.create('point3d', b, { size: 3, name: '', visible: true });
+    var vb = view.create('line3d', [pa, pb], { fixed: true, strokeColor: JXG.palette.orange, strokeWidth: 3, lastArrow: { type: 2, size: 4 } });
+    var tb = view.create('point3d', [() => pa.X() + (pb.X() - pa.X()) / 2, () => pa.Y() + (pb.Y() - pa.Y()) / 2, () => pa.Z() + (pb.Z() - pa.Z()) / 2 ], { visible: true, size: 0, label: { color: 'red', useKatex: true, autoPosition: false }, name: '\\vec n' });
+
+    var px = view.create('point3d', [() => scalarProduct([pa.X(), pa.Y(), pa.Z()], [pb.X() - pa.X(), pb.Y() - pa.Y(), pb.Z() - pa.Z()]) / (pb.X() - pa.X()), 0, 0], { size: 3, name: '', visible: false });
+    var py = view.create('point3d', [0, () => scalarProduct([pa.X(), pa.Y(), pa.Z()], [pb.X() - pa.X(), pb.Y() - pa.Y(), pb.Z() - pa.Z()]) / (pb.Y() - pa.Y()), 0], { size: 3, name: '', visible: false });
+    var pz = view.create('point3d', [0, 0, () => scalarProduct([pa.X(), pa.Y(), pa.Z()], [pb.X() - pa.X(), pb.Y() - pa.Y(), pb.Z() - pa.Z()]) / (pb.Z() - pa.Z())], { size: 3, name: '', visible: false });
+
+    var lxy = view.create('line3d', [px, py], { fixed: true, strokeColor: JXG.palette.orange, strokeWidth: 3 });
+    var lyz = view.create('line3d', [py, pz], { fixed: true, strokeColor: JXG.palette.orange, strokeWidth: 3 });
+    var lzx = view.create('line3d', [pz, px], { fixed: true, strokeColor: JXG.palette.orange, strokeWidth: 3 });
+
+    var plane = view.create('plane3d', [[() => px.X(), 0, 0],
+        [() => -px.X(), () => py.Y(), 0],
+        [() => -px.X(), 0, () => pz.Z()],
+        [-10 + px.X()/2, 10 + px.X()/2], [-10 + py.Y()/2, 10 + py.Y()/2]], {
+        fillColor: JXG.palette.yellow, strokeWidth: 1, strokeColor: '#888888', strokeOpacity: 0.5, mesh3d: { visible: false }
+    });
+
+    //var text = board.create('text', [7.5, 7.5, () => `E: \\vec x = \\textcolor{#D55E00}{\\begin{pmatrix} ${a[0]} \\\\ ${a[1]} \\\\ ${a[2]} \\end{pmatrix}} + r \\cdot \\textcolor{#0072B2}{\\begin{pmatrix} ${b[0]} \\\\ ${b[1]}  \\\\ ${b[2]} \\end{pmatrix}} + s \\cdot \\textcolor{#0072B2}{\\begin{pmatrix} ${c[0]} \\\\ ${c[1]}  \\\\ ${c[2]} \\end{pmatrix}}`], { visible: true, size: 0, useKatex: true, cssClass: 'term', anchorX: 'right', anchorY: 'top' });
+</script>
+
+</body>
+</html>

@@ -33,6 +33,7 @@
 </div>
 
 <script type='text/javascript'>
+    var vbx = 1, vby = 2;
     var board = JXG.JSXGraph.initBoard('board', {boundingbox: [-4, 7, 7, -4], axis: true, showNavigation: false, showZoom: false, showCopyright: false, pan: { enabled: false}});
     var p0 = board.create('point', [0, 0], { visible: false });
     var pa = board.create('point', [2, 1], { visible: true, name: '', snapToGrid: true, snapSizeX: .5, snapSizeY: .5, face: 'cross', size: 3, showInfobox: false });
@@ -45,6 +46,14 @@
     //    name: () => '\\textcolor{#0072B2}{\\begin{pmatrix} ' + (pb.X() - pa.X()) + ' \\\\ ' + (pb.Y() - pa.Y()) + ' \\end{pmatrix}}' });
     var vc = board.create('line', [p0, pb], { fixed: true, strokeOpacity: .8, strokeColor: 'darkgray', straightFirst: false, straightLast: false, lastArrow: { type: 2, size: 6 } });
     var t = board.create('text', [.5, 6, () => '\\textcolor{#D55E00}{\\begin{pmatrix} ' + pa.X() + ' \\\\ ' + pa.Y() + ' \\end{pmatrix}} + \\textcolor{#0072B2}{\\begin{pmatrix} ' + (pb.X() - pa.X()) + ' \\\\ ' + (pb.Y() - pa.Y()) + ' \\end{pmatrix}} = \\begin{pmatrix} ' + pb.X() + ' \\\\ ' + pb.Y() + ' \\end{pmatrix}'], { visible: true, size: 0, useKatex: true, cssClass: 'term' });
+
+    pa.on('drag', () => {
+        pb.moveTo([pa.X() + vbx, pa.Y() + vby]);
+    });
+    pb.on('drag', () => {
+        vbx = pb.X() - pa.X();
+        vby = pb.Y() - pa.Y();
+    });
 </script>
 
 </body>

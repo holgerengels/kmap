@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <title>Räumliches Koordinatensystem</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <link rel='stylesheet' type='text/css' href='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraph.css'/>
+    <script src='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraphcore.js' type='text/javascript'></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js" crossorigin="anonymous"></script>
+
+    <style>
+        body {
+            margin: 0px;
+            padding: 0px;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr;
+        }
+        .jxgbox { border-radius: 0px; border: none}
+        .term { background-color: white }
+        #controls {
+            font-family: sans-serif;
+        }
+        #controls span { white-space: nowrap }
+        #controls input { width: 2.5em; border: 1px solid lightgray }
+        #controls button { border: 1px solid lightgray; border-radius: 4px; background-color: white; padding: 2px 4px 2px 4px }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="controls">
+        <span>x<sub>1</sub> ∈ [<input id="xa" value="-6" type="number" step="1" pattern="\d+" inputmode="numeric"/>; <input id="xb" value="6" type="number" step="1" pattern="\d+" inputmode="numeric"/>]</span>&nbsp;
+        <span>x<sub>2</sub> ∈ [<input id="ya" value="-4" type="number" step="1" pattern="\d+" inputmode="numeric"/>; <input id="yb" value="4" type="number" step="1" pattern="\d+" inputmode="numeric"/>]</span>&nbsp;
+        <span>x<sub>3</sub> ∈ [<input id="za" value="-4" type="number" step="1" pattern="\d+" inputmode="numeric"/>; <input id="zb" value="4" type="number" step="1" pattern="\d+" inputmode="numeric"/>]</span>
+        <button onclick="svg()">SVG&nbsp;↓</button>
+        <button onclick="png()">PNG&nbsp;↓</button>
+    </div>
+    <br/>
+    <div id='board' class='jxgbox' style='width: 100%; max-width: 600px; aspect-ratio: 1'></div>
+</div>
+
+<script type='text/javascript'>
+    var board = JXG.JSXGraph.initBoard('board', { boundingBox: [-4.1, 4.1, 4.1, -4.1], axis: true, showNavigation: false, showZoom: false, showCopyright: false, pan: { enabled: false}, defaultAxes: {
+            x: {
+                withLabel: true,
+                name: 'x₂',
+                label: { position: 'rt', offset: [-5, -15], display: 'internal', fixed: false },
+                ticks: { insertTicks: false, ticksDistance: 1 }
+            },
+            y: {
+                withLabel: true,
+                name: 'x₃',
+                label: { position: 'rt', offset: [-20, -0], display: 'internal' },
+                ticks: { insertTicks: false, ticksDistance: 1 }
+            }
+        } });
+
+    var xa = -6, xb = 6;
+    var ya = -4, yb = 4;
+    var za = -4, zb = 4;
+
+    var axis = board.create('segment', [[() => -xa/2, () => -xa/2], [() => -xb/2, () => -xb/2]], { lastArrow: true, strokeWidth: 1.5, color: '#666666', fixed: true });
+    var ticks = board.create('ticks', [axis], { drawZero: false, scale: Math.sqrt(2)/2, ticksDistance: 1, drawLabels: true, anchor: 'middle', minorTicks: 0, majorHeight: 10, insertTicks: false,
+        display: 'internal', label: { anchorX: 'middle', anchorY: 'top', offset: [10, 0], display: 'internal' }});
+    var at = board.create('point', [() => -xb/2, () => -xb/2], { size: 0, name: 'x₁', anchorX: 'left', anchorY: 'middle', cssClass: 'term', fixed: true, label: { offset: [15, 5], display: 'internal'} });
+
+    var right = board.create('line', [[() => yb, () => za], [() => yb, () => zb]], { color: 'lightgray', strokeWidth: 1})
+    var bottom = board.create('line', [[() => ya, () => zb], [() => yb, () => zb]], { color: 'lightgray', strokeWidth: 1})
+
+    document.getElementById('controls').addEventListener('change', (e) => {
+        board.suspendUpdate();
+        board.removeObject(ticks);
+        var id = e.target.id;
+        var val = parseInt(e.target.value);
+        switch (id) {
+            case 'xa': xa = val; break;
+            case 'xb': xb = val; break;
+            case 'ya': ya = val; break;
+            case 'yb': yb = val; break;
+            case 'za': za = val; break;
+            case 'zb': zb = val; break;
+        }
+        board.setBoundingBox([Math.min(-xb/2, ya) - .1, Math.max(-xa/2, zb) + .1, Math.max(-xa/2, yb) + .1, Math.min(-xb/2, za) - .1]);
+        //requestAnimationFrame(() => ticks.update())
+        ticks = board.create('ticks', [axis], { drawZero: false, scale: Math.sqrt(2)/2, ticksDistance: 1, drawLabels: true, anchor: 'middle', minorTicks: 0, majorHeight: 10, insertTicks: false,
+            display: 'internal', label: { anchorX: 'middle', anchorY: 'top', offset: [10, 0], display: 'internal' }});
+        board.unsuspendUpdate();
+    });
+
+    function svg() {
+        const svgEl = board.renderer.svgRoot;
+        svgEl.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+        var svgData = svgEl.outerHTML;
+        var preface = '<?xml version="1.0" standalone="no"?>\r\n';
+        var svgBlob = new Blob([preface, svgData], {type:"image/svg+xml;charset=utf-8"});
+        var svgUrl = URL.createObjectURL(svgBlob);
+        var downloadLink = document.createElement("a");
+        downloadLink.href = svgUrl;
+        downloadLink.download = 'Koordinatensystem.svg';
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+    }
+
+    function png() {
+        const svgEl = board.renderer.svgRoot;
+        svgEl.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+        var svgData = svgEl.outerHTML;
+        var preface = '<?xml version="1.0" standalone="no"?>\r\n';
+        var svgBlob = new Blob([preface, svgData], {type:"image/svg+xml;charset=utf-8"});
+
+        var canvas = document.createElement("canvas");
+        canvas.width = 1200;
+        canvas.height = 1200;
+        var context = canvas.getContext("2d");
+        var image = new Image();
+        image.onload = function () {
+            context.drawImage(image, 0, 0, svgEl.clientWidth, svgEl.clientHeight, 0, 0, 1200, 1200)
+            var downloadLink = document.createElement("a");
+            downloadLink.href = canvas.toDataURL("image/png");
+            downloadLink.download = 'Koordinatensystem.png';
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+        }.bind(this);
+
+        image.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(preface + svgData)));
+    }
+</script>
+
+</body>
+</html>
