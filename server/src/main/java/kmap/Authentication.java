@@ -24,7 +24,7 @@ public class Authentication {
 
     public Authentication(Properties properties) {
         this.properties = properties;
-        ExtendedTrustManager.getInstance(properties);
+        //ExtendedTrustManager.getInstance(properties);
     }
 
     private Map<String, Account> getCSV() {
