@@ -14,8 +14,13 @@ import javax.naming.directory.Attributes;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.*;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -57,6 +62,8 @@ public class PaedMLConnection
         env.put("java.naming.ldap.version", "3");
         env.put(Context.PROVIDER_URL, getProperty("paedml.url"));
         env.put(Context.SECURITY_AUTHENTICATION, "simple");
+
+        testSSLConnection();
     }
 
     private LdapContext authContext(String user, String password) throws NamingException {
@@ -279,9 +286,10 @@ public class PaedMLConnection
     }
 
     public static void main(String[] args) throws IOException {
+        System.out.println("args = " + Arrays.asList(args));
         Properties properties = new Properties();
         properties.load(new FileInputStream(args[0]));
-        ExtendedTrustManager.getInstance(properties);
+        //ExtendedTrustManager.getInstance(properties);
         PaedMLConnection connection = new PaedMLConnection(properties);
         Set<String> roles = connection.doauthenticate(properties.getProperty("paedml.testuser"), properties.getProperty("paedml.testpassword"));
         System.out.println("roles = " + roles);
@@ -293,5 +301,28 @@ public class PaedMLConnection
         System.out.println("filtered = " + filtered);
         List<JsonObject> clazz = connection.expandClass("GYM02E");
         System.out.println("clazz = " + clazz);
+    }
+
+    void testSSLConnection() {
+        try {
+            URL url = new URL(getProperty("paedml.url"));
+
+            SSLSocketFactory sslsocketfactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
+            SSLSocket sslsocket = (SSLSocket) sslsocketfactory.createSocket(url.getHost(), url.getPort());
+
+            InputStream in = sslsocket.getInputStream();
+            OutputStream out = sslsocket.getOutputStream();
+
+            // Write a test byte to get a reaction :)
+            out.write(1);
+
+            while (in.available() > 0) {
+                System.out.print(in.read());
+            }
+            System.out.println("Successfully connected");
+
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
     }
 }
