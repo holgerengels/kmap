@@ -305,22 +305,28 @@ public class PaedMLConnection
 
     void testSSLConnection() {
         try {
-            URL url = new URL(getProperty("paedml.url"));
+            String url = getProperty("paedml.url");
+            if (url.startsWith("ldaps://")) {
+                url = url.substring("ldaps://".length());
 
-            SSLSocketFactory sslsocketfactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
-            SSLSocket sslsocket = (SSLSocket) sslsocketfactory.createSocket(url.getHost(), url.getPort());
-
-            InputStream in = sslsocket.getInputStream();
-            OutputStream out = sslsocket.getOutputStream();
-
-            // Write a test byte to get a reaction :)
-            out.write(1);
-
-            while (in.available() > 0) {
-                System.out.print(in.read());
+                int pos = url.indexOf(":");
+                String host = url.substring(0, pos);
+                String port = url.substring(pos + 1);
+                System.out.println("host = " + host);
+                System.out.println("port = " + port);
+                SSLSocketFactory sslsocketfactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
+                InputStream in;
+                OutputStream out;
+                try (SSLSocket sslsocket = (SSLSocket) sslsocketfactory.createSocket(host, Integer.parseInt(port))) {
+                    in = sslsocket.getInputStream();
+                    out = sslsocket.getOutputStream();
+                    out.write(1);
+                }
+                while (in.available() > 0) {
+                    System.out.print(in.read());
+                }
+                System.out.println("Successfully connected");
             }
-            System.out.println("Successfully connected");
-
         } catch (Exception exception) {
             exception.printStackTrace();
         }
