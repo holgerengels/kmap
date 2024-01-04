@@ -308,12 +308,13 @@ public class PaedMLConnection
             String url = getProperty("paedml.url");
             if (url.startsWith("ldaps://")) {
                 url = url.substring("ldaps://".length());
-
                 int pos = url.indexOf(":");
                 String host = url.substring(0, pos);
                 String port = url.substring(pos + 1);
                 System.out.println("host = " + host);
                 System.out.println("port = " + port);
+                System.out.println("trustStore = " + System.getProperty("javax.net.ssl.trustStore"));
+
                 SSLSocketFactory sslsocketfactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
                 InputStream in;
                 OutputStream out;
