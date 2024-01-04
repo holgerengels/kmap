@@ -159,6 +159,7 @@ public class Authentication {
             return roles;
         }
         catch (FirebaseAuthException e) {
+            e.printStackTrace();
             return null;
         }
     }
