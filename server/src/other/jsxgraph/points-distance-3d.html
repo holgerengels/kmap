@@ -39,7 +39,7 @@
             [-6, -3], [8, 8], // 2D box of view
             [box, box, box]   // 3D bounding cube
         ],
-        {});
+        { az: { slider: { visible: false } }, el: { slider: { visible: false } } });
 
     var pa = view.create('point3d', [-2, -2, -2], { visible: true, name: '', snapSizeX: .5, snapSizeY: .5, size: 5, color: '#D55E00' });
     var pb = view.create('point3d', [2, 1, 1], { visible: true, name: '', snapSizeX: .5, snapSizeY: .5, size: 5, color: '#D55E00' });

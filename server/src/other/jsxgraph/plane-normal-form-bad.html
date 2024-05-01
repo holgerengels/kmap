@@ -47,7 +47,8 @@
             [box, box, box]   // 3D bounding cube
         ],
         { xAxis: { visible: true }, yAxis: { visible: true }, zAxis: { visible: true },
-            xPlaneRear: {visible: false}, yPlaneRear: {visible: false}, zPlaneRear: {visible: false} });
+            xPlaneRear: {visible: false}, yPlaneRear: {visible: false}, zPlaneRear: {visible: false},
+            az: { slider: { visible: false } }, el: { slider: { visible: false } } });
 
     const scalarProduct = (a, b) => a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
     const vectorProduct = (a, b) => [a[1]*b[2] - a[2]*b[1], a[2]*b[0] - a[0]*b[2], a[0]*b[1] - a[1]*b[0]];

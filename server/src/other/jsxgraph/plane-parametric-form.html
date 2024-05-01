@@ -71,7 +71,8 @@
             [box, box, box]   // 3D bounding cube
         ],
         { xAxis: { visible: true }, yAxis: { visible: true }, zAxis: { visible: true },
-            xPlaneRear: {visible: false}, yPlaneRear: {visible: false}, zPlaneRear: {visible: false} });
+            xPlaneRear: {visible: false}, yPlaneRear: {visible: false}, zPlaneRear: {visible: false},
+            az: { slider: { visible: false } }, el: { slider: { visible: false } } });
 
     const azimuth = (v) => {
         var s = view.az_slide._smin,

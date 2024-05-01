@@ -71,7 +71,8 @@
             [box, box, box]   // 3D bounding cube
         ],
         { xAxis: { visible: true }, yAxis: { visible: true }, zAxis: { visible: true },
-            xPlaneRear: {visible: false}, yPlaneRear: {visible: false}, zPlaneRear: {visible: false} });
+            xPlaneRear: {visible: false}, yPlaneRear: {visible: false}, zPlaneRear: {visible: false},
+            az: { slider: { visible: false } }, el: { slider: { visible: false } } });
 
     const scalarProduct = (a, b) => a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
     const vectorProduct = (a, b) => [a[1]*b[2] - a[2]*b[1], a[2]*b[0] - a[0]*b[2], a[0]*b[1] - a[1]*b[0]];
@@ -128,12 +129,14 @@
         (t) => px.Z() + .7 * Math.cos(t) * 0/n12 + .7 * Math.sin(t) * 1/n13,
         [0, 2* Math.PI]], { strokeWidth: 3, visible: true, strokeColor: JXG.palette.orange });
 
-    var angle = view.create('curve3d', [
-        (t) => pa.X() + .7 * Math.cos(t) * (px.X() - pa.X())/JXG.Math.norm([px.X() - pa.X(), px.Y() - pa.Y(), px.Z() - pa.Z()]) + .7 * Math.sin(t) * plane.normal[0],
-        (t) => pa.Y() + .7 * Math.cos(t) * (px.Y() - pa.Y())/JXG.Math.norm([px.X() - pa.X(), px.Y() - pa.Y(), px.Z() - pa.Z()]) + .7 * Math.sin(t) * plane.normal[1],
-        (t) => pa.Z() + .7 * Math.cos(t) * (px.Z() - pa.Z())/JXG.Math.norm([px.X() - pa.X(), px.Y() - pa.Y(), px.Z() - pa.Z()]) + .7 * Math.sin(t) * plane.normal[2],
+    const cangle = (m, a, b) => view.create('curve3d', [
+        (t) => m.X() + .7 * Math.cos(t) * (a.X() - m.X())/JXG.Math.norm([a.X() - m.X(), a.Y() - m.Y(), a.Z() - m.Z()]) + .7 * Math.sin(t) * (b.X() - m.X())/JXG.Math.norm([b.X() - m.X(), b.Y() - m.Y(), b.Z() - m.Z()]),
+        (t) => m.Y() + .7 * Math.cos(t) * (a.Y() - m.Y())/JXG.Math.norm([a.X() - m.X(), a.Y() - m.Y(), a.Z() - m.Z()]) + .7 * Math.sin(t) * (b.Y() - m.Y())/JXG.Math.norm([b.X() - m.X(), b.Y() - m.Y(), b.Z() - m.Z()]),
+        (t) => m.Z() + .7 * Math.cos(t) * (a.Z() - m.Z())/JXG.Math.norm([a.X() - m.X(), a.Y() - m.Y(), a.Z() - m.Z()]) + .7 * Math.sin(t) * (b.Z() - m.Z())/JXG.Math.norm([b.X() - m.X(), b.Y() - m.Y(), b.Z() - m.Z()]),
         [0, 1/2*Math.PI]], { strokeWidth: 3, visible: true, strokeColor: JXG.palette.darkblue });
 
+    var pnn = view.create('point3d', [pa.X() + plane.normal[0], pa.Y() + plane.normal[1], pa.Z() + plane.normal[2]], { size: 3, name: '', visible: false });
+    cangle(pa, px, pnn)
     //var text = board.create('text', [7.5, 7.5, () => `E: \\vec x = \\textcolor{#D55E00}{\\begin{pmatrix} ${a[0]} \\\\ ${a[1]} \\\\ ${a[2]} \\end{pmatrix}} + r \\cdot \\textcolor{#0072B2}{\\begin{pmatrix} ${b[0]} \\\\ ${b[1]}  \\\\ ${b[2]} \\end{pmatrix}} + s \\cdot \\textcolor{#0072B2}{\\begin{pmatrix} ${c[0]} \\\\ ${c[1]}  \\\\ ${c[2]} \\end{pmatrix}}`], { visible: true, size: 0, useKatex: true, cssClass: 'term', anchorX: 'right', anchorY: 'top' });
 </script>
 

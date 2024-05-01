@@ -82,7 +82,8 @@
             [box, box, box]   // 3D bounding cube
         ],
         { xAxis: { visible: false }, yAxis: { visible: false }, zAxis: { visible: false },
-            xPlaneRear: {visible: true}, yPlaneRear: {visible: true}, zPlaneRear: {visible: true} });
+            xPlaneRear: {visible: true}, yPlaneRear: {visible: true}, zPlaneRear: {visible: true},
+            az: { slider: { visible: false } }, el: { slider: { visible: false } } });
 
     var P = view.create('point3d', [1, -2, -4], { size: 3, name: '', visible: true, color: JXG.palette.vermillion });
     var A = view.create('point3d', [0, 1, -4], { size: 3, name: '', visible: true, color: JXG.palette.vermillion });

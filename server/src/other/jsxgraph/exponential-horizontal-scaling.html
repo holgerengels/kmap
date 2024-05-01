@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <title>Exponentialfunkion - Horizontale Streckung und Basis</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <link rel='stylesheet' type='text/css' href='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraph.css'/>
+    <script src='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraphcore.js' type='text/javascript'></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js" crossorigin="anonymous"></script>
+
+    <style>
+        body {
+            margin: 0px;
+            padding: 0px;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr;
+        }
+        .jxgbox { border-radius: 0px; border: none}
+        .term {
+            background-color: white;
+        }
+        #lala {
+            color: #0072B2;
+            display: flex;
+            align-items: center;
+            font-size: 1.2em;
+            gap: 4px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id='board' class='jxgbox' style='width: 100%; aspect-ratio: 2'></div>
+</div>
+
+<script type='text/javascript'>
+    var board = JXG.JSXGraph.initBoard('board', {boundingbox: [-4.25, 7, 5.25, -2.5], axis: true, showNavigation: false, showZoom: false, showCopyright: false, pan: { enabled: false}, label: {fontSize: 1, fontUnit: 'em', strokeColor: JXG.palette.darkblue, offset: [-4, -16]}});
+
+    var input = board.create('input', [3.5, -1.2, 1, 'b = '], { cssClass: 'term', cssStyle: 'width: 3em', color: '#D55E00', maxlength: 10, fixed: true });
+    var k = board.create('text', [-4, -1.2, '<div id="lala"><span style="margin-right: -4px">k&ThinSpace;=</span><span><input type="radio" name="k" value="-1"/>&ThinSpace;-1</span><span><input type="radio" name="k" value=".5"/>&ThinSpace;½</span><span><input type="radio" name="k" value="1" checked/>&ThinSpace;1</span><span><input type="radio" name="k" value="2"/>&ThinSpace;2</span></div>'], { anchorY: 'middle' });
+    k._value = "1"; k.Value = () => k._value;
+    document.getElementById("lala").onchange = (e) => { k._value = e.target.value; console.log(e.target.value); board.update() };
+    var b = board.create('slider', [[.5, -1.2], [3.0, -1.2], [0, 2, 7.5]], { snapWidth: .01, size: 4, ticks: { ticksDistance: 1, insertTicks: true, drawLabels: true, label: {fontSize: 1, fontUnit: 'em', strokeColor: '#D55E00', offset: [-4, -16]} }, name: 'a', digits: 2, withLabel: false, label: {fontSize: 1, fontUnit: 'em', strokeColor: '#D55E00'}});
+    b.on('drag', () => { input.set(b.Value().toFixed(2)) });
+
+    let s = (x) => Math.E**x;
+    let f = (x) => Math.E**(1/k.Value()*x);
+    let g = (x) => b.Value()**x;
+
+    const plusminus = val => val == 0 ? "" : val < 0 ? "− " + (-val) : "+ " + val;
+    const leftright = val => val == 0 ? "" : val < 0 ? "← " + (-val) : "→ " + val;
+
+    var gs = board.create('functiongraph', [s], {strokeWidth: 2, dash: 2, strokeColor: 'gray'});
+    var gf = board.create('functiongraph', [f], {strokeWidth: 3});
+    var gg = board.create('functiongraph', [g], {strokeWidth: 3, strokeColor: JXG.palette.vermillion});
+    var f1 = board.create('segment', [[0, 2], [() => k.Value() * Math.log(2), 2]], {name: () => '↔ • ' + k.Value(), withLabel: true, label: { color: JXG.palette.darkblue}, dash: 2, firstArrow: true, firstArrow: { type: 2, size: 5 }, lastArrow: true, lastArrow: { type: 2, size: 5 },});
+    var f2 = board.create('segment', [[0, 3], [() => k.Value() * Math.log(3), 3]], {name: () => '↔ • ' + k.Value(), withLabel: true, label: { color: JXG.palette.darkblue}, dash: 2, firstArrow: true, firstArrow: { type: 2, size: 5 }, lastArrow: true, lastArrow: { type: 2, size: 5 }});
+    var g1x = board.create('segment', [[0, 1], [1, 1]], {name: '', dash: 2, lastArrow: true, lastArrow: { type: 2, size: 5 }, strokeColor: JXG.palette.vermillion});
+    var g1y = board.create('segment', [[1, 1], [1, () => g(1)]], {name: () => '• ' + b.Value().toFixed(1), withLabel: true, label: { color: JXG.palette.vermillion}, dash: 2, lastArrow: true, lastArrow: { type: 2, size: 5 }, strokeColor: JXG.palette.vermillion});
+    var g2x = board.create('segment', [[1, () => g(1)], [2, () => g(1)]], {name: '', dash: 2, lastArrow: true, lastArrow: { type: 2, size: 5 }, strokeColor: JXG.palette.vermillion});
+    var g2y = board.create('segment', [[2, () => g(1)], [2, () => g(2)]], {name: () => '• ' + b.Value().toFixed(1), withLabel: true, label: { color: JXG.palette.vermillion}, dash: 2, lastArrow: true, lastArrow: { type: 2, size: 5 }, strokeColor: JXG.palette.vermillion});
+
+    var oldv = 1;
+    JXG.addEvent(input.rendNodeInput, 'blur', throttle(() => {
+        let v = input.Value();
+        if (v === oldv)
+            return;
+
+        oldv = v;
+        v = v.replaceAll("e", "EULER")
+        const ev = board.jc.snippet(v, true, 'x', true);
+        console.log(ev())
+        b.setValue(ev())
+        board.fullUpdate()
+    }));
+
+    const bofk = (k) => { switch (k) { case "-1": return "-1"; case ".5": return "2"; case "1": return "1"; case "2": return "½"; default: return "?" + k}}
+    var ft = board.create('text', [-4, 6, () => `\\large f(x)=e^{${bofk(k.Value())}\\cdot x}`], { anchorY: 'top', useKatex: true, color: JXG.palette.darkblue });
+    var gt = board.create('text', [-4, 4, () => `\\large f(x)=${b.Value().toFixed(1)}^x`], { anchorY: 'top', useKatex: true, color: JXG.palette.vermillion });
+
+    function throttle(fn, threshold, scope) {
+        threshold || (threshold = 250);
+        var last, deferTimer;
+
+        return function() {
+            // @ts-ignore
+            var context = scope || this;
+            var now = +new Date, args = arguments;
+
+            if (last && now < last + threshold) {
+                // Hold on to it
+                clearTimeout(deferTimer);
+                deferTimer = setTimeout(function() {
+                    last = now;
+                    fn.apply(context, args);
+                }, threshold);
+            } else {
+                last = now;
+                fn.apply(context, args);
+            }
+        };
+    }
+</script>
+
+</body>
+</html>

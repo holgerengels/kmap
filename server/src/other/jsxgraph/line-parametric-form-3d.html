@@ -50,7 +50,8 @@
             [box, box, box]   // 3D bounding cube
         ],
         { xAxis: { visible: true }, yAxis: { visible: true }, zAxis: { visible: true },
-            xPlaneRear: {visible: false}, yPlaneRear: {visible: false}, zPlaneRear: {visible: false} });
+            xPlaneRear: {visible: false}, yPlaneRear: {visible: false}, zPlaneRear: {visible: false},
+            az: { slider: { visible: false } }, el: { slider: { visible: false } } });
 
     var p0 = view.create('point3d', [0, 0, 0], { visible: false });
     var pa = view.create('point3d', [3, -1, 2], { size: 3, name: '', visible: false });

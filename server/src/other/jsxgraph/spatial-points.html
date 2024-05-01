@@ -39,7 +39,7 @@
             [-6, -3], [8, 8], // 2D box of view
             [box, box, box]   // 3D bounding cube
         ],
-        {});
+        { az: { slider: { visible: false } }, el: { slider: { visible: false } } });
 
     var planea = view.create('plane3d', [[0, 0, 0], [1, 0, 0], [0, 1, 0], [-5, 5], [-5, 5]], {
         fillColor: JXG.palette.vermillion, strokeWidth: 1, strokeColor: JXG.palette.vermillion, strokeOpacity: 0.6, mesh3d: { visible: false }

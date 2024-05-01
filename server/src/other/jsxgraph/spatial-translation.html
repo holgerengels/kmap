@@ -39,7 +39,7 @@
             [-6, -3], [8, 8], // 2D box of view
             [box, box, box]   // 3D bounding cube
         ],
-        {});
+        { az: { slider: { visible: false } }, el: { slider: { visible: false } } });
 
     var A = view.create('point3d', [1, 1, 1], { size: 1, name: '', visible: true, fixed: true });
     var B = view.create('point3d', [3, 1, 1], { size: 1, name: '', visible: true, fixed: true });
