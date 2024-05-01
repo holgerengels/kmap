@@ -168,17 +168,6 @@ export default createModel({
             educationalLevel: card.educationalLevel?.split(",").map(l => l.trim()),
             educationalContext: card.educationalContext?.split(",").map(l => l.trim()),
             typicalAgeRange: card.typicalAgeRange,
-            course: {
-              "@context": "https://schema.org",
-              "@type": "Course",
-              "name": `${card.chapter} - ${card.topic}`,
-              "description": card.summary,
-              "provider": {
-                "@type": "Organization",
-                "name": "KMap Team",
-                "sameAs": "https://kmap.eu"
-              }
-            }
           });
         }
       }

@@ -1,7 +1,7 @@
 import {createModel, RoutingState} from '@captaincodeman/rdx';
 import {Store} from '../store';
 import {endpoint, fetchjson} from "../endpoint";
-import {encodePath, urls} from "../urls";
+import {urls} from "../urls";
 import {Card} from "./types";
 
 export interface Line {
@@ -336,25 +336,9 @@ export default createModel({
         const state = store.getState();
 
         var topics: string[] = [];
-        var courseList: object[] = [];
         for (let line of state.maps.lines) {
           for (let card of line.cards) {
             topics.push(card.topic);
-            courseList.push({
-              "@type": "ListItem",
-              "position": courseList.length + 1,
-              "item": {
-                "@type": "Course",
-                "url": `${urls.client}${encodePath("browser", card.subject, card.chapter, card.topic)}`,
-                "name": `${card.chapter} - ${card.topic}`,
-                "description": card.summary,
-                "provider": {
-                  "@type": "Organization",
-                  "name": "KMap Team",
-                  "sameAs": "https://kmap.eu"
-                }
-              }
-            })
           }
         }
 
@@ -369,11 +353,6 @@ export default createModel({
           breadcrumbs: ["browser", subject, chapter],
           about: [subject],
           learningResourceType: ["Unterrichtsplanung"],
-          courseList: {
-            "@context": "https://schema.org",
-            "@type": "ItemList",
-            "itemListElement": courseList
-          },
         });
       },
       'app/chooseInstance': async function () {

@@ -20,8 +20,6 @@ export interface Meta {
   educationalLevel?: string[],
   educationalContext?: string[],
   typicalAgeRange?: string,
-  courseList?: object,
-  course?: object,
 }
 export interface ShellState {
   meta: Meta,
@@ -136,8 +134,6 @@ export default createModel({
             "educationalLevel": meta.educationalLevel,
             "oeh:educationalContext": meta.educationalContext,
             "typicalAgeRange": meta.typicalAgeRange,
-            "courseList": meta.courseList,
-            "course": meta.course,
           } : undefined
         });
       },

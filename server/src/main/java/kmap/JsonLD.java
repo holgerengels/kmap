@@ -31,7 +31,7 @@ public class JsonLD {
                 ? SERVER + encodePath("server", "data", subject, chapter, topic, JSON.string(card, "thumb")) + "?instance=root"
                 : "https://kmap.eu/app/icons/KMap-Logo-cropped.png";
         String keywords = JSON.string(card, "keywords", "");
-        if (keywords.length() != 0) keywords += ", ";
+        if (!keywords.isEmpty()) keywords += ", ";
         keywords += subject + ", " + chapter + ", " + topic;
         String created = JSON.date(card, "created", System.currentTimeMillis());
         String modified = JSON.date(card, "modified", JSON.loong(card, "created", System.currentTimeMillis()));
