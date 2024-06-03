@@ -316,6 +316,7 @@ export class KmapMain extends connect(store, LitElement) {
       .cc-fb-inst > a.license {
         box-shadow: var(--elevation-01);
         transition: 200ms ease-in-out background-color, var(--elevation-transition);
+        margin-block: 0;
       }
       .cc-fb-inst > a.license:hover {
         box-shadow: var(--elevation-03);
