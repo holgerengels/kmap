@@ -314,6 +314,7 @@ public class PaedMLConnection
                 System.out.println("host = " + host);
                 System.out.println("port = " + port);
                 System.out.println("trustStore = " + System.getProperty("javax.net.ssl.trustStore"));
+                // echo -n | openssl s_client -connect 192.168.1.225:636 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > ldapserver.pem
 
                 SSLSocketFactory sslsocketfactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
                 InputStream in;
