@@ -177,6 +177,7 @@ export class KMapLoginPopup extends Connected {
         }
         .auth img {
           margin-right: 0.5em;
+          margin-block: 0;
         }
         .auth img, auth svg {
           width: 24px;
