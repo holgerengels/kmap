@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <title>Produktform</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <link rel='stylesheet' type='text/css' href='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraph.css'/>
+    <script src='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraphcore.js' type='text/javascript'></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js" crossorigin="anonymous"></script>
+
+    <style>
+        body {
+            margin: 0px;
+            padding: 0px;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr;
+            position: relative;
+        }
+        .jxgbox { border-radius: 0px; border: none}
+        .panel {
+            position: absolute;
+            display: flex;
+            flex-direction: row;
+            gap: 12px;
+            font-family: Roboto, sans-serif;
+            right: 4px
+        }
+        .term { background-color: white }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id=fboard class='jxgbox' style='width: 100%; aspect-ratio: 1'></div>
+</div>
+
+<script type='text/javascript'>
+    var board = JXG.JSXGraph.initBoard('fboard', {boundingbox: [-4.5, 9, 4.5, -9], axis: true, grid: false, showNavigation: false, showZoom: false, showCopyright: false, pan: { enabled: false}});
+
+    var a = board.create('slider', [[-4.3, 8], [-1.3, 8], [-3, 1, 3]], {snapWidth: .2, ticks: { drawLabels: true, insertTicks: false, ticksDistance: .5, label: {fontSize: 13, strokeColor: '#D55E00'} }, name: 'a', digits: 1, label: {fontSize: 14, strokeColor: '#D55E00', cssClass: 'term'}})
+    var t = board.create('text', [4, -8, () => ""], { cssClass: 'term', fixed: true, anchorX: 'right', useKatex: true });
+
+    var A = board.create('point', [-4, 0], { visible: false, fixed: true })
+    var B = board.create('point', [4, 0], { visible: false, fixed: true })
+    var bar = board.create('segment', [A,B], { visible: true, fixed: true })
+
+    var n1 = board.create('glider', [-2, 0, bar], { visible: true, withLabel: false })
+    var n2 = board.create('glider', [2, 0, bar], { visible: true, withLabel: false })
+
+    var gliders = [n1, n2];
+    var f = undefined;
+
+    gliders.forEach(g => {
+        g.on('up', () => {
+            g.moveTo([Math.round(g.X()*2)/2, 0], 100, { effect: '<>', callback: plot });
+        });
+    })
+    const plusminus = val => val < 0 ? "- " + (-val) : "+ " + val;
+    const plot = () => {
+        let table = gliders.map(g => { r = { x: g.X(), ex: 1}; return r });
+        let multiplicities = Object.entries(Object.groupBy(table, ({x}) => x)).map(entry => { l = [entry[0], entry[1].length]; return l }).sort(((a, b) => a[0] - b[0]));
+        let term = "" + a.Value().toFixed(1);
+        let tex = "f(x)=" + a.Value().toFixed(1);
+        multiplicities.forEach(m => {
+            term += `*(x${plusminus(-m[0])})${m[1]>1 ? "**" + m[1] : ""}`
+            tex += `\\cdot\\left(x${plusminus(-m[0])}\\right)${m[1]>1 ? "^" + m[1] : ""}`
+        })
+        if (f) board.removeObject(f)
+        if (gliders.length) {
+            f = board.create('functiongraph', [board.jc.snippet(term, true, 'x', true)]);
+            t.setText(tex);
+        }
+        else
+            t.setText("");
+    }
+
+    a.on('drag', plot);
+    plot();
+</script>
+
+</body>
+</html>

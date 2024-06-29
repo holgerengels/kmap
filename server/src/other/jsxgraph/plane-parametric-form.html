@@ -111,8 +111,9 @@
     var vc = view.create('line3d', [pa, pc], { fixed: true, strokeColor: JXG.palette.orange, strokeWidth: 3, lastArrow: { type: 2, size: 4 } });
     var tc = view.create('point3d', [() => pa.X() + (pc.X() - pa.X()) / 2, () => pa.Y() + (pc.Y() - pa.Y()) / 2, () => pa.Z() + (pc.Z() - pa.Z()) / 2 ], { visible: true, size: 0, label: { color: 'red', useKatex: true, autoPosition: false }, name: '\\vec v' });
     var px = view.create('point3d', [() => pa.X() + r.Value() * (pb.X() - pa.X()) + s.Value() * (pc.X() - pa.X()), () => pa.Y() + r.Value() * (pb.Y() - pa.Y()) + s.Value() * (pc.Y() - pa.Y()), () => pa.Z() + r.Value() * (pb.Z() - pa.Z()) + s.Value() * (pc.Z() - pa.Z())], { size: 4, name: '', visible: true });
-    var vx = view.create('line3d', [p0, px], { fixed: true, strokeColor: 'darkgray', strokeWidth: 3, dash: 2, lastArrow: { type: 2, size: 4 } });
-    var tx = view.create('point3d', [() => px.X() / 2, () => px.Y() / 2, () => px.Z() / 2 ], { visible: true, size: 0, label: { color: 'black', useKatex: true }, name: '\\vec x' });
+    var vx = view.create('line3d', [p0, px], { fixed: true, strokeColor: '#666', strokeWidth: 3, dash: 2, lastArrow: { type: 2, size: 4 } });
+    var tx = view.create('point3d', [() => px.X() / 2, () => px.Y() / 2, () => px.Z() / 2 ], { visible: true, size: 0, label: { color: '#666', useKatex: true }, name: '\\vec x' });
+    var vab = view.create('line3d', [pa, px], { fixed: true, strokeColor: 'black', strokeWidth: 2, lastArrow: { type: 2, size: 4 } });
 
     var p1 = view.create('point3d', [() => pa.X() + 10 * (pb.X() - pa.X()), () => pa.Y() + 10 * (pb.Y() - pa.Y()), () => pa.Z() + 10 * (pb.Z() - pa.Z())], { size: 3, name: '', visible: true });
     var p2 = view.create('point3d', [() => pa.X() - 10 * (pb.X() - pa.X()), () => pa.Y() - 10 * (pb.Y() - pa.Y()), () => pa.Z() - 10 * (pb.Z() - pa.Z())], { size: 3, name: '', visible: true });

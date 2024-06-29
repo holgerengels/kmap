@@ -45,6 +45,9 @@ export async function lazyComponents(code: string) {
         case 'kmap-binomial-coefficient':
           customElements.define('kmap-binomial-coefficient', (await import('kmap-binomial-coefficient')).KmapBinomialCoefficient);
           break;
+        case 'kmap-solvee':
+          customElements.define('kmap-solvee', (await import('kmap-solvee')).KmapSolvee);
+          break;
       }
       //customElements.define(tag, (await import(source))[constructor]);
 
