@@ -94,6 +94,7 @@ export class KMapTestCardContent extends LitElement {
       ...element.getElementsByTagName("dnd-fillin"),
       ...element.getElementsByTagName("kmap-solve-tree"),
       ...element.getElementsByTagName("kmap-jsxgraph"),
+      ...element.getElementsByTagName("kmap-solvee"),
     ].forEach(element => fun(element as unknown as TestInteraction));
   }
 
@@ -233,8 +234,9 @@ export class KMapTestCardContent extends LitElement {
           border-radius: 2px;
           padding: 2px 4px;
         }
-        kmap-solve-tree, kmap-jsxgraph {
+        kmap-solve-tree, kmap-jsxgraph, kmap-solvee {
           outline: 3px solid transparent;
+          border-radius: 8px;
         }
         *[correctness=correct]:not([empty]) {
           outline-color: rgba(var(--color-green-num), .7) !important;

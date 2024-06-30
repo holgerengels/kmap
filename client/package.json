@@ -86,7 +86,7 @@
     "kmap-html-editor": "^0.9.12",
     "kmap-jsxgraph": "^0.9.16",
     "kmap-solve-tree": "^0.9.17",
-    "kmap-solvee": "^0.9.1",
+    "kmap-solvee": "^0.9.2",
     "kmap-term-tree": "^0.9.21",
     "kmap-binomial-coefficient": "^0.9.5",
     "lit": "^2.8.0",
