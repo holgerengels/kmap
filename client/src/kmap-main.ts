@@ -304,24 +304,14 @@ export class KmapMain extends connect(store, LitElement) {
         color: var(--app-drawer-selected-color);
       }
       .cc-fb-inst {
+        font-size: 0;
         margin: 16px;
         display: flex;
         flex-direction: row;
         align-items: center;
         justify-content: space-evenly;
       }
-      .cc-fb-inst > a {
-        line-height: 0;
-      }
-      .cc-fb-inst > a.license {
-        box-shadow: var(--elevation-01);
-        transition: 200ms ease-in-out background-color, var(--elevation-transition);
-        margin-block: 0;
-      }
-      .cc-fb-inst > a.license:hover {
-        box-shadow: var(--elevation-03);
-      }
-      .cc-fb-inst > a.social:hover {
+      .cc-fb-inst > a:hover {
         filter: drop-shadow(2px 2px 2px rgba(0, 0, 0, 0.14));
       }
       span[slot=subtitle] {
