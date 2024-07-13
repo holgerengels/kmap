@@ -66,6 +66,10 @@ h1, h2, h3, h4, h5, p, img, details {
 h1:first-child, h2:first-child, h3:first-child, h4:first-child, h5:first-child, p:first-child, img:first-child {
   margin-block-start: 0px;
 }
+summary {
+  -webkit-user-select: none;
+  user-select: none;
+}
 sub,
 sup {
   font-size: 75%;
