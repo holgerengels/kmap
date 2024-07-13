@@ -162,9 +162,6 @@ export class KMapKnowledgeCardDescription extends LitElement {
           flex: 1 1 100%;
           margin: 8px;
         }
-        details {
-          margin: 8px 0px;
-        }
         @media (min-width: 600px) {
           box {
             flex: 0 1 auto;

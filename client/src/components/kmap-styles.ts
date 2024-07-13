@@ -59,7 +59,7 @@ p, .font-body, td, dd, .secondary {
 img {
   display: block;
 }
-h1, h2, h3, h4, h5, p, img {
+h1, h2, h3, h4, h5, p, img, details {
   margin-block: 1.15em;
   line-height: 1.2rem;
 }
