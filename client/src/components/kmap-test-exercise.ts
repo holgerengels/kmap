@@ -68,7 +68,7 @@ export class KmapTestExercise extends Connected {
     }
   }
 
-  _start() {
+  async _start() {
     if (!this._expandedTests)
       return;
 
@@ -87,13 +87,15 @@ export class KmapTestExercise extends Connected {
     this._currentIndex = 0;
     this._currentTest = this._tests[0];
     store.dispatch.tests.clearResults();
+    await this.updateComplete;
+    this._testCard.init();
   }
 
   _restart() {
     this._start();
   }
 
-  _next(e) {
+  async _next(e) {
     if (this._tests === undefined) return;
 
     let detail = e.detail;
@@ -103,7 +105,8 @@ export class KmapTestExercise extends Connected {
     this._currentIndex++;
     if (this._currentIndex < this._tests.length) {
       this._currentTest = this._tests[this._currentIndex];
-      requestAnimationFrame(() => this._testCard.init())
+      await this.updateComplete;
+      this._testCard.init();
     }
     else
       this.dispatchEvent(new CustomEvent('end', {bubbles: true, composed: true}));

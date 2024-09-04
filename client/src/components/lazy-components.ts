@@ -1,20 +1,6 @@
 
 export async function lazyComponents(code: string) {
   if (!code) return;
-  /*
-  let result = code.match(/<((kmap-((term-tree)|(ascii-math)|(solve-tree)|(jsxgraph)))|(html-include)|(lazy-html))/g);
-  if (result !== null) {
-    for (let i = 0; i < result.length; i++) {
-      const m = result[i].substring(1);
-      if (customElements.get(m))
-        continue;
-
-      console.log("loading component: " + m);
-
-      //await customElements.whenDefined(m);
-    }
-  }
-   */
   const lazies = [...code.matchAll(/<([a-z0-9-]+) lazy:([^:]+):([^ >]+)/g)];
   for (let i = 0; i < lazies.length; i++) {
     const lazy = lazies[i];

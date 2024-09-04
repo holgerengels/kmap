@@ -1,4 +1,4 @@
-import {css, html, LitElement, PropertyValues} from 'lit';
+import {css, html, LitElement, PropertyValues, ReactiveElement} from 'lit';
 import {customElement, property, query, state} from 'lit/decorators.js';
 import {unsafeHTML} from 'lit/directives/unsafe-html.js';
 import {urls} from '../urls';
@@ -40,27 +40,23 @@ export class KMapTestCardContent extends LitElement {
   @state()
   private _answer: string = '';
 
-  @query('#question')
-  // @ts-ignore
-  private _questionElement: HTMLElement;
   @query('#answer')
   private _answerElement: HTMLElement;
 
   protected willUpdate(_changedProperties) {
     if (_changedProperties.has("balance"))
       this._flexes(this.balance);
-  }
-
-  protected async updated(_changedProperties: PropertyValues) {
     if (_changedProperties.has("question")) {
-      await lazyComponents(this.question);
+      lazyComponents(this.question);
       this._question = this._math(this.question);
     }
     if (_changedProperties.has("answer")) {
-      await lazyComponents(this.answer);
+      lazyComponents(this.answer);
       this._answer = this._math(this.answer);
-      setTimeout(() => this.init());
     }
+  }
+
+  protected async updated(_changedProperties: PropertyValues) {
   }
 
   _flexes(balance) {
@@ -95,26 +91,33 @@ export class KMapTestCardContent extends LitElement {
       ...element.getElementsByTagName("kmap-solve-tree"),
       ...element.getElementsByTagName("kmap-jsxgraph"),
       ...element.getElementsByTagName("kmap-solvee"),
-    ].forEach(element => fun(element as unknown as TestInteraction));
+    ].forEach(async element => {
+      await customElements.whenDefined(element.tagName.toLowerCase())
+      if (element instanceof ReactiveElement)
+        await element.updateComplete;
+      fun(element as unknown as TestInteraction)
+    });
   }
 
-  init() {
-    var element = this._answerElement;
-    var inputs = element.getElementsByTagName("input");
-    for (var i = 0; i < inputs.length; i++) {
-      var input: HTMLInputElement = inputs[i];
-      input.removeAttribute("correctness");
-      input.setAttribute("empty", "")
-      if (input.type === "checkbox")
-        input.checked = false;
-      else
-        input.value = '';
-    }
+  async init() {
+    setTimeout(() => {
+      var element = this._answerElement;
+      var inputs = element.getElementsByTagName("input");
+      for (var i = 0; i < inputs.length; i++) {
+        var input: HTMLInputElement = inputs[i];
+        input.removeAttribute("correctness");
+        input.setAttribute("empty", "")
+        if (input.type === "checkbox")
+          input.checked = false;
+        else
+          input.value = '';
+      }
 
-    this.forEachTestInteraction((testInteraction: TestInteraction) => {
-      testInteraction.init();
-      testInteraction.removeAttribute("correctness");
-    });
+      this.forEachTestInteraction((testInteraction: TestInteraction) => {
+        testInteraction.removeAttribute("correctness");
+        testInteraction.init();
+      });
+    }, 500);
   }
 
   checkValues(): boolean {
