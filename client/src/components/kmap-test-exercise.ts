@@ -103,7 +103,7 @@ export class KmapTestExercise extends Connected {
     this._currentIndex++;
     if (this._currentIndex < this._tests.length) {
       this._currentTest = this._tests[this._currentIndex];
-      this._testCard.init();
+      requestAnimationFrame(() => this._testCard.init())
     }
     else
       this.dispatchEvent(new CustomEvent('end', {bubbles: true, composed: true}));
