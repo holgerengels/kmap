@@ -16,7 +16,7 @@ import {KMapTestCardContent} from "./kmap-test-card-content";
 import {KMapFeedback} from "./kmap-feedback";
 
 @customElement('kmap-exercise-card')
-export class KMapRandomTestCard extends Connected {
+export class KMapExerciseCard extends Connected {
   @property({type: String})
   private _instance: string = '';
   @property({type: String})
@@ -125,7 +125,7 @@ export class KMapRandomTestCard extends Connected {
         }
 
         .blink {
-          animation: blinker .2s ease-in-out 2;
+          animation: blinker .25s ease-in-out 2;
         }
         @keyframes blinker {
           70% {

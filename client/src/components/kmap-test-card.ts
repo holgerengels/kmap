@@ -220,8 +220,9 @@ export class KMapTestCard extends Connected {
           animation: blinker .25s ease-in-out 2;
         }
         @keyframes blinker {
-          50% {
-            transform: scale(1.2);
+          70% {
+            text-shadow: 1px 1px 4px var(--color-darkgray);
+            transform: scale(1.1);
             color: var(--color-secondary-dark)
           }
         }

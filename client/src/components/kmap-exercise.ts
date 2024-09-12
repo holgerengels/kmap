@@ -1,5 +1,5 @@
-import {css, html} from 'lit';
-import {customElement, state} from 'lit/decorators.js';
+import {css, html, PropertyValues} from 'lit';
+import {customElement, state, query} from 'lit/decorators.js';
 import {Connected, store} from "./connected";
 import {State} from "../store";
 
@@ -13,16 +13,28 @@ import './kmap-exercise-card';
 import {resetStyles, colorStyles, fontStyles} from "./kmap-styles";
 import {Test} from "../models/tests";
 import {encodePath} from "../urls";
+import {KMapExerciseCard} from "./kmap-exercise-card";
 
 @customElement('kmap-exercise')
 export class KMapExercise extends Connected {
   @state()
   private _test?: Test;
 
+  @query('kmap-exercise-card')
+  private _testElement: KMapExerciseCard;
+
   mapState(state: State) {
     return {
       _test: state.exercises.test,
     };
+  }
+
+  protected updated(_changedProperties: PropertyValues) {
+    if (_changedProperties.has("_test") && this._test)
+      setTimeout(() => {
+        this._testElement!.init();
+      }
+      , 500)
   }
 
   _more() {
