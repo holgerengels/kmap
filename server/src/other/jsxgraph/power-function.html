@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <title>Potenzfunktion</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <link rel='stylesheet' type='text/css' href='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraph.css'/>
+    <script src='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraphcore.js' type='text/javascript'></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js" crossorigin="anonymous"></script>
+
+    <style>
+        body {
+            margin: 0px;
+            padding: 0px;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr;
+            position: relative;
+        }
+        .jxgbox { border-radius: 0px; border: none}
+        .term { background-color: white }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id='board' class='jxgbox' style='width: 100%; aspect-ratio: 1'></div>
+</div>
+
+<script type='text/javascript'>
+    var board = JXG.JSXGraph.initBoard('board', {boundingbox: [-8, 8, 8, -8], axis: true, showNavigation: false, showZoom: false, showCopyright: false, pan: { enabled: false}});
+
+    var n = board.create('slider', [[1.5, -7], [6, -7], [-4, 2, 5]], { snapWidth: 1, size: 4, ticks: { ticksDistance: 1, insertTicks: false, drawLabels: true, label: {fontSize: 1, fontUnit: 'em', offset: [-4, -16], } }, name: 'n', digits: 0, label: {fontSize: 1, fontUnit: 'em', cssClass: 'term'}});
+    var para = board.create('functiongraph', [(x) => JXG.Math.ratpow(x, n.Value(), 1)], {strokeWidth: 3, strokeColor: JXG.palette.green});
+    var hype = board.create('functiongraph', [(x) => JXG.Math.ratpow(x, -n.Value(), 1)], {strokeWidth: 3, strokeColor: JXG.palette.blue});
+    var root = board.create('functiongraph', [(x) => JXG.Math.ratpow(x, 1, n.Value())], {strokeWidth: 3, strokeColor: JXG.palette.red});
+
+    var parat = board.create('text', [1.5, -5, () => `\\large p(x)=x^${n.Value()}`], { cssClass: 'term', fixed: true, useKatex: true, color: JXG.palette.green });
+    var hypet = board.create('text', [1.5, -4, () => `\\large h(x)=x^{${-n.Value()}}`], { cssClass: 'term', fixed: true, useKatex: true, color: JXG.palette.blue });
+    var roott = board.create('text', [1.5, -3, () => `\\large r(x)=x^{\\frac{1}{${n.Value()}}}`], { cssClass: 'term', fixed: true, useKatex: true, color: JXG.palette.red });
+
+</script>
+
+</body>
+</html>

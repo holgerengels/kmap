@@ -121,7 +121,7 @@ function generateMeta(posts: Card[], current?: string): Meta {
     if (card) {
       type = "BlogPosting";
       title = card.topic;
-      description = textOnly(card.summary);
+      description = card.meta ? card.meta : textOnly(card.summary);
       keywords = card.keywords?.split(",").map(w => w.trim()) || [];
       created = card.created || Date.now();
       modified = card.modified || Date.now();

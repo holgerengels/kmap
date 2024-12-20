@@ -35,7 +35,7 @@
     let g = (x) => JXG.Math.log(x, b.Value());
 
     var board = JXG.JSXGraph.initBoard('board', {boundingbox: [-2, 4, 4, -2], axis: true, showNavigation: false, showZoom: false, showCopyright: false, pan: { enabled: false}});
-    var b = board.create('slider', [[1.2, -1.6], [3.2, -1.6], [0, 2, 3]], {snapWidth: .1, ticks: { drawLabels: true, label: {fontSize: 14, strokeColor: '#D55E00'} }, name: 'b', digits: 0, label: {fontSize: 14, strokeColor: '#D55E00'}});
+    var b = board.create('slider', [[1.2, -1.6], [3.2, -1.6], [0, 2, 3]], {snapWidth: .1, ticks: { insertTicks: false, drawLabels: true, label: {fontSize: 14, strokeColor: '#D55E00'} }, name: 'b', digits: 0, label: {fontSize: 14, strokeColor: '#D55E00'}});
 
     var fg = board.create('functiongraph', [f, -2, 4], { strokeWidth: 3 });
     var gg = board.create('functiongraph', [g, -2, 4], { strokeWidth: 3, strokeColor: JXG.palette.bluishgreen });

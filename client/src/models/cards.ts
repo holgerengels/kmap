@@ -153,7 +153,7 @@ export default createModel({
             type: "Article",
             title: chapter,
             detail: card.topic,
-            description: card.summary,
+            description: card.meta ? card.meta : textOnly(card.summary),
             created: card.created,
             modified: card.modified,
             author: card.author,
@@ -174,3 +174,9 @@ export default createModel({
     }
   }
 })
+
+function textOnly(html: string) {
+  var tempDivElement = document.createElement("div");
+  tempDivElement.innerHTML = html;
+  return tempDivElement.textContent || "";
+}

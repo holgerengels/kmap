@@ -86,10 +86,11 @@ public class IndexServlet extends JsonServlet {
                         url = SERVER + encodePath("app", "browser", subject, chapter);
                     }
                     if (card != null) {
+                        String cardMeta = string(card, "meta");
                         String cardSummary = string(card, "summary");
                         String cardDescription = string(card, "description");
-                        description = cardSummary != null ? cardSummary : description;
-                        text = cardDescription != null ? cardDescription : cardSummary;
+                        description = cardMeta != null ? cardMeta : cardSummary != null ? cardSummary : description;
+                        //text = cardDescription != null ? cardDescription : cardSummary;
                         author = string(card, "author");
                         created = JSON.date(card, "created");
                         modified = JSON.date(card, "modified");
@@ -119,9 +120,10 @@ public class IndexServlet extends JsonServlet {
                     if (path.length == 2) {
                         String topic = path[1];
                         JsonObject card = couch.loadTopic("Blog", "Blog", topic);
+                        String cardMeta = string(card, "meta");
                         String cardSummary = string(card, "summary");
                         String cardDescription = string(card, "description");
-                        description = cardSummary != null ? cardSummary : description;
+                        description = cardMeta != null ? cardMeta : cardSummary != null ? cardSummary : description;
                         author = string(card, "author");
                         created = JSON.date(card, "created");
                         modified = JSON.date(card, "modified");

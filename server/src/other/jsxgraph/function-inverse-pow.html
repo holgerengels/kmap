@@ -35,7 +35,7 @@
     let g = (x) => JXG.Math.pow(x, 1/n.Value());
 
     var board = JXG.JSXGraph.initBoard('board', {boundingbox: [-2.5, 6.5, 6.5, -2.5], axis: true, showNavigation: false, showZoom: false, showCopyright: false, pan: { enabled: false}});
-    var n = board.create('slider', [[1.7, -1.6], [4.7, -1.6], [-4, 2, 5]], {snapWidth: .5, ticks: { drawLabels: true, label: {fontSize: 14, strokeColor: '#D55E00'} }, name: 'n', digits: 0, label: {fontSize: 14, strokeColor: '#D55E00'}});
+    var n = board.create('slider', [[1.7, -1.6], [4.7, -1.6], [-4, 2, 5]], {snapWidth: .5, ticks: { insertTicks: false, drawLabels: true, label: {fontSize: 14, strokeColor: '#D55E00'} }, name: 'n', digits: 0, label: {fontSize: 14, strokeColor: '#D55E00'}});
 
     var fg = board.create('functiongraph', [f, 0, 6.5], { strokeWidth: 3 });
     var gg = board.create('functiongraph', [g, 0, 6.5], { strokeWidth: 3, strokeColor: JXG.palette.bluishgreen });

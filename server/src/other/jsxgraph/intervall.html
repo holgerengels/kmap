@@ -87,7 +87,7 @@
         else if (l !== '-')
             return "{ x | x" + (l === '[' ? " &ge; " : " &gt; ") + a + " } = " + l + " " + a + "; &infin; [";
         else if (r !== '-')
-            return "{ x | x" + (r === ']' ? " &le; " : " &lt; ") + b + " } = ] &infin;; " + b + " " + r ;
+            return "{ x | x" + (r === ']' ? " &le; " : " &lt; ") + b + " } = ] -&infin;; " + b + " " + r ;
         else
             return "";
     }], {fontSize: 16, fontUnit: 'px', color: '#D55E00', cssStyle: 'font-family: Roboto, sans-serif'});

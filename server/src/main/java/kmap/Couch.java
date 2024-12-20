@@ -248,6 +248,7 @@ public class Couch extends Server {
                     existing.add("educationalContext", changed.get("educationalContext"));
                     existing.add("typicalAgeRange", changed.get("typicalAgeRange"));
                     existing.add("description", changed.get("description"));
+                    existing.add("meta", changed.get("meta"));
                     existing.add("thumb", changed.get("thumb"));
                     existing.add("summary", changed.get("summary"));
                     existing.add("attachments", changed.get("attachments"));
@@ -386,8 +387,10 @@ public class Couch extends Server {
                 chapterNode.setEducationalLevel(string(topic, "educationalLevel"));
                 chapterNode.setEducationalContext(string(topic, "educationalContext"));
                 chapterNode.setTypicalAgeRange(string(topic, "typicalAgeRange"));
-                if (includeContent)
+                if (includeContent) {
+                    chapterNode.setMeta(string(topic, "meta"));
                     chapterNode.setDescription(string(topic, "description"));
+                }
                 chapterNode.setSummary(string(topic, "summary"));
                 chapterNode.setAttachments(amendAttachments(topic.getAsJsonArray("attachments"), topic.getAsJsonObject("_attachments")));
                 chapterNode.setSkills(topic.getAsJsonArray("skills"));
@@ -404,8 +407,10 @@ public class Couch extends Server {
                 node.setEducationalLevel(string(topic, "educationalLevel"));
                 node.setEducationalContext(string(topic, "educationalContext"));
                 node.setTypicalAgeRange(string(topic, "typicalAgeRange"));
-                if (includeContent)
+                if (includeContent) {
+                    node.setMeta(string(topic, "meta"));
                     node.setDescription(string(topic, "description"));
+                }
                 node.setSummary(string(topic, "summary"));
                 node.setThumb(string(topic, "thumb"));
                 node.setPriority(integer(topic, "priority"));
@@ -490,8 +495,10 @@ public class Couch extends Server {
             JSON.addProperty(card, "educationalLevel", node.getEducationalLevel());
             JSON.addProperty(card, "educationalContext", node.getEducationalContext());
             JSON.addProperty(card, "typicalAgeRange", node.getTypicalAgeRange());
-            if (includeContent)
+            if (includeContent) {
                 JSON.addProperty(card, "description", node.getDescription());
+                JSON.addProperty(card, "meta", node.getMeta());
+            }
             JSON.addProperty(card, "summary", node.getSummary());
             JSON.addProperty(card, "thumb", node.getThumb());
             JSON.addProperty(card, "links", node.getLinks());
@@ -527,8 +534,10 @@ public class Couch extends Server {
             JSON.addProperty(card, "educationalLevel", chapterNode.getEducationalLevel());
             JSON.addProperty(card, "educationalContext", chapterNode.getEducationalContext());
             JSON.addProperty(card, "typicalAgeRange", chapterNode.getTypicalAgeRange());
-            if (includeContent)
+            if (includeContent) {
                 JSON.addProperty(card, "description", chapterNode.getDescription());
+                JSON.addProperty(card, "meta", chapterNode.getMeta());
+            }
             JSON.addProperty(card, "summary", chapterNode.getSummary());
             JSON.addProperty(card, "links", chapterNode.getLinks());
             add(card, "attachments", chapterNode.getAttachments());
@@ -979,25 +988,28 @@ public class Couch extends Server {
                 }
             }
             String summary = string(object, "summary");
+            String meta = string(object, "meta");
             String description = string(object, "description");
             String links = string(object, "links");
-            if (links == null && nully(description)) {
-                System.out.println(formatIdentity(object) + ": has no description");
-                JsonObject message = new JsonObject();
-                message.addProperty("id", JSON.string(object, "_id"));
-                message.addProperty("chapter", JSON.string(object, "chapter"));
-                message.addProperty("topic", JSON.string(object, "topic"));
-                message.addProperty("message", ": has no description");
-                messages.add(message);
-            }
-            else if (links == null && !nully(description) && nully(summary)) {
-                System.out.println(formatIdentity(object) + ": has no summary");
-                JsonObject message = new JsonObject();
-                message.addProperty("id", JSON.string(object, "_id"));
-                message.addProperty("chapter", JSON.string(object, "chapter"));
-                message.addProperty("topic", JSON.string(object, "topic"));
-                message.addProperty("message", ": has no summary");
-                messages.add(message);
+            if (links == null) {
+                if (nully(description)) {
+                    System.out.println(formatIdentity(object) + ": has no description");
+                    JsonObject message = new JsonObject();
+                    message.addProperty("id", JSON.string(object, "_id"));
+                    message.addProperty("chapter", JSON.string(object, "chapter"));
+                    message.addProperty("topic", JSON.string(object, "topic"));
+                    message.addProperty("message", ": has no description");
+                    messages.add(message);
+                }
+                else if (!nully(description) && nully(summary)) {
+                    System.out.println(formatIdentity(object) + ": has no summary");
+                    JsonObject message = new JsonObject();
+                    message.addProperty("id", JSON.string(object, "_id"));
+                    message.addProperty("chapter", JSON.string(object, "chapter"));
+                    message.addProperty("topic", JSON.string(object, "topic"));
+                    message.addProperty("message", ": has no summary");
+                    messages.add(message);
+                }
             }
         }
         return messages;

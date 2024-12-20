@@ -146,6 +146,7 @@ export class KMapEditorAddFabs extends Connected {
       chapter: this._chapter,
       topic: this._topic,
       name: this._topic,
+      meta: '',
       summary: '',
       description: '',
       thumb: '',

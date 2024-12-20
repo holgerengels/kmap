@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static kmap.JSON.isNull;
 import static kmap.JSON.string;
 import static kmap.URLs.encodePath;
 import static kmap.Server.readProperties;
@@ -25,7 +26,7 @@ public class JsonLD {
         String chapter = JSON.string(card, "chapter");
         String topic = JSON.string(card, "topic");
         String title = topic != null ? chapter  + " - " + topic : chapter;
-        String description = JSON.string(card, "summary");
+        String description = isNull(card, "meta") ? string(card, "summary") : string(card, "meta");
         if (description == null) description = "KMap kartographiert Wissen mit Zusammenhang";
         String image = JSON.string(card, "thumb") != null
                 ? SERVER + encodePath("server", "data", subject, chapter, topic, JSON.string(card, "thumb")) + "?instance=root"

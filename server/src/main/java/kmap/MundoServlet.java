@@ -84,7 +84,7 @@ public class MundoServlet extends JsonServlet {
                     Long modified = loong(card, "modified");
                     String keywords = string(card, "keywords");
                     createNode(eventWriter, "title", chapter + " - " + topic);
-                    createNode(eventWriter, "description", string(card, "summary"));
+                    createNode(eventWriter, "description", isNull(card, "meta") ? string(card, "summary") : string(card, "meta"));
                     createNode(eventWriter, "link", "https://kmap.eu/app/browser/" + URLs.encode(subject) + "/" + URLs.encode(chapter) + "/" + URLs.encode(topic));
                     createNode(eventWriter, "author", author);
                     createNode(eventWriter, "guid", DigestUtils.md5Hex(subject + "/" + chapter + "/" + topic), Collections.singletonMap("isPermaLink", "false"));

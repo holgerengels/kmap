@@ -60,10 +60,12 @@
     var vbs = board.create('line', [p0, pbs], { visible: () => butt.value, fixed: true, strokeColor: JXG.palette.green, straightFirst: false, straightLast: false, lastArrow: { type: 2, size: 6 } });
     var tbs = board.create('point', [() => pbs.X() / 2, () => pbs.Y() / 2], { visible: () => butt.value, size: 0, label: { color: JXG.palette.green, useKatex: true, autoPosition: true, offset:[10, 10] }, name: '\\vec {p_a}' });
 
+    const scalarProduct = (a, b) => a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
+
     var tab = board.create('text', [5, -3, () => '\\textcolor{#009E73}{\\vec a} \\circ \\textcolor{#0072B2}{\\vec b} = \\textcolor{#009E73}{|\\vec a|} \\cdot \\textcolor{#0072B2}{|\\vec b|} \\cdot \\cos\\alpha \\newline' +
-        '=\\textcolor{#009E73}{|\\vec a|} \\cdot \\textcolor{#0072B2}{|\\vec p_b|} = ' + (p0.Dist(pa) * p0.Dist(pbs) * angle.Value()).toFixed(1)], { visible: () => !butt.value, size: 0, useKatex: true, cssClass: 'term', anchorX: 'right', anchorY: 'bottom' });
+        '=\\textcolor{#009E73}{|\\vec a|} \\cdot \\textcolor{#0072B2}{|\\vec p_b|} \\approx ' + (scalarProduct([pa.X(), pa.Y(), 0], [pb.X(), pb.Y(), 0])).toFixed(1)], { visible: () => !butt.value, size: 0, useKatex: true, cssClass: 'term', anchorX: 'right', anchorY: 'bottom' });
     var tab = board.create('text', [5, -3, () => '\\textcolor{#009E73}{\\vec a} \\circ \\textcolor{#0072B2}{\\vec b} = \\textcolor{#009E73}{|\\vec a|} \\cdot \\textcolor{#0072B2}{|\\vec b|} \\cdot \\cos\\alpha \\newline' +
-        '=\\textcolor{#009E73}{|\\vec p_a|} \\cdot \\textcolor{#0072B2}{|\\vec b|} = ' + (p0.Dist(pa) * p0.Dist(pbs) * angle.Value()).toFixed(1)], { visible: () => butt.value, size: 0, useKatex: true, cssClass: 'term', anchorX: 'right', anchorY: 'bottom' });
+        '=\\textcolor{#009E73}{|\\vec p_a|} \\cdot \\textcolor{#0072B2}{|\\vec b|} \\approx ' + (scalarProduct([pa.X(), pa.Y(), 0], [pb.X(), pb.Y(), 0])).toFixed(1)], { visible: () => butt.value, size: 0, useKatex: true, cssClass: 'term', anchorX: 'right', anchorY: 'bottom' });
 
 </script>
 

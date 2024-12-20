@@ -31,6 +31,7 @@ export interface Card {
   educationalLevel?: string,
   educationalContext?: string,
   typicalAgeRange?: string,
+  meta: string,
   summary: string,
   description: string,
   thumb?: string;

@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <title>Potenzfunktion mit negativen Exponenten</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <link rel='stylesheet' type='text/css' href='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraph.css'/>
+    <script src='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraphcore.js' type='text/javascript'></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js" crossorigin="anonymous"></script>
+
+    <style>
+        body {
+            margin: 0px;
+            padding: 0px;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr;
+            position: relative;
+        }
+        .jxgbox { border-radius: 0px; border: none}
+        .term { background-color: white }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id='board' class='jxgbox' style='width: 100%; aspect-ratio: 1'></div>
+</div>
+
+<script type='text/javascript'>
+    var board = JXG.JSXGraph.initBoard('board', {boundingbox: [-1, 15, 15, -1], axis: false, showNavigation: false, showZoom: false, showCopyright: false, pan: { enabled: false}});
+    var xa = board.create('segment', [[0, 0], [15, 0]], { lastArrow: true });
+    var xt = board.create('ticks', [xa], {
+        anchor: 'left',
+        drawLabels: true,
+        minorTicks: 0,
+        label: {
+            anchorX: 'middle',
+            anchorY: 'top',
+            offset: [1, -5]
+        }
+    });
+    var ya = board.create('segment', [[0, 0], [0, 15]], { lastArrow: true, strokeColor: JXG.palette.grey });
+    var yt = board.create('ticks', [ya], {
+        anchor: 'left',
+        drawLabels: true,
+        minorTicks: 0,
+        label: {
+            anchorX: 'right',
+            anchorY: 'middle',
+            offset: [-8, 0]
+        }
+    });
+
+    const h = (x) => 12 * JXG.Math.ratpow(x, -1, 1);
+    var n = board.create('slider', [[6.5, 14], [12, 14], [1, 1, 12]], { snapWidth: 1, size: 4, ticks: { ticksDistance: 1, insertTicks: false, drawLabels: true, label: {fontSize: 1, fontUnit: 'em', offset: [-4, -16], } }, name: 'x', digits: 0, label: {fontSize: 1, fontUnit: 'em', cssClass: 'term'}});
+    var hype = board.create('functiongraph', [h], {strokeWidth: 3, strokeColor: JXG.palette.blue});
+    var P = board.create('point', [() => n.Value(), () => h(n.Value())], { visible: true, name: '' });
+    var O = board.create('point', [0, 0], { visible: false });
+    var X = board.create('point', [() => n.Value(), 0], { visible: false });
+    var Y = board.create('point', [0, () => h(n.Value())], { visible: false });
+    var box = board.create('polygon', [O, X, P, Y], { visible: true });
+
+    for (let i = 0; i < 12; i++) {
+        board.create('segment', [[i, 0], [i, () => h(n.Value())]], { strokeWidth: 1, visible: () => n.Value() > i });
+    }
+    for (let i = 0; i < 12; i++) {
+        board.create('segment', [[0, i], [() => n.Value(), i]], { strokeWidth: 1, visible: () => h(n.Value()) > i });
+    }
+
+</script>
+
+</body>
+</html>

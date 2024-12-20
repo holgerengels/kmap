@@ -24,6 +24,7 @@ public class Node {
     private String educationalLevel;
     private String educationalContext;
     private String typicalAgeRange;
+    private String meta;
     private String description;
     private String summary;
     private String thumb;
@@ -157,6 +158,14 @@ public class Node {
 
     public void setTypicalAgeRange(String typicalAgeRange) {
         this.typicalAgeRange = typicalAgeRange;
+    }
+
+    public String getMeta() {
+        return meta;
+    }
+
+    public void setMeta(String meta) {
+        this.meta = meta;
     }
 
     public String getDescription() {

@@ -88,6 +88,7 @@ export class KMapTestCardContent extends LitElement {
     [
       ...element.getElementsByTagName("dnd-assign"),
       ...element.getElementsByTagName("dnd-fillin"),
+      ...element.getElementsByTagName("kmap-assign"),
       ...element.getElementsByTagName("kmap-solve-tree"),
       ...element.getElementsByTagName("kmap-jsxgraph"),
       ...element.getElementsByTagName("kmap-solvee"),

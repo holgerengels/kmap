@@ -16,6 +16,9 @@ export async function lazyComponents(code: string) {
       console.log("loading component: " + constructor + " from " + source + " as " + tag);
 
       switch (tag) {
+        case 'kmap-assign':
+          customElements.define('kmap-assign', (await import('kmap-assign')).KmapAssign);
+          break;
         case 'kmap-term-tree':
           customElements.define('kmap-term-tree', (await import('kmap-term-tree')).KmapTermTree);
           break;

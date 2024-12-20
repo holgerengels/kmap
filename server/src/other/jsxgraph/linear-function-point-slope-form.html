@@ -34,7 +34,7 @@
 <script>
     var board = JXG.JSXGraph.initBoard('board', {boundingbox: [-5, 5, 5, -5], axis: true, showNavigation: false, showZoom: false, showCopyright: false, pan: { enabled: false}});
     var p = board.create('point', [0, 0], {visible: true, name: 'P', snapToGrid: true, snapSizeX: .5, snapSizeY: .5});
-    var s = board.create('slider', [[-4.5, -4], [-2.5,-4], [-2, 1, 2]], {snapWidth: .5, ticks: { drawLabels: true, label: {fontSize: 16, strokeColor: '#D55E00', offset: [-4, -16]} }, name: 'm', digits: 1, label: {fontSize: 16, strokeColor: '#D55E00'}});
+    var s = board.create('slider', [[-4.5, -4], [-2.5,-4], [-2, 1, 2]], {snapWidth: .5, ticks: { insertTicks: false, drawLabels: true, label: {fontSize: 16, strokeColor: '#D55E00', offset: [-4, -16]} }, name: 'm', digits: 1, label: {fontSize: 16, strokeColor: '#D55E00'}});
     var g = board.create('functiongraph', [(x) => s.Value() * x], {strokeWidth: 1, dash: 2});
     var f = board.create('functiongraph', [(x) => s.Value() * (x-p.X()) + p.Y()], {strokeWidth: 3});
 

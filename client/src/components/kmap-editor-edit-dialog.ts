@@ -38,6 +38,8 @@ export class KMapEditorEditDialog extends Connected {
   @state()
   private _card?: Card = undefined;
   @state()
+  private _meta: string = '';
+  @state()
   private _summary: string = '';
   @state()
   private _description: string = '';
@@ -107,6 +109,8 @@ export class KMapEditorEditDialog extends Connected {
 
   @query('#editDialog')
   private _editDialog: Dialog;
+  @query('#meta')
+  private _metaTextArea: TextArea;
   @query('#summary')
   private _summaryTextArea: TextArea;
   @query('#description')
@@ -138,6 +142,7 @@ export class KMapEditorEditDialog extends Connected {
 
   constructor() {
     super();
+    this._setMeta = throttle(this._setMeta, 1000, this);
     this._setSummary = throttle(this._setSummary, 1000, this);
     //this._setDescription = throttle(this._setDescription, 1000, this);
   }
@@ -153,8 +158,9 @@ export class KMapEditorEditDialog extends Connected {
       this._attachmentMime = '';
       this._attachmentHref = '';
       this._attachmentFile = undefined;
-      this._summary = this._card.summary;
-      this._description = this._card.description;
+      this._meta = this._card.meta || '';
+      this._summary = this._card.summary || '';
+      this._description = this._card.description || '';
       this._thumb = this._card.thumb || '';
       this._keywords = this._card.keywords || '';
       this._sgs = this._card.sgs || '';
@@ -205,6 +211,7 @@ export class KMapEditorEditDialog extends Connected {
       return;
 
     const card: Card = this._card;
+    card.meta = this._meta;
     card.summary = this._summary;
     card.description = this._description;
     card.thumb = this._thumb;
@@ -241,6 +248,10 @@ export class KMapEditorEditDialog extends Connected {
     this._editDialog.close();
     store.dispatch.maps.unsetEditAction();
     store.dispatch.uploads.clearUploads();
+  }
+
+  _setMeta() {
+    this._meta = this._metaTextArea.value;
   }
 
   _setSummary() {
@@ -386,7 +397,7 @@ export class KMapEditorEditDialog extends Connected {
         .preview { grid-area: preview; }
         .content {
           display: grid;
-          grid-template-rows: min-content 3fr;
+          grid-template-rows: min-content min-content 3fr;
         }
         .preview {
           overflow-y: auto;
@@ -487,10 +498,13 @@ export class KMapEditorEditDialog extends Connected {
       <div class="content" ?hidden="${!this._contentVisible}">
         <validating-form @keydown="${this._captureKeys}" @validity="${e => this._contentValid = e.target.valid}">
           <mwc-textarea id="summary" label="Kurztext" ?dialogInitialFocus="${this._card.topic === '_'}" dense
-                        ?required=${this._description} fullwidth rows="1" .value=${this._card.summary}
+                        ?required=${this._description} fullwidth rows="1" .value=${this._summary}
                         @keyup="${this._setSummary}"></mwc-textarea>
+          <mwc-textarea id="meta" label="Metatext" dense
+                        ?required=${this._summary} fullwidth rows="1" .value=${this._meta}
+                        @keyup="${this._setMeta}"></mwc-textarea>
           <div class="scrollcontainer">
-            <kmap-html-editor id="description" placeholder="Inhalt" .value=${this._card.description} @change="${e => this._description = e.detail.value}"></kmap-html-editor>
+            <kmap-html-editor id="description" placeholder="Inhalt" .value=${this._description} @change="${e => this._description = e.detail.value}"></kmap-html-editor>
           </div>
         </validating-form>
       </div>

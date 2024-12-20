@@ -47,13 +47,16 @@ public class AIConnectorServlet extends JsonServlet {
                             ? "https://kmap.eu/app/browser/" + URLs.encode(subject) + "/" + URLs.encode(chapter)
                             : "https://kmap.eu/app/browser/" + URLs.encode(subject) + "/" + URLs.encode(chapter) + "/" + URLs.encode(topic);
 
+                    String meta = stringTrim(card, "meta");
                     String summary = stringTrim(card, "summary");
                     String description = string(card, "description");
                     String text = chapter + "\n";
                     if (!"_".equals(topic))
                         text +=  topic + "\n";
-                    if (summary != null && summary.length() != 0)
+                    if (summary != null && !summary.isEmpty())
                         text += summary;
+                    if (meta != null && !meta.isEmpty())
+                        text += meta;
                     if (description != null) {
                         text += text.endsWith(".") ? " " : ". ";
                         Document document = Jsoup.parse(description);
