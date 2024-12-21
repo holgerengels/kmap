@@ -34,11 +34,10 @@
 <script type='text/javascript'>
     var board = JXG.JSXGraph.initBoard('board', {boundingbox: [-8, 8, 8, -8], axis: true, showNavigation: false, showZoom: false, showCopyright: false, pan: { enabled: false}});
 
-    var a = board.create('slider', [[.5, -5.5], [5, -5.5], [-2, 1, 2.5]], { snapWidth: .5, size: 4, ticks: { ticksDistance: 1, insertTicks: false, drawLabels: true, label: {fontSize: 1, fontUnit: 'em', offset: [-4, -16], } }, name: 'a', digits: 1, label: {fontSize: 1, fontUnit: 'em', cssClass: 'term'}});
     var n = board.create('slider', [[.5, -7], [5, -7], [1, 1, 10]], { snapWidth: 1, size: 4, ticks: { ticksDistance: 1, insertTicks: false, drawLabels: true, label: {fontSize: 1, fontUnit: 'em', offset: [-4, -16], } }, name: 'n', digits: 0, label: {fontSize: 1, fontUnit: 'em', cssClass: 'term'}});
-    var hype = board.create('functiongraph', [(x) => a.Value() * JXG.Math.ratpow(x, -n.Value(), 1)], {strokeWidth: 3, strokeColor: JXG.palette.blue});
+    var hype = board.create('functiongraph', [(x) => JXG.Math.ratpow(x, -n.Value(), 1)], {strokeWidth: 3, strokeColor: JXG.palette.blue});
 
-    var hypet = board.create('text', [1, -4, () => `\\large h(x)={${a.Value()}}\\cdot x^{${-n.Value()}}`], { cssClass: 'term', fixed: true, useKatex: true, color: JXG.palette.blue });
+    var hypet = board.create('text', [1, -4, () => `\\large h(x)=x^{${-n.Value()}}=\\frac{1}{x^{${n.Value()}}}`], { cssClass: 'term', fixed: true, useKatex: true, color: JXG.palette.blue });
 
 </script>
 

@@ -64,7 +64,7 @@ public class Test {
                 System.out.println();
                 row++;
             }
-            else if (!new Integer(0).equals(node.column)) {
+            else if (!Integer.valueOf(0).equals(node.column)) {
                 System.out.print(", ");
             }
             System.out.print(node.topic);

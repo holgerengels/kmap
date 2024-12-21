@@ -8,6 +8,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.collections.iterators.SingletonIterator;
 import org.apache.commons.collections4.IteratorUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventWriter;
@@ -53,14 +56,13 @@ public class SEOServlet extends JsonServlet {
         String subject = extractSubject(req);
         try {
             Server.CLIENT.set("root");
-            XMLOutputFactory factory = XMLOutputFactory.newInstance();
-            XMLEventWriter eventWriter = factory.createXMLEventWriter(resp.getOutputStream());
-            XMLEventFactory eventFactory = XMLEventFactory.newInstance();
 
-            eventWriter.add(eventFactory.createStartDocument());
-            eventWriter.add(eventFactory.createCharacters("\n"));
-
-            startNode(eventWriter, "checks");
+            SortedMap<Element,Element> lines = new TreeMap<>(new Comparator<Element>() {
+                @Override
+                public int compare(Element o1, Element o2) {
+                    return o1.selectFirst("a").text().compareTo(o2.selectFirst("a").text());
+                }
+            });
 
             if (subject != null) {
                 JsonArray array = couch.latest(subject, 100000, false);
@@ -74,85 +76,51 @@ public class SEOServlet extends JsonServlet {
                     Long created = loong(card, "created");
                     String thumb = string(card, "thumb");
                     String keywords = string(card, "keywords");
+                    String meta = string(card, "meta");
                     boolean image = IteratorUtils.toList(card.getAsJsonArray("attachments").iterator()).stream().anyMatch(a -> {
                         String mime = string((JsonObject) a, "mime");
                         return mime != null && mime.startsWith("image/");
                     });
-                    if (created != null && keywords != null && (thumb != null || !image))
+                    if (created != null && keywords != null && meta != null && (thumb != null || !image))
                         continue;
-
-                    startNode(eventWriter, "missing");
 
                     String chapter = string(card, "chapter");
                     String topic = string(card, "topic");
                     String url = "https://kmap.eu/app/browser/" + URLs.encode(subject) + "/" + URLs.encode(chapter) + "/" + URLs.encode(topic);
-
-                    eventWriter.add(eventFactory.createStartElement("", "", "a", new SingletonIterator(eventFactory.createAttribute("href", url)), null));
-                    endNode(eventWriter, "a");
+                    Element dt = new Element("dt");
+                    dt.html("<a target=\"_blank\" href=\"" + url + "\">" + subject + " → " + chapter + " → " + topic + "</a>");
+                    Element dd = new Element("dd");
+                    Element ul = new Element("ul");
+                    dd.appendChild(ul);
 
                     if (created == null)
-                        emptyNode(eventWriter, "created");
+                        ul.appendChild(new Element("li").text("created"));
                     if (thumb == null)
-                        emptyNode(eventWriter, "thumb");
+                        ul.appendChild(new Element("li").text("thumb"));
                     if (keywords == null)
-                        emptyNode(eventWriter, "keywords");
+                        ul.appendChild(new Element("li").text("keywords"));
+                    if (meta == null)
+                        ul.appendChild(new Element("li").text("meta"));
 
-                    endNode(eventWriter, "missing");
+                    lines.put(dt, dd);
                 }
-            }
 
-            eventWriter.add(eventFactory.createEndElement("", "", "checks"));
-            eventWriter.add(eventFactory.createEndDocument());
+                String html = "<html lang=\"de\"><head><meta charset=\"UTF-8\"><title>SEO Checks</title></head><body><dl></dl></body></html>";
+                Document doc = Jsoup.parse(html);
+                Element dl = doc.selectFirst("dl");
+                for (Map.Entry<Element, Element> entry : lines.entrySet()) {
+                    dl.appendChild(entry.getKey());
+                    dl.appendChild(entry.getValue());
+                }
+                resp.setContentType("text/html");
+                resp.setCharacterEncoding("utf-8");
+                resp.getWriter().print(doc.outerHtml());
+            }
         } catch (Exception e) {
             e.printStackTrace();
             sendError(req, resp, e);
         } finally {
             Server.CLIENT.remove();
         }
-    }
-
-    private static void emptyNode(XMLEventWriter eventWriter, String name) throws XMLStreamException {
-        startNode(eventWriter, name);
-        endNode(eventWriter, name);
-    }
-    private static void startNode(XMLEventWriter eventWriter, String name) throws XMLStreamException {
-        XMLEventFactory eventFactory = XMLEventFactory.newInstance();
-        eventWriter.add(eventFactory.createStartElement("", "", name));
-    }
-    private static void endNode(XMLEventWriter eventWriter, String name) throws XMLStreamException {
-        XMLEventFactory eventFactory = XMLEventFactory.newInstance();
-        eventWriter.add(eventFactory.createEndElement("", "", name));
-        eventWriter.add(eventFactory.createCharacters("\n"));
-    }
-
-    private void createNode(XMLEventWriter eventWriter, String name, String value) throws XMLStreamException {
-        createNode(eventWriter, name, value, null, false);
-    }
-    private void createNode(XMLEventWriter eventWriter, String name, String value, Map<String, String> attributes)
-            throws XMLStreamException {
-        createNode(eventWriter, name, value, attributes, false);
-    }
-
-    private void createNode(XMLEventWriter eventWriter, String name, String value, Map<String, String> attributes, boolean cdata)
-            throws XMLStreamException {
-        XMLEventFactory eventFactory = XMLEventFactory.newInstance();
-        XMLEvent end = eventFactory.createDTD("\n");
-        XMLEvent tab = eventFactory.createDTD("\t");
-        // create Start node
-        List<Attribute> attrs = attributes != null
-                ? attributes.entrySet().stream().map((entry) -> eventFactory.createAttribute(entry.getKey(), entry.getValue())).collect(Collectors.toList())
-                : null;
-        StartElement sElement = attrs != null
-                ? eventFactory.createStartElement("", "", name, attrs.iterator(), null)
-                : eventFactory.createStartElement("", "", name);
-        eventWriter.add(tab);
-        eventWriter.add(sElement);
-        // create Content
-        Characters characters = cdata ? eventFactory.createCData(value) : eventFactory.createCharacters(value);
-        eventWriter.add(characters);
-        // create End node
-        EndElement eElement = eventFactory.createEndElement("", "", name);
-        eventWriter.add(eElement);
-        eventWriter.add(end);
     }
 }
