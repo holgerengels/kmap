@@ -57,12 +57,7 @@ public class SEOServlet extends JsonServlet {
         try {
             Server.CLIENT.set("root");
 
-            SortedMap<Element,Element> lines = new TreeMap<>(new Comparator<Element>() {
-                @Override
-                public int compare(Element o1, Element o2) {
-                    return o1.selectFirst("a").text().compareTo(o2.selectFirst("a").text());
-                }
-            });
+            List<Element> lines = new ArrayList<>();
 
             if (subject != null) {
                 JsonArray array = couch.latest(subject, 100000, false);
@@ -87,31 +82,35 @@ public class SEOServlet extends JsonServlet {
                     String chapter = string(card, "chapter");
                     String topic = string(card, "topic");
                     String url = "https://kmap.eu/app/browser/" + URLs.encode(subject) + "/" + URLs.encode(chapter) + "/" + URLs.encode(topic);
-                    Element dt = new Element("dt");
-                    dt.html("<a target=\"_blank\" href=\"" + url + "\">" + subject + " → " + chapter + " → " + topic + "</a>");
-                    Element dd = new Element("dd");
-                    Element ul = new Element("ul");
-                    dd.appendChild(ul);
+                    Element tr = new Element("tr");
+                    Element th = new Element("th");
+                    th.attr("style", "text-align: left");
+                    th.html("<a target=\"_blank\" href=\"" + url + "\">" + subject + " → " + chapter + " → " + topic + "</a>");
+                    th.selectFirst("a").attr("style", "text-decoration: none");
+                    tr.appendChild(th);
 
                     if (created == null)
-                        ul.appendChild(new Element("li").text("created"));
+                        tr.appendChild(new Element("td").text("created"));
                     if (thumb == null)
-                        ul.appendChild(new Element("li").text("thumb"));
+                        tr.appendChild(new Element("td").text("thumb"));
                     if (keywords == null)
-                        ul.appendChild(new Element("li").text("keywords"));
+                        tr.appendChild(new Element("td").text("keywords"));
                     if (meta == null)
-                        ul.appendChild(new Element("li").text("meta"));
+                        tr.appendChild(new Element("td").text("meta"));
 
-                    lines.put(dt, dd);
+                    lines.add(tr);
                 }
 
-                String html = "<html lang=\"de\"><head><meta charset=\"UTF-8\"><title>SEO Checks</title></head><body><dl></dl></body></html>";
+                String html = "<html lang=\"de\"><head><meta charset=\"UTF-8\"><title>SEO Checks</title></head><body style=\"font-family: sans-serif\"><table></table></body></html>";
                 Document doc = Jsoup.parse(html);
-                Element dl = doc.selectFirst("dl");
-                for (Map.Entry<Element, Element> entry : lines.entrySet()) {
-                    dl.appendChild(entry.getKey());
-                    dl.appendChild(entry.getValue());
-                }
+                Element table = doc.selectFirst("table");
+                lines.sort(new Comparator<Element>() {
+                    @Override
+                    public int compare(Element o1, Element o2) {
+                        return o1.selectFirst("a").text().compareTo(o2.selectFirst("a").text());
+                    }
+                });
+                lines.forEach(tr -> table.appendChild(tr));
                 resp.setContentType("text/html");
                 resp.setCharacterEncoding("utf-8");
                 resp.getWriter().print(doc.outerHtml());
