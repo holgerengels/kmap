@@ -155,7 +155,43 @@ export const formStyles: CSSResult = css`
 `;
 
 // language=CSS
-export const calculationStyles: CSSResult = css`
+export const contentStyles: CSSResult = css`
+  container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin: -8px;
+  }
+  box {
+    flex: 1 1 100%;
+    margin: 8px;
+  }
+  growbox {
+    flex: 1 1 100%;
+    margin: 8px;
+  }
+  @media (min-width: 600px) {
+    box {
+      flex: 0 1 auto;
+      margin: 8px;
+    }
+    growbox {
+      flex: 1 1 0px;
+      margin: 8px;
+    }
+  }
+  img {
+    max-width: calc(var(--content-width, 100vw) - 32px);
+  }
+  @media (min-width: 600px) {
+    img {
+      max-width: calc(var(--content-width, 100vw) - 64px);
+    }
+  }
+  figure { margin: 0px; }
+  table {
+    border-collapse: collapse;
+  }
   calculation {
     display: grid;
     grid-gap: 16px;

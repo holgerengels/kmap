@@ -2,7 +2,7 @@ import {css, html, LitElement, PropertyValues, ReactiveElement} from 'lit';
 import {customElement, property, query, state} from 'lit/decorators.js';
 import {unsafeHTML} from 'lit/directives/unsafe-html.js';
 import {urls} from '../urls';
-import {colorStyles, fontStyles, resetStyles} from "./kmap-styles";
+import {colorStyles, contentStyles, fontStyles, resetStyles} from "./kmap-styles";
 import {katexStyles} from "../katex-css";
 import {math} from "../math";
 import {lazyComponents} from "./lazy-components";
@@ -206,6 +206,7 @@ export class KMapTestCardContent extends LitElement {
       resetStyles,
       fontStyles,
       colorStyles,
+      contentStyles,
       katexStyles,
       css`
         :host {
@@ -215,14 +216,6 @@ export class KMapTestCardContent extends LitElement {
           flex-direction: row;
           flex-wrap: wrap;
           gap: 16px;
-        }
-        img {
-          max-width: calc(var(--content-width, 100vw) - 32px);
-        }
-        @media (min-width: 600px) {
-          img {
-            max-width: calc(var(--content-width, 100vw) - 64px);
-          }
         }
         input[type=checkbox] {
           vertical-align: middle;

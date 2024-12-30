@@ -33,7 +33,7 @@
 
 <script type='text/javascript'>
     var board = JXG.JSXGraph.initBoard('board', {boundingbox: [-1, 15, 15, -1], axis: false, showNavigation: false, showZoom: false, showCopyright: false, pan: { enabled: false}});
-    var xa = board.create('segment', [[0, 0], [15, 0]], { lastArrow: true });
+    var xa = board.create('segment', [[0, 0], [15, 0]], { lastArrow: true, strokeColor: '#444', strokeWidth: 1 });
     var xt = board.create('ticks', [xa], {
         anchor: 'left',
         drawLabels: true,
@@ -44,7 +44,7 @@
             offset: [1, -5]
         }
     });
-    var ya = board.create('segment', [[0, 0], [0, 15]], { lastArrow: true, strokeColor: JXG.palette.grey });
+    var ya = board.create('segment', [[0, 0], [0, 15]], { lastArrow: true, strokeColor: '#444', strokeWidth: 1 });
     var yt = board.create('ticks', [ya], {
         anchor: 'left',
         drawLabels: true,
@@ -57,19 +57,23 @@
     });
 
     const h = (x) => 12 * JXG.Math.ratpow(x, -1, 1);
-    var n = board.create('slider', [[6.5, 14], [12, 14], [1, 1, 12]], { snapWidth: 1, size: 4, ticks: { ticksDistance: 1, insertTicks: false, drawLabels: true, label: {fontSize: 1, fontUnit: 'em', offset: [-4, -16], } }, name: 'x', digits: 0, label: {fontSize: 1, fontUnit: 'em', cssClass: 'term'}});
-    var hype = board.create('functiongraph', [h], {strokeWidth: 3, strokeColor: JXG.palette.blue});
+    var n = board.create('slider', [[5.5, 14], [12, 14], [1, 1, 14]], { snapWidth: 1, size: 4, ticks: { ticksDistance: 1, insertTicks: false, drawLabels: true, label: {fontSize: 1, fontUnit: 'em', offset: [-4, -16], } }, name: 'x', digits: 0, label: {fontSize: 1, fontUnit: 'em', cssClass: 'term'}});
+    var checkbox = board.create('checkbox', [5.5, 12, 'Graph']);
+    var hype = board.create('functiongraph', [h], {visible: () => checkbox.Value(), strokeWidth: 3, strokeColor: JXG.palette.blue});
     var P = board.create('point', [() => n.Value(), () => h(n.Value())], { visible: true, name: '' });
     var O = board.create('point', [0, 0], { visible: false });
     var X = board.create('point', [() => n.Value(), 0], { visible: false });
     var Y = board.create('point', [0, () => h(n.Value())], { visible: false });
-    var box = board.create('polygon', [O, X, P, Y], { visible: true });
+    var box = board.create('polygon', [O, X, P, Y], { borders: { strokeWidth: 2 }, fillColor: JXG.palette.blue, fillOpacity: .1 });
 
-    for (let i = 0; i < 12; i++) {
+    for (let i = 1; i < 14; i++) {
         board.create('segment', [[i, 0], [i, () => h(n.Value())]], { strokeWidth: 1, visible: () => n.Value() > i });
     }
-    for (let i = 0; i < 12; i++) {
+    for (let i = 1; i < 14; i++) {
         board.create('segment', [[0, i], [() => n.Value(), i]], { strokeWidth: 1, visible: () => h(n.Value()) > i });
+    }
+    for (let i = 1; i < 14; i++) {
+        board.create('point', [i, () => h(i)], { name: '', visible: () => n.Value() > i });
     }
 
 </script>
