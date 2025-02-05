@@ -341,10 +341,10 @@ public class Couch extends Server {
     }
 
     private boolean checks(JsonObject object) {
-        return !isNull(object, "module") && string(object, "module") != null
-            && !isNull(object, "subject") && string(object, "subject") != null
-            && !isNull(object, "chapter") && string(object, "chapter") != null
-            && !isNull(object, "topic") && string(object, "topic") != null;
+        return !isMissingOrNull(object,"module")
+            && !isMissingOrNull(object,"subject")
+            && !isMissingOrNull(object,"chapter")
+            && !isMissingOrNull(object,"topic");
     }
 
     private boolean equals(JsonObject element, String subject, String chapter, String topic) {

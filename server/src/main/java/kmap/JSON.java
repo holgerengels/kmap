@@ -13,6 +13,11 @@ import java.util.stream.StreamSupport;
 public class JSON {
     private static DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
 
+    public static boolean isMissingOrNull(JsonObject topic, String name) {
+        JsonElement value = topic.get(name);
+        return value == null || value.isJsonNull();
+    }
+
     public static boolean isNull(JsonObject topic, String name) {
         return topic.get(name).isJsonNull();
     }

@@ -399,11 +399,11 @@ public class Tests {
     }
 
     private boolean checks(JsonObject object) {
-        return !isNull(object, "set") && string(object, "set") != null
-            && !isNull(object, "subject") && string(object, "subject") != null
-            && !isNull(object, "chapter") && string(object, "chapter") != null
-            && !isNull(object, "topic") && string(object, "topic") != null
-            && !isNull(object, "key") && string(object, "key") != null;
+        return !isMissingOrNull(object, "set")
+            && !isMissingOrNull(object, "subject")
+            && !isMissingOrNull(object, "chapter")
+            && !isMissingOrNull(object, "topic")
+            && !isMissingOrNull(object, "key");
     }
 
     private boolean equals(JsonObject element, String subject, String chapter, String topic, String key) {

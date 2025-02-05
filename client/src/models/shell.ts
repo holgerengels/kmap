@@ -88,8 +88,8 @@ export default createModel({
       updateMeta(meta: Meta) {
         const title = meta.detail ? meta.title  + " - " + meta.detail : meta.title;
         console.log("update meta " + title);
-        const docTitle = title || "KMap";
-        const description = meta.description || "KMap kartographiert Wissen mit Zusammenhang";
+        const docTitle = title || "Wissenslandkarten";
+        const description = meta.description || "KMap kartografiert Wissen auf übersichtlichen Wissenslandkarten. Du erkennst sofort, wie alles zusammenhängt und wo welches Wissen vorausgesetzt wird. Durch Einfärben der Wissenskarten kannst du deinen Lernfortschritt sichtbar machen. So weißt du immer, wo du stehst.";
         document.title = docTitle ? docTitle + " - KMap" : "KMap";
         updateMetadata({ title: title, description: description, image: meta.image, keywords: meta.keywords });
         updateLd({

@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <title>Quadratische Funktion - Scheitelpunktform</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <link rel='stylesheet' type='text/css' href='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraph.css'/>
+    <script src='https://cdn.jsdelivr.net/npm/jsxgraph@latest/distrib/jsxgraphcore.js' type='text/javascript'></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js" crossorigin="anonymous"></script>
+
+    <style>
+        body {
+            margin: 0px;
+            padding: 0px;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr;
+            position: relative;
+        }
+        .jxgbox { border-radius: 0px; border: none}
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id='board' class='jxgbox' style='width: 100%; aspect-ratio: 1'></div>
+</div>
+
+<script>
+    var board = JXG.JSXGraph.initBoard('board', {boundingbox: [-5, 9.5, 5, -.5], axis: true, showNavigation: false, showZoom: false, showCopyright: false, pan: { enabled: false}});
+    var s = board.create('segment', [[-4, 0], [4, 0]], {visible: false});
+    var s = board.create('glider', [2,0,s], {visible: true, name: "", snapToGrid: true, snapSizeX: .5, snapSizeY: .5});
+    var g = board.create('functiongraph', [(x) => x**2], {strokeWidth: 1, dash: 2});
+    var f = board.create('functiongraph', [(x) => (x-s.X())**2], {strokeWidth: 3});
+
+    var p = board.create('point', [() => s.X() + 2, 4], {visible: true, name: "P"});
+    var q = board.create('point', [() => 2, 4], {visible: true, name: ""});
+    var a = board.create('arrow', [[() => s.X() + 2, 0], [2,0]], {visible: true, name: ""});
+    var a = board.create('arrow', [[2, 0], [2,4]], {visible: true, name: ""});
+    var a = board.create('arrow', [q, p], {visible: true, name: ""});
+    var a = board.create('arrow', [[() => s.X() + 2, 0], [() => s.X() + 2, 4]], {visible: true, name: ""});
+
+    var text = board.create('text', [.3, -4, () => {
+        const plusminus = val => val < 0 ? "- " + (-val) : "+ " + val;
+        return "f(x) = (x " + plusminus(-p.X()) + ")^2";
+    }], {useKatex: true});
+</script>
+
+</body>
+</html>

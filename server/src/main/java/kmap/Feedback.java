@@ -11,8 +11,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static kmap.JSON.isNull;
-import static kmap.JSON.string;
+import static kmap.JSON.*;
 
 public class Feedback {
     private Couch couch;
@@ -40,11 +39,11 @@ public class Feedback {
     }
 
     private boolean checks(JsonObject object) {
-        return !isNull(object, "subject") && string(object, "subject") != null
-                && !isNull(object, "chapter") && string(object, "chapter") != null
-                && !isNull(object, "type") && string(object, "type") != null
-                && !isNull(object, "title") && string(object, "title") != null
-                && !isNull(object, "text") && string(object, "text") != null;
+        return !isMissingOrNull(object, "subject")
+                && !isMissingOrNull(object, "chapter")
+                && !isMissingOrNull(object, "type")
+                && !isMissingOrNull(object, "title")
+                && !isMissingOrNull(object, "text");
     }
 
     public synchronized void bug(String json) {
@@ -62,8 +61,8 @@ public class Feedback {
     }
 
     private boolean errorChecks(JsonObject object) {
-        return !isNull(object, "title") && string(object, "title") != null
-                && !isNull(object, "text") && string(object, "text") != null;
+        return !isMissingOrNull(object, "title")
+                && !isMissingOrNull(object, "text");
     }
 
     public synchronized void resolve(String json) {
