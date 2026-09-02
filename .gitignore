@@ -3,6 +3,23 @@ node_modules
 package-lock.json
 dist/
 target/
+stuff/
 .idea/
 kmap.properties
 serviceAccountKey.json
+
+# TypeScript compilation output
+client/src/**/*.js
+client/src/**/*.js.map
+
+# Service Worker / Workbox build artifacts
+client/sw.js
+client/sw.js.map
+client/workbox-*.js
+client/workbox-*.js.map
+
+snappy/src/config.json
+
+# IDE and desktop environment files
+.vscode/
+.directory
