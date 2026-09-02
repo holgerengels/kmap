@@ -43,19 +43,20 @@
     this.point = function(label, x, y, z, attrs) {
         return board.create('point', [y-x/2, z-x/2], { visible: true, name: label, size: 2, snapToGrid: true, snapSizeX: .5, snapSizeY: .5, ...attrs });
     }
-
+/*
     var a = this.point('', 5, 5, 1, { visible: true });
-    var b = this.point('', 1, 5, 4, { visible: true }); // -2 |  3 | -1
-    var c = this.point('', 1, 0, 4, { visible: true }); // -8 | -2 |  2
+    var b = this.point('', 5, 5, 4, { visible: true });
+    var c = this.point('', 1, 0, 4, { visible: true });
     var d = this.point('', 5, 0, 1, { visible: true });
 
     board.create('line', [a, b], { visible: true, straightFirst: false, straightLast: false, color: JXG.palette.green });
-    board.create('line', [b, c], { visible: true, straightFirst: false, straightLast: false, color: JXG.palette.green });
     board.create('line', [c, d], { visible: true, straightFirst: false, straightLast: false, color: JXG.palette.green });
     board.create('line', [d, a], { visible: true, straightFirst: false, straightLast: false, color: JXG.palette.green });
 
-    board.create('angle', [b, a, d], { visible: true, name: () => '', radius: 1, type: 'sectordot', color: JXG.palette.green, fillOpacity: .2 });
+    board.create('angle', [b, a, d], { visible: true, name: () => '', radius: 1, type: 'sectordot', orthoType: 'sectordot', color: JXG.palette.green, fillOpacity: .2 });
     board.create('angle', [a, d, c], { visible: true, name: () => '', radius: 1, type: 'sectordot', color: JXG.palette.green, fillOpacity: .2 });
+
+ */
   //]]></script>
 </kmap-jsxgraph>
 

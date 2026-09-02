@@ -487,8 +487,6 @@ export class KmapMain extends connect(store, LitElement) {
       <!--googleon: all-->
       <div class="cc-fb-inst">
         <a class="license" rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/deed.de"><img width="88" height="31" src="/app/icons/cc-by-sa.png" alt="CC BY-SA 4.0" loading="lazy"></a>
-        <a class="social" href="https://www.facebook.com/kmap.eu/"><img height="24" src="icons/facebook-logo.svg" alt="facebook" loading="lazy"/></a>
-        <a class="social" href="https://www.instagram.com/kmap_eu/"><img height="24" src="icons/instagram-logo.svg" alt="instagram" loading="lazy"/></a>
       </div>
     `;
   }

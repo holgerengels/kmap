@@ -73,7 +73,8 @@
     var A = board.create('point', [-4, 0], { visible: false, fixed: true })
     var B = board.create('point', [4, 0], { visible: false, fixed: true })
     var bar = board.create('segment', [A,B], { visible: true, fixed: true })
-    bar.on('dblclick', e => {
+
+    const add = function (e) {
         let coords = new JXG.Coords(JXG.COORDS_BY_SCREEN, board.getMousePosition(e), board);
         let x = coords.usrCoords[1];
         var g = board.create('glider', [x, 0, bar], { visible: true, withLabel: false })
@@ -82,7 +83,26 @@
         g.on('up', () => {
             g.moveTo([Math.round(g.X()*2)/2, 0], 100, { effect: '<>', callback: plot });
         });
-    });
+    };
+
+    let expired;
+    const doubleTouch = function (e) {
+        console.log("touch")
+        if (e.touches.length === 1) {
+            if (!expired) {
+                expired = e.timeStamp + 400
+            } else if (e.timeStamp <= expired) {
+                e.preventDefault()
+                add(e)
+                expired = null
+            } else {
+                expired = e.timeStamp + 400
+            }
+        }
+    }
+
+    bar.on('dblclick', add);
+    bar.on('touchstart', doubleTouch);
     a.on('drag', plot);
 
     document.getElementById('revert').addEventListener('click', () => {

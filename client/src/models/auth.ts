@@ -71,9 +71,6 @@ async function providerFromName(name: string) {
     case 'google':
       // @ts-ignore
       return module.google;
-    case 'facebook':
-      // @ts-ignore
-      return module.facebook;
     default:
       throw `unknown provider ${name}`
   }
@@ -104,5 +101,5 @@ export namespace AuthSelectors {
 }
 
 const _errorCodes = new Map([
-  ["auth/account-exists-with-different-credential", "Es existiert bereits ein Konto mit der gleichen E-Mail-Adresse!"],
+  ["auth/account-exists-with-different-credential", "Es existiert bereits ein Konto mit der gleichen E-Mail-Adresse!"]
 ]);
