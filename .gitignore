@@ -23,3 +23,4 @@ snappy/src/config.json
 # IDE and desktop environment files
 .vscode/
 .directory
+root-users.csv
