@@ -2,23 +2,77 @@ version: "3.8"
 
 services:
   couchdb:
-    image: couchdb:latest
+    image: kmap-couchdb:latest
     restart: unless-stopped
     volumes:
       - couchdb:/opt/couchdb/data
     networks:
       kmap:
         aliases:
-          - couchdb
+         - couchdb
     environment:
       COUCHDB_USER: admin
       COUCHDB_PASSWORD: secret
     ports:
       - "127.0.0.1:5984:5984"
 
+  jetty:
+    image: kmap-jetty:latest
+    restart: unless-stopped
+    environment:
+      JAVA_OPTIONS: "-Djavax.net.ssl.trustStore=/var/lib/jetty/auth/trustStore -Djavax.net.ssl.trustStorePassword=changeit"
+    volumes:
+      - jetty:/var/lib/jetty/auth
+    networks:
+      kmap:
+        aliases:
+          - jetty
+    links:
+      - couchdb
+    depends_on:
+      - couchdb
+    ports:
+      - "127.0.0.1:8080:8080"
+
+  nginx:
+    image: kmap-nginx:latest
+    restart: unless-stopped
+    networks:
+      kmap:
+        aliases:
+          - nginx
+    links:
+      - jetty
+    depends_on:
+      - jetty
+    ports:
+      - "80:80"
+      - "443:443"
+
+  snappy:
+    image: kmap-snappy:latest
+    restart: unless-stopped
+    volumes:
+      - snappy:/opt/snappy/snaps
+    networks:
+      kmap:
+        aliases:
+          - snappy
+    links:
+      - jetty
+      - couchdb
+    depends_on:
+      - jetty
+      - couchdb
+    ports:
+      - "127.0.0.1:8090:8090"
+    extra_hosts:
+      - "kmap.eu:host-gateway"
+
 volumes:
   couchdb:
+  jetty:
+  snappy:
 
 networks:
-  kmap:
-
+  kmap: 
