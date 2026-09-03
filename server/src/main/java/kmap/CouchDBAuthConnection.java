@@ -21,13 +21,21 @@ public class CouchDBAuthConnection extends AuthConnection {
         return connection.createClient("auth");
     }
 
+    private boolean checkPassword(String plain, String hash) {
+        if (hash == null) return false;
+        if (hash.startsWith("$2b$") || hash.startsWith("$2y$")) {
+            hash = "$2a$" + hash.substring(4);
+        }
+        return BCrypt.checkpw(plain, hash);
+    }
+
     @Override
     Set<String> doauthenticate(String user, String password) {
         try {
             CouchDbClient client = authClient();
             JsonObject userDoc = client.find(JsonObject.class, "user:" + user);
             String hash = JSON.string(userDoc, "passwordHash");
-            if (hash != null && BCrypt.checkpw(password, hash)) {
+            if (checkPassword(password, hash)) {
                 Set<String> roles = new HashSet<>();
                 roles.add("user");
                 JsonArray rolesArray = userDoc.getAsJsonArray("roles");
@@ -139,7 +147,7 @@ public class CouchDBAuthConnection extends AuthConnection {
         try {
             JsonObject userDoc = client.find(JsonObject.class, "user:" + userid);
             String hash = JSON.string(userDoc, "passwordHash");
-            if (hash == null || !BCrypt.checkpw(oldPassword, hash)) {
+            if (!checkPassword(oldPassword, hash)) {
                 return false;
             }
             userDoc.addProperty("passwordHash", BCrypt.hashpw(newPassword, BCrypt.gensalt()));
