@@ -111,7 +111,7 @@ public class Authentication {
         JsonServlet.writeResponse(request, resp, array);
     }
 
-    private Set<String> authenticate(String user, String password) {
+    public Set<String> authenticate(String user, String password) {
         boolean authenticate = Boolean.parseBoolean(getProperty("auth.authenticate"));
         if (!authenticate && "admin".equals(password)) {
             Set<String> roles = new HashSet<>();

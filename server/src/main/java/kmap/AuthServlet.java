@@ -227,7 +227,12 @@ public class AuthServlet extends JsonServlet {
             return;
         }
 
-        if (couchDB.changePassword(userid, oldPassword, newPassword)) {
+        if (authentication.authenticate(userid, oldPassword) == null) {
+            sendError(req, resp, HttpServletResponse.SC_BAD_REQUEST, "Altes Passwort ist falsch");
+            return;
+        }
+
+        if (couchDB.changePassword(userid, newPassword)) {
             writeResponse(req, resp, new JsonPrimitive("Passwort wurde ge\u00e4ndert"));
         } else {
             sendError(req, resp, HttpServletResponse.SC_BAD_REQUEST, "Altes Passwort ist falsch");

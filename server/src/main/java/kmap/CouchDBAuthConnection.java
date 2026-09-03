@@ -142,14 +142,10 @@ public class CouchDBAuthConnection extends AuthConnection {
         }
     }
 
-    public boolean changePassword(String userid, String oldPassword, String newPassword) {
+    public boolean changePassword(String userid, String newPassword) {
         CouchDbClient client = authClient();
         try {
             JsonObject userDoc = client.find(JsonObject.class, "user:" + userid);
-            String hash = JSON.string(userDoc, "passwordHash");
-            if (!checkPassword(oldPassword, hash)) {
-                return false;
-            }
             userDoc.addProperty("passwordHash", BCrypt.hashpw(newPassword, BCrypt.gensalt()));
             client.update(userDoc);
             return true;
