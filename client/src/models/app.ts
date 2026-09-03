@@ -19,6 +19,13 @@ export interface Credentials {
   password: string,
 }
 
+export interface Registration {
+  userid: string,
+  email: string,
+  password: string,
+  displayName: string,
+}
+
 export interface AppState {
   version: string,
   instance: string,
@@ -111,7 +118,7 @@ export default createModel({
         const state = store.getState();
 
         dispatch.app.requestLogin();
-        fetchjson(`${urls.server}state?login=${payload.userid}`, {
+        fetchjson(`${urls.server}auth?login=${payload.userid}`, {
             ...endpoint.post(state),
             body: JSON.stringify(payload)
           },
@@ -127,7 +134,7 @@ export default createModel({
         const state = store.getState();
 
         dispatch.app.requestLogout();
-        fetchjson(`${urls.server}state?logout=${state.app.userid}`, {
+        fetchjson(`${urls.server}auth?logout=${state.app.userid}`, {
             ...endpoint.post(state),
             body: JSON.stringify({userid: state.app.userid})
           },
@@ -151,6 +158,89 @@ export default createModel({
           },
           dispatch.app.handleError,
           dispatch.app.error);
+      },
+      async deleteAccount() {
+        const state = store.getState();
+
+        dispatch.app.requestDeleteData();
+        // First delete learning data
+        fetchjson(`${urls.server}state?delete=${state.app.userid}`, {
+            ...endpoint.post(state),
+            body: JSON.stringify({userid: state.app.userid})
+          },
+          () => {
+            // Then delete the CouchDB account
+            fetchjson(`${urls.server}auth?delete-account=true`, {
+                ...endpoint.post(state),
+                body: JSON.stringify({userid: state.app.userid})
+              },
+              () => {
+                dispatch.app.receivedDeleteData();
+                dispatch.app.receivedLogout();
+                dispatch.shell.showMessage("Konto und Daten wurden gelöscht");
+              },
+              dispatch.app.handleError,
+              dispatch.app.error);
+          },
+          dispatch.app.handleError,
+          dispatch.app.error);
+      },
+      async register(payload: Registration) {
+        const state = store.getState();
+
+        dispatch.app.requestLogin();
+        fetchjson(`${urls.server}auth?register=true`, {
+            ...endpoint.post(state),
+            body: JSON.stringify(payload)
+          },
+          () => {
+            dispatch.app.loginResponse("Registrierung erfolgreich! Du kannst dich jetzt anmelden.");
+          },
+          dispatch.app.handleError,
+          dispatch.app.loginResponse);
+      },
+      async resetPassword(email: string) {
+        const state = store.getState();
+
+        dispatch.app.requestLogin();
+        fetchjson(`${urls.server}auth?reset-password=true`, {
+            ...endpoint.post(state),
+            body: JSON.stringify({email: email})
+          },
+          (json) => {
+            dispatch.app.loginResponse(json);
+          },
+          dispatch.app.handleError,
+          dispatch.app.loginResponse);
+      },
+      async resetPasswordConfirm(payload: {token: string, password: string}) {
+        const state = store.getState();
+
+        dispatch.app.requestLogin();
+        fetchjson(`${urls.server}auth?reset-password-confirm=true`, {
+            ...endpoint.post(state),
+            body: JSON.stringify(payload)
+          },
+          (json) => {
+            dispatch.app.loginResponse(json);
+          },
+          dispatch.app.handleError,
+          dispatch.app.loginResponse);
+      },
+
+      async changePassword(payload: {oldPassword: string, newPassword: string}) {
+        const state = store.getState();
+
+        dispatch.app.requestLogin();
+        fetchjson(`${urls.server}auth?change-password=true`, {
+            ...endpoint.post(state),
+            body: JSON.stringify(payload)
+          },
+          (json) => {
+            dispatch.app.loginResponse(json);
+          },
+          dispatch.app.handleError,
+          dispatch.app.loginResponse);
       },
 
       handleError(error: Error) {

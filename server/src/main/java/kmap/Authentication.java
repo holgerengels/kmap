@@ -1,8 +1,5 @@
 package kmap;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseAuthException;
-import com.google.firebase.auth.FirebaseToken;
 import com.google.gson.*;
 import com.opencsv.CSVReader;
 import org.apache.commons.io.IOUtils;
@@ -24,7 +21,6 @@ public class Authentication {
 
     public Authentication(Properties properties) {
         this.properties = properties;
-        //ExtendedTrustManager.getInstance(properties);
     }
 
     private Map<String, Account> getCSV() {
@@ -125,43 +121,29 @@ public class Authentication {
             roles.add("student");
             return roles;
         }
-        if ("root".equals(Server.CLIENT.get())) {
-            Set<String> roles = verifyIdToken(user, password);
-            Map<String, Account> csv = getCSV();
+
+        // 1. Primary Auth (CouchDB, LDAP, or NoConnection — depending on auth.type)
+        AuthConnection connection = AuthConnection.get(properties);
+        Set<String> roles = connection.doauthenticate(user, password);
+
+        // 2. CSV role overlay (when primary auth succeeded)
+        Map<String, Account> csv = getCSV();
+        if (roles != null && csv != null) {
             Account account = csv.get(user);
             if (account != null)
                 roles.addAll(account.roles);
-            return roles;
         }
-        else {
-            AuthConnection connection = AuthConnection.get(properties);
-            Set<String> roles = connection.doauthenticate(user, password);
-            Map<String, Account> csv = getCSV();
-            if (roles == null && csv != null) {
-                Account account = csv.get(user);
-                roles = account != null && account.match(password) ? account.roles : null;
 
-                if (roles == null)
-                    System.out.println("csv auth failed");
-            }
-            return roles;
-        }
-    }
+        // 3. CSV auth fallback (when primary auth failed)
+        if (roles == null && csv != null) {
+            Account account = csv.get(user);
+            roles = account != null && account.match(password) ? account.roles : null;
 
-    private Set<String> verifyIdToken(String user, String token) {
-        try {
-            FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(token);
-            //System.out.println("uid = " + decodedToken.getUid());
-            Set<String> roles = new HashSet<>(2);
-            roles.add("user");
-            roles.add("student");
-            roles.add("displayName:" + decodedToken.getName());
-            return roles;
+            if (roles == null)
+                System.out.println("csv auth failed");
         }
-        catch (FirebaseAuthException e) {
-            e.printStackTrace();
-            return null;
-        }
+
+        return roles;
     }
 
     void checkRole(HttpServletRequest request, String role) throws AuthException {

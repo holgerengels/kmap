@@ -170,11 +170,11 @@ export class KMapContentManagerInstances extends Connected {
         <div class="form">
           <label>Instanzen</label>
           <span style="float: right">
-          <mwc-icon @click="${() => this._showPage('sync')}">merge_type</mwc-icon>
-          <mwc-icon @click="${() => this._showPage('edit')}" ?disabled="${this._selectedIndex === -1}">edit</mwc-icon>
-          <mwc-icon @click="${() => this._showPage('batch')}" ?disabled="${this._selectedIndex === -1}">dynamic_feed</mwc-icon>
-          <mwc-icon @click="${() => this._showPage('create')}">add</mwc-icon>
-          <mwc-icon @click="${() => this._showPage('drop')}" ?disabled="${this._selectedIndex === -1}">delete</mwc-icon>
+          <mwc-icon @click="${() => this._showPage('sync')}" title="Inhalte übertragen">merge_type</mwc-icon>
+          <mwc-icon @click="${() => this._showPage('edit')}" ?disabled="${this._selectedIndex === -1}" title="Bearbeiten">edit</mwc-icon>
+          <mwc-icon @click="${() => this._showPage('batch')}" ?disabled="${this._selectedIndex === -1}" title="Batch-Änderung">dynamic_feed</mwc-icon>
+          <mwc-icon @click="${() => this._showPage('create')}" title="Neue Instanz">add</mwc-icon>
+          <mwc-icon @click="${() => this._showPage('drop')}" ?disabled="${this._selectedIndex === -1}" title="Löschen">delete</mwc-icon>
           </span>
           <br style="clear: right"/>
           <div class="scroll">

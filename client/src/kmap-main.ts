@@ -160,6 +160,13 @@ export class KmapMain extends connect(store, LitElement) {
         this._userActive = false;
       }
     }, 1000 * 60 * 10);
+
+    // Handle reset-token from password reset email
+    const urlParams = new URLSearchParams(window.location.search);
+    const resetToken = urlParams.get('reset-token');
+    if (resetToken) {
+      this._showResetPasswordConfirm(resetToken);
+    }
   }
 
   willUpdate(changedProps: PropertyValues) {
@@ -245,6 +252,13 @@ export class KmapMain extends connect(store, LitElement) {
       await import('./components/kmap-login-popup');
     }
     this._loginPopup.show();
+  }
+
+  async _showResetPasswordConfirm(token: string) {
+    if (customElements.get('kmap-login-popup') === undefined) {
+      await import('./components/kmap-login-popup');
+    }
+    this._loginPopup.showResetPasswordConfirm(token);
   }
 
   async _showChooseInstance() {
@@ -413,21 +427,19 @@ export class KmapMain extends connect(store, LitElement) {
     return html`
       <nav class="drawer-list">
         <a ?selected="${this._page === 'home'}" href="/app/">Startseite</a>
-        ${this._roles.includes('teacher')
-          ? html` <a ?selected="${this._page === 'test'}" href="/app/test">Test</a> `
-          : ''}
+        <a ?selected="${this._page === 'test'}" href="/app/test" ?hidden="${!this._roles.includes('teacher') && !this._roles.includes('admin')}">Test</a>
         <a
           ?selected="${this._page === 'courses'}"
           ?disabled="${!this._roles.includes('teacher')}"
           href="/app/courses"
           >Kurse</a
         >
+        ${this._roles.includes('teacher') || this._roles.includes('admin') ? html`
         <a
           ?selected="${this._page === 'content-manager'}"
-          ?disabled="${!this._roles.includes('teacher')}"
           href="/app/content-manager"
           >Content Manager</a
-        >
+        >` : ''}
         <a href="/app/browser/Hilfe/Hilfe">Hilfe</a>
         <a ?selected="${this._page === 'blog'}" href="/app/blog">Blog</a>
         <a href="/app/browser/Hilfe/Hilfe/Impressum">Impressum</a>

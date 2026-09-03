@@ -135,8 +135,8 @@ export class KMapContentManagerFeedback extends Connected {
         <div class="form">
           <label>Feedback</label>
           <span style="float: right">
-          <mwc-icon @click="${() => this._showPage('resolve')}" ?disabled="${this._selectedIndex === -1}">check</mwc-icon>
-          <mwc-icon @click="${() => this._showPage('purge')}">auto_delete</mwc-icon>
+          <mwc-icon @click="${() => this._showPage('resolve')}" ?disabled="${this._selectedIndex === -1}" title="Bearbeitet">check</mwc-icon>
+          <mwc-icon @click="${() => this._showPage('purge')}" title="Alte löschen">auto_delete</mwc-icon>
           </span>
           <br style="clear: right"/>
           <div class="scroll">

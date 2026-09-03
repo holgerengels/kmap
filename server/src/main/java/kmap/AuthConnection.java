@@ -22,6 +22,11 @@ public abstract class AuthConnection {
                 System.out.println("New LinuxmusterConnection\n" + properties.toString());
                 connection = new LinuxmusterConnection(properties);
             }
+            else if ("couchdb".equals(properties.get("auth.type"))
+                    || properties.get("auth.type") == null) {
+                System.out.println("New CouchDBAuthConnection");
+                connection = new CouchDBAuthConnection(properties);
+            }
             else
                 connection = new NoConnection();
 

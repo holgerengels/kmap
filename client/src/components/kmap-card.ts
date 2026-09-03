@@ -1,19 +1,19 @@
-import {LitElement, html, css, PropertyValues} from 'lit';
-import {customElement, property, query, state, eventOptions} from 'lit/decorators.js';
+import { LitElement, html, css, PropertyValues } from 'lit';
+import { customElement, property, query, state, eventOptions } from 'lit/decorators.js';
 
 import '@material/mwc-icon';
 import '@material/mwc-ripple/mwc-ripple';
-import {Ripple} from '@material/mwc-ripple/mwc-ripple';
-import {RippleHandlers} from '@material/mwc-ripple/ripple-handlers';
-import {resetStyles, fontStyles, colorStyles, elevationStyles} from "./kmap-styles";
-import {StyleInfo, styleMap} from 'lit/directives/style-map.js';
-import {unsafeHTML} from "lit/directives/unsafe-html.js";
+import { Ripple } from '@material/mwc-ripple/mwc-ripple';
+import { RippleHandlers } from '@material/mwc-ripple/ripple-handlers';
+import { resetStyles, fontStyles, colorStyles, elevationStyles } from "./kmap-styles";
+import { StyleInfo, styleMap } from 'lit/directives/style-map.js';
+import { unsafeHTML } from "lit/directives/unsafe-html.js";
 
 @customElement('kmap-card')
 export class KMapCard extends LitElement {
-  @property({type: String})
+  @property({ type: String })
   private header?: string = undefined;
-  @property({type: String})
+  @property({ type: String })
   private subHeader?: string = undefined;
   @property()
   private primaryLink?: string = undefined;
@@ -22,7 +22,7 @@ export class KMapCard extends LitElement {
 
   // @ts-ignore
   private _inside: boolean = false;
-  @property({reflect: true, type: Boolean})
+  @property({ reflect: true, type: Boolean })
   // @ts-ignore
   private hover: boolean = false;
   @query('#ripple')
@@ -48,26 +48,26 @@ export class KMapCard extends LitElement {
 
   protected updated(_changedProperties: PropertyValues) {
     if (_changedProperties.has("hover") && _changedProperties.get("hover") !== undefined) {
-      this.dispatchEvent(new CustomEvent('hover', {bubbles: true, composed: true, detail: {hover: this.hover}}));
+      this.dispatchEvent(new CustomEvent('hover', { bubbles: true, composed: true, detail: { hover: this.hover } }));
     }
   }
 
   _slotChange(e) {
     switch (e.target.name) {
       case "teaser":
-        this._teaserElements = (e.target as HTMLSlotElement).assignedElements({flatten: true});
+        this._teaserElements = (e.target as HTMLSlotElement).assignedElements({ flatten: true });
         break;
       case "primary":
-        this._primaryElements = (e.target as HTMLSlotElement).assignedElements({flatten: true});
+        this._primaryElements = (e.target as HTMLSlotElement).assignedElements({ flatten: true });
         break;
       case "button":
-        this._buttonElements = (e.target as HTMLSlotElement).assignedElements({flatten: true});
+        this._buttonElements = (e.target as HTMLSlotElement).assignedElements({ flatten: true });
         break;
       case "icon":
-        this._iconElements = (e.target as HTMLSlotElement).assignedElements({flatten: true});
+        this._iconElements = (e.target as HTMLSlotElement).assignedElements({ flatten: true });
         break;
       default:
-        this._secondaryElements = (e.target as HTMLSlotElement).assignedElements({flatten: true});
+        this._secondaryElements = (e.target as HTMLSlotElement).assignedElements({ flatten: true });
         break;
     }
     const hasPrimary = this._primaryElements.length !== 0 || this.header !== undefined || this.subHeader !== undefined;
@@ -99,7 +99,7 @@ export class KMapCard extends LitElement {
     this._rippleHandlers.startPress(e);
   }
 
-  @eventOptions({passive: true})
+  @eventOptions({ passive: true })
   _touchstart(e) {
     //e.preventDefault();
     const onTouchEnd = () => {
@@ -123,7 +123,7 @@ export class KMapCard extends LitElement {
           position: relative;
           display: flex;
           flex-direction: column;
-          border-radius: 4px;
+          border-radius: 8px;
           background-color: var(--mdc-theme-surface, #fff);
           box-shadow: var(--elevation-01);
           transition: background-color 280ms cubic-bezier(0.4, 0, 0.2, 1), border-color 280ms cubic-bezier(0.4, 0, 0.2, 1), opacity 280ms cubic-bezier(0.4, 0, 0.2, 1), var(--elevation-transition);

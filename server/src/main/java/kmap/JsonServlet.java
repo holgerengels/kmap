@@ -22,7 +22,6 @@ public class JsonServlet extends HttpServlet {
             properties.setProperty("context.path", getServletContext().getRealPath("/"));
             getServletContext().setAttribute("properties", properties);
             authentication = new Authentication(properties);
-            FirebaseInitializer.init(getServletContext().getResourceAsStream("/serviceAccountKey.json"));
         }
         catch (IOException e) {
             throw new ServletException(e);

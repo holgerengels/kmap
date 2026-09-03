@@ -88,6 +88,11 @@
     </servlet>
 
     <servlet>
+        <servlet-name>auth</servlet-name>
+        <servlet-class>kmap.AuthServlet</servlet-class>
+    </servlet>
+
+    <servlet>
         <servlet-name>aiconnector</servlet-name>
         <servlet-class>kmap.AIConnectorServlet</servlet-class>
     </servlet>
@@ -165,6 +170,11 @@
     <servlet-mapping>
         <servlet-name>search</servlet-name>
         <url-pattern>/search/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>auth</servlet-name>
+        <url-pattern>/auth</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>

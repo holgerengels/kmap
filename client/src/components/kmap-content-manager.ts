@@ -12,6 +12,7 @@ import './kmap-content-manager-feedback';
 import './kmap-content-manager-instances';
 import './kmap-content-manager-modules';
 import './kmap-content-manager-sets';
+import './kmap-content-manager-users';
 import {resetStyles, colorStyles, fontStyles} from "./kmap-styles";
 
 @customElement('kmap-content-manager')
@@ -51,6 +52,7 @@ export class KMapContentManager extends Connected {
     return html`
       <main id="content" class="board">
         ${this._roles.includes('admin') ? html`<kmap-content-manager-instances></kmap-content-manager-instances>` : ''}
+        ${this._roles.includes('admin') ? html`<kmap-content-manager-users></kmap-content-manager-users>` : ''}
         ${this._roles.includes('teacher') ? html`<kmap-content-manager-modules></kmap-content-manager-modules>` : ''}
         ${this._roles.includes('teacher') ? html`<kmap-content-manager-sets></kmap-content-manager-sets>` : ''}
         ${this._roles.includes('teacher') ? html`<kmap-content-manager-feedback></kmap-content-manager-feedback>` : ''}

@@ -15,6 +15,8 @@ import {resetStyles, colorStyles, fontStyles} from "./kmap-styles";
 import {Instance} from "../models/instances";
 import {DatalistTextField} from "./datalist-textfield";
 
+type DialogView = 'login' | 'register' | 'reset-password' | 'reset-password-confirm' | 'change-password';
+
 @customElement('kmap-login-popup')
 export class KMapLoginPopup extends Connected {
   @state()
@@ -40,6 +42,14 @@ export class KMapLoginPopup extends Connected {
 
   @state()
   private _deleting: boolean = false;
+  @state()
+  private _changingPassword: boolean = false;
+
+  @state()
+  private _view: DialogView = 'login';
+
+  @state()
+  private _resetToken: string = '';
 
   @query('#loginDialog')
   // @ts-ignore
@@ -78,15 +88,17 @@ export class KMapLoginPopup extends Connected {
   show() {
     store.dispatch.app.clearLoginResponse();
     this._showInstanceChooser = false;
+    this._view = 'login';
+    this._deleting = false;
     this._loginDialog.show();
   }
 
-  _signIn(event) {
-    store.dispatch.auth.signinProvider(event.target.id);
-  }
-
-  _signOut() {
-    store.dispatch.auth.signout();
+  showResetPasswordConfirm(token: string) {
+    store.dispatch.app.clearLoginResponse();
+    this._resetToken = token;
+    this._view = 'reset-password-confirm';
+    this._deleting = false;
+    this._loginDialog.show();
   }
 
   _login() {
@@ -107,6 +119,63 @@ export class KMapLoginPopup extends Connected {
     store.dispatch.app.logout();
   }
 
+  _register() {
+    const regId = this.shadowRoot.getElementById("regId") as HTMLInputElement;
+    const regEmail = this.shadowRoot.getElementById("regEmail") as HTMLInputElement;
+    const regPassword = this.shadowRoot.getElementById("regPassword") as HTMLInputElement;
+    const regPasswordRepeat = this.shadowRoot.getElementById("regPasswordRepeat") as HTMLInputElement;
+
+    if (regId && regEmail && regPassword && regPasswordRepeat) {
+      if (regPassword.value !== regPasswordRepeat.value) {
+        store.dispatch.app.loginResponse("Passwörter stimmen nicht überein");
+        return;
+      }
+      store.dispatch.app.register({
+        userid: regId.value.toLowerCase(),
+        email: regEmail.value,
+        password: regPassword.value,
+        displayName: regId.value,
+      });
+    }
+  }
+
+  _resetPassword() {
+    const resetEmail = this.shadowRoot.getElementById("resetEmail") as HTMLInputElement;
+    if (resetEmail) {
+      store.dispatch.app.resetPassword(resetEmail.value);
+    }
+  }
+
+  _confirmResetPassword() {
+    const newPassword = this.shadowRoot.getElementById("newPassword") as HTMLInputElement;
+    const newPasswordRepeat = this.shadowRoot.getElementById("newPasswordRepeat") as HTMLInputElement;
+    if (newPassword && newPasswordRepeat) {
+      if (newPassword.value !== newPasswordRepeat.value) {
+        store.dispatch.app.loginResponse("Passwörter stimmen nicht überein");
+        return;
+      }
+      store.dispatch.app.resetPasswordConfirm({token: this._resetToken, password: newPassword.value});
+      // After successful reset, clean up URL
+      const url = new URL(window.location.href);
+      url.searchParams.delete('reset-token');
+      window.history.replaceState({}, '', url.toString());
+    }
+  }
+
+  _changePassword() {
+    const oldPw = this.shadowRoot.getElementById("oldPassword") as HTMLInputElement;
+    const newPw = this.shadowRoot.getElementById("changeNewPassword") as HTMLInputElement;
+    const newPwRepeat = this.shadowRoot.getElementById("changeNewPasswordRepeat") as HTMLInputElement;
+    if (oldPw && newPw && newPwRepeat) {
+      if (newPw.value !== newPwRepeat.value) {
+        store.dispatch.app.loginResponse("Passwörter stimmen nicht überein");
+        return;
+      }
+      store.dispatch.app.changePassword({oldPassword: oldPw.value, newPassword: newPw.value});
+      this._changingPassword = false;
+    }
+  }
+
   _delete() {
     this._deleting = true;
   }
@@ -116,10 +185,19 @@ export class KMapLoginPopup extends Connected {
     store.dispatch.app.deleteData();
   }
 
+  _deleteAccount() {
+    this._deleting = false;
+    store.dispatch.app.deleteAccount();
+  }
+
   _maybeEnter(event) {
     if (event.key === "Enter" && this._valid) {
       event.preventDefault();
-      this._login();
+      if (this._view === 'login') this._login();
+      else if (this._view === 'register') this._register();
+      else if (this._view === 'reset-password') this._resetPassword();
+      else if (this._view === 'reset-password-confirm') this._confirmResetPassword();
+      else if (this._view === 'change-password') this._changePassword();
     }
   }
 
@@ -139,6 +217,11 @@ export class KMapLoginPopup extends Connected {
       store.dispatch.app.chooseInstance(instance);
       this._instanceValid = true;
     }
+  }
+
+  _switchView(view: DialogView) {
+    store.dispatch.app.clearLoginResponse();
+    this._view = view;
   }
 
   static get styles() {
@@ -170,75 +253,172 @@ export class KMapLoginPopup extends Connected {
         span:hover mwc-icon-button[icon="polymer"] {
           color: var(--color-primary-dark);
         }
-        .auth {
-          min-width: 240px;
-          margin: 8px 0;
-          width: 100%;
+        .link {
+          cursor: pointer;
+          color: var(--color-primary-dark);
+          text-decoration: underline;
+          font-size: 0.875rem;
         }
-        .auth img {
-          margin-right: 0.5em;
-          margin-block: 0;
-        }
-        .auth img, auth svg {
-          width: 24px;
-          height: 24px;
-          vertical-align: middle;
-          margin-right: 10px;
+        .links {
+          margin-top: 8px;
+          display: flex;
+          justify-content: space-between;
         }
       `];
   }
 
   render() {
+    const dialogTitle = this._userid
+      ? (this._changingPassword ? "Passwort ändern" : "Angemeldet")
+      : this._view === 'register' ? "Registrieren"
+      : this._view === 'reset-password' ? "Passwort vergessen?"
+      : this._view === 'reset-password-confirm' ? "Neues Passwort setzen"
+      : "Anmelden";
+
     // language=HTML
     return html`
   <!--googleoff: all-->
-  <mwc-dialog id="loginDialog" heading="Anmelden">
-    <validating-form id="loginForm" ?hidden="${this._userid}" @keyup="${this._maybeEnter}" @validity="${e => this._formValid = e.target.valid}">
-      ${!this._showInstanceChooser ? html`
-        <span secondary>Anmelden an Instanz: ${this._instance}&nbsp;
-          <mwc-icon-button icon="polymer" class="secondary" @click="${this._showChooseInstance}" title="Instanz wechseln"></mwc-icon-button>
-        </span>
-      ` : html`
-        <datalist-textfield id="instance" name="instance" label="Instanz" type="text" required @change="${this._chooseInstance}"
-          .datalist="${this._instances.map(instance => {return {value: instance.name, label: instance.description}})}"
-          pattern="[a-z-]*" helper="Nur kleine Buchstaben">
-        </datalist-textfield>
-      `}
-      <br/><br/>
-      ${this._instance !== 'root' ? html`
-      <mwc-textfield id="loginId" name="user" label="Benutzerkennung" type="text" dialogInitialFocus required pattern="[a-z0-9.]*" helper="Nur kleine Buchstaben, Ziffern und Punkt"></mwc-textfield>
-      <br/>
-      <mwc-textfield id="loginPassword" name="password" label="Passwort" type="password" required></mwc-textfield>
-      ` : html`
-        <mwc-button class="auth" outlined @click=${this._signIn} id="google"><img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg">Anmelden mit Google</mwc-button>
-      `}
-    </validating-form>
-    <form id="logoutForm" ?hidden="${!this._userid}">
-      Angemeldet als ${this._username} ..
-    </form>
-    <div class="deleting">
-      <div ?hidden="${!this._deleting}">
-        Möchtest du wirklich alle persönlichen Daten unwiederbringlich löschen?
-      </div>
-      <div ?hidden="${!this._deleting}">
-        <mwc-button outlined @click=${this._deleteData} style="--mdc-theme-primary: var(--color-red)">Löschen</mwc-button>
-        <mwc-button outlined @click="${() => this._deleting = false}">Nicht löschen</mwc-button>
-      </div>
-    </div>
+  <mwc-dialog id="loginDialog" heading="${dialogTitle}">
+    ${!this._userid ? this._renderUnauthenticated() : this._renderAuthenticated()}
     <div class="layout horizontal">
       <div id="message" style="height: 32px; padding-top: 10px">${this._message}</div>
     </div>
-    <pwa-install-button slot="secondaryAction"><mwc-button outlined style="--mdc-theme-primary: var(--color-secondary-dark);">App installieren</mwc-button></pwa-install-button>
-    <pwa-update-available slot="secondaryAction"><mwc-button outlined style="--mdc-theme-primary: var(--color-secondary-dark);">App aktualisieren</mwc-button></pwa-update-available>
-    <mwc-button slot="primaryAction" ?hidden="${this._userid}" @click=${this._login} ?disabled="${!this._valid}">Anmelden</mwc-button>
-    <mwc-button slot="secondaryAction" ?hidden="${!this._userid}" @click=${this._delete}>Daten löschen</mwc-button>
-    ${this._instance !== 'root' ? html`
-      <mwc-button slot="primaryAction" ?hidden="${!this._userid}" @click=${this._logout}>Abmelden</mwc-button>
-    ` : html`
-      <mwc-button slot="primaryAction" ?hidden="${!this._userid}" @click=${this._signOut}>Abmelden</mwc-button>
-    `}
+    ${this._renderActions()}
   </mwc-dialog>
   <!--googleon: all-->
+    `;
+  }
+
+  _renderUnauthenticated() {
+    if (this._view === 'register') {
+      return html`
+        <validating-form id="registerForm" @keyup="${this._maybeEnter}" @validity="${e => this._formValid = e.target.valid}">
+          <mwc-textfield id="regId" name="userid" label="Benutzerkennung" type="text" dialogInitialFocus required pattern="[a-z0-9.]*" helper="Nur kleine Buchstaben, Ziffern und Punkt"></mwc-textfield>
+          <br/>
+          <mwc-textfield id="regEmail" name="email" label="E-Mail" type="email" required></mwc-textfield>
+          <br/>
+          <mwc-textfield id="regPassword" name="password" label="Passwort" type="password" required minlength="8" helper="Mindestens 8 Zeichen"></mwc-textfield>
+          <br/>
+          <mwc-textfield id="regPasswordRepeat" name="passwordRepeat" label="Passwort wiederholen" type="password" required minlength="8"></mwc-textfield>
+          <div class="links">
+            <span class="link" @click="${() => this._switchView('login')}">Zurück zur Anmeldung</span>
+          </div>
+        </validating-form>
+      `;
+    }
+    if (this._view === 'reset-password') {
+      return html`
+        <validating-form id="resetForm" @keyup="${this._maybeEnter}" @validity="${e => this._formValid = e.target.valid}">
+          <mwc-textfield id="resetEmail" name="email" label="E-Mail" type="email" dialogInitialFocus required></mwc-textfield>
+          <br/>
+          <span secondary>Wir senden dir einen Link zum Zurücksetzen deines Passworts.</span>
+          <div class="links">
+            <span class="link" @click="${() => this._switchView('login')}">Zurück zur Anmeldung</span>
+          </div>
+        </validating-form>
+      `;
+    }
+    if (this._view === 'reset-password-confirm') {
+      return html`
+        <validating-form id="confirmResetForm" @keyup="${this._maybeEnter}" @validity="${e => this._formValid = e.target.valid}">
+          <mwc-textfield id="newPassword" name="password" label="Neues Passwort" type="password" dialogInitialFocus required minlength="8" helper="Mindestens 8 Zeichen"></mwc-textfield>
+          <br/>
+          <mwc-textfield id="newPasswordRepeat" name="passwordRepeat" label="Passwort wiederholen" type="password" required minlength="8"></mwc-textfield>
+        </validating-form>
+      `;
+    }
+    // Default: login view
+    return html`
+      <validating-form id="loginForm" @keyup="${this._maybeEnter}" @validity="${e => this._formValid = e.target.valid}">
+        ${!this._showInstanceChooser ? html`
+          <span secondary>Anmelden an Instanz: ${this._instance}&nbsp;
+            <mwc-icon-button icon="polymer" class="secondary" @click="${this._showChooseInstance}" title="Instanz wechseln"></mwc-icon-button>
+          </span>
+        ` : html`
+          <datalist-textfield id="instance" name="instance" label="Instanz" type="text" required @change="${this._chooseInstance}"
+            .datalist="${this._instances.map(instance => {return {value: instance.name, label: instance.description}})}"
+            pattern="[a-z-]*" helper="Nur kleine Buchstaben">
+          </datalist-textfield>
+        `}
+        <br/><br/>
+        <mwc-textfield id="loginId" name="user" label="Benutzerkennung" type="text" dialogInitialFocus required pattern="[a-z0-9.]*" helper="Nur kleine Buchstaben, Ziffern und Punkt"></mwc-textfield>
+        <br/>
+        <mwc-textfield id="loginPassword" name="password" label="Passwort" type="password" required></mwc-textfield>
+        <div class="links">
+          ${this._instance === 'root' ? html`
+            <span class="link" @click="${() => this._switchView('register')}">Registrieren</span>
+            <span class="link" @click="${() => this._switchView('reset-password')}">Passwort vergessen?</span>
+          ` : ''}
+        </div>
+      </validating-form>
+    `;
+  }
+
+  _renderAuthenticated() {
+    if (this._changingPassword) {
+      return html`
+        <validating-form id="changePasswordForm" @keyup="${this._maybeEnter}" @validity="${e => this._formValid = e.target.valid}">
+          <mwc-textfield id="oldPassword" name="oldPassword" label="Aktuelles Passwort" type="password" dialogInitialFocus required></mwc-textfield>
+          <br/>
+          <mwc-textfield id="changeNewPassword" name="newPassword" label="Neues Passwort" type="password" required minlength="8" helper="Mindestens 8 Zeichen"></mwc-textfield>
+          <br/>
+          <mwc-textfield id="changeNewPasswordRepeat" name="newPasswordRepeat" label="Neues Passwort wiederholen" type="password" required minlength="8"></mwc-textfield>
+        </validating-form>
+      `;
+    }
+    return html`
+      <form id="logoutForm">
+        Angemeldet als ${this._username} ..
+      </form>
+      <div class="deleting">
+        <div ?hidden="${!this._deleting}">
+          ${this._instance === 'root'
+            ? html`Möchtest du wirklich dein Konto und alle persönlichen Daten unwiederbringlich löschen?`
+            : html`Möchtest du wirklich alle persönlichen Daten unwiederbringlich löschen?`
+          }
+        </div>
+        <div ?hidden="${!this._deleting}">
+          ${this._instance === 'root'
+            ? html`<mwc-button outlined @click=${this._deleteAccount} style="--mdc-theme-primary: var(--color-red)">Konto und Daten löschen</mwc-button>`
+            : html`<mwc-button outlined @click=${this._deleteData} style="--mdc-theme-primary: var(--color-red)">Daten löschen</mwc-button>`
+          }
+          <mwc-button outlined @click="${() => this._deleting = false}">Abbrechen</mwc-button>
+        </div>
+      </div>
+    `;
+  }
+
+  _renderActions() {
+    if (this._userid && this._changingPassword) {
+      return html`
+        <mwc-button slot="secondaryAction" @click=${() => this._changingPassword = false}>Abbrechen</mwc-button>
+        <mwc-button slot="primaryAction" @click=${this._changePassword}>Passwort ändern</mwc-button>
+      `;
+    }
+    if (this._userid) {
+      return html`
+        <mwc-button slot="secondaryAction" @click=${this._delete}>${this._instance === 'root' ? 'Konto löschen' : 'Daten löschen'}</mwc-button>
+        <mwc-button slot="secondaryAction" @click=${() => this._changingPassword = true}>Passwort ändern</mwc-button>
+        <mwc-button slot="primaryAction" @click=${this._logout}>Abmelden</mwc-button>
+      `;
+    }
+    if (this._view === 'register') {
+      return html`
+        <mwc-button slot="primaryAction" @click=${this._register}>Registrieren</mwc-button>
+      `;
+    }
+    if (this._view === 'reset-password') {
+      return html`
+        <mwc-button slot="primaryAction" @click=${this._resetPassword}>Zurücksetzen</mwc-button>
+      `;
+    }
+    if (this._view === 'reset-password-confirm') {
+      return html`
+        <mwc-button slot="primaryAction" @click=${this._confirmResetPassword}>Passwort setzen</mwc-button>
+      `;
+    }
+    return html`
+      <mwc-button slot="primaryAction" @click=${this._login} ?disabled="${!this._valid}">Anmelden</mwc-button>
     `;
   }
 }

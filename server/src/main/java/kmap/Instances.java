@@ -48,9 +48,10 @@ public class Instances
     }
 
     public JsonArray instances() {
-        CouchDbClient client = connection.createClient("lala");
+        CouchDbClient client = connection.createClient("map");
         String uri = client.getBaseUri().toString();
-        JsonArray result = client.findAny(JsonArray.class, uri + "/_all_dbs");
+
+        JsonArray result = client.findAny(JsonArray.class, uri + "_all_dbs");
         List<String> list = new ArrayList<>();
         result.forEach(element -> {
             String name = element.getAsString();
@@ -62,7 +63,7 @@ public class Instances
             JsonObject instance = new JsonObject();
             instance.addProperty("name", name);
             try {
-                JsonObject meta = client.findAny(JsonObject.class, uri + "/" + name + "-map/meta");
+                JsonObject meta = client.findAny(JsonObject.class, uri + name + "-map/meta");
                 instance.addProperty("description", string(meta, "description"));
                 instance.addProperty("authconf", string(meta, "authconf"));
             } catch (NoDocumentException ignored) {}
@@ -138,6 +139,8 @@ curl -X PUT -u $1 http://localhost:5984/$2-test/_design/test -d @design-test.jso
             try (CloseableHttpResponse ignored = httpClient.execute(put, context)){ System.out.println("created " + name + "-feedback"); }
             put = new HttpPut(url() + name + "-course");
             try (CloseableHttpResponse ignored = httpClient.execute(put, context)){ System.out.println("created " + name + "-course"); }
+            put = new HttpPut(url() + name + "-auth");
+            try (CloseableHttpResponse ignored = httpClient.execute(put, context)){ System.out.println("created " + name + "-auth"); }
 
             put = new HttpPut(url() + name + "-map/_design/net");
             entity = new InputStreamEntity(Files.newInputStream(Paths.get(getProperty("context.path") + "/WEB-INF/classes/couchdb/design-map.json")));
@@ -203,6 +206,8 @@ curl -X DELETE -u $1 http://127.0.0.1:5984/$2-state
             try (CloseableHttpResponse ignored = client.execute(put, context)){ System.out.println("dropped " + name + "-feedback"); }
             put = new HttpDelete(url() + name + "-course");
             try (CloseableHttpResponse ignored = client.execute(put, context)){ System.out.println("dropped " + name + "-course"); }
+            put = new HttpDelete(url() + name + "-auth");
+            try (CloseableHttpResponse ignored = client.execute(put, context)){ System.out.println("dropped " + name + "-auth"); }
         }
         catch (IOException e) {
             throw new RuntimeException(e);
