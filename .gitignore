@@ -4,6 +4,7 @@ package-lock.json
 dist/
 target/
 stuff/
+prod/
 .idea/
 kmap.properties
 serviceAccountKey.json
