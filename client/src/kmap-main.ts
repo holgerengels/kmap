@@ -1,9 +1,9 @@
-import {css, html, LitElement, PropertyValues} from 'lit';
-import {customElement, property, state, query} from 'lit/decorators.js';
-import {installMediaQueryWatcher} from 'pwa-helpers/media-query.js';
-import {installOfflineWatcher} from 'pwa-helpers/network.js';
-import {connect, RoutingState} from '@captaincodeman/rdx'
-import {State, store} from './store'
+import { css, html, LitElement, PropertyValues } from 'lit';
+import { customElement, property, state, query } from 'lit/decorators.js';
+import { installMediaQueryWatcher } from 'pwa-helpers/media-query.js';
+import { installOfflineWatcher } from 'pwa-helpers/network.js';
+import { connect, RoutingState } from '@captaincodeman/rdx'
+import { State, store } from './store'
 
 import './components/kmap-subjects';
 import './components/kmap-browser';
@@ -21,12 +21,12 @@ import '@material/mwc-switch';
 import 'pwa-helper-components/pwa-install-button';
 import 'pwa-helper-components/pwa-update-available';
 
-import {colorStyles, elevationStyles, fontStyles, resetStyles} from "./components/kmap-styles";
-import {Snackbar} from "@material/mwc-snackbar/mwc-snackbar";
-import {TopAppBar} from "@material/mwc-top-app-bar/mwc-top-app-bar";
-import {Meta} from "./models/shell";
-import {Timeline} from "./models/courses";
-import {timelineClosed, timelineOpen} from "./components/icons";
+import { colorStyles, elevationStyles, fontStyles, resetStyles } from "./components/kmap-styles";
+import { Snackbar } from "@material/mwc-snackbar/mwc-snackbar";
+import { TopAppBar } from "@material/mwc-top-app-bar/mwc-top-app-bar";
+import { Meta } from "./models/shell";
+import { Timeline } from "./models/courses";
+import { timelineClosed, timelineOpen } from "./components/icons";
 
 // @ts-ignore
 //const _standalone = (window.matchMedia('(display-mode: standalone)').matches) || (window.navigator.standalone) || document.referrer.includes('android-app://');
@@ -79,10 +79,10 @@ export class KmapMain extends connect(store, LitElement) {
   // @ts-ignore
   private _loginPopup: KMapLoginPopup;
 
+  @query('#drawer')
+  private _drawer: HTMLElement;
   @query('#bar')
   private _bar: TopAppBar;
-  @query('#main')
-  private _main: HTMLElement;
   private _userActive: boolean = true;
 
   set route(routingState: RoutingState<string>) {
@@ -118,7 +118,35 @@ export class KmapMain extends connect(store, LitElement) {
       store.dispatch.shell.updateCompactCards(true);
     }
 
-    this._bar.scrollTarget = this._main;
+    if (this._drawer && this._drawer.shadowRoot) {
+      const style = document.createElement('style');
+      style.textContent = `
+        :host {
+          display: flex !important;
+          min-height: 100vh !important;
+          height: auto !important;
+          width: 100% !important;
+        }
+        .mdc-drawer--dismissible {
+          position: fixed !important;
+          top: 0 !important;
+          bottom: 0 !important;
+          height: 100vh !important;
+          z-index: 5 !important;
+        }
+        .mdc-drawer-app-content {
+          overflow: visible !important;
+          height: auto !important;
+          min-height: 100vh !important;
+          display: flex !important;
+          flex-direction: column !important;
+          flex: 1 !important;
+        }
+      `;
+      this._drawer.shadowRoot.appendChild(style);
+    }
+
+    this._bar.scrollTarget = window;
 
     store.dispatch.shell.clearMessages();
     if (!window.location.host.includes("localhost")) {
@@ -176,9 +204,9 @@ export class KmapMain extends connect(store, LitElement) {
       this._barTitle = this._meta.title || _title.get(this._page) || "KMap";
     }
 
-    if (this._scrollToTop && this._main !== null) {
+    if (this._scrollToTop) {
       this._scrollToTop = false;
-      this._main.scrollTo({top: 0, left: 0, behavior: "smooth"})
+      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
     }
 
     if (changedProps.has('_page') && !this._layers.includes('editor'))
@@ -198,9 +226,9 @@ export class KmapMain extends connect(store, LitElement) {
     window.onerror = function (message, source, lineno, colno, error) {
       console.log(error?.stack);
       if (error)
-        store.dispatch.feedback.bug({message: error.name + ": " + error.message, detail: error.stack as string});
+        store.dispatch.feedback.bug({ message: error.name + ": " + error.message, detail: error.stack as string });
       else {
-        store.dispatch.feedback.bug({message: message as string, detail: source + " (" + lineno + ":" + colno + ")"});
+        store.dispatch.feedback.bug({ message: message as string, detail: source + " (" + lineno + ":" + colno + ")" });
       }
       return false;
     };
@@ -287,13 +315,21 @@ export class KmapMain extends connect(store, LitElement) {
       elevationStyles,
       css`
       :host {
-        display: contents;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        width: 100%;
         --app-drawer-background-color: var(--app-secondary-color);
         --app-drawer-text-color: var(--app-light-text-color);
         --app-drawer-selected-color: #c67100;
       }
       mwc-drawer {
         --mdc-theme-surface: white;
+        min-height: 100vh;
+        height: auto;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
       }
       .drawer-list {
         display: flex;
@@ -360,13 +396,55 @@ export class KmapMain extends connect(store, LitElement) {
 
       main {
         width: 100%;
-        height: 100%;
+        min-height: 100vh;
         box-sizing: border-box;
-        overflow: auto;
-        scrollbar-color: var(--color-mediumgray);
-        scrollbar-width: thin;
-        scroll-behavior: smooth;
-        scroll-snap-type: y mandatory;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+      }
+      .content {
+        flex: 1;
+      }
+      .footer {
+        background-color: #e0e0e0;
+        color: var(--color-darkgray);
+        padding: 16px 24px;
+        margin-top: 32px;
+        border-top: 1px solid rgba(0, 0, 0, 0.12);
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        font-size: 0.875rem;
+      }
+      .footer-links {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .footer-links a {
+        color: var(--color-primary-dark);
+        font-weight: 500;
+      }
+      .footer-links a:hover {
+        text-decoration: underline;
+      }
+      .footer-links .separator {
+        color: var(--color-mediumgray);
+      }
+      .footer-license {
+        display: flex;
+        align-items: center;
+      }
+      .footer-license img {
+        opacity: 0.85;
+        transition: opacity 0.2s ease-in-out;
+        margin-block-end: 0;
+      }
+      .footer-license img:hover {
+        opacity: 1;
       }
       [hidden] {
         display: none !important;
@@ -394,7 +472,24 @@ export class KmapMain extends connect(store, LitElement) {
         <kmap-login-button slot="actionItems" @click="${this._showLogin}" title="Anmeldung"></kmap-login-button>
       </mwc-top-app-bar>
 
-      ${this._renderPage()}
+      <div class="content">
+        ${this._renderPage()}
+      </div>
+
+      <footer class="footer">
+        <div class="footer-links">
+          <a href="/app/browser/Hilfe/Hilfe">Hilfe</a>
+          <span class="separator">•</span>
+          <a href="/app/browser/Hilfe/Hilfe/Impressum">Impressum</a>
+          <span class="separator">•</span>
+          <a href="/app/browser/Hilfe/Hilfe/Datenschutzerklärung">Datenschutzerklärung</a>
+        </div>
+        <div class="footer-license">
+          <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/deed.de" target="_blank" rel="noopener">
+            <img width="88" height="31" src="/app/icons/cc-by-sa.png" alt="CC BY-SA 4.0" loading="lazy" />
+          </a>
+        </div>
+      </footer>
     </main>
   </mwc-drawer>
 
@@ -508,7 +603,7 @@ export class KmapMain extends connect(store, LitElement) {
           ></mwc-switch>
         </mwc-formfield>
         ${this._roles.includes('teacher')
-          ? html`
+        ? html`
               <mwc-formfield label="Wochenplan">
                 <mwc-switch
                   ?selected="${this._layers.includes('timeline')}"
@@ -516,8 +611,8 @@ export class KmapMain extends connect(store, LitElement) {
                 ></mwc-switch>
               </mwc-formfield>
               ${this._layers.includes('timeline')
-                ? html` <kmap-timeline-selector class="nomargin"></kmap-timeline-selector>`
-                : ''}
+            ? html` <kmap-timeline-selector class="nomargin"></kmap-timeline-selector>`
+            : ''}
               <mwc-formfield label="Mittelwerte">
                 <mwc-switch
                   ?selected="${this._layers.includes('averages')}"
@@ -525,8 +620,8 @@ export class KmapMain extends connect(store, LitElement) {
                 ></mwc-switch>
               </mwc-formfield>
               ${this._layers.includes('averages')
-                ? html` <kmap-course-selector class="nomargin"></kmap-course-selector>`
-                : ''}
+            ? html` <kmap-course-selector class="nomargin"></kmap-course-selector>`
+            : ''}
               <mwc-formfield label="Editor">
                 <mwc-switch
                   ?selected="${this._layers.includes('editor')}"
@@ -534,17 +629,17 @@ export class KmapMain extends connect(store, LitElement) {
                 ></mwc-switch>
               </mwc-formfield>
               ${this._layers.includes('editor')
-                ? html`
+            ? html`
                     ${this._page === 'home' || this._page === 'browser'
-                      ? html` <kmap-module-selector class="nomargin"></kmap-module-selector>`
-                      : ''}
-                    ${this._page === 'test'
-                      ? html` <kmap-set-selector class="nomargin"></kmap-set-selector>`
-                      : ''}
-                  `
+                ? html` <kmap-module-selector class="nomargin"></kmap-module-selector>`
                 : ''}
+                    ${this._page === 'test'
+                ? html` <kmap-set-selector class="nomargin"></kmap-set-selector>`
+                : ''}
+                  `
+            : ''}
             `
-          : ''}
+        : ''}
       </nav>
       <hr />
       <!--googleon: all-->
