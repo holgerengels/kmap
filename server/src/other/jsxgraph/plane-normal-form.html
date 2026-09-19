@@ -82,10 +82,10 @@
     var gx = view.create('line3d', [x1, x2], { fixed: true, strokeColor: 'lightgray' });
     var y1 = view.create('point3d', [0, 20, 0], { size: 3, name: '', visible: false });
     var y2 = view.create('point3d', [0, -20, 0], { size: 3, name: '', visible: false });
-    var gy = view.create('line3d', [y1, y2], { fiyed: true, strokeColor: 'lightgray' });
+    var gy = view.create('line3d', [y1, y2], { fixed: true, strokeColor: 'lightgray' });
     var z1 = view.create('point3d', [0, 0, 20], { size: 3, name: '', visible: false });
     var z2 = view.create('point3d', [0, 0, -20], { size: 3, name: '', visible: false });
-    var gz = view.create('line3d', [z1, z2], { fized: true, strokeColor: 'lightgray' });
+    var gz = view.create('line3d', [z1, z2], { fixed: true, strokeColor: 'lightgray' });
 
     var planex = view.create('plane3d', [[0, 0, 0], [0, 1, 0], [0, 0, 1]], { fillColor: JXG.palette.red, strokeColor: '#888888', strokeOpacity: 0.5, mesh3d: { visible: false } });
     var planey = view.create('plane3d', [[0, 0, 0], [1, 0, 0], [0, 0, 1]], { fillColor: JXG.palette.green, strokeColor: '#888888', strokeOpacity: 0.5, mesh3d: { visible: false } });
@@ -105,7 +105,7 @@
     var tx = view.create('point3d', [() => px.X() / 2, () => px.Y() / 2, () => px.Z() / 2 ], { visible: true, size: 0, label: { color: 'black', useKatex: true }, name: '\\vec x' });
     var vax = view.create('line3d', [pa, px], { fixed: true, strokeColor: JXG.palette.orange, strokeWidth: 3, lastArrow: { type: 2, size: 4 } });
 
-    var plane = view.create('plane3d', [[() => pa.X(), () => pa.Y(), () => pa.Z()], [-3, 6, 0], [-3, 0, 1], [-10, 10], [-10, 10]], {
+    var plane = view.create('plane3d', [[() => pa.X(), () => pa.Y(), () => pa.Z()], [-3, 6, 0], [-3, 0, 1]], {
         fillColor: JXG.palette.yellow, strokeWidth: 1, strokeColor: '#888888', strokeOpacity: 0.5, mesh3d: { visible: false }
     });
     var pn = view.create('point3d', [() => pa.X() + 2*plane.normal[0], () => pa.Y() + 2*plane.normal[1], () => pa.Z() + 2*plane.normal[2]], { size: 3, name: '', visible: false });

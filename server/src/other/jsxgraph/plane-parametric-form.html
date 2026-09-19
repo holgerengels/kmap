@@ -88,10 +88,10 @@
     var gx = view.create('line3d', [x1, x2], { fixed: true, strokeColor: 'lightgray' });
     var y1 = view.create('point3d', [0, 20, 0], { size: 3, name: '', visible: false });
     var y2 = view.create('point3d', [0, -20, 0], { size: 3, name: '', visible: false });
-    var gy = view.create('line3d', [y1, y2], { fiyed: true, strokeColor: 'lightgray' });
+    var gy = view.create('line3d', [y1, y2], { fixed: true, strokeColor: 'lightgray' });
     var z1 = view.create('point3d', [0, 0, 20], { size: 3, name: '', visible: false });
     var z2 = view.create('point3d', [0, 0, -20], { size: 3, name: '', visible: false });
-    var gz = view.create('line3d', [z1, z2], { fized: true, strokeColor: 'lightgray' });
+    var gz = view.create('line3d', [z1, z2], { fixed: true, strokeColor: 'lightgray' });
 
     var planex = view.create('plane3d', [[0, 0, 0], [0, 1, 0], [0, 0, 1]], { fillColor: JXG.palette.red, strokeColor: '#888888', strokeOpacity: 0.5, mesh3d: { visible: false } });
     var planey = view.create('plane3d', [[0, 0, 0], [1, 0, 0], [0, 0, 1]], { fillColor: JXG.palette.green, strokeColor: '#888888', strokeOpacity: 0.5, mesh3d: { visible: false } });
@@ -118,7 +118,7 @@
     var p1 = view.create('point3d', [() => pa.X() + 10 * (pb.X() - pa.X()), () => pa.Y() + 10 * (pb.Y() - pa.Y()), () => pa.Z() + 10 * (pb.Z() - pa.Z())], { size: 3, name: '', visible: true });
     var p2 = view.create('point3d', [() => pa.X() - 10 * (pb.X() - pa.X()), () => pa.Y() - 10 * (pb.Y() - pa.Y()), () => pa.Z() - 10 * (pb.Z() - pa.Z())], { size: 3, name: '', visible: true });
 
-    var plane = view.create('plane3d', [[() => pa.X(), () => pa.Y(), () => pa.Z()], [() => pb.X() - pa.X(), () => pb.Y() - pa.Y(), () => pb.Z() - pa.Z()], [() => pc.X() - pa.X(), () => pc.Y() - pa.Y(), () => pc.Z() - pa.Z()], [-10, 10], [-10, 10]], {
+    var plane = view.create('plane3d', [[() => pa.X(), () => pa.Y(), () => pa.Z()], [() => pb.X() - pa.X(), () => pb.Y() - pa.Y(), () => pb.Z() - pa.Z()], [() => pc.X() - pa.X(), () => pc.Y() - pa.Y(), () => pc.Z() - pa.Z()]], {
         fillColor: JXG.palette.yellow, strokeWidth: 1, strokeColor: '#888888', strokeOpacity: 0.5, mesh3d: { visible: false }
     });
 

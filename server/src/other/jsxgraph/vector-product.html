@@ -121,26 +121,24 @@
     calc();
     */
 
-    view.create('segment', [P.element2D, A.element2D], { lastArrow: true });
-    view.create('segment', [P.element2D, B.element2D], { lastArrow: true });
-    view.create('segment', [P.element2D, D.element2D], { lastArrow: true });
-    view.create('polygon', [P.element2D, A.element2D, C.element2D, B.element2D], {
+    view.create('line3d', [P, A], { fixed: true, strokeColor: JXG.palette.blue, strokeWidth: 2, lastArrow: { type: 2, size: 4 } });
+    view.create('line3d', [P, B], { fixed: true, strokeColor: JXG.palette.blue, strokeWidth: 2, lastArrow: { type: 2, size: 4 } });
+    view.create('line3d', [P, D], { fixed: true, strokeColor: JXG.palette.blue, strokeWidth: 2, lastArrow: { type: 2, size: 4 } });
+    view.create('polygon3d', [P, A, C, B], {
         visible: () => b.Value() === 'p',
         highlight: false,
-        gradient: 'linear',
-        gradientSecondColor: 'white',
         fillColor: 'blue',
-        borders: { strokecolor: 'blue', strokeWidth: 1 }
+        fillOpacity: 0.4,
+        borders: { strokeColor: 'blue', strokeWidth: 1 }
     });
-    view.create('polygon', [P.element2D, A.element2D, B.element2D], {
+    view.create('polygon3d', [P, A, B], {
         visible: () => b.Value() === 'd',
         highlight: false,
-        gradient: 'linear',
-        gradientSecondColor: 'white',
         fillColor: 'blue',
-        borders: { strokecolor: 'blue', strokeWidth: 1 }
+        fillOpacity: 0.4,
+        borders: { strokeColor: 'blue', strokeWidth: 1 }
     });
-    var plane = view.create('plane3d', [[() => P.X(), () => P.Y(), () => P.Z()], [() => P.X() - A.X(), () => P.Y() - A.Y(), () => P.Z() - A.Z()], [() => P.X() - B.X(), () => P.Y() - B.Y(), () => P.Z() - B.Z()], [-10, 10], [-10, 10]], {
+    var plane = view.create('plane3d', [[() => P.X(), () => P.Y(), () => P.Z()], [() => P.X() - A.X(), () => P.Y() - A.Y(), () => P.Z() - A.Z()], [() => P.X() - B.X(), () => P.Y() - B.Y(), () => P.Z() - B.Z()]], {
         visible: () => b.Value() === 'n',
         fillColor: JXG.palette.blue, strokeWidth: 1, strokeColor: '#888888', strokeOpacity: 0.6, mesh3d: { visible: false }
     });
