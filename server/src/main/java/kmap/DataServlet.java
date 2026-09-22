@@ -8,6 +8,11 @@ import org.apache.commons.io.IOUtils;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 
 /**
@@ -99,9 +104,25 @@ public class DataServlet
 
                 corsHeaders(req, resp);
 
-                couch.loadAttachment(attachment -> {
-                    sendAttachment(resp, attachment);
-                }, dirs);
+                boolean webpRequested = req.getParameter("webp") != null;
+                String fileName = dirs.length > 0 ? dirs[dirs.length - 1] : "";
+                boolean isSvg = fileName.toLowerCase().endsWith(".svg");
+
+                if (webpRequested && isSvg) {
+                    float width = 800f;
+                    String widthParam = req.getParameter("width");
+                    if (widthParam != null) {
+                        try {
+                            width = Float.parseFloat(widthParam);
+                        } catch (NumberFormatException ignored) {}
+                    }
+                    sendSvgAsWebp(resp, dirs, width);
+                }
+                else {
+                    couch.loadAttachment(attachment -> {
+                        sendAttachment(resp, attachment);
+                    }, dirs);
+                }
             }
             else if (topic != null) {
                 log("load topic = " + topic);
@@ -141,6 +162,41 @@ public class DataServlet
         catch (Exception e) {
             e.printStackTrace(System.err);
             throw new RuntimeException(e);
+        }
+    }
+
+    private void sendSvgAsWebp(HttpServletResponse resp, String[] dirs, float width) throws IOException {
+        File cacheDir = new File(properties.getProperty("kmap.cache", System.getProperty("java.io.tmpdir") + File.separator + "kmap-cache"), "webp");
+        if (!cacheDir.exists()) {
+            cacheDir.mkdirs();
+        }
+
+        boolean found = couch.loadAttachment(attachment -> {
+            try {
+                String digestPart = attachment.digest != null ? attachment.digest.replaceAll("[^a-zA-Z0-9]", "") : "nodigest";
+                String safeName = String.join("_", dirs) + "." + digestPart + "." + (int) width + ".webp";
+                File cachedFile = new File(cacheDir, safeName);
+
+                if (!cachedFile.exists()) {
+                    SvgRasterizer.rasterizeToWebpFile(attachment.stream, cachedFile, width);
+                }
+
+                resp.setContentType("image/webp");
+                resp.setContentLength((int) cachedFile.length());
+                resp.setHeader("Cache-Control", "public, max-age=86400");
+                try (InputStream fis = new BufferedInputStream(new FileInputStream(cachedFile))) {
+                    IOUtils.copy(fis, resp.getOutputStream());
+                }
+                resp.getOutputStream().flush();
+            }
+            catch (Exception e) {
+                e.printStackTrace(System.err);
+                throw new RuntimeException(e);
+            }
+        }, dirs);
+
+        if (!found) {
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND);
         }
     }
 }

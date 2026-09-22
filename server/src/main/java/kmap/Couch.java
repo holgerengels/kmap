@@ -681,9 +681,10 @@ public class Couch extends Server {
             if (attachment != null) {
                 type = string(attachment, "content_type");
                 length = integer(attachment, "length");
+                String digest = string(attachment, "digest");
                 in = client.find(id + "/" + encode(dirs[3]));
                 //System.out.println("Load " + id + "/" + dirs[3] + " from couch");
-                sender.accept(new AttachmentInputStream(in, dirs[3], type, length));
+                sender.accept(new AttachmentInputStream(in, dirs[3], type, length, digest));
                 in.close();
                 return true;
             }

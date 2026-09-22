@@ -63,27 +63,41 @@ public class IndexServlet extends JsonServlet {
                 String page = path.length > 0 ? path[0] : null;
 
                 if ("browser".equals(page)) {
-                    String subject = path[1];
-                    String chapter = path[2];
-
-                    JsonObject card;
-                    if (path.length == 4) {
+                    JsonObject card = null;
+                    if (path.length >= 4) {
+                        String subject = path[1];
+                        String chapter = path[2];
                         String topic = path[3];
                         title = subject + " - " + chapter + " - " + topic;
                         card = couch.loadTopic(subject, chapter, topic);
                         String thumb = JSON.string(card, "thumb");
                         if ("".equals(thumb))
                             thumb = null;
-                        image = thumb != null
-                                ? "https://kmap.eu/" + encodePath("server", "data", subject, chapter, topic, JSON.string(card, "thumb")) + "?instance=root"
-                                : "https://kmap.eu/" + encodePath("snappy", subject, chapter, topic + ".png");
+                        if (thumb != null) {
+                            String thumbUrl = "https://kmap.eu/" + encodePath("server", "data", subject, chapter, topic, JSON.string(card, "thumb")) + "?instance=root";
+                            if (thumb.toLowerCase().endsWith(".svg")) {
+                                thumbUrl += "&webp";
+                            }
+                            image = thumbUrl;
+                        }
+                        else {
+                            image = "https://kmap.eu/" + encodePath("snappy", subject, chapter, topic + ".png");
+                        }
                         url = SERVER + encodePath("app", "browser", subject, chapter, topic);
                         embeddedTopic = card.toString();
                     }
-                    else {
+                    else if (path.length == 3) {
+                        String subject = path[1];
+                        String chapter = path[2];
                         title = subject + " - " + chapter;
                         card = couch.loadTopic(subject, chapter, "_");
                         url = SERVER + encodePath("app", "browser", subject, chapter);
+                    }
+                    else if (path.length == 2) {
+                        String subject = path[1];
+                        title = subject;
+                        description = "Wissenslandkarten zum Fach " + subject;
+                        url = SERVER + encodePath("app", "browser", subject, subject);
                     }
                     if (card != null) {
                         String cardMeta = string(card, "meta");
@@ -106,13 +120,23 @@ public class IndexServlet extends JsonServlet {
                     Server.CLIENT.remove();
                 }
                 else if ("test".equals(page)) {
-                    String subject = path[1];
-                    String chapter = path[2];
-                    if (path.length == 4) {
+                    if (path.length >= 4) {
+                        String subject = path[1];
+                        String chapter = path[2];
                         String topic = path[3];
                         title = "Aufgaben zum Thema " + subject + " - " + chapter + " - " + topic;
-                    } else {
+                    }
+                    else if (path.length == 3) {
+                        String subject = path[1];
+                        String chapter = path[2];
                         title = "Aufgaben zum Thema " + subject + " - " + chapter;
+                    }
+                    else if (path.length == 2) {
+                        String subject = path[1];
+                        title = "Aufgaben zum Fach " + subject;
+                    }
+                    else {
+                        title = "Aufgaben auf KMap";
                     }
                     description = "Ermittle Deinen Wissensstand mit Hilfe von interaktiven Aufgaben!";
                 }
@@ -129,6 +153,16 @@ public class IndexServlet extends JsonServlet {
                         modified = JSON.date(card, "modified");
                         section = title;
                         keywords = string(card, "keywords");
+                        String thumb = JSON.string(card, "thumb");
+                        if ("".equals(thumb))
+                            thumb = null;
+                        if (thumb != null) {
+                            String thumbUrl = "https://kmap.eu/" + encodePath("server", "data", "Blog", "Blog", topic, JSON.string(card, "thumb")) + "?instance=root";
+                            if (thumb.toLowerCase().endsWith(".svg")) {
+                                thumbUrl += "&webp";
+                            }
+                            image = thumbUrl;
+                        }
                         try {
                             //jsonld = new JsonLD().postLD(card);
                         }

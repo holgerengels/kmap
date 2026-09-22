@@ -127,7 +127,7 @@ function generateMeta(posts: Card[], current?: string): Meta {
       modified = card.modified || Date.now();
       author = card.author || "KMap Team";
       thumb = card.thumb
-        ? `${urls.server}data/Blog/Blog/${card.topic}/${card.thumb}?instance=root`
+        ? `${urls.server}data/Blog/Blog/${card.topic}/${card.thumb}?instance=root${card.thumb.toLowerCase().endsWith('.svg') ? '&webp' : ''}`
         : "/app/icons/KMap.svg";
     }
     else
