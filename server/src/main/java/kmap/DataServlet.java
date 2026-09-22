@@ -9,6 +9,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -177,17 +178,32 @@ public class DataServlet
                 String safeName = String.join("_", dirs) + "." + digestPart + "." + (int) width + ".webp";
                 File cachedFile = new File(cacheDir, safeName);
 
-                if (!cachedFile.exists()) {
-                    SvgRasterizer.rasterizeToWebpFile(attachment.stream, cachedFile, width);
+                if (cachedFile.exists()) {
+                    resp.setContentType("image/webp");
+                    resp.setContentLength((int) cachedFile.length());
+                    resp.setHeader("Cache-Control", "public, max-age=86400");
+                    try (InputStream fis = new BufferedInputStream(new FileInputStream(cachedFile))) {
+                        IOUtils.copy(fis, resp.getOutputStream());
+                    }
+                    resp.getOutputStream().flush();
+                    return;
                 }
 
-                resp.setContentType("image/webp");
-                resp.setContentLength((int) cachedFile.length());
-                resp.setHeader("Cache-Control", "public, max-age=86400");
-                try (InputStream fis = new BufferedInputStream(new FileInputStream(cachedFile))) {
-                    IOUtils.copy(fis, resp.getOutputStream());
+                byte[] rawBytes = IOUtils.toByteArray(attachment.stream);
+                try {
+                    SvgRasterizer.rasterizeToWebpFile(new ByteArrayInputStream(rawBytes), cachedFile, width);
+                    resp.setContentType("image/webp");
+                    resp.setContentLength((int) cachedFile.length());
+                    resp.setHeader("Cache-Control", "public, max-age=86400");
+                    try (InputStream fis = new BufferedInputStream(new FileInputStream(cachedFile))) {
+                        IOUtils.copy(fis, resp.getOutputStream());
+                    }
+                    resp.getOutputStream().flush();
                 }
-                resp.getOutputStream().flush();
+                catch (Exception rasterErr) {
+                    System.err.println("Failed to rasterize SVG to WebP, falling back to original SVG: " + rasterErr.getMessage());
+                    sendAttachmentBytes(resp, rawBytes, attachment.fileName, attachment.mimeType);
+                }
             }
             catch (Exception e) {
                 e.printStackTrace(System.err);
@@ -198,5 +214,14 @@ public class DataServlet
         if (!found) {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND);
         }
+    }
+
+    private void sendAttachmentBytes(HttpServletResponse resp, byte[] data, String fileName, String mimeType) throws IOException {
+        String type = mimeType != null ? mimeType : MimeTypes.guessType(fileName);
+        resp.setContentType(type);
+        resp.setContentLength(data.length);
+        resp.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
+        resp.getOutputStream().write(data);
+        resp.getOutputStream().flush();
     }
 }

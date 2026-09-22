@@ -35,4 +35,46 @@ public class SvgRasterizerTest {
         assertEquals(800, img.getWidth(), "Width should be scaled to 800");
         assertEquals(400, img.getHeight(), "Height should be proportionally scaled to 400");
     }
+
+    @Test
+    public void testRasterizeSvgWithMissingClipReference() throws Exception {
+        String svg = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 400 200\">"
+                + "<g clip-path=\"url(#clip1)\">"
+                + "<rect width=\"400\" height=\"200\" fill=\"#336699\"/>"
+                + "</g>"
+                + "</svg>";
+
+        File tempWebp = File.createTempFile("test-svg-clip-", ".webp");
+        tempWebp.deleteOnExit();
+
+        try (ByteArrayInputStream in = new ByteArrayInputStream(svg.getBytes(StandardCharsets.UTF_8))) {
+            SvgRasterizer.rasterizeToWebpFile(in, tempWebp, 800f);
+        }
+
+        assertTrue(tempWebp.exists());
+        BufferedImage img = ImageIO.read(new FileInputStream(tempWebp));
+        assertNotNull(img);
+        assertEquals(800, img.getWidth());
+    }
+
+    @Test
+    public void testRasterizeSvgWithMissingClipInStyle() throws Exception {
+        String svg = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 400 200\">"
+                + "<g style=\"clip-path: url(#clip1); fill: #336699;\">"
+                + "<rect width=\"400\" height=\"200\"/>"
+                + "</g>"
+                + "</svg>";
+
+        File tempWebp = File.createTempFile("test-svg-style-", ".webp");
+        tempWebp.deleteOnExit();
+
+        try (ByteArrayInputStream in = new ByteArrayInputStream(svg.getBytes(StandardCharsets.UTF_8))) {
+            SvgRasterizer.rasterizeToWebpFile(in, tempWebp, 800f);
+        }
+
+        assertTrue(tempWebp.exists());
+        BufferedImage img = ImageIO.read(new FileInputStream(tempWebp));
+        assertNotNull(img);
+        assertEquals(800, img.getWidth());
+    }
 }
