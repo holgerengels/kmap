@@ -1,9 +1,13 @@
 package kmap;
 
 import com.google.gson.*;
-import org.lightcouch.*;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.*;
+import com.mongodb.client.result.DeleteResult;
+import org.bson.Document;
+import org.bson.conversions.Bson;
 
-import java.io.FileNotFoundException;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -21,22 +25,35 @@ import static kmap.JSON.*;
 
 /**
  * Created by holger on 04.04.17.
+ * Refactored to MongoDB backend.
  */
 public class Couch extends Server {
 
-    private final CouchConnection connection;
+    private final MongoConnection connection;
 
     public Couch(Properties properties) {
         super(properties);
-        connection = new CouchConnection(properties);
+        connection = new MongoConnection(properties);
     }
 
-    protected CouchDbClient createClient(String name) {
-        return connection.createClient(name);
+    public MongoConnection getConnection() {
+        return connection;
+    }
+
+    private MongoCollection<Document> cards() {
+        return connection.getCollection("cards");
+    }
+
+    private MongoCollection<Document> attachments() {
+        return connection.getCollection("attachments");
+    }
+
+    private String instance() {
+        return connection.getInstance();
     }
 
     Gson getGson() {
-        return createClient("map").getGson();
+        return MongoConnection.getGson();
     }
 
     public synchronized JsonArray loadModule(String subject, String module) {
@@ -45,102 +62,121 @@ public class Couch extends Server {
     }
 
     private List<JsonObject> loadModuleAsList(String subject, String module) {
-        View view = createClient("map").view("net/byModule")
-            .key(subject, module)
-            .reduce(false)
-            .includeDocs(true);
-        List<JsonObject> objects = view.query(JsonObject.class);
-        objects.removeIf(o -> string(o, "chapter") == null || string(o,"topic") == null);
-        objects.forEach(o -> o.addProperty("module", module));
-        objects.forEach(o -> {
+        Bson filter = Filters.and(
+            Filters.eq("instance", instance()),
+            Filters.eq("subject", subject),
+            Filters.eq("module", module),
+            Filters.exists("chapter"),
+            Filters.exists("topic")
+        );
+        List<JsonObject> objects = new ArrayList<>();
+        for (Document doc : cards().find(filter).sort(Sorts.ascending("chapter", "topic"))) {
+            JsonObject o = MongoConnection.toJsonObject(doc);
+            if (string(o, "chapter") == null || string(o, "topic") == null)
+                continue;
+            o.addProperty("module", module);
             JsonArray attachments = o.getAsJsonArray("attachments");
             JsonObject _attachments = o.getAsJsonObject("_attachments");
             o.add("attachments", amendAttachments(attachments, _attachments));
             fixAttachments(attachments, subject, string(o, "chapter"), string(o, "topic"));
             o.remove("_attachments");
-        });
-        objects.sort(Comparator.comparing((JsonObject o) -> string(o, "chapter")).thenComparing(o -> string(o, "topic")));
+            objects.add(o);
+        }
         return objects;
     }
 
     public JsonArray latest(String subject, int n, boolean includeChapters) {
-        View view = createClient("map").view("net/byModified")
-                .startKey(subject, Long.MAX_VALUE)
-                .endKey(subject, Long.MIN_VALUE)
-                .reduce(false)
-                .descending(true)
-                .includeDocs(true);
-        List<JsonObject> objects = view.query(JsonObject.class);
-        if (includeChapters)
-            objects.removeIf(o -> string(o, "chapter") == null
-                    || string(o,"topic") == null
-                    || ("_".equals(string(o, "topic")) && stringTrim(o, "summary") == null));
-        else
-            objects.removeIf(o -> string(o, "chapter") == null
-                    || string(o,"topic") == null
-                    || "_".equals(string(o, "topic"))
-                    || string(o,"description") == null
-                    || stringTrim(o,"description").length() == 0);
-
-        if (n < objects.size())
-            objects = objects.subList(0, n);
-        objects.forEach(JSON::removeEmptyStrings);
-        objects.forEach(o -> {
+        Bson filter = Filters.and(
+            Filters.eq("instance", instance()),
+            Filters.eq("subject", subject),
+            Filters.exists("chapter"),
+            Filters.exists("topic")
+        );
+        List<JsonObject> objects = new ArrayList<>();
+        for (Document doc : cards().find(filter).sort(Sorts.descending("modified"))) {
+            JsonObject o = MongoConnection.toJsonObject(doc);
+            if (includeChapters) {
+                if (string(o, "chapter") == null
+                        || string(o, "topic") == null
+                        || ("_".equals(string(o, "topic")) && stringTrim(o, "summary") == null))
+                    continue;
+            } else {
+                if (string(o, "chapter") == null
+                        || string(o, "topic") == null
+                        || "_".equals(string(o, "topic"))
+                        || string(o, "description") == null
+                        || stringTrim(o, "description").length() == 0)
+                    continue;
+            }
+            JSON.removeEmptyStrings(o);
             JsonArray attachments = o.getAsJsonArray("attachments");
             JsonObject _attachments = o.getAsJsonObject("_attachments");
             o.add("attachments", amendAttachments(attachments, _attachments));
             fixAttachments(attachments, subject, string(o, "chapter"), string(o, "topic"));
             o.remove("_attachments");
-        });
+            objects.add(o);
+            if (objects.size() >= n)
+                break;
+        }
         return toArray(objects);
     }
 
     public synchronized JsonArray loadModules() {
-        View view = createClient("map").view("net/availableModules")
-            .group(true)
-            .reduce(true);
-        List<JsonObject> objects = view.query(JsonObject.class);
-        List<JsonObject> modules = new ArrayList<>();
-        objects.forEach(object -> {
-            JsonObject module = new JsonObject();
-            module.addProperty("subject", object.getAsJsonArray("key").get(0).getAsString());
-            module.addProperty("module", object.getAsJsonArray("key").get(1).getAsString());
-            module.addProperty("count", object.get("value").getAsNumber());
-            modules.add(module);
-        });
-        modules.sort(Comparator
-            .comparing((JsonObject o) -> o.getAsJsonPrimitive("subject").getAsString())
-            .thenComparing(o -> o.getAsJsonPrimitive("module").getAsString())
+        List<Bson> pipeline = Arrays.asList(
+            Aggregates.match(Filters.and(
+                Filters.eq("instance", instance()),
+                Filters.exists("subject"),
+                Filters.exists("module"),
+                Filters.exists("chapter"),
+                Filters.exists("topic")
+            )),
+            Aggregates.group(
+                new Document("subject", "$subject").append("module", "$module"),
+                Accumulators.sum("count", 1)
+            ),
+            Aggregates.sort(Sorts.ascending("_id.subject", "_id.module"))
         );
-        return toArray(modules);
+        JsonArray array = new JsonArray();
+        for (Document doc : cards().aggregate(pipeline)) {
+            Document id = doc.get("_id", Document.class);
+            if (id != null) {
+                JsonObject module = new JsonObject();
+                module.addProperty("subject", id.getString("subject"));
+                module.addProperty("module", id.getString("module"));
+                module.addProperty("count", doc.getInteger("count", 0));
+                array.add(module);
+            }
+        }
+        return array;
     }
 
     public JsonArray loadSubjects() {
-        View view = createClient("map").view("net/availableModules")
-            .group(true)
-            .reduce(true);
-        List<JsonObject> objects = view.query(JsonObject.class);
-        List<JsonObject> modules = new ArrayList<>();
-        objects.forEach(object -> {
-            JsonObject subject = new JsonObject();
-            subject.addProperty("subject", object.getAsJsonArray("key").get(0).getAsString());
-            subject.addProperty("count", object.get("value").getAsNumber());
-            modules.add(subject);
-        });
-        Map<String, Integer> map = modules.stream().collect(Collectors.groupingBy(s -> JSON.string(s, "subject"), Collectors.summingInt(c -> integer(c, "count"))));
+        List<Bson> pipeline = Arrays.asList(
+            Aggregates.match(Filters.and(
+                Filters.eq("instance", instance()),
+                Filters.exists("subject"),
+                Filters.nin("subject", "Hilfe", "Blog"),
+                Filters.exists("chapter"),
+                Filters.exists("topic")
+            )),
+            Aggregates.group("$subject", Accumulators.sum("count", 1)),
+            Aggregates.sort(Sorts.ascending("_id"))
+        );
         JsonArray array = new JsonArray();
-        map.entrySet().stream().filter(entry -> !"Hilfe".equals(entry.getKey()) && !"Blog".equals(entry.getKey())).sorted(Map.Entry.comparingByKey()).distinct().forEach(e -> {
-            JsonObject subject = new JsonObject();
-            subject.addProperty("name", e.getKey());
-            subject.addProperty("count", e.getValue());
-            array.add(subject);
-        });
+        for (Document doc : cards().aggregate(pipeline)) {
+            String subject = doc.getString("_id");
+            if (subject != null) {
+                JsonObject subjectObj = new JsonObject();
+                subjectObj.addProperty("name", subject);
+                subjectObj.addProperty("count", doc.getInteger("count", 0));
+                array.add(subjectObj);
+            }
+        }
         return array;
     }
 
     public synchronized String storeTopic(String subject, String module, String json, Map<String, Upload> uploads) {
-        CouchDbClient client = createClient("map");
-        JsonObject object = client.getGson().fromJson(json, JsonObject.class);
+        JsonObject object = MongoConnection.getGson().fromJson(json, JsonObject.class);
         if (object.has("delete")) {                                 // delete
             JsonObject old = (JsonObject)object.get("delete");
             String chapter = string(old, "chapter");
@@ -152,7 +188,16 @@ public class Couch extends Server {
             for (JsonObject element : array) {
                 pos++;
                 if (equals(element, subject, chapter, topic)) {
-                    client.remove(element);
+                    cards().deleteOne(Filters.and(
+                        Filters.eq("instance", instance()),
+                        Filters.eq("subject", subject),
+                        Filters.eq("chapter", chapter),
+                        Filters.eq("topic", topic)
+                    ));
+                    attachments().deleteMany(Filters.and(
+                        Filters.eq("instance", instance()),
+                        Filters.eq("card", subject + "." + chapter + "." + topic)
+                    ));
                     return "delete:" + pos;
                 }
             }
@@ -175,7 +220,7 @@ public class Couch extends Server {
                     element.addProperty("chapter", newChapter);
                     element.addProperty("topic", newTopic);
                     element.remove("depends");
-                    client.update(element);
+                    cards().replaceOne(Filters.eq("_id", string(element, "_id")), MongoConnection.toDocument(element));
                 }
                 else if (equals(element, subject, chapter, null)) {
                     boolean change = false;
@@ -192,10 +237,22 @@ public class Couch extends Server {
                         }
                         if (change) {
                             element.add("depends", newDepends);
-                            client.update(element);
+                            cards().replaceOne(Filters.eq("_id", string(element, "_id")), MongoConnection.toDocument(element));
                         }
                     }
                 }
+            }
+            // Update attachment soft-references if card was renamed
+            String oldCardRef = subject + "." + chapter + "." + topic;
+            String newCardRef = subject + "." + newChapter + "." + newTopic;
+            for (Document att : attachments().find(Filters.and(Filters.eq("instance", instance()), Filters.eq("card", oldCardRef)))) {
+                String oldSlug = att.getString("_id");
+                String name = att.getString("name");
+                String newSlug = instance() + "/cards/" + subject + "/" + newChapter + "/" + newTopic + "/" + name;
+                attachments().deleteOne(Filters.eq("_id", oldSlug));
+                att.put("_id", newSlug);
+                att.put("card", newCardRef);
+                attachments().insertOne(att);
             }
             return "reload:";
         }
@@ -207,13 +264,13 @@ public class Couch extends Server {
             assert chapter != null;
             assert topic != null;
             assert nmodule != null;
-            List<JsonObject> array = loadModuleAsList(subject, module);
-            for (JsonObject element : array) {
-                if (equals(element, subject, chapter, topic)) {
-                    element.addProperty("module", nmodule);
-                    client.update(element);
-                }
-            }
+            Bson filter = Filters.and(
+                Filters.eq("instance", instance()),
+                Filters.eq("subject", subject),
+                Filters.eq("chapter", chapter),
+                Filters.eq("topic", topic)
+            );
+            cards().updateOne(filter, Updates.set("module", nmodule));
             return "reload:";
         }
         else {
@@ -221,17 +278,22 @@ public class Couch extends Server {
             if (changed.get("priority") != null && (changed.get("priority").isJsonNull() || string(changed, "priority") == null))
                 changed.remove("priority");
 
-            String command;
             if (object.has("old")) {                                // update
-                command = "move:";
                 JsonObject old = (JsonObject)object.get("old");
                 String chapter = string(old, "chapter");
                 String topic = string(old, "topic");
                 assert chapter != null;
                 assert topic != null;
 
-                JsonObject existing = loadTopic(client, new String[] { subject, chapter, topic });
-                if (existing != null) {
+                Bson filter = Filters.and(
+                    Filters.eq("instance", instance()),
+                    Filters.eq("subject", subject),
+                    Filters.eq("chapter", chapter),
+                    Filters.eq("topic", topic)
+                );
+                Document existingDoc = cards().find(filter).first();
+                if (existingDoc != null) {
+                    JsonObject existing = MongoConnection.toJsonObject(existingDoc);
                     existing.addProperty("subject", subject);
                     if (!JSON.bool(changed, "minorEdit"))
                         existing.addProperty("modified", System.currentTimeMillis());
@@ -254,18 +316,16 @@ public class Couch extends Server {
                     existing.add("attachments", changed.get("attachments"));
                     existing.add("skills", changed.get("skills"));
                     if (checks(changed)) {
-                        Response response = client.update(existing);
+                        cards().replaceOne(Filters.eq("_id", existingDoc.getString("_id")), MongoConnection.toDocument(existing));
                         JsonArray attachments = changed.getAsJsonArray("attachments");
-                        response = saveFiles(client, response, uploads, attachments);
-                        JsonObject _attachments = existing.getAsJsonObject("_attachments");
-                        deleteFiles(client, response, attachments, _attachments);
+                        saveFiles(subject, string(changed, "chapter"), string(changed, "topic"), uploads, attachments);
+                        deleteFiles(subject, string(changed, "chapter"), string(changed, "topic"), attachments);
                     }
                     else
                         return "error:module, subject, chapter or topic missing";
                 }
             }
             else {
-                command = "add:";                                               // save
                 changed.remove("added");
                 changed.addProperty("subject", subject);
                 Long created = JSON.loong(changed, "created");
@@ -277,9 +337,11 @@ public class Couch extends Server {
                     changed.addProperty("modified", millis);
                 }
                 if (checks(changed)) {
-                    Response response = client.save(changed);
+                    changed.addProperty("instance", instance());
+                    changed.addProperty("_id", instance() + ":" + UUID.randomUUID().toString().replace("-", ""));
+                    cards().insertOne(MongoConnection.toDocument(changed));
                     JsonArray attachments = changed.getAsJsonArray("attachments");
-                    saveFiles(client, response, uploads, attachments);
+                    saveFiles(subject, string(changed, "chapter"), string(changed, "topic"), uploads, attachments);
                 }
                 else
                     return "error:module, subject, chapter or topic missing";
@@ -289,15 +351,28 @@ public class Couch extends Server {
         }
     }
 
-    private Response saveFiles(CouchDbClient client, Response response, Map<String, Upload> uploads, JsonArray attachments) {
+    private void saveFiles(String subject, String chapter, String topic, Map<String, Upload> uploads, JsonArray attachments) {
+        if (uploads == null || attachments == null) return;
         for (JsonElement alement : attachments) {
-            String file = string((JsonObject)alement,"file");
+            String file = string((JsonObject)alement, "file");
             if (file != null) {
                 Upload upload = uploads.get(file);
                 if (upload != null) {
                     try {
                         System.out.println("saving " + upload);
-                        response = client.saveAttachment(Files.newInputStream(upload.tmp), encode(upload.fileName), upload.contentType, response.getId(), response.getRev());
+                        String slug = instance() + "/cards/" + subject + "/" + chapter + "/" + topic + "/" + upload.fileName;
+                        byte[] data = Files.readAllBytes(upload.tmp);
+                        Document attDoc = new Document("_id", slug)
+                                .append("instance", instance())
+                                .append("target", "cards")
+                                .append("card", subject + "." + chapter + "." + topic)
+                                .append("name", upload.fileName)
+                                .append("contentType", upload.contentType)
+                                .append("length", data.length)
+                                .append("digest", null)
+                                .append("data", new org.bson.types.Binary(data))
+                                .append("modified", System.currentTimeMillis());
+                        attachments().replaceOne(Filters.eq("_id", slug), attDoc, new ReplaceOptions().upsert(true));
                     }
                     catch (IOException e) {
                         e.printStackTrace();
@@ -305,39 +380,52 @@ public class Couch extends Server {
                 }
             }
         }
-        return response;
     }
 
-    private Response deleteFiles(CouchDbClient client, Response response, JsonArray attachments, JsonObject _attachments) {
-        if (_attachments == null)
-            return response;
-
-        Set<String> existingNames = _attachments.keySet();
-        for (JsonElement alement : attachments) {
-            String file = string((JsonObject)alement,"file");
-            if (file != null) {
-                System.out.println("keeping " + file);
-                existingNames.remove(file);
+    private void deleteFiles(String subject, String chapter, String topic, JsonArray attachments) {
+        Set<String> keepNames = new HashSet<>();
+        if (attachments != null) {
+            for (JsonElement alement : attachments) {
+                String file = string((JsonObject)alement, "file");
+                if (file != null)
+                    keepNames.add(file);
             }
         }
-        for (String name : existingNames) {
-            System.out.println("removing " + name);
-            response = client.removeAttachment(encode(name), response.getId(), response.getRev());
+        String cardRef = subject + "." + chapter + "." + topic;
+        Bson filter = Filters.and(
+            Filters.eq("instance", instance()),
+            Filters.eq("card", cardRef)
+        );
+        for (Document doc : attachments().find(filter)) {
+            String name = doc.getString("name");
+            if (name != null && !keepNames.contains(name)) {
+                System.out.println("removing " + name);
+                attachments().deleteOne(Filters.eq("_id", doc.getString("_id")));
+            }
         }
-        return response;
     }
 
-    public String[] importAttachment(String[] idrev, String file, String contentType , InputStream in) {
-        CouchDbClient client = createClient("map");
+    public String[] importAttachment(String[] idrev, String file, String contentType, InputStream in) {
         String[] dirs = file.split("/");
-        if (idrev == null) {
-            JsonObject object = loadTopic(client, dirs);
-            String id = string(object,"_id");
-            String rev = string(object,"_rev");
-            idrev = new String[] { id, rev };
+        // dirs: [subject, chapter, topic, fileName]
+        try {
+            byte[] bytes = in.readAllBytes();
+            String slug = instance() + "/cards/" + dirs[0] + "/" + dirs[1] + "/" + dirs[2] + "/" + dirs[3];
+            Document attDoc = new Document("_id", slug)
+                    .append("instance", instance())
+                    .append("target", "cards")
+                    .append("card", dirs[0] + "." + dirs[1] + "." + dirs[2])
+                    .append("name", dirs[3])
+                    .append("contentType", contentType)
+                    .append("length", bytes.length)
+                    .append("digest", null)
+                    .append("data", new org.bson.types.Binary(bytes))
+                    .append("modified", System.currentTimeMillis());
+            attachments().replaceOne(Filters.eq("_id", slug), attDoc, new ReplaceOptions().upsert(true));
+            return new String[] { slug, "1" };
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        Response response = client.saveAttachment(in, encode(dirs[3]), contentType, idrev[0], idrev[1]);
-        return new String[] { response.getId(), response.getRev() };
     }
 
     private boolean checks(JsonObject object) {
@@ -356,6 +444,7 @@ public class Couch extends Server {
     public synchronized JsonObject chapter(String subject, String name) {
         return chapter(subject, name, false);
     }
+
     public synchronized JsonObject chapter(String subject, String name, boolean includeContent) {
         List<JsonObject> objects = loadChapterAsList(subject, name);
         Map<String, Node> nodes = new HashMap<>();
@@ -366,9 +455,7 @@ public class Couch extends Server {
         board.addProperty("chapter", name);
         Map<String, Set<String>> aggregates = new HashMap<>();
         Map<String, String> links = links(subject);
-        //debugLinks(subject, links);
         MultiMap<String, String> deps = deps(subject);
-        //debugDeps(subject, deps);
         JsonArray lines = new JsonArray();
         board.add("lines", lines);
 
@@ -427,7 +514,6 @@ public class Couch extends Server {
             if (depends != null) {
                 for (JsonElement depend : depends) {
                     String dependsOn = depend.getAsString();
-                    //System.out.println("--> " + dependsOn);
                     Connection connection = connections.computeIfAbsent(dependsOn + ":" + topicName, s -> {
                         Node source = nodes.get(dependsOn);
                         if (source == null) {
@@ -548,11 +634,16 @@ public class Couch extends Server {
     }
 
     private List<JsonObject> loadChapterAsList(String subject, String name) {
-        View view = createClient("map").view("net/byChapter")
-            .key(subject, name)
-            .reduce(false)
-            .includeDocs(true);
-        return view.query(JsonObject.class);
+        Bson filter = Filters.and(
+            Filters.eq("instance", instance()),
+            Filters.eq("subject", subject),
+            Filters.eq("chapter", name)
+        );
+        List<JsonObject> list = new ArrayList<>();
+        for (Document doc : cards().find(filter)) {
+            list.add(MongoConnection.toJsonObject(doc));
+        }
+        return list;
     }
 
     private List<String> backlinks(Map<String, String> links, String name) {
@@ -668,25 +759,18 @@ public class Couch extends Server {
     }
 
     public boolean loadAttachment(Consumer<AttachmentInputStream> sender, String... dirs) throws IOException {
-        CouchDbClient client = createClient("map");
-        JsonObject object = loadTopic(client, dirs);
-        String id = string(object,"_id");
-        JsonObject attachments = object.getAsJsonObject("_attachments");
-        String type = null;
-        Integer length = null;
-        InputStream in = null;
-        if (attachments != null) {
-            System.out.println("loadAttachment = " + Arrays.toString(dirs));
-            JsonObject attachment = attachments.getAsJsonObject(dirs[3]);
-            if (attachment != null) {
-                type = string(attachment, "content_type");
-                length = integer(attachment, "length");
-                String digest = string(attachment, "digest");
-                in = client.find(id + "/" + encode(dirs[3]));
-                //System.out.println("Load " + id + "/" + dirs[3] + " from couch");
-                sender.accept(new AttachmentInputStream(in, dirs[3], type, length, digest));
-                in.close();
-                return true;
+        String slug = instance() + "/cards/" + dirs[0] + "/" + dirs[1] + "/" + dirs[2] + "/" + dirs[3];
+        Document doc = attachments().find(Filters.eq("_id", slug)).first();
+        if (doc != null) {
+            org.bson.types.Binary bin = doc.get("data", org.bson.types.Binary.class);
+            if (bin != null) {
+                String type = doc.getString("contentType");
+                Integer length = doc.getInteger("length");
+                String digest = doc.getString("digest");
+                try (InputStream in = new ByteArrayInputStream(bin.getData())) {
+                    sender.accept(new AttachmentInputStream(in, dirs[3], type, length, digest));
+                    return true;
+                }
             }
         }
         return false;
@@ -694,44 +778,62 @@ public class Couch extends Server {
 
     public void fix(String path, List<JsonObject> list) {
         String[] dirs = path.split("/");
-        CouchDbClient client = createClient("map");
-        JsonObject object = loadTopic(client, dirs);
-        JsonArray attachments = object.getAsJsonArray("attachments");
-        if (attachments == null)
-            attachments = new JsonArray();
-        list.forEach(attachments::add);
-        object.add("attachments", attachments);
-        client.update(object);
+        Bson filter = Filters.and(
+            Filters.eq("instance", instance()),
+            Filters.eq("subject", dirs[0]),
+            Filters.eq("chapter", dirs[1]),
+            Filters.eq("topic", dirs[2])
+        );
+        Document doc = cards().find(filter).first();
+        if (doc != null) {
+            JsonObject object = MongoConnection.toJsonObject(doc);
+            JsonArray attachments = object.getAsJsonArray("attachments");
+            if (attachments == null)
+                attachments = new JsonArray();
+            list.forEach(attachments::add);
+            object.add("attachments", attachments);
+            cards().replaceOne(filter, MongoConnection.toDocument(object));
+        }
     }
 
     public JsonObject loadTopic(String... dirs) {
-        CouchDbClient client = createClient("map");
-        return loadTopic(client, dirs);
-    }
-
-    private JsonObject loadTopic(CouchDbClient client, String[] dirs) {
-        View view = client.view("net/byTopic")
-                .key(dirs[0], dirs[1], dirs[2])
-                .reduce(false)
-                .includeDocs(true);
-        List<JsonObject> objects = view.query(JsonObject.class);
-        JsonObject o = objects.size() == 1 ? objects.get(0) : null;
-        if (o == null)
+        Bson filter = Filters.and(
+            Filters.eq("instance", instance()),
+            Filters.eq("subject", dirs[0]),
+            Filters.eq("chapter", dirs[1]),
+            Filters.eq("topic", dirs[2])
+        );
+        Document doc = cards().find(filter).first();
+        if (doc == null)
             return null;
+        JsonObject o = MongoConnection.toJsonObject(doc);
         JsonArray attachments = o.getAsJsonArray("attachments");
         JsonObject _attachments = o.getAsJsonObject("_attachments");
         o.add("attachments", amendAttachments(attachments, _attachments));
         fixAttachments(attachments, dirs[0], string(o, "chapter"), string(o, "topic"));
-        //o.remove("_attachments");
         return o;
     }
 
     public synchronized JsonArray search(String filter) {
-        CouchDbClient client = createClient("map");
-        String uri = client.getBaseUri() + "_fti/local/" + "map" + "/_design/net/search?q=content:" + filter;
-        JsonObject result = client.findAny(JsonObject.class, uri);
-        System.out.println("search result = " + result);
-        return result.getAsJsonArray("rows");
+        Bson query = Filters.and(
+            Filters.eq("instance", instance()),
+            Filters.text(filter)
+        );
+        JsonArray rows = new JsonArray();
+        for (Document doc : cards().find(query).limit(50)) {
+            JsonObject row = new JsonObject();
+            row.addProperty("id", doc.getString("_id"));
+            JsonObject fields = new JsonObject();
+            fields.addProperty("subject", doc.getString("subject"));
+            fields.addProperty("chapter", doc.getString("chapter"));
+            fields.addProperty("topic", doc.getString("topic"));
+            fields.addProperty("summary", doc.getString("summary"));
+            fields.addProperty("description", doc.getString("description"));
+            fields.addProperty("thumb", doc.getString("thumb"));
+            row.add("fields", fields);
+            rows.add(row);
+        }
+        return rows;
     }
 
     private String encode(String string) {
@@ -744,26 +846,45 @@ public class Couch extends Server {
     }
 
     public Map<String, String> links(String subject) {
-        int index = subject.length() + 1;
-        View view = createClient("map")
-            .view("net/links")
-            .startKey(subject + ".")
-            .endKey((subject + ".\uffff"))
-            .reduce(false);
-        List<JsonObject> objects = view.query(JsonObject.class);
-        return objects.stream().collect(Collectors.toMap(object -> string(object, "key").substring(index), object -> string(object, "value").substring(index), (a, b) -> b));
+        Bson filter = Filters.and(
+            Filters.eq("instance", instance()),
+            Filters.eq("subject", subject),
+            Filters.exists("links"),
+            Filters.ne("links", null),
+            Filters.ne("links", "")
+        );
+        Map<String, String> map = new HashMap<>();
+        for (Document doc : cards().find(filter)) {
+            String chapter = doc.getString("chapter");
+            String topic = doc.getString("topic");
+            String links = doc.getString("links");
+            if (chapter != null && topic != null && links != null && !links.isEmpty()) {
+                map.put(chapter + "." + topic, links);
+            }
+        }
+        return map;
     }
 
     public MultiMap<String, String> deps(String subject) {
-        int index = subject.length() + 1;
-        View view = createClient("map")
-            .view("net/deps")
-            .startKey(subject + ".")
-            .endKey((subject + ".\uffff"))
-            .reduce(false);
-        List<JsonObject> objects = view.query(JsonObject.class);
+        Bson filter = Filters.and(
+            Filters.eq("instance", instance()),
+            Filters.eq("subject", subject),
+            Filters.exists("links"),
+            Filters.ne("links", null),
+            Filters.ne("links", ""),
+            Filters.exists("depends")
+        );
         MultiMap<String, String> deps = new MultiMap<>();
-        objects.stream().forEach(object -> deps.put(string(object, "key").substring(index), string(object, "value").substring(index)));
+        for (Document doc : cards().find(filter)) {
+            String links = doc.getString("links");
+            String chapter = doc.getString("chapter");
+            List<String> dependsList = doc.getList("depends", String.class);
+            if (links != null && chapter != null && dependsList != null) {
+                for (String dep : dependsList) {
+                    deps.put(links, chapter + "." + dep);
+                }
+            }
+        }
         return deps;
     }
 
@@ -790,10 +911,9 @@ public class Couch extends Server {
                 parent = parent.substring(0, parent.indexOf("."));
                 chapter = parent;
             }
-            paths.add(path.substring(subject.length() + 1));
+            paths.add(path);
         }
         Collections.sort(paths);
-        //System.out.println("paths = " + paths);
         JsonArray array = new JsonArray();
         paths.forEach(array::add);
         return array;
@@ -826,24 +946,29 @@ public class Couch extends Server {
     }
 
     public JsonArray chapters(String subject) {
-        View view = createClient("map").view("net/chapters")
-            .key(subject)
-            .reduce(false)
-            .includeDocs(false);
-        List<JsonObject> objects = view.query(JsonObject.class);
+        Bson filter = Filters.and(
+            Filters.eq("instance", instance()),
+            Filters.eq("subject", subject),
+            Filters.exists("chapter")
+        );
         JsonArray array = new JsonArray();
-        objects.stream().map(object -> string(object, "value")).distinct().forEach(array::add);
+        for (String chapter : cards().distinct("chapter", filter, String.class)) {
+            array.add(chapter);
+        }
         return array;
     }
 
     public JsonArray topics(String subject, String chapter) {
-        View view = createClient("map").view("net/topics")
-            .key(subject, chapter)
-            .reduce(false)
-            .includeDocs(false);
-        List<JsonObject> objects = view.query(JsonObject.class);
+        Bson filter = Filters.and(
+            Filters.eq("instance", instance()),
+            Filters.eq("subject", subject),
+            Filters.eq("chapter", chapter),
+            Filters.or(Filters.exists("links", false), Filters.eq("links", null), Filters.eq("links", ""))
+        );
         JsonArray array = new JsonArray();
-        objects.stream().map(object -> string(object, "value").split("\\.")[1]).distinct().forEach(array::add);
+        for (String topic : cards().distinct("topic", filter, String.class)) {
+            array.add(topic);
+        }
         return array;
     }
 
@@ -852,26 +977,43 @@ public class Couch extends Server {
         topicsAsList(subject).forEach(array::add);
         return array;
     }
+
     public List<String> topicsAsList(String subject) {
-        View view = createClient("map")
-            .view("net/topics")
-            .startKey(subject, "\u0000")
-            .endKey(subject, "\uffff")
-            .reduce(false);
-        List<JsonObject> objects = view.query(JsonObject.class);
-        return objects.stream().map(object -> string(object, "value")).collect(Collectors.toList());
+        Bson filter = Filters.and(
+            Filters.eq("instance", instance()),
+            Filters.eq("subject", subject),
+            Filters.or(Filters.exists("links", false), Filters.eq("links", null), Filters.eq("links", ""))
+        );
+        List<String> list = new ArrayList<>();
+        for (Document doc : cards().find(filter)) {
+            String chapter = doc.getString("chapter");
+            String topic = doc.getString("topic");
+            if (chapter != null && topic != null) {
+                list.add(chapter + "." + topic);
+            }
+        }
+        return list;
     }
 
     Map<String, Integer> counts(String subject) {
-        int index = subject.length() + 1;
-        View view = createClient("map")
-            .view("net/count")
-            .startKey(subject + ".")
-            .endKey((subject + ".\uffff"))
-            .reduce(true)
-            .group(true);
-        List<JsonObject> objects = view.query(JsonObject.class);
-        return objects.stream().collect(Collectors.toMap(object -> string(object, "key").substring(index), object -> integer(object, "value"), (a, b) -> b));
+        List<Bson> pipeline = Arrays.asList(
+            Aggregates.match(Filters.and(
+                Filters.eq("instance", instance()),
+                Filters.eq("subject", subject),
+                Filters.or(Filters.exists("links", false), Filters.eq("links", null), Filters.eq("links", "")),
+                Filters.ne("topic", "_"),
+                Filters.exists("chapter")
+            )),
+            Aggregates.group("$chapter", Accumulators.sum("count", 1))
+        );
+        Map<String, Integer> map = new HashMap<>();
+        for (Document doc : cards().aggregate(pipeline)) {
+            String chapter = doc.getString("_id");
+            if (chapter != null) {
+                map.put(chapter, doc.getInteger("count", 0));
+            }
+        }
+        return map;
     }
 
     private List<Node> layout(Map<String, Node> nodes, Map<String, Connection> connections) {
@@ -910,33 +1052,33 @@ public class Couch extends Server {
     }
 
     public JsonObject importModule(String subject, String module, String json) {
-        CouchDbClient client = createClient("map");
-        JsonObject data = client.getGson().fromJson(json, JsonObject.class);
-        System.out.println("data = " + data);
+        JsonObject data = MongoConnection.getGson().fromJson(json, JsonObject.class);
         JsonArray array = (JsonArray)data.get("docs");
-        List<JsonObject> newTopics = new ArrayList<>();
+        List<Document> newTopics = new ArrayList<>();
+        long millis = System.currentTimeMillis();
         for (JsonElement element : array) {
             JsonObject object = (JsonObject)element;
             object.addProperty("subject", subject);
             object.addProperty("module", module);
-            long millis = System.currentTimeMillis();
+            object.addProperty("instance", instance());
             if (loong(object, "created") == null)
                 object.addProperty("created", millis);
             if (loong(object, "modified") == null)
                 object.addProperty("modified", millis);
-            object.remove("_id");
+            object.addProperty("_id", instance() + ":" + UUID.randomUUID().toString().replace("-", ""));
             object.remove("_rev");
-            newTopics.add(object);
+            newTopics.add(MongoConnection.toDocument(object));
         }
-        List<JsonObject> oldTopics = loadModuleAsList(subject, module);
-        for (JsonObject object : oldTopics) {
-            object.addProperty("_deleted", true);
+
+        cards().deleteMany(Filters.and(
+            Filters.eq("instance", instance()),
+            Filters.eq("subject", subject),
+            Filters.eq("module", module)
+        ));
+
+        if (!newTopics.isEmpty()) {
+            cards().insertMany(newTopics);
         }
-        System.out.println("oldTopics = " + oldTopics);
-        System.out.println("newTopics = " + newTopics);
-        if (!oldTopics.isEmpty())
-            client.bulk(oldTopics, true);
-        client.bulk(newTopics, true);
 
         JsonObject object = new JsonObject();
         object.addProperty("subject", subject);
@@ -946,38 +1088,36 @@ public class Couch extends Server {
     }
 
     public JsonObject deleteModule(String subject, String module) {
-        CouchDbClient client = createClient("map");
-        List<JsonObject> oldTopics = loadModuleAsList(subject, module);
-        for (JsonObject object : oldTopics) {
-            object.addProperty("_deleted", true);
-        }
-        System.out.println("oldTopics = " + oldTopics);
-        List<Response> responses = client.bulk(oldTopics, true);
-        System.out.println("responses = " + responses);
+        DeleteResult res = cards().deleteMany(Filters.and(
+            Filters.eq("instance", instance()),
+            Filters.eq("subject", subject),
+            Filters.eq("module", module)
+        ));
 
         JsonObject object = new JsonObject();
         object.addProperty("subject", subject);
         object.addProperty("module", module);
-        object.addProperty("count", oldTopics.size());
+        object.addProperty("count", (int) res.getDeletedCount());
         return object;
     }
 
     public synchronized JsonArray checks(String subject) {
-        View view = createClient("map").view("net/bySubject")
-                .key(subject)
-                .reduce(false)
-                .includeDocs(true);
-
+        Bson filter = Filters.and(
+            Filters.eq("instance", instance()),
+            Filters.eq("subject", subject),
+            Filters.exists("chapter"),
+            Filters.exists("topic")
+        );
         JsonArray messages = new JsonArray();
-        List<JsonObject> objects = view.query(JsonObject.class);
-        for (JsonObject object : objects) {
-            JsonObject _attachments = object.getAsJsonObject("_attachments");
-            Set<String> names = _attachments != null ? _attachments.keySet() : Collections.emptySet();
+        for (Document doc : cards().find(filter)) {
+            JsonObject object = MongoConnection.toJsonObject(doc);
             JsonArray attachments = requireNonNullElse(object.getAsJsonArray("attachments"), new JsonArray());
             for (JsonElement element : attachments) {
                 JsonObject attachment = (JsonObject)element;
                 if ("file".equals(JSON.string(attachment, "type"))) {
-                    if (!names.contains(JSON.string(attachment, "file"))) {
+                    String file = JSON.string(attachment, "file");
+                    String slug = instance() + "/cards/" + doc.getString("subject") + "/" + doc.getString("chapter") + "/" + doc.getString("topic") + "/" + file;
+                    if (file != null && attachments().countDocuments(Filters.eq("_id", slug)) == 0) {
                         System.out.println(formatIdentity(object) + ": lost the file for " + JSON.string(attachment, "name"));
                         JsonObject message = new JsonObject();
                         message.addProperty("id", JSON.string(object, "_id"));
@@ -989,7 +1129,6 @@ public class Couch extends Server {
                 }
             }
             String summary = string(object, "summary");
-            String meta = string(object, "meta");
             String description = string(object, "description");
             String links = string(object, "links");
             if (links == null) {
@@ -1025,79 +1164,43 @@ public class Couch extends Server {
     }
 
     public synchronized JsonArray list(String subject, String chapter) {
-        CouchDbClient client = createClient("map");
-        View view = chapter != null
-                ? client.view("net/byChapter").key(subject, chapter).reduce(false).includeDocs(true)
-                : client.view("net/bySubject").key(subject).reduce(false).includeDocs(true)
-                ;
+        Bson filter = chapter != null
+            ? Filters.and(Filters.eq("instance", instance()), Filters.eq("subject", subject), Filters.eq("chapter", chapter))
+            : Filters.and(Filters.eq("instance", instance()), Filters.eq("subject", subject));
 
         JsonArray list = new JsonArray();
-        List<JsonObject> objects = view.query(JsonObject.class);
-        for (JsonObject object : objects) {
-            JsonObject line = new JsonObject();
-            chapter = JSON.string(object, "chapter");
-            String topic = JSON.string(object, "topic");
-            if ("_".equals(topic))
+        for (Document doc : cards().find(filter)) {
+            String ch = doc.getString("chapter");
+            String topic = doc.getString("topic");
+            if (ch == null || topic == null || "_".equals(topic))
                 continue;
+            JsonObject line = new JsonObject();
             line.addProperty("subject", subject);
-            line.addProperty("chapter", chapter);
+            line.addProperty("chapter", ch);
             line.addProperty("topic", topic);
             list.add(line);
         }
         return list;
     }
 
-    private void addProperty(CouchDbClient client, String[] dirs, String name, JsonElement element) {
-        JsonObject object = loadTopic(dirs);
-        object.add(name, element);
-        client.update(object);
+    private void addProperty(String[] dirs, String name, JsonElement element) {
+        Bson filter = Filters.and(
+            Filters.eq("instance", instance()),
+            Filters.eq("subject", dirs[0]),
+            Filters.eq("chapter", dirs[1]),
+            Filters.eq("topic", dirs[2])
+        );
+        Object bsonVal = (element == null || element.isJsonNull()) ? null
+                : element.isJsonPrimitive() ? (element.getAsJsonPrimitive().isBoolean() ? element.getAsBoolean()
+                    : element.getAsJsonPrimitive().isNumber() ? element.getAsNumber() : element.getAsString())
+                : Document.parse(element.toString());
+        cards().updateOne(filter, Updates.set(name, bsonVal));
     }
-
-    public static void main(String[] args) throws IOException {
-        Couch couch = new Couch(readProperties(args[0]));
-        Server.CLIENT.set("root");
-        Pattern pattern = Pattern.compile(".*[0-9]+,[0-9]+.*", Pattern.DOTALL);
-        List<JsonObject> objects = couch.loadModuleAsList("Mathematik", "Analysis");
-        System.out.println("objects.size() = " + objects.size());
-        objects = objects.stream().filter(o -> {
-            String description = string(o, "description");
-            return description != null && pattern.matcher(description).matches();
-        }).collect(Collectors.toList());
-        System.out.println("objects.size() = " + objects.size());
-        System.out.println("objects = " + objects.stream().map(o -> string(o, "chapter") + " " + string(o, "topic") + "\n").collect(Collectors.toList()));
-        Server.CLIENT.remove();
-    }
-
-    /*
-    public static void main(String[] args) throws IOException {
-        Couch couch = new Couch(readProperties(args[0]));
-        if (args.length != 4) {
-            System.err.println("Usage: <kmap.properties> name value <topics>");
-            System.exit(1);
-        }
-        Server.CLIENT.set("root");
-        CouchDbClient client = couch.createClient("map");
-        String name = args[1];
-        JsonElement value = client.getGson().fromJson(args[2], JsonElement.class);
-        String json = Files.readString(Paths.get(args[3]));
-        JsonArray topics = client.getGson().fromJson(json, JsonArray.class);
-        for (JsonElement element : topics) {
-            String[] path = {
-                    JSON.string((JsonObject) element, "subject"),
-                    JSON.string((JsonObject) element, "chapter"),
-                    JSON.string((JsonObject) element, "topic")
-            };
-            couch.addProperty(client, path, name, value);
-        }
-        Server.CLIENT.remove();
-    }
-    */
 
     public int batchCards(String json) {
-        CouchDbClient client = createClient("map");
-        JsonObject batch = client.getGson().fromJson(json, JsonObject.class);
+        JsonObject batch = MongoConnection.getGson().fromJson(json, JsonObject.class);
         json = string(batch, "json");
-        batch = client.getGson().fromJson(json, JsonObject.class);
+        batch = MongoConnection.getGson().fromJson(json, JsonObject.class);
         JsonArray properties = batch.getAsJsonArray("properties");
         JsonArray cards = batch.getAsJsonArray("cards");
         int count = 0;
@@ -1112,7 +1215,7 @@ public class Couch extends Server {
                 JsonObject property = (JsonObject)elefant;
                 String name = string(property, "name");
                 JsonElement value = property.get("value");
-                addProperty(client, path, name, value);
+                addProperty(path, name, value);
             }
             count++;
         }

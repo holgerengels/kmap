@@ -3,10 +3,11 @@ package kmap;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import org.lightcouch.CouchDbClient;
-import org.lightcouch.NoDocumentException;
-import org.lightcouch.View;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Sorts;
+import org.bson.Document;
+import org.bson.conversions.Bson;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -17,97 +18,96 @@ import static kmap.Server.readProperties;
 
 /**
  * Created by holger on 04.04.17.
+ * Refactored to MongoDB backend.
  */
 public class Courses {
-    private States states;
+    private final States states;
+    private final MongoConnection connection;
 
     public Courses(States states) {
         this.states = states;
+        this.connection = states.getCouch().getConnection();
     }
 
-    private CouchDbClient getClient() {
-        return states.getCouch().createClient("course");
+    private MongoCollection<Document> courses() {
+        return connection.getCollection("courses");
+    }
+
+    private String instance() {
+        return connection.getInstance();
     }
 
     public JsonArray courses(String user) {
-        CouchDbClient client = getClient();
-        View view = client.view("course/byUser")
-                .key(user)
-                .reduce(false)
-                .includeDocs(true);
-        try {
-            List<JsonObject> objects = view.query(JsonObject.class);
-            return sortedArray(objects, "name");
+        Bson filter = Filters.and(
+            Filters.eq("instance", instance()),
+            Filters.eq("user", user)
+        );
+        List<JsonObject> objects = new ArrayList<>();
+        for (Document doc : courses().find(filter).sort(Sorts.ascending("name"))) {
+            objects.add(MongoConnection.toJsonObject(doc));
         }
-        catch (NoDocumentException e) {
-            return new JsonArray();
-        }
+        return toArray(objects);
     }
 
     public JsonArray timelines(String user) {
-        CouchDbClient client = getClient();
-        View view = client.view("course/byStudent")
-                .startKey(user, "\u0000", "\u0000")
-                .endKey(user, "\uffff", "\uffff")
-                .reduce(false)
-                .includeDocs(true);
-        try {
-            List<JsonObject> objects = view.query(JsonObject.class);
-            return sortedArray(objects, "name");
+        Bson filter = Filters.and(
+            Filters.eq("instance", instance()),
+            Filters.exists("subject"),
+            Filters.exists("curriculum"),
+            Filters.exists("students"),
+            Filters.or(
+                Filters.eq("user", user),
+                Filters.eq("students", user)
+            )
+        );
+        List<JsonObject> objects = new ArrayList<>();
+        for (Document doc : courses().find(filter).sort(Sorts.ascending("name"))) {
+            objects.add(MongoConnection.toJsonObject(doc));
         }
-        catch (NoDocumentException e) {
-            return new JsonArray();
-        }
+        return toArray(objects);
     }
 
     public JsonObject course(String user, String name) {
-        CouchDbClient client = getClient();
-        View view = client.view("course/byName")
-                .key(user, name)
-                .reduce(false)
-                .includeDocs(true);
-        try {
-            List<JsonObject> objects = view.query(JsonObject.class);
-            return objects.size() == 1 ? objects.get(0) : null;
-        }
-        catch (NoDocumentException e) {
-            return null;
-        }
+        Bson filter = Filters.and(
+            Filters.eq("instance", instance()),
+            Filters.eq("user", user),
+            Filters.eq("name", name)
+        );
+        Document doc = courses().find(filter).first();
+        return doc != null ? MongoConnection.toJsonObject(doc) : null;
     }
 
     public void deleteCourse(String user, String json) {
-        CouchDbClient client = getClient();
-        JsonObject data = client.getGson().fromJson(json, JsonObject.class);
+        JsonObject data = MongoConnection.getGson().fromJson(json, JsonObject.class);
         String name = JSON.string(data, "name");
-        View view = client.view("course/byName")
-                .key(user, name)
-                .reduce(false)
-                .includeDocs(true);
-        List<JsonObject> objects = view.query(JsonObject.class);
-        JsonObject jsonObject = objects.get(0);
-        jsonObject.addProperty("_deleted", true);
-        client.update(jsonObject);
+        Bson filter = Filters.and(
+            Filters.eq("instance", instance()),
+            Filters.eq("user", user),
+            Filters.eq("name", name)
+        );
+        courses().deleteOne(filter);
     }
 
     public void saveCourse(String user, String name, String json) {
-        CouchDbClient client = getClient();
-        JsonObject data = client.getGson().fromJson(json, JsonObject.class);
-        try {
-            JsonObject object = course(user, name);
-            if (object != null) {
-                object.add("students", data.getAsJsonArray("students"));
-                object.add("curriculum", data.getAsJsonPrimitive("curriculum"));
-                client.update(object);
-            }
-            else {
-                object = data;
-                object.addProperty("user", user);
-                client.save(object);
-            }
+        JsonObject data = MongoConnection.getGson().fromJson(json, JsonObject.class);
+        Bson filter = Filters.and(
+            Filters.eq("instance", instance()),
+            Filters.eq("user", user),
+            Filters.eq("name", name)
+        );
+        Document existing = courses().find(filter).first();
+        if (existing != null) {
+            JsonObject object = MongoConnection.toJsonObject(existing);
+            object.add("students", data.getAsJsonArray("students"));
+            object.add("curriculum", data.getAsJsonPrimitive("curriculum"));
+            courses().replaceOne(filter, MongoConnection.toDocument(object));
         }
-        catch (NoDocumentException e) {
-            System.out.println("WARNING: there should be a document = " + e);
-            throw new RuntimeException(e);
+        else {
+            JsonObject object = data;
+            object.addProperty("instance", instance());
+            object.addProperty("user", user);
+            object.addProperty("_id", instance() + ":" + UUID.randomUUID().toString().replace("-", ""));
+            courses().insertOne(MongoConnection.toDocument(object));
         }
     }
 

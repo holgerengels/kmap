@@ -30,13 +30,6 @@ build_and_push_snappy() {
   docker push "${REGISTRY}/kmap-snappy:latest"
 }
 
-build_and_push_couchdb() {
-  echo "==> Building kmap-couchdb..."
-  docker build -f deploy/couchdb.docker -t "${REGISTRY}/kmap-couchdb:latest" .
-  echo "==> Pushing kmap-couchdb to registry..."
-  docker push "${REGISTRY}/kmap-couchdb:latest"
-}
-
 case "$TARGET" in
   server)
     build_and_push_server
@@ -47,17 +40,13 @@ case "$TARGET" in
   snappy)
     build_and_push_snappy
     ;;
-  couchdb)
-    build_and_push_couchdb
-    ;;
   all)
     build_and_push_server
     build_and_push_frontend
     build_and_push_snappy
-    build_and_push_couchdb
     ;;
   *)
-    echo "Usage: $0 [all|server|frontend|snappy|couchdb]"
+    echo "Usage: $0 [all|server|frontend|snappy]"
     exit 1
     ;;
 esac

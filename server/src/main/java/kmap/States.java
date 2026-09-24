@@ -1,60 +1,72 @@
 package kmap;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import org.lightcouch.*;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
+import org.bson.Document;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.*;
-
-import static kmap.JSON.string;
+import java.util.regex.Pattern;
 
 /**
  * Created by holger on 04.04.17.
+ * Refactored to MongoDB backend.
  */
 public class States {
     private final Couch couch;
+    private final MongoConnection connection;
 
     public States(Couch couch) {
         this.couch = couch;
+        this.connection = couch.getConnection();
     }
 
     public Couch getCouch() {
         return couch;
     }
 
-    public synchronized JsonObject states(String user, String subject) {
-        CouchDbClient client = getClient();
-        try {
-            JsonObject states = client.find(JsonObject.class, user + "." + subject);
-            states.entrySet().stream().filter(entry -> !"_id".equals(entry.getKey()) && !"_rev".equals(entry.getKey())).forEach(entry -> {
-                JsonElement value = entry.getValue();
-                if (value.isJsonPrimitive() && value.getAsJsonPrimitive().isNumber() && value.getAsInt() == 5)
-                    entry.setValue(new JsonPrimitive(4));
-                if (value.isJsonPrimitive() && value.getAsJsonPrimitive().isString())
-                    entry.setValue(new JsonPrimitive(value.getAsNumber()));
-            });
-            return states;
-        }
-        catch (NoDocumentException e) {
-            JsonObject states = new JsonObject();
-            states.addProperty("_id", user + "." + subject);
-            client.save(states);
-            return client.find(JsonObject.class, user + "." + subject);
-        }
+    private MongoCollection<Document> states() {
+        return connection.getCollection("states");
     }
 
-    private CouchDbClient getClient() {
-        return couch.createClient("state");
+    private String instance() {
+        return connection.getInstance();
+    }
+
+    public synchronized JsonObject states(String user, String subject) {
+        String id = instance() + ":" + user + "." + subject;
+        Document doc = states().find(Filters.eq("_id", id)).first();
+        if (doc == null) {
+            JsonObject states = new JsonObject();
+            states.addProperty("_id", id);
+            states.addProperty("instance", instance());
+            states().insertOne(MongoConnection.toDocument(states));
+            return states;
+        }
+
+        JsonObject states = MongoConnection.toJsonObject(doc);
+        states.entrySet().stream()
+                .filter(entry -> !"_id".equals(entry.getKey()) && !"_rev".equals(entry.getKey()) && !"instance".equals(entry.getKey()) && !"couch_id".equals(entry.getKey()))
+                .forEach(entry -> {
+                    JsonElement value = entry.getValue();
+                    if (value.isJsonPrimitive() && value.getAsJsonPrimitive().isNumber() && value.getAsInt() == 5)
+                        entry.setValue(new JsonPrimitive(4));
+                    if (value.isJsonPrimitive() && value.getAsJsonPrimitive().isString())
+                        entry.setValue(new JsonPrimitive(value.getAsNumber()));
+                });
+        return states;
     }
 
     public synchronized JsonObject statesAndProgress(String user, String subject) {
         JsonObject states = states(user, subject);
         states.remove("_id");
         states.remove("_rev");
+        states.remove("instance");
+        states.remove("couch_id");
 
         averageAndProgress(states, subject);
 
@@ -82,7 +94,6 @@ public class States {
         Map<String, Couch.WeightedSum> weightedSums = new HashMap<>();
         for (Map.Entry<String, Set<String>> entry : aggregates.entrySet()) {
             String chapter = entry.getKey();
-            System.out.println(chapter + " ... " + entry.getValue());
             Couch.WeightedSum sum = weights(states, chapter);
             sum.target(counts.getOrDefault(chapter, 0));
             for (String aggregatedChapter : entry.getValue()) {
@@ -90,7 +101,6 @@ public class States {
                 sum.add(aggregatedSum);
                 sum.target(counts.getOrDefault(aggregatedChapter, 0));
             }
-            //System.out.println(chapter + ": average = " + sum.getSum() + " / " + sum.getCount() + " = " + sum.average() + " of " + sum.getTarget());
             weightedSums.put(chapter, sum);
         }
         return weightedSums;
@@ -99,100 +109,50 @@ public class States {
     private Couch.WeightedSum weights(JsonObject states, String chapter) {
         Couch.WeightedSum sum = new Couch.WeightedSum();
         for (Map.Entry<String, JsonElement> entry : states.entrySet()) {
-            if (entry.getKey().startsWith(chapter + ".") && !entry.getKey().endsWith("*")) {
+            if (entry.getKey().startsWith(chapter + ".") && !entry.getKey().endsWith("*") && !entry.getKey().endsWith("#")) {
                 int value = entry.getValue().getAsInt();
                 if (value != 0) {
                     sum.add(value);
-                    //System.out.println("   " + chapter + ": " + entry.getKey() + " = " + value);
                 }
             }
         }
         return sum;
     }
 
-
     public synchronized JsonObject store(String user, String subject, String json) {
-        CouchDbClient client = getClient();
-        JsonObject object = client.getGson().fromJson(json, JsonObject.class);
+        JsonObject object = MongoConnection.getGson().fromJson(json, JsonObject.class);
         JsonObject states = states(user, subject);
         List<String> topics = couch.topicsAsList(subject);
         states.entrySet().removeIf(entry -> {
             String key = entry.getKey();
             JsonElement value = entry.getValue();
-            return !"_id".equals(key) && !"_rev".equals(key) && !topics.contains(key) || (value.getAsJsonPrimitive().isNumber() && value.getAsInt() == 0);
+            return !"_id".equals(key) && !"_rev".equals(key) && !"instance".equals(key) && !"couch_id".equals(key)
+                    && !topics.contains(key) || (value.getAsJsonPrimitive().isNumber() && value.getAsInt() == 0);
         });
         states.add(object.get("id").getAsString(), object.get("rate"));
-        client.update(states);
+        String id = instance() + ":" + user + "." + subject;
+        states.addProperty("_id", id);
+        states.addProperty("instance", instance());
+        states().replaceOne(Filters.eq("_id", id), MongoConnection.toDocument(states));
         return statesAndProgress(user, subject);
+    }
+
+    public void delete(String user) {
+        states().deleteMany(Filters.and(
+            Filters.eq("instance", instance()),
+            Filters.regex("_id", "^" + Pattern.quote(instance() + ":" + user + "."))
+        ));
+    }
+
+    public static void main(String[] args) throws IOException {
+        Server.CLIENT.set("root");
+        States states = new States(new Couch(readProperties(args[0])));
+        states.delete("h.engels");
     }
 
     private static Properties readProperties(String fileName) throws IOException {
         Properties properties = new Properties();
         properties.load(new FileInputStream(fileName));
         return properties;
-    }
-
-    private void fixStates() {
-        CouchDbClient client = getClient();
-        View view = client.view("_all_docs")
-                .reduce(false)
-                .includeDocs(true);
-        List<JsonObject> list = view.query(JsonObject.class);
-        List<JsonObject> deleted = new ArrayList<>();
-        List<JsonObject> added = new ArrayList<>();
-        for (JsonObject object : list) {
-            String id = string(object, "_id");
-            int pos = id.lastIndexOf(".");
-            String subject = id.substring(pos+1);
-            id = id.substring(0, pos);
-            if (!id.equals(id.toLowerCase())) {
-                System.out.println("id = " + id);
-                JsonObject delete = new JsonObject();
-                delete.addProperty("_id", id + "." + subject);
-                delete.add("_rev", object.get("_rev"));
-                delete.addProperty("_deleted", true);
-                deleted.add(delete);
-
-                object.remove("_rev");
-                object.addProperty("_id", id.toLowerCase() + "." + subject);
-                added.add(object);
-            }
-        }
-        System.out.println("added = " + added);
-        System.out.println("deleted = " + deleted);
-
-        if (!deleted.isEmpty())
-            client.bulk(deleted, true);
-        if (!added.isEmpty())
-            client.bulk(added, true);
-    }
-
-    public void delete(String user) {
-        CouchDbClient client = getClient();
-        JsonArray result = couch.loadSubjects();
-        for (Object element : result) {
-            String subject = JSON.string((JsonObject)element, "name");
-            try {
-                JsonObject states = client.find(JsonObject.class, user + "." + subject);
-                client.remove(states);
-                System.out.println("Deleted states for " + user + "." + subject);
-            }
-            catch (NoDocumentException e) {
-                System.out.println("No states for " + user + "." + subject);
-            }
-        }
-    }
-
-    public static void main(String[] args) throws IOException {
-        Server.CLIENT.set("root");
-        States couch = new States(new Couch(readProperties(args[0])));
-        //JsonObject object = couch.chapter("mathe", "Mathematik");
-        //System.out.println("object = " + object);
-        //JsonObject states = couch.statesAndProgress("h.engels", "Mathematik");
-        //System.out.println("states = " + states);
-        //JsonObject states = couch.courseStates("lala", "test", "Mathematik");
-        //System.out.println("states = " + states);
-        //couch.fixStates();
-        couch.delete("h.engels");
     }
 }

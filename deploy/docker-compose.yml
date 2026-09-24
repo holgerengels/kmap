@@ -1,27 +1,29 @@
 version: "3.8"
 
 services:
-  kmap-couchdb:
-    image: ghcr.io/holgerengels/kmap-couchdb:latest
+  kmap-mongodb:
+    image: mongo:7
     restart: unless-stopped
     volumes:
-      - couchdb:/opt/couchdb/data
+      - mongodb:/data/db
     networks:
       kmap:
         aliases:
-          - couchdb
-          - kmap-couchdb
+          - mongodb
+          - kmap-mongodb
     environment:
-      COUCHDB_USER: admin
-      COUCHDB_PASSWORD: secret
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
     ports:
-      - "127.0.0.1:5984:5984"
+      - "127.0.0.1:27017:27017"
 
   kmap-server:
     image: ghcr.io/holgerengels/kmap-server:latest
     restart: unless-stopped
     environment:
       JAVA_OPTIONS: "-Djavax.net.ssl.trustStore=/var/lib/jetty/auth/trustStore -Djavax.net.ssl.trustStorePassword=changeit"
+      MONGO_HOST: mongodb
+      MONGO_URI: "mongodb://admin:password@mongodb:27017/?authSource=admin"
     volumes:
       - jetty:/var/lib/jetty/auth
     networks:
@@ -31,7 +33,7 @@ services:
           - server
           - kmap-server
     depends_on:
-      - kmap-couchdb
+      - kmap-mongodb
     ports:
       - "127.0.0.1:8080:8080"
 
@@ -55,6 +57,8 @@ services:
   kmap-snappy:
     image: ghcr.io/holgerengels/kmap-snappy:latest
     restart: unless-stopped
+    environment:
+      MONGO_URI: "mongodb://admin:password@mongodb:27017/?authSource=admin"
     volumes:
       - snappy:/opt/snappy/snaps
     networks:
@@ -64,15 +68,15 @@ services:
           - kmap-snappy
     depends_on:
       - kmap-server
-      - kmap-couchdb
+      - kmap-mongodb
     ports:
       - "127.0.0.1:8090:8090"
     extra_hosts:
       - "kmap.eu:host-gateway"
 
 volumes:
-  couchdb:
-    name: kmap_couchdb
+  mongodb:
+    name: kmap_mongodb
   jetty:
     name: kmap_jetty
   snappy:

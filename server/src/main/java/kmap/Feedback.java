@@ -1,37 +1,47 @@
 package kmap;
 
 import com.google.gson.JsonObject;
-import org.lightcouch.CouchDbClient;
-import org.lightcouch.View;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Sorts;
+import com.mongodb.client.model.Updates;
+import org.bson.Document;
+import org.bson.conversions.Bson;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static kmap.JSON.*;
 
 public class Feedback {
-    private Couch couch;
+    private final Couch couch;
+    private final MongoConnection connection;
 
     public Feedback(Couch couch) {
         this.couch = couch;
+        this.connection = couch.getConnection();
     }
 
-    private CouchDbClient getClient() {
-        return couch.createClient("feedback");
+    private MongoCollection<Document> feedback() {
+        return connection.getCollection("feedback");
+    }
+
+    private String instance() {
+        return connection.getInstance();
     }
 
     public synchronized void submit(String userid, String json) {
-        CouchDbClient client = getClient();
-        JsonObject object = client.getGson().fromJson(json, JsonObject.class);
+        JsonObject object = MongoConnection.getGson().fromJson(json, JsonObject.class);
         if (checks(object)) {
             object.addProperty("userid", userid);
             object.addProperty("state", "open");
             object.addProperty("timestamp", System.currentTimeMillis());
-            client.save(object);
+            object.addProperty("instance", instance());
+            object.addProperty("_id", instance() + ":" + UUID.randomUUID().toString().replace("-", ""));
+            feedback().insertOne(MongoConnection.toDocument(object));
         }
         else {
             throw new RuntimeException("property missing");
@@ -47,12 +57,14 @@ public class Feedback {
     }
 
     public synchronized void bug(String json) {
-        CouchDbClient client = getClient();
-        JsonObject object = client.getGson().fromJson(json, JsonObject.class);
+        JsonObject object = MongoConnection.getGson().fromJson(json, JsonObject.class);
         if (errorChecks(object)) {
             object.addProperty("type", "bug");
             object.addProperty("state", "open");
             object.addProperty("timestamp", System.currentTimeMillis());
+            object.addProperty("instance", instance());
+            object.addProperty("_id", instance() + ":" + UUID.randomUUID().toString().replace("-", ""));
+            feedback().insertOne(MongoConnection.toDocument(object));
             System.out.println(object);
         }
         else {
@@ -66,30 +78,22 @@ public class Feedback {
     }
 
     public synchronized void resolve(String json) {
-        CouchDbClient client = getClient();
-        JsonObject object = client.getGson().fromJson(json, JsonObject.class);
-        object.addProperty("state", "resolved");
-        client.update(object);
+        JsonObject object = MongoConnection.getGson().fromJson(json, JsonObject.class);
+        String id = string(object, "_id");
+        if (id != null) {
+            feedback().updateOne(Filters.eq("_id", id), Updates.set("state", "resolved"));
+        }
     }
 
     public synchronized List<JsonObject> purge(String date, Set<String> types) {
         try {
             long time = new SimpleDateFormat("yyyy-MM-dd").parse(date).getTime();
-            CouchDbClient client = getClient();
-            for (String type : types) {
-                View view = client.view("feedback/" + type + "sByTimestamp")
-                        .startKey(0)
-                        .endKey(time)
-                        .reduce(false)
-                        .includeDocs(true);
-                List<JsonObject> objects = view.query(JsonObject.class);
-                if (!objects.isEmpty()) {
-                    for (JsonObject object : objects) {
-                        object.addProperty("_deleted", true);
-                    }
-                    client.bulk(objects, true);
-                }
-            }
+            Bson filter = Filters.and(
+                Filters.eq("instance", instance()),
+                Filters.in("type", types),
+                Filters.lte("timestamp", time)
+            );
+            feedback().deleteMany(filter);
         }
         catch (ParseException e) {
             e.printStackTrace();
@@ -98,27 +102,20 @@ public class Feedback {
     }
 
     List<JsonObject> load(String state) {
-        View view = getClient().view("_all_docs").includeDocs(true);
-        List<JsonObject> objects = view.query(JsonObject.class).stream().filter(o -> "open".equals(string(o, "state"))).collect(Collectors.toList());
-        if (objects.size() > 100)
-            objects = objects.subList(0, 100);
-        return objects;
+        Bson filter = Filters.and(
+            Filters.eq("instance", instance()),
+            Filters.eq("state", "open")
+        );
+        List<JsonObject> list = new ArrayList<>();
+        for (Document doc : feedback().find(filter).sort(Sorts.descending("timestamp")).limit(100)) {
+            list.add(MongoConnection.toJsonObject(doc));
+        }
+        return list;
     }
 
     public static void main(String[] args) throws IOException {
         Server.CLIENT.set("vu");
         Feedback feedback = new Feedback(new Couch(readProperties(args[0])));
-        /*
-        JsonObject object = new JsonObject();
-        object.addProperty("subject", "Mathematik");
-        object.addProperty("chapter", "Differentialrechnung");
-        object.addProperty("topics", "Mittlere Änderungsrate");
-        object.addProperty("type", "bug");
-        object.addProperty("title", "Test");
-        object.addProperty("text", "Hallo");
-        feedback.submit("test", object.toString());
-        System.out.println(feedback.load(""));
-         */
         feedback.purge("2022-01-30", Set.of("bug"));
     }
 

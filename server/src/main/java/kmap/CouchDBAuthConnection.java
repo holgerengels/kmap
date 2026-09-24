@@ -3,22 +3,30 @@ package kmap;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import org.lightcouch.CouchDbClient;
-import org.lightcouch.NoDocumentException;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Updates;
+import com.mongodb.client.result.UpdateResult;
+import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class CouchDBAuthConnection extends AuthConnection {
-    private final CouchConnection connection;
+    private final MongoConnection connection;
 
     public CouchDBAuthConnection(Properties properties) {
-        this.connection = new CouchConnection(properties);
+        this.connection = new MongoConnection(properties);
     }
 
-    private CouchDbClient authClient() {
-        return connection.createClient("auth");
+    private MongoCollection<Document> users() {
+        return connection.getCollection("users");
+    }
+
+    private String instance() {
+        return connection.getInstance();
     }
 
     private boolean checkPassword(String plain, String hash) {
@@ -32,46 +40,50 @@ public class CouchDBAuthConnection extends AuthConnection {
     @Override
     Set<String> doauthenticate(String user, String password) {
         try {
-            CouchDbClient client = authClient();
-            JsonObject userDoc = client.find(JsonObject.class, "user:" + user);
-            String hash = JSON.string(userDoc, "passwordHash");
+            Document userDoc = users().find(Filters.or(
+                Filters.eq("_id", instance() + ":user:" + user),
+                Filters.and(Filters.eq("instance", instance()), Filters.eq("userid", user))
+            )).first();
+
+            if (userDoc == null) return null;
+
+            JsonObject userJson = MongoConnection.toJsonObject(userDoc);
+            String hash = JSON.string(userJson, "passwordHash");
             if (checkPassword(password, hash)) {
                 Set<String> roles = new HashSet<>();
                 roles.add("user");
-                JsonArray rolesArray = userDoc.getAsJsonArray("roles");
+                JsonArray rolesArray = userJson.getAsJsonArray("roles");
                 if (rolesArray != null) {
                     for (JsonElement role : rolesArray) {
                         roles.add(role.getAsString());
                     }
                 }
-                String displayName = JSON.string(userDoc, "displayName");
+                String displayName = JSON.string(userJson, "displayName");
                 if (displayName != null) {
                     roles.add("displayName:" + displayName);
                 }
                 return roles;
             }
             return null;
-        } catch (NoDocumentException e) {
-            return null;
         } catch (Exception e) {
-            System.err.println("CouchDB auth error: " + e.getMessage());
+            System.err.println("Auth error: " + e.getMessage());
             return null;
         }
     }
 
     public JsonObject register(String userid, String email, String password, String displayName) {
-        CouchDbClient client = authClient();
+        Document existing = users().find(Filters.or(
+            Filters.eq("_id", instance() + ":user:" + userid),
+            Filters.and(Filters.eq("instance", instance()), Filters.eq("userid", userid))
+        )).first();
 
-        // Check if user already exists
-        try {
-            client.find(JsonObject.class, "user:" + userid);
+        if (existing != null) {
             return null; // User already exists
-        } catch (NoDocumentException ignored) {
-            // Good, user does not exist
         }
 
         JsonObject userDoc = new JsonObject();
-        userDoc.addProperty("_id", "user:" + userid);
+        userDoc.addProperty("_id", instance() + ":user:" + userid);
+        userDoc.addProperty("instance", instance());
         userDoc.addProperty("type", "user");
         userDoc.addProperty("userid", userid);
         userDoc.addProperty("email", email);
@@ -83,116 +95,108 @@ public class CouchDBAuthConnection extends AuthConnection {
         roles.add("student");
         userDoc.add("roles", roles);
 
-        client.save(userDoc);
+        users().insertOne(MongoConnection.toDocument(userDoc));
         return userDoc;
     }
 
     public String createResetToken(String email) {
-        CouchDbClient client = authClient();
+        Document userDoc = users().find(Filters.and(
+            Filters.eq("instance", instance()),
+            Filters.eq("type", "user"),
+            Filters.eq("email", email)
+        )).first();
 
-        // Find user by email
-        List<JsonObject> allDocs = client.view("_all_docs")
-                .startKey("user:")
-                .endKey("user:\ufff0")
-                .includeDocs(true)
-                .query(JsonObject.class);
-
-        String userid = null;
-        for (JsonObject doc : allDocs) {
-            if (email.equals(JSON.string(doc, "email"))) {
-                userid = JSON.string(doc, "userid");
-                break;
-            }
-        }
-
+        if (userDoc == null) return null;
+        String userid = userDoc.getString("userid");
         if (userid == null) return null;
 
-        // Create reset token
         String token = UUID.randomUUID().toString();
         JsonObject tokenDoc = new JsonObject();
-        tokenDoc.addProperty("_id", "reset:" + token);
+        tokenDoc.addProperty("_id", instance() + ":reset:" + token);
+        tokenDoc.addProperty("instance", instance());
         tokenDoc.addProperty("type", "reset-token");
         tokenDoc.addProperty("userid", userid);
         tokenDoc.addProperty("email", email);
         long expiresAt = System.currentTimeMillis() + 3600000; // 1 hour
         tokenDoc.addProperty("expiresAt", expiresAt);
-        client.save(tokenDoc);
+        users().insertOne(MongoConnection.toDocument(tokenDoc));
 
         return token;
     }
 
     public boolean resetPassword(String token, String newPassword) {
-        CouchDbClient client = authClient();
         try {
-            JsonObject tokenDoc = client.find(JsonObject.class, "reset:" + token);
-            long expiresAt = tokenDoc.getAsJsonPrimitive("expiresAt").getAsLong();
-            if (System.currentTimeMillis() > expiresAt) {
-                client.remove(tokenDoc);
+            Document tokenDoc = users().find(Filters.eq("_id", instance() + ":reset:" + token)).first();
+            if (tokenDoc == null) return false;
+
+            Long expiresAt = tokenDoc.getLong("expiresAt");
+            if (expiresAt != null && System.currentTimeMillis() > expiresAt) {
+                users().deleteOne(Filters.eq("_id", instance() + ":reset:" + token));
                 return false;
             }
 
-            String userid = JSON.string(tokenDoc, "userid");
-            JsonObject userDoc = client.find(JsonObject.class, "user:" + userid);
-            userDoc.addProperty("passwordHash", BCrypt.hashpw(newPassword, BCrypt.gensalt()));
-            client.update(userDoc);
-            client.remove(tokenDoc);
+            String userid = tokenDoc.getString("userid");
+            users().updateOne(
+                Filters.eq("_id", instance() + ":user:" + userid),
+                Updates.set("passwordHash", BCrypt.hashpw(newPassword, BCrypt.gensalt()))
+            );
+            users().deleteOne(Filters.eq("_id", instance() + ":reset:" + token));
             return true;
-        } catch (NoDocumentException e) {
+        } catch (Exception e) {
             return false;
         }
     }
 
     public boolean changePassword(String userid, String newPassword) {
-        CouchDbClient client = authClient();
         try {
-            JsonObject userDoc = client.find(JsonObject.class, "user:" + userid);
-            userDoc.addProperty("passwordHash", BCrypt.hashpw(newPassword, BCrypt.gensalt()));
-            client.update(userDoc);
-            return true;
-        } catch (NoDocumentException e) {
+            UpdateResult res = users().updateOne(
+                Filters.eq("_id", instance() + ":user:" + userid),
+                Updates.set("passwordHash", BCrypt.hashpw(newPassword, BCrypt.gensalt()))
+            );
+            return res.getMatchedCount() > 0;
+        } catch (Exception e) {
             return false;
         }
     }
 
     public void deleteUser(String userid) {
-        CouchDbClient client = authClient();
-        try {
-            JsonObject userDoc = client.find(JsonObject.class, "user:" + userid);
-            client.remove(userDoc);
-        } catch (NoDocumentException ignored) {
-        }
+        users().deleteOne(Filters.eq("_id", instance() + ":user:" + userid));
     }
 
     public List<JsonObject> listUsers() {
-        CouchDbClient client = authClient();
-        List<JsonObject> users = new ArrayList<>();
-        List<JsonObject> allDocs = client.view("_all_docs")
-                .startKey("user:")
-                .endKey("user:\ufff0")
-                .includeDocs(true)
-                .query(JsonObject.class);
-
-        for (JsonObject doc : allDocs) {
+        List<JsonObject> usersList = new ArrayList<>();
+        Bson filter = Filters.and(
+            Filters.eq("instance", instance()),
+            Filters.eq("type", "user")
+        );
+        for (Document doc : users().find(filter)) {
             JsonObject user = new JsonObject();
-            user.addProperty("userid", JSON.string(doc, "userid"));
-            user.addProperty("email", JSON.string(doc, "email"));
-            user.addProperty("displayName", JSON.string(doc, "displayName"));
-            user.add("roles", doc.getAsJsonArray("roles"));
-            users.add(user);
+            user.addProperty("userid", doc.getString("userid"));
+            user.addProperty("email", doc.getString("email"));
+            user.addProperty("displayName", doc.getString("displayName"));
+            JsonObject jsonDoc = MongoConnection.toJsonObject(doc);
+            user.add("roles", jsonDoc.getAsJsonArray("roles"));
+            usersList.add(user);
         }
-        return users;
+        return usersList;
     }
 
     public void updateUser(String userid, String email, String displayName, JsonArray roles) {
-        CouchDbClient client = authClient();
-        JsonObject userDoc = client.find(JsonObject.class, "user:" + userid);
-        if (email != null) userDoc.addProperty("email", email);
-        if (displayName != null) userDoc.addProperty("displayName", displayName);
-        if (roles != null) userDoc.add("roles", roles);
-        client.update(userDoc);
+        List<Bson> updates = new ArrayList<>();
+        if (email != null) updates.add(Updates.set("email", email));
+        if (displayName != null) updates.add(Updates.set("displayName", displayName));
+        if (roles != null) {
+            List<String> rolesList = new ArrayList<>();
+            roles.forEach(r -> rolesList.add(r.getAsString()));
+            updates.add(Updates.set("roles", rolesList));
+        }
+        if (!updates.isEmpty()) {
+            users().updateOne(
+                Filters.eq("_id", instance() + ":user:" + userid),
+                Updates.combine(updates)
+            );
+        }
     }
-
-
 
     @Override
     public List<JsonObject> readStudents() {

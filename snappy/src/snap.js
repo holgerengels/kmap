@@ -5,16 +5,27 @@ const http = require("http");
 const url = require("url");
 const fs = require("fs").promises;
 const schedule = require('node-schedule');
-const NodeCouchDb = require('node-couchdb');
+const { MongoClient } = require('mongodb');
 
 const host = config.host;
 const port = config.port;
 
-const couchDB = config.couch_db;
+const mongoUri = process.env.MONGO_URI || config.mongo_uri || "mongodb://admin:password@localhost:27017";
+const mongoDbName = process.env.MONGO_DB || config.mongo_db || "kmap";
+const instance = process.env.INSTANCE || config.instance || "vu";
 
 let server;
 let browser;
-const couch = new NodeCouchDb({ host: config.couch_host, auth: { user: config.couch_user, pass: config.couch_password }});
+const mongoClient = new MongoClient(mongoUri);
+let db;
+
+async function getDb() {
+    if (!db) {
+        await mongoClient.connect();
+        db = mongoClient.db(mongoDbName);
+    }
+    return db;
+}
 
 const job = schedule.scheduleJob('22 12,21 * * *', async function() {
     console.log("Snappy background job");
@@ -26,10 +37,10 @@ const job = schedule.scheduleJob('22 12,21 * * *', async function() {
 
         const parts = path.split("/").map(p => decodeURIComponent(p));
 
-        const lastModified = modified(parts);
+        const lastModified = await modified(parts);
         if (lastModified !== entry[1]) {
             const directory = config.path + path;
-            const file = directory + "/" + lastModified + ".png"
+            const file = directory + "/" + lastModified + ".png";
             console.log("Snappy precache " + path);
             await generate(directory, path, file);
 
@@ -70,7 +81,7 @@ function determineHeight(url) {
             const directory = config.path + width + "x" + height + "/" + path;
 
             const lastModified = await modified(parts);
-            const file = directory + "/" + lastModified + ".png"
+            const file = directory + "/" + lastModified + ".png";
 
             const cached = await exists(file);
             if (!cached) {
@@ -100,37 +111,51 @@ function determineHeight(url) {
 
 const cleanupServer = async function(type) {
     console.log('Snappy is going down ..');
-    await server.close();
-    await browser.close();
+    if (server) await server.close();
+    if (browser) await browser.close();
+    await mongoClient.close();
     console.log("Snappy has stopped ..");
-}
+};
 
-function latest() {
-    return couch.get(couchDB, "_design/net/_view/byModified", {descending: "true", include_docs: "true"}).then(({ data, headers, status}) => {
-        let map = new Map();
-        data.rows.forEach(row => map.set(encodeURIComponent(row.doc.subject) + "/" + encodeURIComponent(row.doc.chapter) + "/" + encodeURIComponent(row.doc.topic), row.doc.modified));
+async function latest() {
+    try {
+        const database = await getDb();
+        const cursor = database.collection('cards').find(
+            { instance, modified: { $exists: true }, chapter: { $exists: true }, topic: { $exists: true } },
+            { projection: { subject: 1, chapter: 1, topic: 1, modified: 1 } }
+        ).sort({ modified: -1 });
+
+        const map = new Map();
+        for await (const doc of cursor) {
+            map.set(encodeURIComponent(doc.subject) + "/" + encodeURIComponent(doc.chapter) + "/" + encodeURIComponent(doc.topic), doc.modified);
+        }
         return [...map].sort((a, b) => b[1] - a[1]);
-    }, err => {
+    } catch (err) {
         console.log(err);
         return [];
-    });
+    }
 }
 
-function modified(parts) {
-    return couch.get(couchDB, "_design/net/_view/byTopic", {keys: [parts], include_docs: "true"}).then(({ data, headers, status}) => {
-        return data.rows[0].doc.modified;
-    }, err => {
+async function modified(parts) {
+    try {
+        const database = await getDb();
+        const doc = await database.collection('cards').findOne(
+            { instance, subject: parts[0], chapter: parts[1], topic: parts[2] },
+            { projection: { modified: 1 } }
+        );
+        return doc ? doc.modified : -1;
+    } catch (err) {
         console.log(err);
         return -1;
-    });
+    }
 }
 
 async function exists(path) {
     try {
         await fs.access(path);
-        return true
+        return true;
     } catch {
-        return false
+        return false;
     }
 }
 
@@ -140,7 +165,7 @@ async function generate(directory, path, file, width, height) {
     await fs.mkdir(directory, {recursive: true});
     const url = "https://kmap.eu/app/browser/" + path;
     const page = await browser.newPage();
-    await page.setViewport({width: width + 16, height: height + 48 + 16})
+    await page.setViewport({width: width + 16, height: height + 48 + 16});
     await windowSet(page, 'compactCards', true);
     await page.goto(url, {waitUntil: 'networkidle0'});
     await page.waitForTimeout(1000);

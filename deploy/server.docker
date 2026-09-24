@@ -9,9 +9,9 @@ COPY client/index.html /build/server/src/main/webapp/index.html
 COPY server/pom.xml /build/server/
 COPY server/src /build/server/src
 
-# Set couchdb as host for docker environment
+# Set mongodb as host for docker environment
 RUN if [ -f /build/server/src/main/webapp/kmap.properties ]; then \
-        sed -i 's/kmap\.host=localhost/kmap.host=couchdb/' /build/server/src/main/webapp/kmap.properties; \
+        sed -i 's/kmap\.mongo\.host=localhost/kmap.mongo.host=mongodb/' /build/server/src/main/webapp/kmap.properties; \
     fi
 
 WORKDIR /build/server
