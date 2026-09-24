@@ -1,0 +1,60 @@
+FROM node:20-bookworm-slim
+
+# Install Chromium dependencies for headless browser rendering
+RUN apt-get update && apt-get install -y \
+    ca-certificates \
+    fonts-liberation \
+    libasound2 \
+    libatk-bridge2.0-0 \
+    libatk1.0-0 \
+    libc6 \
+    libcairo2 \
+    libcups2 \
+    libdbus-1-3 \
+    libexpat1 \
+    libfontconfig1 \
+    libgbm1 \
+    libglib2.0-0 \
+    libgtk-3-0 \
+    libnspr4 \
+    libnss3 \
+    libpango-1.0-0 \
+    libpangocairo-1.0-0 \
+    libx11-6 \
+    libx11-xcb1 \
+    libxcb1 \
+    libxcomposite1 \
+    libxcursor1 \
+    libxdamage1 \
+    libxext6 \
+    libxfixes3 \
+    libxi6 \
+    libxrandr2 \
+    libxrender1 \
+    libxss1 \
+    libxtst6 \
+    --no-install-recommends \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY snappy/package*.json ./
+RUN npm install --omit=dev
+
+COPY snappy/ ./
+
+# Configure snappy for docker container environment
+RUN node -e '\
+  const fs = require("fs"); \
+  const p = "src/config.json"; \
+  let c = fs.existsSync(p) ? JSON.parse(fs.readFileSync(p)) : {}; \
+  c.host = "0.0.0.0"; \
+  c.port = 8090; \
+  c.path = "/opt/snappy/snaps/"; \
+  c.couch_host = "couchdb"; \
+  fs.writeFileSync(p, JSON.stringify(c, null, 2));'
+
+RUN mkdir -p /opt/snappy/snaps
+
+EXPOSE 8090
+CMD ["node", "src/snap.js"]

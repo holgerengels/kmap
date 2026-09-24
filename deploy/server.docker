@@ -1,0 +1,27 @@
+# ── Stage 1: Build Java WAR with Maven ──────────────────────────────
+FROM maven:3.9-eclipse-temurin-21 AS builder
+WORKDIR /build
+
+# Copy client index.html so IndexServlet has /index.html in the webapp
+COPY client/index.html /build/server/src/main/webapp/index.html
+
+# Copy server sources and configuration
+COPY server/pom.xml /build/server/
+COPY server/src /build/server/src
+
+# Set couchdb as host for docker environment
+RUN if [ -f /build/server/src/main/webapp/kmap.properties ]; then \
+        sed -i 's/kmap\.host=localhost/kmap.host=couchdb/' /build/server/src/main/webapp/kmap.properties; \
+    fi
+
+WORKDIR /build/server
+RUN mvn clean package -DskipTests
+
+# ── Stage 2: Jetty 11 Runtime ──────────────────────────────────────
+FROM jetty:11-jre21-alpine
+
+# Copy server.war into Jetty's webapps directory
+COPY --from=builder /build/server/target/server.war /var/lib/jetty/webapps/server.war
+
+USER jetty
+EXPOSE 8080

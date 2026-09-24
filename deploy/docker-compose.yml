@@ -1,0 +1,83 @@
+version: "3.8"
+
+services:
+  kmap-couchdb:
+    image: ghcr.io/holgerengels/kmap-couchdb:latest
+    restart: unless-stopped
+    volumes:
+      - couchdb:/opt/couchdb/data
+    networks:
+      kmap:
+        aliases:
+          - couchdb
+          - kmap-couchdb
+    environment:
+      COUCHDB_USER: admin
+      COUCHDB_PASSWORD: secret
+    ports:
+      - "127.0.0.1:5984:5984"
+
+  kmap-server:
+    image: ghcr.io/holgerengels/kmap-server:latest
+    restart: unless-stopped
+    environment:
+      JAVA_OPTIONS: "-Djavax.net.ssl.trustStore=/var/lib/jetty/auth/trustStore -Djavax.net.ssl.trustStorePassword=changeit"
+    volumes:
+      - jetty:/var/lib/jetty/auth
+    networks:
+      kmap:
+        aliases:
+          - jetty
+          - server
+          - kmap-server
+    depends_on:
+      - kmap-couchdb
+    ports:
+      - "127.0.0.1:8080:8080"
+
+  kmap-frontend:
+    image: ghcr.io/holgerengels/kmap-frontend:latest
+    restart: unless-stopped
+    volumes:
+      - /etc/nginx/ssl:/etc/nginx/ssl:ro
+    networks:
+      kmap:
+        aliases:
+          - nginx
+          - frontend
+          - kmap-frontend
+    depends_on:
+      - kmap-server
+    ports:
+      - "80:80"
+      - "443:443"
+
+  kmap-snappy:
+    image: ghcr.io/holgerengels/kmap-snappy:latest
+    restart: unless-stopped
+    volumes:
+      - snappy:/opt/snappy/snaps
+    networks:
+      kmap:
+        aliases:
+          - snappy
+          - kmap-snappy
+    depends_on:
+      - kmap-server
+      - kmap-couchdb
+    ports:
+      - "127.0.0.1:8090:8090"
+    extra_hosts:
+      - "kmap.eu:host-gateway"
+
+volumes:
+  couchdb:
+    name: kmap_couchdb
+  jetty:
+    name: kmap_jetty
+  snappy:
+    name: kmap_snappy
+
+networks:
+  kmap:
+    name: kmap
