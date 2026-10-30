@@ -21,6 +21,11 @@ client/workbox-*.js.map
 
 snappy/src/config.json
 
+# external configuration (config.json, trustStore, *-users.csv) – never commit, never bake into images
+config/*
+!config/config.example.json
+deploy/config/
+
 # IDE and desktop environment files
 .vscode/
 .directory

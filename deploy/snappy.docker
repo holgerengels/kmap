@@ -33,6 +33,7 @@ RUN apt-get update && apt-get install -y \
     libxrender1 \
     libxss1 \
     libxtst6 \
+    libxshmfence1 \
     --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
@@ -43,17 +44,7 @@ RUN npm install --omit=dev
 
 COPY snappy/ ./
 
-# Configure snappy for docker container environment
-RUN node -e '\
-  const fs = require("fs"); \
-  const p = "src/config.json"; \
-  let c = fs.existsSync(p) ? JSON.parse(fs.readFileSync(p)) : {}; \
-  c.host = "0.0.0.0"; \
-  c.port = 8090; \
-  c.path = "/opt/snappy/snaps/"; \
-  c.couch_host = "couchdb"; \
-  fs.writeFileSync(p, JSON.stringify(c, null, 2));'
-
+# Configuration is NOT part of the image, it is mounted at runtime as /config/config.json (section "snappy")
 RUN mkdir -p /opt/snappy/snaps
 
 EXPOSE 8090

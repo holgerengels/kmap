@@ -23,6 +23,8 @@ public abstract class AuthConnection {
                 connection = new LinuxmusterConnection(properties);
             }
             else if ("couchdb".equals(properties.get("auth.type"))
+                    || "mongo".equals(properties.get("auth.type"))
+                    || "mongodb".equals(properties.get("auth.type"))
                     || properties.get("auth.type") == null) {
                 System.out.println("New CouchDBAuthConnection");
                 connection = new CouchDBAuthConnection(properties);

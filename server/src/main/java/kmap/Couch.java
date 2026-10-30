@@ -759,6 +759,9 @@ public class Couch extends Server {
     }
 
     public boolean loadAttachment(Consumer<AttachmentInputStream> sender, String... dirs) throws IOException {
+        if (dirs == null || dirs.length < 4) {
+            return false;
+        }
         String slug = instance() + "/cards/" + dirs[0] + "/" + dirs[1] + "/" + dirs[2] + "/" + dirs[3];
         Document doc = attachments().find(Filters.eq("_id", slug)).first();
         if (doc != null) {
@@ -1088,11 +1091,22 @@ public class Couch extends Server {
     }
 
     public JsonObject deleteModule(String subject, String module) {
-        DeleteResult res = cards().deleteMany(Filters.and(
+        Bson filter = Filters.and(
             Filters.eq("instance", instance()),
             Filters.eq("subject", subject),
             Filters.eq("module", module)
-        ));
+        );
+        for (Document doc : cards().find(filter)) {
+            String chapter = doc.getString("chapter");
+            String topic = doc.getString("topic");
+            if (chapter != null && topic != null) {
+                attachments().deleteMany(Filters.and(
+                    Filters.eq("instance", instance()),
+                    Filters.eq("card", subject + "." + chapter + "." + topic)
+                ));
+            }
+        }
+        DeleteResult res = cards().deleteMany(filter);
 
         JsonObject object = new JsonObject();
         object.addProperty("subject", subject);

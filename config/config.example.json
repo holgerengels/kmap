@@ -1,0 +1,45 @@
+{
+  "server": {
+    "cors": false,
+    "index": "/index.html",
+    "mongo": {
+      "uri": "mongodb://admin:CHANGE_ME@mongodb:27017/?authSource=admin",
+      "db": "kmap"
+    },
+    "auth": {
+      "authenticate": true,
+      "type": "mongo",
+      "trustStorePassword": "changeit"
+    },
+    "mail": {
+      "smtp": {
+        "host": "smtp.strato.de",
+        "port": 587,
+        "user": "noreply@kmap.eu",
+        "password": "CHANGE_ME",
+        "starttls": true
+      },
+      "from": "noreply@kmap.eu",
+      "base-url": "https://kmap.eu"
+    },
+    "paedml": {
+      "url": "ldaps://dc01.musterschule.schule.paedml:636",
+      "user": "cn=Administrator,cn=users,dc=musterschule,dc=schule,dc=paedml",
+      "password": "CHANGE_ME",
+      "domain": "MUSTERSCHULE",
+      "userbase": "OU=Benutzer,DC=musterschule,DC=schule,DC=paedml"
+    },
+    "linuxmuster": {
+      "url": "ldaps://server.example.org:636",
+      "user": "uid=CHANGE_ME,ou=accounts,dc=example,dc=org",
+      "password": "CHANGE_ME",
+      "userbase": "ou=accounts,dc=example,dc=org"
+    }
+  },
+  "snappy": {
+    "host": "0.0.0.0",
+    "port": 8090,
+    "path": "/opt/snappy/snaps/",
+    "instance": "root"
+  }
+}

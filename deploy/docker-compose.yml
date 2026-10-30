@@ -21,11 +21,10 @@ services:
     image: ghcr.io/holgerengels/kmap-server:latest
     restart: unless-stopped
     environment:
-      JAVA_OPTIONS: "-Djavax.net.ssl.trustStore=/var/lib/jetty/auth/trustStore -Djavax.net.ssl.trustStorePassword=changeit"
-      MONGO_HOST: mongodb
-      MONGO_URI: "mongodb://admin:password@mongodb:27017/?authSource=admin"
+      JAVA_OPTIONS: "-Djavax.net.ssl.trustStore=/config/trustStore -Djavax.net.ssl.trustStorePassword=changeit"
     volumes:
-      - jetty:/var/lib/jetty/auth
+      # config.json (section "server"), trustStore, <instance>-users.csv
+      - ./config:/config:ro
     networks:
       kmap:
         aliases:
@@ -57,9 +56,9 @@ services:
   kmap-snappy:
     image: ghcr.io/holgerengels/kmap-snappy:latest
     restart: unless-stopped
-    environment:
-      MONGO_URI: "mongodb://admin:password@mongodb:27017/?authSource=admin"
     volumes:
+      # config.json (section "snappy")
+      - ./config:/config:ro
       - snappy:/opt/snappy/snaps
     networks:
       kmap:
@@ -77,8 +76,6 @@ services:
 volumes:
   mongodb:
     name: kmap_mongodb
-  jetty:
-    name: kmap_jetty
   snappy:
     name: kmap_snappy
 

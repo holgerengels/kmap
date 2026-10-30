@@ -1,4 +1,4 @@
-var config = require('./config.json');
+var config = require('./config');
 
 const puppeteer = require('puppeteer');
 const http = require("http");

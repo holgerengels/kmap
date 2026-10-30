@@ -30,7 +30,7 @@ export class KMapSummaryCard extends Connected {
   private highlighted: boolean = false;
 
   @state()
-  private _targeted: string[] = [];
+  private _targeted?: string[] = undefined;
 
   @property()
   private grayedOut: boolean = false;
@@ -70,7 +70,7 @@ export class KMapSummaryCard extends Connected {
 
   willUpdate(changedProperties) {
     if (changedProperties.has("_targeted"))
-      this.grayedOut = this.card !== undefined && this._targeted
+      this.grayedOut = this.card !== undefined && this._targeted !== undefined && this._targeted.length > 0
         && !(this._targeted.includes(this.card.chapter + "/" + this.card.topic)
           || this._targeted.includes(this.card.chapter)
           || (this.card.links && this._targeted.filter(t => t.startsWith(this.card?.links || "!!!")).length > 0))
@@ -115,7 +115,7 @@ export class KMapSummaryCard extends Connected {
       source = this.shadowRoot.getElementById('rating');
     }
 
-    this._colorize(source ? source.getState() : 0);
+    this._colorize((source && source.getState() !== undefined) ? source.getState() : 0);
   }
 
   _hovered(e) {

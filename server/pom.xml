@@ -23,7 +23,8 @@
         <dependency>
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
-            <version>6.0.0</version>
+            <!-- must match the runtime: Jetty 11 implements Servlet 5.0 -->
+            <version>5.0.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -130,6 +131,9 @@
                     <webApp>
                         <contextPath>/server</contextPath>
                     </webApp>
+                    <systemProperties>
+                        <kmap.config>${project.basedir}/../config/config.json</kmap.config>
+                    </systemProperties>
                 </configuration>
             </plugin>
             <plugin>

@@ -18,7 +18,7 @@ public class JsonServlet extends HttpServlet {
         super.init();
         try {
             properties = new Properties();
-            properties.load(getServletContext().getResourceAsStream("/kmap.properties"));
+            properties.putAll(Config.get());
             properties.setProperty("context.path", getServletContext().getRealPath("/"));
             getServletContext().setAttribute("properties", properties);
             authentication = new Authentication(properties);
@@ -86,7 +86,7 @@ public class JsonServlet extends HttpServlet {
 
     static void corsHeaders(HttpServletRequest request, HttpServletResponse resp) {
         Properties properties = (Properties)request.getServletContext().getAttribute("properties");
-        if (Boolean.parseBoolean(properties.getProperty("kmap.cors"))) {
+        if (Boolean.parseBoolean(properties.getProperty("cors"))) {
             String referer = getHeader(request, "referer");
             if (referer != null) {
                 int i = referer.indexOf("/", 9);

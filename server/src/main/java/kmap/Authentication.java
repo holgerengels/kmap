@@ -28,12 +28,15 @@ public class Authentication {
             Path path = Paths.get(properties.getProperty("auth.csv") + Server.CLIENT.get() + "-users.csv");
             if (Files.exists(path)) {
                 System.out.println("instance csv: " + path + " - added");
-                try {
-                    CSVReader reader = new CSVReader(Files.newBufferedReader(path));
+                try (CSVReader reader = new CSVReader(Files.newBufferedReader(path))) {
                     Map<String, Account> csv = new HashMap<>();
-                    reader.forEach(line -> csv.put(line[0], new Account(line)));
+                    reader.forEach(line -> {
+                        if (line != null && line.length >= 2 && !line[0].trim().isEmpty()) {
+                            csv.put(line[0].trim(), new Account(line));
+                        }
+                    });
                     csvs.put(Server.CLIENT.get(), csv);
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -161,8 +164,8 @@ public class Authentication {
 
 
         public Account(String[] cols) {
-            this.userid = cols[0];
-            this.password = cols[1];
+            this.userid = cols.length > 0 ? cols[0].trim() : "";
+            this.password = cols.length > 1 ? cols[1].trim() : "";
             if (cols.length > 2)
                 this.roles = new HashSet<>(Arrays.asList(Arrays.copyOfRange(cols, 2, cols.length)));
             else

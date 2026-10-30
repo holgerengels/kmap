@@ -27,7 +27,7 @@ public class MongoConnection {
 
     public MongoConnection(Properties properties) {
         this.properties = properties;
-        this.dbName = getProperty("kmap.mongo.db", "kmap");
+        this.dbName = getProperty("mongo.db", "kmap");
         initClient();
     }
 
@@ -37,16 +37,16 @@ public class MongoConnection {
                 if (mongoClient == null) {
                     String uri = System.getenv("MONGO_URI");
                     if (uri == null || uri.trim().isEmpty()) {
-                        uri = properties != null ? properties.getProperty("kmap.mongo.uri") : null;
+                        uri = properties != null ? properties.getProperty("mongo.uri") : null;
                     }
                     if (uri == null || uri.trim().isEmpty()) {
                         String host = System.getenv("MONGO_HOST");
                         if (host == null || host.trim().isEmpty()) {
-                            host = getProperty("kmap.mongo.host", "localhost");
+                            host = getProperty("mongo.host", "localhost");
                         }
-                        int port = Integer.parseInt(getProperty("kmap.mongo.port", "27017"));
-                        String user = getProperty("kmap.mongo.user", "admin");
-                        String pass = getProperty("kmap.mongo.password", "password");
+                        int port = Integer.parseInt(getProperty("mongo.port", "27017"));
+                        String user = getProperty("mongo.user", "admin");
+                        String pass = getProperty("mongo.password", "password");
                         if (user != null && pass != null && !user.isEmpty()) {
                             uri = "mongodb://" + user + ":" + pass + "@" + host + ":" + port + "/?authSource=admin";
                         } else {

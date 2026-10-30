@@ -10,6 +10,8 @@
  *   --mongo-uri <uri>      MongoDB URI (default: mongodb://admin:password@localhost:27017)
  *   --mongo-db <dbname>    MongoDB database name (default: kmap)
  *   --drop                 Drop target collections before migration (default: true)
+ *   --donor-uri <uri>      Optional MongoDB to recover missing card attachments from (e.g. dev)
+ *   --donor-db <dbname>    Database name of the donor MongoDB (default: kmap)
  */
 
 import { createRequire } from 'module';
@@ -50,6 +52,8 @@ const COUCH_URL = parsedCouchUrl.toString().replace(/\/$/, '');
 const MONGO_URI = getArg('--mongo-uri', 'mongodb://admin:password@localhost:27017');
 const MONGO_DB = getArg('--mongo-db', 'kmap');
 const SHOULD_DROP = !args.includes('--no-drop');
+const DONOR_URI = getArg('--donor-uri', null);
+const DONOR_DB = getArg('--donor-db', 'kmap');
 
 // Mapping CouchDB database names to target collections and instances
 function parseDbName(dbName) {
@@ -213,6 +217,23 @@ async function main() {
         }
       }
 
+      // Ensure all binary _attachments are represented in doc.attachments array
+      if (doc._attachments && (collection === 'cards' || collection === 'tests')) {
+        if (!Array.isArray(doc.attachments)) {
+          doc.attachments = [];
+        }
+        for (const [attName, attInfo] of Object.entries(doc._attachments)) {
+          if (!doc.attachments.some(a => a && a.file === attName)) {
+            doc.attachments.push({
+              type: 'file',
+              name: attName,
+              file: attName,
+              mime: attInfo.content_type || 'application/octet-stream',
+            });
+          }
+        }
+      }
+
       // Clean CouchDB specifics
       delete doc._rev;
       delete doc._attachments;
@@ -239,6 +260,60 @@ async function main() {
     }
 
     console.log(`ok (${docsToInsert.length} docs, ${attachmentsToInsert.length} attachments)`);
+  }
+
+  // Recover attachments lost due to legacy CouchDB rename bug from other instances/chapters
+  console.log("\nChecking for missing card attachments recoverable from other instances...");
+  let donorClient = null;
+  let donorDb = null;
+  if (DONOR_URI) {
+    donorClient = new MongoClient(DONOR_URI);
+    await donorClient.connect();
+    donorDb = donorClient.db(DONOR_DB);
+    console.log(`✓ Connected to donor MongoDB (db: ${DONOR_DB})`);
+  }
+  const cardsWithAtts = await db.collection("cards").find({ attachments: { $exists: true, $ne: [] } }).toArray();
+  let recoveredAtts = 0;
+  const stillMissing = [];
+  for (const c of cardsWithAtts) {
+    for (const att of (c.attachments || [])) {
+      if (att.type === "link" || !att.file) continue;
+      const slug = `${c.instance}/cards/${c.subject}/${c.chapter}/${c.topic}/${att.file}`;
+      const existing = await db.collection("attachments").findOne({ _id: slug }, { projection: { _id: 1 } });
+      if (!existing) {
+        let donor = await db.collection("attachments").findOne({ target: "cards", name: att.file });
+        if (!donor && donorDb) {
+          donor = await donorDb.collection("attachments").findOne({ _id: slug })
+            || await donorDb.collection("attachments").findOne({ target: "cards", name: att.file });
+        }
+        if (!donor) {
+          stillMissing.push(slug);
+        }
+        if (donor) {
+          await db.collection("attachments").insertOne({
+            _id: slug,
+            instance: c.instance,
+            target: "cards",
+            card: `${c.subject}.${c.chapter}.${c.topic}`,
+            name: att.file,
+            contentType: donor.contentType,
+            length: donor.length,
+            digest: donor.digest,
+            data: donor.data,
+            modified: c.modified || Date.now(),
+          });
+          stats["attachments"]++;
+          recoveredAtts++;
+          console.log(`  ✓ Recovered ${slug} (from ${donor._id})`);
+        }
+      }
+    }
+  }
+  if (donorClient) await donorClient.close();
+  console.log(`✓ Recovered ${recoveredAtts} missing attachments`);
+  if (stillMissing.length) {
+    console.log(`⚠ ${stillMissing.length} attachments could not be recovered:`);
+    stillMissing.forEach(s => console.log(`  ${s}`));
   }
 
   // Create Indexes

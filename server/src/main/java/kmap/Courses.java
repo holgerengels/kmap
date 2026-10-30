@@ -119,6 +119,8 @@ public class Courses {
             JsonObject studentStates = states.states(element.getAsString(), subject);
             studentStates.remove("_id");
             studentStates.remove("_rev");
+            studentStates.remove("instance");
+            studentStates.remove("couch_id");
             studentStates.entrySet().forEach(entry -> map.merge(entry.getKey(), new Couch.WeightedSum(entry.getValue().getAsInt()), Couch.WeightedSum::add));
         }
 

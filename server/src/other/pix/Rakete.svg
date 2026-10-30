@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="729" height="386" viewBox="0 0 729 386">
+  <defs>
+    <clipPath id="oizSQcIJNmlK">
+      <path fill="none" stroke="none" d="M 0 0 L 729 0 L 729 386 L 0 386 Z"/>
+    </clipPath>
+  </defs>
+  <g transform="scale(1,1)" clip-path="url(#oizSQcIJNmlK)">
+    <g transform="translate(-33.0,-9.0)">
+      <!-- Hintergrund -->
+      <rect fill="rgb(255,255,255)" stroke="none" x="0" y="0" width="1200" height="800" fill-opacity="1"/>
+
+      <!-- Gitter -->
+      <path fill="none" stroke="rgb(180,179,186)" paint-order="fill stroke markers" d=" M 129.5 0.5 L 129.5 366.5 M 195.5 0.5 L 195.5 366.5 M 260.5 0.5 L 260.5 366.5 M 326.5 0.5 L 326.5 366.5 M 392.5 0.5 L 392.5 366.5 M 457.5 0.5 L 457.5 366.5 M 523.5 0.5 L 523.5 366.5 M 589.5 0.5 L 589.5 366.5 M 654.5 0.5 L 654.5 366.5 M 720.5 0.5 L 720.5 366.5 M 786.5 0.5 L 786.5 366.5 M 852.5 0.5 L 852.5 366.5 M 917.5 0.5 L 917.5 366.5 M 983.5 0.5 L 983.5 366.5 M 1049.5 0.5 L 1049.5 366.5 M 1114.5 0.5 L 1114.5 366.5 M 1180.5 0.5 L 1180.5 366.5" stroke-opacity="1" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10"/>
+      <path fill="none" stroke="rgb(180,179,186)" paint-order="fill stroke markers" d=" M 76.5 0.5 L 76.5 366.5 M 90.5 0.5 L 90.5 366.5 M 103.5 0.5 L 103.5 366.5 M 116.5 0.5 L 116.5 366.5 M 142.5 0.5 L 142.5 366.5 M 155.5 0.5 L 155.5 366.5 M 168.5 0.5 L 168.5 366.5 M 181.5 0.5 L 181.5 366.5 M 208.5 0.5 L 208.5 366.5 M 221.5 0.5 L 221.5 366.5 M 234.5 0.5 L 234.5 366.5 M 247.5 0.5 L 247.5 366.5 M 273.5 0.5 L 273.5 366.5 M 287.5 0.5 L 287.5 366.5 M 300.5 0.5 L 300.5 366.5 M 313.5 0.5 L 313.5 366.5 M 339.5 0.5 L 339.5 366.5 M 352.5 0.5 L 352.5 366.5 M 365.5 0.5 L 365.5 366.5 M 379.5 0.5 L 379.5 366.5 M 405.5 0.5 L 405.5 366.5 M 418.5 0.5 L 418.5 366.5 M 431.5 0.5 L 431.5 366.5 M 444.5 0.5 L 444.5 366.5 M 471.5 0.5 L 471.5 366.5 M 484.5 0.5 L 484.5 366.5 M 497.5 0.5 L 497.5 366.5 M 510.5 0.5 L 510.5 366.5 M 536.5 0.5 L 536.5 366.5 M 549.5 0.5 L 549.5 366.5 M 562.5 0.5 L 562.5 366.5 M 576.5 0.5 L 576.5 366.5 M 602.5 0.5 L 602.5 366.5 M 615.5 0.5 L 615.5 366.5 M 628.5 0.5 L 628.5 366.5 M 641.5 0.5 L 641.5 366.5 M 668.5 0.5 L 668.5 366.5 M 681.5 0.5 L 681.5 366.5 M 694.5 0.5 L 694.5 366.5 M 707.5 0.5 L 707.5 366.5 M 733.5 0.5 L 733.5 366.5 M 746.5 0.5 L 746.5 366.5 M 760.5 0.5 L 760.5 366.5 M 773.5 0.5 L 773.5 366.5 M 799.5 0.5 L 799.5 366.5 M 812.5 0.5 L 812.5 366.5 M 825.5 0.5 L 825.5 366.5 M 838.5 0.5 L 838.5 366.5 M 865.5 0.5 L 865.5 366.5 M 878.5 0.5 L 878.5 366.5 M 891.5 0.5 L 891.5 366.5 M 904.5 0.5 L 904.5 366.5 M 930.5 0.5 L 930.5 366.5 M 943.5 0.5 L 943.5 366.5 M 957.5 0.5 L 957.5 366.5 M 970.5 0.5 L 970.5 366.5 M 996.5 0.5 L 996.5 366.5 M 1009.5 0.5 L 1009.5 366.5 M 1022.5 0.5 L 1022.5 366.5 M 1035.5 0.5 L 1035.5 366.5 M 1062.5 0.5 L 1062.5 366.5 M 1075.5 0.5 L 1075.5 366.5 M 1088.5 0.5 L 1088.5 366.5 M 1101.5 0.5 L 1101.5 366.5 M 1127.5 0.5 L 1127.5 366.5 M 1141.5 0.5 L 1141.5 366.5 M 1154.5 0.5 L 1154.5 366.5 M 1167.5 0.5 L 1167.5 366.5 M 1193.5 0.5 L 1193.5 366.5" stroke-opacity="0.23529411764705882" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10"/>
+      <path fill="none" stroke="rgb(180,179,186)" paint-order="fill stroke markers" d=" M 63.5 13.5 L 1196.5 13.5 M 63.5 13.5 L 1196.5 13.5 M 63.5 64.5 L 1196.5 64.5 M 63.5 114.5 L 1196.5 114.5 M 63.5 164.5 L 1196.5 164.5 M 63.5 215.5 L 1196.5 215.5 M 63.5 265.5 L 1196.5 265.5 M 63.5 316.5 L 1196.5 316.5" stroke-opacity="1" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10"/>
+      <path fill="none" stroke="rgb(180,179,186)" paint-order="fill stroke markers" d=" M 63.5 3.5 L 1196.5 3.5 M 63.5 3.5 L 1196.5 3.5 M 63.5 23.5 L 1196.5 23.5 M 63.5 33.5 L 1196.5 33.5 M 63.5 43.5 L 1196.5 43.5 M 63.5 54.5 L 1196.5 54.5 M 63.5 74.5 L 1196.5 74.5 M 63.5 84.5 L 1196.5 84.5 M 63.5 94.5 L 1196.5 94.5 M 63.5 104.5 L 1196.5 104.5 M 63.5 124.5 L 1196.5 124.5 M 63.5 134.5 L 1196.5 134.5 M 63.5 144.5 L 1196.5 144.5 M 63.5 154.5 L 1196.5 154.5 M 63.5 174.5 L 1196.5 174.5 M 63.5 185.5 L 1196.5 185.5 M 63.5 195.5 L 1196.5 195.5 M 63.5 205.5 L 1196.5 205.5 M 63.5 225.5 L 1196.5 225.5 M 63.5 235.5 L 1196.5 235.5 M 63.5 245.5 L 1196.5 245.5 M 63.5 255.5 L 1196.5 255.5 M 63.5 275.5 L 1196.5 275.5 M 63.5 285.5 L 1196.5 285.5 M 63.5 295.5 L 1196.5 295.5 M 63.5 305.5 L 1196.5 305.5 M 63.5 326.5 L 1196.5 326.5 M 63.5 336.5 L 1196.5 336.5 M 63.5 346.5 L 1196.5 346.5 M 63.5 356.5 L 1196.5 356.5" stroke-opacity="0.23529411764705882" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10"/>
+
+      <!-- Vertikale Achse (s-Achse) & Pfeil nach oben -->
+      <path fill="none" stroke="rgb(28,28,31)" paint-order="fill stroke markers" d=" M 63.5 14.5 L 63.5 366.5" stroke-opacity="1" stroke-miterlimit="10"/>
+      <path fill="none" stroke="rgb(28,28,31)" paint-order="fill stroke markers" d="M 63.5 14.5 L 59.5 18.5" stroke-opacity="1" stroke-miterlimit="10"/>
+      <path fill="none" stroke="rgb(28,28,31)" paint-order="fill stroke markers" d="M 63.5 14.5 L 67.5 18.5" stroke-opacity="1" stroke-miterlimit="10"/>
+
+      <!-- Horizontale Achse (t-Achse) & Pfeil nach rechts -->
+      <path fill="none" stroke="rgb(28,28,31)" paint-order="fill stroke markers" d=" M 63.5 366.5 L 755.5 366.5" stroke-opacity="1" stroke-miterlimit="10"/>
+      <path fill="none" stroke="rgb(28,28,31)" paint-order="fill stroke markers" d="M 755.5 366.5 L 751.5 362.5" stroke-opacity="1" stroke-miterlimit="10"/>
+      <path fill="none" stroke="rgb(28,28,31)" paint-order="fill stroke markers" d="M 755.5 366.5 L 751.5 370.5" stroke-opacity="1" stroke-miterlimit="10"/>
+
+      <!-- T-Achsen-Zahlen -->
+      <text fill="rgb(28,28,31)" stroke="none" font-family="geogebra-sans-serif, sans-serif" font-size="12px" font-style="normal" font-weight="normal" text-decoration="normal" x="127" y="382" text-anchor="start" dominant-baseline="alphabetic" fill-opacity="1">2</text>
+      <text fill="rgb(28,28,31)" stroke="none" font-family="geogebra-sans-serif, sans-serif" font-size="12px" font-style="normal" font-weight="normal" text-decoration="normal" x="193" y="382" text-anchor="start" dominant-baseline="alphabetic" fill-opacity="1">4</text>
+      <text fill="rgb(28,28,31)" stroke="none" font-family="geogebra-sans-serif, sans-serif" font-size="12px" font-style="normal" font-weight="normal" text-decoration="normal" x="258" y="382" text-anchor="start" dominant-baseline="alphabetic" fill-opacity="1">6</text>
+      <text fill="rgb(28,28,31)" stroke="none" font-family="geogebra-sans-serif, sans-serif" font-size="12px" font-style="normal" font-weight="normal" text-decoration="normal" x="324" y="382" text-anchor="start" dominant-baseline="alphabetic" fill-opacity="1">8</text>
+      <text fill="rgb(28,28,31)" stroke="none" font-family="geogebra-sans-serif, sans-serif" font-size="12px" font-style="normal" font-weight="normal" text-decoration="normal" x="387" y="382" text-anchor="start" dominant-baseline="alphabetic" fill-opacity="1">10</text>
+      <text fill="rgb(28,28,31)" stroke="none" font-family="geogebra-sans-serif, sans-serif" font-size="12px" font-style="normal" font-weight="normal" text-decoration="normal" x="452" y="382" text-anchor="start" dominant-baseline="alphabetic" fill-opacity="1">12</text>
+      <text fill="rgb(28,28,31)" stroke="none" font-family="geogebra-sans-serif, sans-serif" font-size="12px" font-style="normal" font-weight="normal" text-decoration="normal" x="518" y="382" text-anchor="start" dominant-baseline="alphabetic" fill-opacity="1">14</text>
+      <text fill="rgb(28,28,31)" stroke="none" font-family="geogebra-sans-serif, sans-serif" font-size="12px" font-style="normal" font-weight="normal" text-decoration="normal" x="584" y="382" text-anchor="start" dominant-baseline="alphabetic" fill-opacity="1">16</text>
+      <text fill="rgb(28,28,31)" stroke="none" font-family="geogebra-sans-serif, sans-serif" font-size="12px" font-style="normal" font-weight="normal" text-decoration="normal" x="649" y="382" text-anchor="start" dominant-baseline="alphabetic" fill-opacity="1">18</text>
+      <text fill="rgb(28,28,31)" stroke="none" font-family="geogebra-sans-serif, sans-serif" font-size="12px" font-style="normal" font-weight="normal" text-decoration="normal" x="715" y="382" text-anchor="start" dominant-baseline="alphabetic" fill-opacity="1">20</text>
+
+      <!-- S-Achsen-Zahlen -->
+      <text fill="rgb(28,28,31)" stroke="none" font-family="geogebra-sans-serif, sans-serif" font-size="12px" font-style="normal" font-weight="normal" text-decoration="normal" x="43" y="321" text-anchor="start" dominant-baseline="alphabetic" fill-opacity="1">10</text>
+      <text fill="rgb(28,28,31)" stroke="none" font-family="geogebra-sans-serif, sans-serif" font-size="12px" font-style="normal" font-weight="normal" text-decoration="normal" x="43" y="270" text-anchor="start" dominant-baseline="alphabetic" fill-opacity="1">20</text>
+      <text fill="rgb(28,28,31)" stroke="none" font-family="geogebra-sans-serif, sans-serif" font-size="12px" font-style="normal" font-weight="normal" text-decoration="normal" x="43" y="220" text-anchor="start" dominant-baseline="alphabetic" fill-opacity="1">30</text>
+      <text fill="rgb(28,28,31)" stroke="none" font-family="geogebra-sans-serif, sans-serif" font-size="12px" font-style="normal" font-weight="normal" text-decoration="normal" x="43" y="169" text-anchor="start" dominant-baseline="alphabetic" fill-opacity="1">40</text>
+      <text fill="rgb(28,28,31)" stroke="none" font-family="geogebra-sans-serif, sans-serif" font-size="12px" font-style="normal" font-weight="normal" text-decoration="normal" x="43" y="119" text-anchor="start" dominant-baseline="alphabetic" fill-opacity="1">50</text>
+      <text fill="rgb(28,28,31)" stroke="none" font-family="geogebra-sans-serif, sans-serif" font-size="12px" font-style="normal" font-weight="normal" text-decoration="normal" x="43" y="69" text-anchor="start" dominant-baseline="alphabetic" fill-opacity="1">60</text>
+      <text fill="rgb(28,28,31)" stroke="none" font-family="geogebra-sans-serif, sans-serif" font-size="12px" font-style="normal" font-weight="normal" text-decoration="normal" x="49" y="382" text-anchor="start" dominant-baseline="alphabetic" fill-opacity="1">0</text>
+
+      <!-- Funktionsgraph -->
+      <path fill="none" stroke="rgb(176,0,32)" paint-order="fill stroke markers" d=" M 63.727272727273 215.29113227078193 L 720.6251993620406 215.29113227078193" stroke-opacity="0.6980392156862745" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="3.5"/>
+
+      <!-- Achsenbeschriftungen -->
+      <text fill="rgb(28,28,31)" stroke="none" font-family="geogebra-sans-serif, sans-serif" font-size="16px" font-style="normal" font-weight="normal" text-decoration="normal" x="72" y="25" text-anchor="start" dominant-baseline="alphabetic" fill-opacity="1">v [m/s]</text>
+      <text fill="rgb(28,28,31)" stroke="none" font-family="geogebra-sans-serif, sans-serif" font-size="16px" font-style="normal" font-weight="normal" text-decoration="normal" x="724" y="355" text-anchor="start" dominant-baseline="alphabetic" fill-opacity="1">t [s]</text>
+    </g>
+  </g>
+</svg>

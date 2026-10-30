@@ -109,6 +109,11 @@ public class DataServlet
                 String fileName = dirs.length > 0 ? dirs[dirs.length - 1] : "";
                 boolean isSvg = fileName.toLowerCase().endsWith(".svg");
 
+                if (dirs.length < 4) {
+                    sendError(req, resp, HttpServletResponse.SC_NOT_FOUND, "Invalid attachment path");
+                    return;
+                }
+
                 if (webpRequested && isSvg) {
                     float width = 800f;
                     String widthParam = req.getParameter("width");
@@ -120,9 +125,12 @@ public class DataServlet
                     sendSvgAsWebp(resp, dirs, width);
                 }
                 else {
-                    couch.loadAttachment(attachment -> {
+                    boolean found = couch.loadAttachment(attachment -> {
                         sendAttachment(resp, attachment);
                     }, dirs);
+                    if (!found) {
+                        sendError(req, resp, HttpServletResponse.SC_NOT_FOUND, "Attachment not found");
+                    }
                 }
             }
             else if (topic != null) {
@@ -167,7 +175,7 @@ public class DataServlet
     }
 
     private void sendSvgAsWebp(HttpServletResponse resp, String[] dirs, float width) throws IOException {
-        File cacheDir = new File(properties.getProperty("kmap.cache", System.getProperty("java.io.tmpdir") + File.separator + "kmap-cache"), "webp");
+        File cacheDir = new File(properties.getProperty("cache", System.getProperty("java.io.tmpdir") + File.separator + "kmap-cache"), "webp");
         if (!cacheDir.exists()) {
             cacheDir.mkdirs();
         }

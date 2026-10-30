@@ -187,16 +187,26 @@ public class ContentManager extends Server
         zipSetDoc(out, doc);
         for (JsonElement element : array) {
             JsonObject object = (JsonObject)element;
-            String chapter = string(object, "chapter");
-            String topic  = string(object, "topic");
             String key = string(object, "key");
-            String question = string(object, "question");
-            String answer = string(object, "answer");
-            String both = question + "\n---\n" + answer;
-            JsonObject attachments = object.getAsJsonObject("_attachments");
+            Set<String> added = new HashSet<>();
+            JsonArray attachments = object.getAsJsonArray("attachments");
             if (attachments != null) {
-                for (String file : attachments.keySet()) {
-                    zipTestFile(out, new String[] { subject, set, key, file });
+                for (JsonElement elefant : attachments) {
+                    JsonObject attachment = (JsonObject)elefant;
+                    if (attachment.has("type") && "link".equals(string(attachment, "type")))
+                        continue;
+                    String file = string(attachment, "file");
+                    if (file != null && added.add(file)) {
+                        zipTestFile(out, new String[] { subject, set, key, file });
+                    }
+                }
+            }
+            JsonObject _attachments = object.getAsJsonObject("_attachments");
+            if (_attachments != null) {
+                for (String file : _attachments.keySet()) {
+                    if (added.add(file)) {
+                        zipTestFile(out, new String[] { subject, set, key, file });
+                    }
                 }
             }
         }

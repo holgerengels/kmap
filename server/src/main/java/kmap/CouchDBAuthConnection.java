@@ -42,13 +42,20 @@ public class CouchDBAuthConnection extends AuthConnection {
         try {
             Document userDoc = users().find(Filters.or(
                 Filters.eq("_id", instance() + ":user:" + user),
-                Filters.and(Filters.eq("instance", instance()), Filters.eq("userid", user))
+                Filters.and(Filters.eq("instance", instance()), Filters.eq("type", "user"), Filters.eq("userid", user))
             )).first();
 
-            if (userDoc == null) return null;
+            if (userDoc == null) {
+                System.out.println("Mongo auth: user '" + user + "' not found in instance '" + instance() + "'");
+                return null;
+            }
 
             JsonObject userJson = MongoConnection.toJsonObject(userDoc);
             String hash = JSON.string(userJson, "passwordHash");
+            if (hash == null) {
+                System.out.println("Mongo auth: user '" + user + "' has no passwordHash");
+                return null;
+            }
             if (checkPassword(password, hash)) {
                 Set<String> roles = new HashSet<>();
                 roles.add("user");
@@ -62,8 +69,10 @@ public class CouchDBAuthConnection extends AuthConnection {
                 if (displayName != null) {
                     roles.add("displayName:" + displayName);
                 }
+                System.out.println("Mongo auth: user '" + user + "' successfully authenticated with roles " + roles);
                 return roles;
             }
+            System.out.println("Mongo auth: password mismatch for user '" + user + "'");
             return null;
         } catch (Exception e) {
             System.err.println("Auth error: " + e.getMessage());
@@ -74,7 +83,7 @@ public class CouchDBAuthConnection extends AuthConnection {
     public JsonObject register(String userid, String email, String password, String displayName) {
         Document existing = users().find(Filters.or(
             Filters.eq("_id", instance() + ":user:" + userid),
-            Filters.and(Filters.eq("instance", instance()), Filters.eq("userid", userid))
+            Filters.and(Filters.eq("instance", instance()), Filters.eq("type", "user"), Filters.eq("userid", userid))
         )).first();
 
         if (existing != null) {

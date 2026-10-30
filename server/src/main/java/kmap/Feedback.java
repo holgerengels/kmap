@@ -120,8 +120,6 @@ public class Feedback {
     }
 
     private static Properties readProperties(String fileName) throws IOException {
-        Properties properties = new Properties();
-        properties.load(new FileInputStream(fileName));
-        return properties;
+        return Config.load(fileName);
     }
 }

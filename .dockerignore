@@ -1,0 +1,19 @@
+# Secrets and local configuration must never end up in an image.
+# Configuration is mounted at runtime as /config (see deploy/docker-compose.yml).
+config/
+deploy/config/
+**/kmap.properties
+**/serviceAccountKey.json
+snappy/src/config.json
+*-users.csv
+**/trustStore
+
+# Build output and dependencies
+**/node_modules
+**/target
+**/dist
+.git
+.idea
+.vscode
+archive
+stuff

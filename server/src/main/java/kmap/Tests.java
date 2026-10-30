@@ -132,8 +132,9 @@ public class Tests {
                 JsonObject o = MongoConnection.toJsonObject(doc);
                 if (string(o, "chapter") == null || string(o, "topic") == null)
                     continue;
+                JsonArray attachments = o.getAsJsonArray("attachments");
                 JsonObject _attachments = o.getAsJsonObject("_attachments");
-                o.add("attachments", amendAttachments(_attachments));
+                o.add("attachments", amendAttachments(attachments, _attachments));
                 if (!o.has("repetitions"))
                     o.addProperty("repetitions", 1);
                 objects.add(o);
@@ -154,8 +155,9 @@ public class Tests {
         JsonArray array = new JsonArray();
         for (Document doc : tests().find(filter)) {
             JsonObject o = MongoConnection.toJsonObject(doc);
-            JsonObject _attachments = o.getAsJsonObject("_attachments");
-            o.add("attachments", amendAttachments(_attachments));
+            JsonArray attachments = o.getAsJsonArray("attachments");
+                JsonObject _attachments = o.getAsJsonObject("_attachments");
+                o.add("attachments", amendAttachments(attachments, _attachments));
             if (!o.has("repetitions"))
                 o.addProperty("repetitions", 1);
             array.add(o);
@@ -173,8 +175,9 @@ public class Tests {
         JsonArray array = new JsonArray();
         for (Document doc : tests().find(filter)) {
             JsonObject o = MongoConnection.toJsonObject(doc);
-            JsonObject _attachments = o.getAsJsonObject("_attachments");
-            o.add("attachments", amendAttachments(_attachments));
+            JsonArray attachments = o.getAsJsonArray("attachments");
+                JsonObject _attachments = o.getAsJsonObject("_attachments");
+                o.add("attachments", amendAttachments(attachments, _attachments));
             if (!o.has("repetitions"))
                 o.addProperty("repetitions", 1);
             array.add(o);
@@ -194,8 +197,9 @@ public class Tests {
         if (doc == null)
             return null;
         JsonObject object = MongoConnection.toJsonObject(doc);
-        JsonObject _attachments = object.getAsJsonObject("_attachments");
-        object.add("attachments", amendAttachments(_attachments));
+        JsonArray attachments = object.getAsJsonArray("attachments");
+                JsonObject _attachments = object.getAsJsonObject("_attachments");
+                object.add("attachments", amendAttachments(attachments, _attachments));
         if (!object.has("repetitions"))
             object.addProperty("repetitions", 1);
         return object;
@@ -227,8 +231,9 @@ public class Tests {
         return toArray(objects);
     }
 
-    private JsonArray amendAttachments(JsonObject _attachments) {
-        JsonArray attachments = new JsonArray();
+    private JsonArray amendAttachments(JsonArray attachments, JsonObject _attachments) {
+        if (attachments == null)
+            attachments = new JsonArray();
 
         Set<String> existing = StreamSupport.stream(attachments.spliterator(), false)
                 .filter(a -> string((JsonObject) a, "file") != null)
@@ -260,6 +265,9 @@ public class Tests {
     }
 
     public boolean loadAttachment(Consumer<AttachmentInputStream> sender, String... dirs) throws IOException {
+        if (dirs == null || dirs.length < 4) {
+            return false;
+        }
         String slug = instance() + "/tests/" + dirs[0] + "/" + dirs[1] + "/" + dirs[2] + "/" + dirs[3];
         Document doc = attachments().find(Filters.eq("_id", slug)).first();
         if (doc != null) {
@@ -325,6 +333,17 @@ public class Tests {
                 Filters.eq("key", key)
             );
             tests().updateOne(filter, Updates.set("key", name));
+            String oldCardRef = subject + "." + set + "." + key;
+            String newCardRef = subject + "." + set + "." + name;
+            for (Document att : attachments().find(Filters.and(Filters.eq("instance", instance()), Filters.eq("card", oldCardRef)))) {
+                String oldSlug = att.getString("_id");
+                String attName = att.getString("name");
+                String newSlug = instance() + "/tests/" + subject + "/" + set + "/" + name + "/" + attName;
+                attachments().deleteOne(Filters.eq("_id", oldSlug));
+                att.put("_id", newSlug);
+                att.put("card", newCardRef);
+                attachments().insertOne(att);
+            }
             return "reload:";
         }
         else {
@@ -524,11 +543,21 @@ public class Tests {
     }
 
     public JsonObject deleteSet(String subject, String set) {
-        DeleteResult res = tests().deleteMany(Filters.and(
+        Bson filter = Filters.and(
             Filters.eq("instance", instance()),
             Filters.eq("subject", subject),
             Filters.eq("set", set)
-        ));
+        );
+        for (Document doc : tests().find(filter)) {
+            String key = doc.getString("key");
+            if (key != null) {
+                attachments().deleteMany(Filters.and(
+                    Filters.eq("instance", instance()),
+                    Filters.eq("card", subject + "." + set + "." + key)
+                ));
+            }
+        }
+        DeleteResult res = tests().deleteMany(filter);
 
         JsonObject object = new JsonObject();
         object.addProperty("subject", subject);
@@ -545,8 +574,6 @@ public class Tests {
     }
 
     private static Properties readProperties(String fileName) throws IOException {
-        Properties properties = new Properties();
-        properties.load(new FileInputStream(fileName));
-        return properties;
+        return Config.load(fileName);
     }
 }

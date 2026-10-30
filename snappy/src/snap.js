@@ -1,4 +1,4 @@
-var config = require('./config.json');
+var config = require('./config');
 
 const puppeteer = require('puppeteer');
 const http = require("http");
@@ -10,9 +10,9 @@ const { MongoClient } = require('mongodb');
 const host = config.host;
 const port = config.port;
 
-const mongoUri = process.env.MONGO_URI || config.mongo_uri || "mongodb://admin:password@localhost:27017";
-const mongoDbName = process.env.MONGO_DB || config.mongo_db || "kmap";
-const instance = process.env.INSTANCE || config.instance || "vu";
+const mongoUri = process.env.MONGO_URI || config.mongo.uri || "mongodb://admin:password@localhost:27017";
+const mongoDbName = process.env.MONGO_DB || config.mongo.db;
+const instance = process.env.INSTANCE || config.instance;
 
 let server;
 let browser;

@@ -23,42 +23,42 @@ public class JSON {
     }
 
     public static String stringTrim(JsonObject topic, String name) {
-        JsonPrimitive primitive = topic.getAsJsonPrimitive(name);
+        JsonPrimitive primitive = isMissingOrNull(topic, name) ? null : topic.getAsJsonPrimitive(name);
         return primitive != null ? primitive.getAsString().trim() : null;
     }
 
     public static String string(JsonObject topic, String name) {
-        JsonPrimitive primitive = topic.getAsJsonPrimitive(name);
+        JsonPrimitive primitive = isMissingOrNull(topic, name) ? null : topic.getAsJsonPrimitive(name);
         return primitive != null ? primitive.getAsString() : null;
     }
 
     public static String string(JsonObject topic, String name, String defaultValue) {
-        JsonPrimitive primitive = topic.getAsJsonPrimitive(name);
+        JsonPrimitive primitive = isMissingOrNull(topic, name) ? null : topic.getAsJsonPrimitive(name);
         return primitive != null ? primitive.getAsString() : defaultValue;
     }
 
     public static Integer integer(JsonObject topic, String name) {
-        JsonPrimitive primitive = topic.getAsJsonPrimitive(name);
+        JsonPrimitive primitive = isMissingOrNull(topic, name) ? null : topic.getAsJsonPrimitive(name);
         return primitive != null && primitive.getAsString().length() != 0 ? primitive.getAsInt() : null;
     }
 
     public static Integer integer(JsonObject topic, String name, Integer defaultValue) {
-        JsonPrimitive primitive = topic.getAsJsonPrimitive(name);
+        JsonPrimitive primitive = isMissingOrNull(topic, name) ? null : topic.getAsJsonPrimitive(name);
         return primitive != null && primitive.getAsString().length() != 0 ? primitive.getAsInt() : defaultValue;
     }
 
     public static Long loong(JsonObject topic, String name) {
-        JsonPrimitive primitive = topic.getAsJsonPrimitive(name);
+        JsonPrimitive primitive = isMissingOrNull(topic, name) ? null : topic.getAsJsonPrimitive(name);
         return primitive != null && primitive.getAsString().length() != 0 ? primitive.getAsLong() : null;
     }
 
     public static Long loong(JsonObject topic, String name, Long defaultValue) {
-        JsonPrimitive primitive = topic.getAsJsonPrimitive(name);
+        JsonPrimitive primitive = isMissingOrNull(topic, name) ? null : topic.getAsJsonPrimitive(name);
         return primitive != null && primitive.getAsString().length() != 0 ? primitive.getAsLong() : defaultValue;
     }
 
     public static Boolean bool(JsonObject topic, String name) {
-        JsonPrimitive primitive = topic.getAsJsonPrimitive(name);
+        JsonPrimitive primitive = isMissingOrNull(topic, name) ? null : topic.getAsJsonPrimitive(name);
         return primitive != null && primitive.getAsBoolean();
     }
 
@@ -106,12 +106,12 @@ public class JSON {
     }
 
     public static String date(JsonObject object, String name) {
-        JsonPrimitive primitive = object.getAsJsonPrimitive(name);
+        JsonPrimitive primitive = isMissingOrNull(object, name) ? null : object.getAsJsonPrimitive(name);
         return primitive != null ? format.format(new Date(primitive.getAsLong())) : null;
     }
 
     public static String date(JsonObject object, String name, long defaultValue) {
-        JsonPrimitive primitive = object.getAsJsonPrimitive(name);
+        JsonPrimitive primitive = isMissingOrNull(object, name) ? null : object.getAsJsonPrimitive(name);
         return format.format(new Date(primitive != null ? primitive.getAsLong() : defaultValue));
     }
 }

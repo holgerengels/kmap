@@ -29,9 +29,7 @@ public abstract class Server
     }
 
     public static Properties readProperties(String fileName) throws IOException {
-        Properties properties = new Properties();
-        properties.load(new FileInputStream(fileName));
-        return properties;
+        return Config.load(fileName);
     }
 
     protected String getProperty(String key) {

@@ -172,9 +172,17 @@ public class TestsServlet
 
                 corsHeaders(req, resp);
 
-                tests.loadAttachment(attachment -> {
+                if (dirs.length < 4) {
+                    sendError(req, resp, HttpServletResponse.SC_NOT_FOUND, "Invalid attachment path");
+                    return;
+                }
+
+                boolean found = tests.loadAttachment(attachment -> {
                     sendAttachment(resp, attachment);
                 }, dirs);
+                if (!found) {
+                    sendError(req, resp, HttpServletResponse.SC_NOT_FOUND, "Attachment not found");
+                }
             }
         }
         catch (Exception e) {
