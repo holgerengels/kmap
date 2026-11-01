@@ -221,9 +221,16 @@ export class KmapMain extends connect(store, LitElement) {
 
   private installOnErrorHandler() {
     window.addEventListener('error', (e) => {
+      if (typeof e.message === 'string' && e.message.includes('ResizeObserver loop')) {
+        e.stopImmediatePropagation();
+        return;
+      }
       console.log(e);
     });
     window.onerror = function (message, source, lineno, colno, error) {
+      if (typeof message === 'string' && message.includes('ResizeObserver loop')) {
+        return true;
+      }
       console.log(error?.stack);
       if (error)
         store.dispatch.feedback.bug({ message: error.name + ": " + error.message, detail: error.stack as string });

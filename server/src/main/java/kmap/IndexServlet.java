@@ -15,6 +15,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
+
 import static kmap.JSON.string;
 import static kmap.JsonLD.SERVER;
 import static kmap.URLs.encodePath;
@@ -22,19 +28,71 @@ import static kmap.URLs.encodePath;
 // http://jetty:8080/server/index/browser/Mathematik/Differentialrechnung/Differenzierbarkeit
 public class IndexServlet extends JsonServlet {
     private Couch couch;
-    private String file;
+    private HttpClient httpClient;
+    private String indexUrl;
+    private volatile String cachedIndexHtml;
+    private volatile long lastFetchTime = 0;
+    private static final long CACHE_TTL_MS = 10_000; // 10 seconds
+    private String fallback;
 
     @Override
     public void init() throws ServletException {
         super.init();
         couch = new Couch(properties);
+        indexUrl = properties.getProperty("indexUrl", properties.getProperty("frontend.index.url", "http://frontend/app/index.html"));
+        httpClient = HttpClient.newBuilder()
+                .connectTimeout(Duration.ofSeconds(2))
+                .followRedirects(HttpClient.Redirect.NORMAL)
+                .build();
         try {
-            Path path = Paths.get(getServletContext().getRealPath(properties.getProperty("index", "/index.html")));
-            file = IOUtils.toString(new InputStreamReader(Files.newInputStream(path), StandardCharsets.UTF_8));
+            String indexPath = properties.getProperty("index", "/index.html");
+            String realPath = getServletContext().getRealPath(indexPath);
+            if (realPath != null) {
+                Path path = Paths.get(realPath);
+                if (Files.isRegularFile(path)) {
+                    fallback = IOUtils.toString(new InputStreamReader(Files.newInputStream(path), StandardCharsets.UTF_8));
+                }
+            }
         }
-        catch (IOException e) {
-            throw new ServletException(e);
+        catch (Exception e) {
+            System.err.println("Note: Local fallback index.html not available: " + e.getMessage());
         }
+    }
+
+    private String getIndexHtml() {
+        long now = System.currentTimeMillis();
+        if (cachedIndexHtml != null && (now - lastFetchTime) < CACHE_TTL_MS) {
+            return cachedIndexHtml;
+        }
+
+        if (indexUrl != null && !indexUrl.isBlank() && !"none".equalsIgnoreCase(indexUrl)) {
+            try {
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(URI.create(indexUrl))
+                        .timeout(Duration.ofSeconds(2))
+                        .GET()
+                        .build();
+                HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+                if (response.statusCode() == 200 && response.body() != null && !response.body().isBlank()) {
+                    cachedIndexHtml = response.body();
+                    lastFetchTime = now;
+                    return cachedIndexHtml;
+                }
+                else {
+                    System.err.println("Warning: GET " + indexUrl + " returned status " + response.statusCode());
+                }
+            }
+            catch (Exception e) {
+                if (cachedIndexHtml == null) {
+                    System.err.println("Could not fetch index.html from " + indexUrl + ": " + e.getMessage());
+                }
+            }
+        }
+
+        if (cachedIndexHtml != null) {
+            return cachedIndexHtml;
+        }
+        return fallback;
     }
 
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -190,7 +248,11 @@ public class IndexServlet extends JsonServlet {
         }
 
         boolean kcard = created != null || modified != null || section != null;
-        String string = file;
+        String string = getIndexHtml();
+        if (string == null) {
+            resp.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE, "Frontend index.html unavailable");
+            return;
+        }
         string = string.replace("<title>KMap</title>", "<title>" + title + "</title>");
         StringBuilder builder = new StringBuilder();
         builder.append("<meta name=\"description\" content=\"").append(description).append("\">");

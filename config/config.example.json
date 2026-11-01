@@ -2,6 +2,7 @@
   "server": {
     "cors": false,
     "index": "/index.html",
+    "indexUrl": "http://frontend/app/index.html",
     "mongo": {
       "uri": "mongodb://admin:CHANGE_ME@mongodb:27017/?authSource=admin",
       "db": "kmap"

@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>KMap - Wissen mit Zusammenhang</title>
+  <base href="/app/">
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#5eb8ff">
+  <meta property="og:site_name" content="KMap">
+  <meta gen>
+  <meta jsonld>
+  <meta property="fb:app_id" content="3514005508685218">
+
+  <link rel="stylesheet" href="./icon-fonts.css" as="style" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="./roboto-fonts.css" as="style" media="print" onload="this.media='all'">
+
+  <link rel="preload" href="/app/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/app/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/app/fonts/KaTeX_AMS-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  <!--link rel="preload" href="/app/fonts/KaTeX_Main-Bold.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/app/fonts/KaTeX_Main-BoldItalic.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/app/fonts/KaTeX_Main-Italic.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/app/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/app/fonts/KaTeX_Math-BoldItalic.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/app/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/app/fonts/KaTeX_Size1-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/app/fonts/KaTeX_Size2-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/app/fonts/KaTeX_Size3-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/app/fonts/KaTeX_Size4-Regular.woff2" as="font" type="font/woff2" crossorigin-->
+  <link rel="stylesheet" href="./katex-fonts.css">
+
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="icon" href="icons/favicon-96x96.png">
+  <link rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/" />
+
+  <script>
+    window.kmapVersion = "3.0";
+    const json = localStorage.getItem(location.hostname);
+    if (json) {
+      const data = JSON.parse(json);
+      console.log(data);
+      if (data.app.version !== window.kmapVersion) {
+        console.log("DROP STATE");
+        window.kmapInstance = data.app.instance;
+        localStorage.removeItem(location.hostname);
+      }
+    }
+  </script>
+
+  <style>
+    html, body {
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      font-family: Roboto, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      background-color: #ededed;
+      --color-primary: #0288d1;
+      --color-primary-lighter: #E1ECF4;
+      --color-primary-light: #5eb8ff;
+      --color-primary-dark: #005b9f;
+      --color-primary-text: #000000;
+      --color-secondary: #fbc02d;
+      --color-secondary-light: #fff263;
+      --color-secondary-dark: #c49000;
+      --color-secondary-text: #000000;
+
+      --color-darkgray: #313131;
+      --color-mediumgray: #6a6a6a;
+      --color-lightergray: #aaaaaa;
+      --color-lightgray: #f5f5f5;
+      --color-green-num: 56, 142, 60;
+      --color-green: rgb(var(--color-green-num));
+      --color-red-num: 211, 47, 47;
+      --color-red: rgb(var(--color-red-num));
+
+      --mdc-theme-primary: #005b9f;
+      --mdc-theme-on-primary: white;
+      --mdc-theme-secondary: #fbc02d;
+      --mdc-theme-on-secondary: black;
+      --mdc-theme-surface: whitesmoke;
+      --mdc-theme-on-surface: #313131;
+
+      --mdc-typography-font-family: Roboto, sans-serif;
+
+      --mdc-text-field-filled-border-radius: 4px 16px 0 0;
+      --mdc-select-filled-border-radius: 4px 16px 0 0;
+
+
+    }
+  </style>
+</head>
+<body>
+  <kmap-main></kmap-main>
+
+  <script type="module" src="src/kmap-main.js"></script>
+  <noscript>JavaScript wird benötigt!</noscript>
+  <scraper id="scraper" style="position: absolute; color: #ededed">
+    <ogtext/>
+  </scraper>
+  <!--script>
+    const element = document.getElementById('scraper');
+    //element.parentElement.removeChild(element);
+  </script-->
+</body>
+
+</html>
